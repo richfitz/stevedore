@@ -1,0 +1,12 @@
+Package: stevedore
+Title: Docker Client
+Version: 0.0.1
+Description: Work with containers over the Docker 'API'.
+License: MIT + file LICENSE
+Author: Rich FitzJohn
+Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+Imports:
+    curl,
+    jsonlite
+Suggests:
+    testthat
