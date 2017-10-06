@@ -1,0 +1,3 @@
+DEFAULT_DOCKER_API_VERSION <- "1.30"
+DEFAULT_DOCKER_UNIX_SOCKET <- "/var/run/docker.sock"
+DEFAULT_USER_AGENT <- "stevedore/0.0.0"
