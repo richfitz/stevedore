@@ -43,7 +43,7 @@ R6_api_client <- R6::R6Class(
     api_version = NULL,
     base_url = NULL,
 
-    initialize = function(base_url = NULL, version = NULL) {
+    initialize = function(base_url = NULL, api_version = NULL) {
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
       self$handle <- handle(base_url)
       self$api_version <- version %||% DEFAULT_DOCKER_API_VERSION
