@@ -7,6 +7,7 @@ Author: Rich FitzJohn
 Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 Imports:
     curl,
-    jsonlite
+    jsonlite,
+    yaml
 Suggests:
     testthat
