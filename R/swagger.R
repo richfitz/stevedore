@@ -51,15 +51,24 @@ make_endpoint <- function(path, method, spec, client) {
     path = path,
     path_args = p$args,
     method = tolower(method),
-    endpoint = function(path_params, query_params) {
+    response_handlers = response_handlers,
+    endpoint = function(path_params, query_params, pass_error = NULL) {
       ## TODO: for non-GET methods there is a body to deal with here too.
       url <- client$url(sprintfn(p$fmt, path_params), params = query_params)
-      res <- client$request(method, url, as = "response")
-      handler <- response_handlers[[as.character(res$status_code)]]
-      if (is.null(handler)) {
-        stop("unexpected response code ", res$status_code)
+      res <- client$request2(method, url)
+      status_code <- res$status_code
+      if (status_code < 300) {
+        handler <- response_handlers[[as.character(res$status_code)]]
+        if (is.null(handler)) {
+          stop("unexpected response code ", res$status_code)
+        }
+        handler(from_json(response_text(res$content)))
+      } else if (status_code %in% pass_error) {
+        list(status_code = status_code,
+             message = response_to_json(res)$message)
+      } else {
+        response_to_error(res)
       }
-      handler(from_json(response_text(res$data$content)))
     })
 }
 
@@ -94,22 +103,22 @@ make_response_handler_array <- function(schema, spec) {
 
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
-  opt <- setdiff(cols, items$required)
-  if (length(opt)) {
-    stop("optional properties not supported")
-  }
 
   type <- vcapply(items$properties, "[[", "type")
   atomic <- list("string" = character(1),
                  "integer" = integer(1))
+  missing <- lapply(atomic, as_na)
   cols_atomic <- names(type)[type %in% names(atomic)]
   cols_object <- setdiff(cols, cols_atomic)
 
+  ## NOTE: we could filter the use of 'pick' via whether things are
+  ## actually optional but I don't think there's much gained there.
   f_atomic <- function(v, data) {
-    vapply(data, "[[", atomic[[type[[v]]]], v, USE.NAMES = FALSE)
+    vapply(data, pick, atomic[[type[[v]]]], v, missing[[type[[v]]]],
+           USE.NAMES = FALSE)
   }
   f_object <- function(v, data) {
-    I(lapply(data, "[[", v))
+    I(lapply(data, pick, v, NULL))
   }
 
   function(data) {

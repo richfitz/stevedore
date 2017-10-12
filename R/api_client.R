@@ -21,9 +21,13 @@ make_handle <- function(base_url) {
 }
 
 response_to_error <- function(response) {
-  msg <- from_json(response$content)$message
+  msg <- from_json(response_text(response$content))$message
   code <- response$status_code
-  stop(sprintf("%s: (code %d)", msg, code))
+  stop(sprintf("%s (code %d)", msg, code))
+}
+
+response_to_json <- function(response) {
+  from_json(response_text(response$content))
 }
 
 response_result <- function(response, as = "text", stop_on_error = TRUE) {
