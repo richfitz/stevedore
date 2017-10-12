@@ -38,11 +38,9 @@ make_endpoint <- function(path, method, spec, client) {
   force(client)
 
   x <- spec$paths[[path]][[method]]
-  if (!identical(x$produces, "application/json")) {
-    stop("non-json endpoints need more work")
-  }
 
-  response_handlers <- make_response_handlers(x$responses, spec)
+  response_handlers <- make_response_handlers(x$responses, spec, x$produces)
+
   p <- parse_path(path)
 
   method <- toupper(method)
@@ -62,7 +60,7 @@ make_endpoint <- function(path, method, spec, client) {
         if (is.null(handler)) {
           stop("unexpected response code ", res$status_code)
         }
-        handler(from_json(response_text(res$content)))
+        handler(res$content)
       } else if (status_code %in% pass_error) {
         list(status_code = status_code,
              message = response_to_json(res)$message)
@@ -72,9 +70,21 @@ make_endpoint <- function(path, method, spec, client) {
     })
 }
 
-make_response_handlers <- function(responses, spec) {
-  lapply(responses[as.integer(names(responses)) < 300],
-         make_response_handler, spec)
+make_response_handlers <- function(responses, spec, produces) {
+  if (length(produces) > 1) {
+    stop("Multi-output production needs work")
+  }
+  responses <- responses[as.integer(names(responses)) < 300]
+  binary_types <- c("application/octet-stream",
+                    "application/x-tar")
+
+  if (produces == "application/json") {
+    lapply(responses, make_response_handler, spec)
+  } else if (produces %in% binary_types) {
+    lapply(responses, function(.) identity)
+  } else {
+    stop("Unhandled response type ", produces)
+  }
 }
 
 make_response_handler <- function(response, spec) {
@@ -121,7 +131,10 @@ make_response_handler_array_object <- function(items, spec) {
     I(lapply(data, pick, v, NULL))
   }
 
-  function(data) {
+  function(data, convert = TRUE) {
+    if (convert) {
+      data <- from_json(response_text(data))
+    }
     ret <- vector("list", length(type))
     names(ret) <- cols
     ret[cols_atomic] <- lapply(cols_atomic, f_atomic, data)
