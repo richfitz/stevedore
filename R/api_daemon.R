@@ -1,24 +1,24 @@
-daemon_df <- function(api_client) {
-  url <- api_client$url('/system/df')
-  api_client$GET(url, as = "json")
+daemon_df <- function(client) {
+  url <- client$url('/system/df')
+  client$GET(url, as = "json")$data
 }
-daemon_info <- function(api_client) {
-  url <- api_client$url('/info')
-  api_client$GET(url, as = "json")
+daemon_info <- function(client) {
+  url <- client$url('/info')
+  client$GET(url, as = "json")$data
 }
-daemon_ping <- function(api_client) {
-  url <- api_client$url('/_ping')
-  api_client$GET(url, as = "text") == "OK"
+daemon_ping <- function(client) {
+  url <- client$url('/_ping')
+  client$GET(url, as = "text")$data == "OK"
 }
-daemon_version <- function(api_client) {
-  url <- api_client$url('/version')
-  api_client$GET(url, as = "json")
+daemon_version <- function(client, versioned_api = TRUE) {
+  url <- client$url('/version', versioned_api = versioned_api)
+  client$GET(url, as = "json")$data
 }
 
 ## These can wait:
-daemon_events <- function(api_client) {
+daemon_events <- function(client) {
   .NotYetImplemented()
 }
-daemon_login <- function(api_client) {
+daemon_login <- function(client) {
   .NotYetImplemented()
 }

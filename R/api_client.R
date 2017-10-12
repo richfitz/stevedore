@@ -13,17 +13,33 @@ handle <- function(base_url) {
   h
 }
 
-response_result <- function(response, as = "text", stop_on_error = TRUE) {
-  if (stop_on_error && response$status_code >= 300) {
-    stop("Error code ", response$status_code)
+make_handle <- function(base_url) {
+  force(base_url)
+  function() {
+    handle(base_url)
   }
-  switch(
+}
+
+response_to_error <- function(response) {
+  msg <- from_json(response$content)$message
+  code <- response$status_code
+  stop(sprintf("%s: (code %d)", msg, code))
+}
+
+response_result <- function(response, as = "text", stop_on_error = TRUE) {
+  status_code <- response$status_code
+  success <- status_code < 300
+  if (stop_on_error && !success) {
+    response_to_error(response)
+  }
+  data <- switch(
     as,
     response = response,
     raw = response$content,
     text = response_text(response$content),
     json = from_json(response_text(response$content)),
     stop("Invalid response type"))
+  list(success = success, status_code = status_code, data = data)
 }
 
 from_json <- function(x) {
@@ -42,12 +58,20 @@ R6_api_client <- R6::R6Class(
     handle = NULL,
     api_version = NULL,
     base_url = NULL,
+    ## handle = NULL,
 
     initialize = function(base_url = NULL, api_version = NULL) {
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
       self$handle <- handle(base_url)
-      self$api_version <- version %||% DEFAULT_DOCKER_API_VERSION
       self$base_url <- "http://localhost"
+      if (is.null(api_version)) {
+        api_version <- daemon_version(self, FALSE)$ApiVersion
+      }
+      if (!identical(api_version, FALSE)) {
+        ## TODO: santise this properly
+        numeric_version(api_version) # or throw
+        self$api_version <- api_version
+      }
     },
     GET = function(...) {
       self$request("GET", ...)
@@ -66,17 +90,30 @@ R6_api_client <- R6::R6Class(
     },
     request = function(verb, url, as = "text", stop_on_error = TRUE) {
       curl::handle_setopt(self$handle, customrequest = verb)
-      on.exit(curl::handle_reset(self$handle))
       res <- curl::curl_fetch_memory(url, self$handle)
       response_result(res, as, stop_on_error)
     },
-    url = function(..., versioned_api = FALSE) {
-      ## TODO: Quote the query fragment of a URL; replacing ' ' with '+'
-      path <- paste(c(...), collapse = "/")
-      if (versioned_api) {
-        sprintf("%s/v%s%s", self$base_url, self$api_version, path)
-      } else {
-        sprintf("%s%s", self$base_url, path)
-      }
+    request2 = function(verb, url) {
+      curl::handle_setopt(self$handle, customrequest = verb)
+      curl::curl_fetch_memory(url, self$handle)
+    },
+    url = function(path, ..., params = NULL, versioned_api = FALSE) {
+      v <- if (versioned_api) self$api_version else NULL
+      build_url(self$base_url, v, sprintf(path, ...), params)
     }
   ))
+
+build_url <- function(base_url, api_version, path, params = NULL) {
+  ## TODO: I think there is some quoting required here! (space -> ' '
+  ## etc)
+  if (length(params) > 0L) {
+    q <- paste(sprintf("%s=%s", names(params), vcapply(params, identity)),
+               collapse = "&")
+    path <- sprintf("%s?%s", path, q)
+  }
+  if (is.null(api_version)) {
+    sprintf("%s%s", base_url, path)
+  } else {
+    sprintf("%s/v%s%s", base_url, api_version, path)
+  }
+}
