@@ -111,6 +111,9 @@ build_url <- function(base_url, api_version, path, params = NULL) {
   ## TODO: I think there is some quoting required here! (space -> ' '
   ## etc)
   if (length(params) > 0L) {
+    stopifnot(is.list(params),
+              !is.null(names(params)),
+              all(nzchar(names(params))))
     q <- paste(sprintf("%s=%s", names(params), vcapply(params, identity)),
                collapse = "&")
     path <- sprintf("%s?%s", path, q)

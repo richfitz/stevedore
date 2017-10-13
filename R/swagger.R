@@ -89,14 +89,58 @@ make_response_handlers <- function(responses, spec, produces) {
 
 make_response_handler <- function(response, spec) {
   schema <- resolve_schema_ref(response, "schema", spec)$schema
-  if (schema$type == "array") {
+  if (schema$type == "object") {
+    make_response_handler_object(schema, spec)
+  } else if (schema$type == "array") {
     make_response_handler_array(schema, spec)
+  } else if (schema$type == "object") {
+    make_response_handler_object(schema, spec)
   } else {
     message("make_Response_Handler")
     browser()
     ## if (schema$type == "object") {
     ##   make_response_handler_object(schema, spec)
     ## } else {
+  }
+}
+
+make_response_handler_object <- function(schema, spec) {
+  els <- names(schema$properties)
+  properties <- lapply(els, resolve_schema_ref, defn = schema, spec = spec)
+  type <- vcapply(properties, "[[", "type")
+
+  if (any(type == "array")) {
+    message("fix array type in object")
+    browser()
+    stop()
+  }
+
+  atomic <- list("string" = character(1),
+                 "integer" = integer(1))
+  missing <- lapply(atomic, as_na)
+  els_atomic <- names(type)[type %in% names(atomic)]
+  els_object <- setdiff(els, els_atomic)
+
+  ## NOTE: we could filter the use of 'pick' via whether things are
+  ## actually optional but I don't think there's much gained there.
+  f_atomic <- function(v, data) {
+    pick(data, v, missing[[type[[v]]]])
+  }
+  f_object <- function(v, data) {
+    pick(data, v, NULL)
+  }
+
+  data <- spec$paths[["/images/{name}/json"]]$get$responses[["200"]]$examples[[1]]
+
+  function(data, convert = TRUE) {
+    if (convert) {
+      data <- from_json(response_text(data))
+    }
+    ret <- vector("list", length(type))
+    names(ret) <- els
+    ret[els_atomic] <- lapply(els_atomic, f_atomic, data)
+    ret[els_object] <- lapply(els_object, f_object, data)
+    ret
   }
 }
 
@@ -113,8 +157,15 @@ make_response_handler_array <- function(schema, spec) {
 
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
+  properties <- lapply(cols, resolve_schema_ref, defn = items, spec = spec)
+  type <- vcapply(properties, "[[", "type")
 
-  type <- vcapply(items$properties, "[[", "type")
+  if (any(type == "array")) {
+    message("fix array type in array[object]")
+    browser()
+    stop()
+  }
+
   atomic <- list("string" = character(1),
                  "integer" = integer(1))
   missing <- lapply(atomic, as_na)
