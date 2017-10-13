@@ -164,26 +164,41 @@ make_response_handler_array <- function(schema, spec) {
 
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
-  properties <- lapply(cols, resolve_schema_ref, defn = items, spec = spec)
+  ## This is ugly and quite roundabout.  We'd be better off just
+  ## looping through this more directly.  I'd like to know if this is
+  ## actually used anywhere first - it's going to fail nicely when it
+  ## used though because the vcapply will fail.  Then counter test it
+  ## with /images/json
+  ##
+  ## properties <-
+  ##   lapply(cols, function(x)
+  ##     resolve_schema_ref(items$properties, x, spec)[[x]])
+  properties <- items$properties
   type <- vcapply(properties, "[[", "type")
-
-  if (any(type == "array")) {
-    message("fix array type in array[object]")
-    browser()
-    stop()
-  }
 
   atomic <- list("string" = character(1),
                  "integer" = integer(1))
   missing <- lapply(atomic, as_na)
+  empty <- lapply(atomic, "[", 0L)
+
   cols_atomic <- names(type)[type %in% names(atomic)]
-  cols_object <- setdiff(cols, cols_atomic)
+  cols_array <- names(type)[vlapply(properties, function(x)
+    x$type == "array" && x$items %in% names(atomic))]
+  cols_object <- setdiff(cols, c(cols_atomic, cols_array))
 
   ## NOTE: we could filter the use of 'pick' via whether things are
   ## actually optional but I don't think there's much gained there.
   f_atomic <- function(v, data) {
     vapply(data, pick, atomic[[type[[v]]]], v, missing[[type[[v]]]],
            USE.NAMES = FALSE)
+  }
+  f_array <- function(v, data) {
+    ret <- lapply(data, pick, v, NULL)
+    i <- lengths(ret) == 0
+    if (any(i)) {
+      ret[i] <- list(empty[[properties[[v]]$items$type]])
+    }
+    I(ret)
   }
   f_object <- function(v, data) {
     I(lapply(data, pick, v, NULL))
@@ -197,6 +212,7 @@ make_response_handler_array_object <- function(items, spec) {
     names(ret) <- cols
     ret[cols_atomic] <- lapply(cols_atomic, f_atomic, data)
     ret[cols_object] <- lapply(cols_object, f_object, data)
+    ret[cols_array]  <- lapply(cols_array,  f_array,  data)
     ret <- as.data.frame(ret, stringsAsFactors = FALSE)
     ret
   }
