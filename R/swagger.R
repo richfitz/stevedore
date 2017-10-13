@@ -71,7 +71,12 @@ make_endpoint <- function(path, method, spec, client) {
 }
 
 make_response_handlers <- function(responses, spec, produces) {
-  if (length(produces) > 1) {
+  if (length(produces) == 0L) {
+    ## /system/df - not sure about others
+    message("assuming json endpoint")
+    produces <- "application/json"
+  } else if (length(produces) > 1) {
+    browser()
     stop("Multi-output production needs work")
   }
   responses <- responses[as.integer(names(responses)) < 300]
@@ -81,7 +86,9 @@ make_response_handlers <- function(responses, spec, produces) {
   if (produces == "application/json") {
     lapply(responses, make_response_handler, spec)
   } else if (produces %in% binary_types) {
-    lapply(responses, function(.) identity)
+    lapply(responses, make_response_handler_binary)
+  } else if (produces == "text/plain") {
+    lapply(responses, make_response_handler_text)
   } else {
     stop("Unhandled response type ", produces)
   }
@@ -195,6 +202,20 @@ make_response_handler_array_object <- function(items, spec) {
   }
 }
 
+make_response_handler_binary <- function(...) {
+  function(data, convert = TRUE) {
+    data
+  }
+}
+
+make_response_handler_text <- function(...) {
+  function(data, convert = TRUE) {
+    if (convert) {
+      data <- response_text(data)
+    }
+    data
+  }
+}
 
 
 ## This is going to dynamically build up a function out of a set of
