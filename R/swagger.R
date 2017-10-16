@@ -34,17 +34,20 @@
 ##              "application/vnd.docker.raw-stream" = "response",
 ##              "raw") # I think
 
-make_endpoint <- function(path, method, spec, client) {
+make_endpoint <- function(method, path, spec, client) {
   force(client)
 
   x <- spec$paths[[path]][[method]]
 
-  response_handlers <- make_response_handlers(x$responses, spec, x$produces)
+  produces <- get_response_type(method, path, x)
+  response_handlers <- make_response_handlers(x$responses, spec, produces)
 
   p <- parse_path(path)
 
   method <- toupper(method)
 
+  ## TODO: it might make sense to pull client out as a separate
+  ## argument, rather than being captured, here?
   list(
     path = path,
     path_args = p$args,
@@ -70,22 +73,31 @@ make_endpoint <- function(path, method, spec, client) {
     })
 }
 
-make_response_handlers <- function(responses, spec, produces) {
+get_response_type <- function(method, path, data) {
+  if (is.null(data)) {
+    stop("stevedore bug")
+  }
+  produces <- data$produces
   if (length(produces) == 0L) {
+    responses <- data$responses
     if (any(vlapply(responses[as.integer(names(responses)) < 300],
                     function(x) "schema" %in% names(x)))) {
-      message("assuming json endpoint")
       ## GET /system/df - not sure about others
       produces <- "application/json"
     } else {
-      message("assuming text endpoint")
       ## DELETE /networks/{id}
       produces <- "text/plain"
     }
+    message(sprintf("assuming %s endpoint for %s %s",
+                    produces, toupper(method), path))
   } else if (length(produces) > 1) {
     browser()
     stop("Multi-output production needs work")
   }
+  produces
+}
+
+make_response_handlers <- function(responses, spec, produces) {
   responses <- responses[as.integer(names(responses)) < 300]
   binary_types <- c("application/octet-stream",
                     "application/x-tar")
