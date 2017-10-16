@@ -229,124 +229,6 @@ make_response_handler_text <- function(...) {
   }
 }
 
-
-## This is going to dynamically build up a function out of a set of
-## *path* parameters and *query* parameters.  Eventually this needs
-## expanding to support body as well and custom handers for different
-## parameters (and also the body); otherwise these have to come in as
-## json directly which is inconvenient!
-##
-## process is a function(path, params)
-make_reciever <- function(method, path, parameters, client,
-                          base = parent.frame()) {
-  env <- new.env(parent = base)
-  env$client <- client
-
-
-  path_parts <- parse_path(path)
-
-  if (length(path_parts) == 0) {
-    call_path <- path_parts$fmt
-  } else {
-    call_path <- as.call(c(
-      quote(sprintf),
-      path_parts$fmt,
-      lapply(path_parts$args, as.symbol)))
-  }
-  if (length(parameters) == 0L) {
-    call_parameters <- NULL
-  } else {
-    call_parameters <- as.call(c(
-      quote(list),
-      setNames(lapply(parameters, as.symbol), parameters)))
-  }
-  call_url <- as.call(c(quote(client$url), call_path, params = call_parameters))
-  call_method <- as.call(c(quote(`$`),
-                           quote(client),
-                           as.symbol(toupper(method))))
-  call_do <- as.call(c(call_method, quote(url), as = "json"))
-
-  body <- bquote({
-    url <- .(call_url)
-    res <- .(call_do)
-
-  })
-
-  ## bquote(url <- .(method))
-
-  ## body <- as.call(c(
-  ##   quote(`{`),
-  ##   bquote(url <- .(call_url))
-  ##   quote(
-
-  ##   as.call(c(if (is.symbol(process)) process else quote(process),
-  ##             path_format = path_parts$fmt,
-  ##             path_parts = call_path,
-  ##             parameters = call_parameters))))
-  ## dat <- c(setNames(rep(alist(. = ), length(path)), path),
-  ##          setNames(rep(alist(. = NULL), length(parameters)), parameters),
-  ##          body)
-
-  as.function(dat, env)
-}
-
-make_process <- function(client) {
-  force(client)
-  function(path_format, path_parts, parameters, method) {
-
-    url <- client$build_url(path, parameters[!vlapply(parameters, is.null)])
-    dat <- client[[method]](url, as = "json")
-  }
-}
-
-
-
-## make_target <- function(name, method, spec, error, query) {
-##   x <- spec$paths[[name]][[method]]
-##   if (grepl("{", path, fixed = TRUE)) {
-
-##     browser()
-##   }
-
-##   pars <- x$parameters
-##   if (!all(vcapply(pars, "[[", "in") == "query")) {
-##     stop("handle non query parameters")
-##   }
-
-##   default <- lapply(pars, "[[", "default")
-##   names(default) <- vcapply(pars, "[[", "name")
-
-##   ## The first step is to make something that does each of the steps
-##   ## individually:
-##   ##
-##   ## * 1. build the payload (for GET that's just the URL)
-##   ## * 2. handle the output
-##   ##
-##   ## Then we pass a client into this and do the whole query
-
-##   nms <- vcapply(pars, "[[", "name")
-##   as.expression(setNames(lapply(nms, as.symbol), nms))
-
-##   p <- vector("list", length(pars))
-##   names(p) <- vcapply(pars, "[[", "name")
-##   body <- bquote({
-##     pars <- list(.(x))
-##   })
-## }
-
-## What we're looking for is some way of converting an
-## array-of-objects into a data.frame.  So let's assume that we
-## already know that's the situation and work back from there.
-
-## I want to be fairly chill about how much of a full-on swagger
-## parser we werite here - I just generally want to simplify how we
-## push things in here.
-
-## TODO: naming here needs to be made better - this is more a "result
-## handler" and the type is really an "object container".
-
-## TODO: assertions so that this is only applied to array(object)
-
 resolve_schema_ref <- function(defn, v, spec) {
   if (identical(names(defn[[v]]), "$ref")) {
     ref <- strsplit(sub("^#/", "", defn[[v]][["$ref"]]), "/",
@@ -365,8 +247,6 @@ resolve_schema_ref2 <- function(x, spec) {
   }
   x
 }
-
-
 
 parse_path <- function(x) {
   re <- "\\{([^}]+)\\}"
