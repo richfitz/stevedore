@@ -112,32 +112,32 @@ make_response_handler <- function(response, spec) {
 }
 
 make_response_handler_object <- function(schema, spec) {
+  ## TODO: there's considerable overlap here with
+  ## 'make_response_handler_array_object', though it's not *quite* the
+  ## same and I don't know if the code can sensibly be shared.
   els <- names(schema$properties)
-  properties <- lapply(els, resolve_schema_ref, defn = schema, spec = spec)
+
+  properties <- lapply(schema$properties, resolve_schema_ref2, spec)
   type <- vcapply(properties, "[[", "type")
 
-  if (any(type == "array")) {
-    message("fix array type in object")
-    browser()
-    stop()
-  }
+  atomic <- atomic_types()
 
-  atomic <- list("string" = character(1),
-                 "integer" = integer(1))
-  missing <- lapply(atomic, as_na)
-  els_atomic <- names(type)[type %in% names(atomic)]
-  els_object <- setdiff(els, els_atomic)
+  els_atomic <- names(type)[type %in% atomic$names]
+  els_array <- names(type)[vlapply(properties, function(x)
+    x$type == "array" && x$items %in% atomic$names)]
+  els_object <- setdiff(els, c(els_atomic, els_array))
 
   ## NOTE: we could filter the use of 'pick' via whether things are
   ## actually optional but I don't think there's much gained there.
   f_atomic <- function(v, data) {
-    pick(data, v, missing[[type[[v]]]])
+    pick(data, v, atomic$missing[[type[[v]]]])
+  }
+  f_array <- function(v, data) {
+    pick(data, v, NULL) %||% atomic$empty[[properties[[v]]$items$type]]
   }
   f_object <- function(v, data) {
     pick(data, v, NULL)
   }
-
-  data <- spec$paths[["/images/{name}/json"]]$get$responses[["200"]]$examples[[1]]
 
   function(data, convert = TRUE) {
     if (convert) {
@@ -147,6 +147,7 @@ make_response_handler_object <- function(schema, spec) {
     names(ret) <- els
     ret[els_atomic] <- lapply(els_atomic, f_atomic, data)
     ret[els_object] <- lapply(els_object, f_object, data)
+    ret[els_array]  <- lapply(els_array,  f_array,  data)
     ret
   }
 }
@@ -164,39 +165,27 @@ make_response_handler_array <- function(schema, spec) {
 
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
-  ## This is ugly and quite roundabout.  We'd be better off just
-  ## looping through this more directly.  I'd like to know if this is
-  ## actually used anywhere first - it's going to fail nicely when it
-  ## used though because the vcapply will fail.  Then counter test it
-  ## with /images/json
-  ##
-  ## properties <-
-  ##   lapply(cols, function(x)
-  ##     resolve_schema_ref(items$properties, x, spec)[[x]])
-  properties <- items$properties
+  properties <- lapply(items$properties, resolve_schema_ref2, spec)
   type <- vcapply(properties, "[[", "type")
 
-  atomic <- list("string" = character(1),
-                 "integer" = integer(1))
-  missing <- lapply(atomic, as_na)
-  empty <- lapply(atomic, "[", 0L)
+  atomic <- atomic_types()
 
-  cols_atomic <- names(type)[type %in% names(atomic)]
+  cols_atomic <- names(type)[type %in% atomic$names]
   cols_array <- names(type)[vlapply(properties, function(x)
-    x$type == "array" && x$items %in% names(atomic))]
+    x$type == "array" && x$items %in% atomic$names)]
   cols_object <- setdiff(cols, c(cols_atomic, cols_array))
 
   ## NOTE: we could filter the use of 'pick' via whether things are
   ## actually optional but I don't think there's much gained there.
   f_atomic <- function(v, data) {
-    vapply(data, pick, atomic[[type[[v]]]], v, missing[[type[[v]]]],
+    vapply(data, pick, atomic$type[[type[[v]]]], v, atomic$missing[[type[[v]]]],
            USE.NAMES = FALSE)
   }
   f_array <- function(v, data) {
     ret <- lapply(data, pick, v, NULL)
     i <- lengths(ret) == 0
     if (any(i)) {
-      ret[i] <- list(empty[[properties[[v]]$items$type]])
+      ret[i] <- list(atomic$empty[[properties[[v]]$items$type]])
     }
     I(ret)
   }
@@ -360,6 +349,16 @@ resolve_schema_ref <- function(defn, v, spec) {
   defn
 }
 
+## This one is probably the one to actually use.
+resolve_schema_ref2 <- function(x, spec) {
+  if (identical(names(x), "$ref")) {
+    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/",
+                    fixed = TRUE)[[1]]
+    x <- spec[[ref]]
+  }
+  x
+}
+
 
 
 parse_path <- function(x) {
@@ -382,4 +381,17 @@ sprintfn <- function(fmt, args) {
          "0" = fmt,
          "1" = sprintf(fmt, args),
          "2" = sprintf(fmt, args[[1]], args[[2]]))
+}
+
+atomic_types <- function() {
+  type <- list("string"  = character(1),
+               "number"  = numeric(1),
+               "integer" = integer(1),
+               "boolean" = logical(1))
+  missing <- lapply(type, as_na)
+  empty <- lapply(type, "[", 0L)
+  list(names = names(type),
+       type = type,
+       missing = missing,
+       empty = empty)
 }
