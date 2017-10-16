@@ -72,9 +72,16 @@ make_endpoint <- function(path, method, spec, client) {
 
 make_response_handlers <- function(responses, spec, produces) {
   if (length(produces) == 0L) {
-    ## /system/df - not sure about others
-    message("assuming json endpoint")
-    produces <- "application/json"
+    if (any(vlapply(responses[as.integer(names(responses)) < 300],
+                    function(x) "schema" %in% names(x)))) {
+      message("assuming json endpoint")
+      ## GET /system/df - not sure about others
+      produces <- "application/json"
+    } else {
+      message("assuming text endpoint")
+      ## DELETE /networks/{id}
+      produces <- "text/plain"
+    }
   } else if (length(produces) > 1) {
     browser()
     stop("Multi-output production needs work")
