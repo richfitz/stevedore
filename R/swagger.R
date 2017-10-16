@@ -50,10 +50,10 @@ make_endpoint <- function(path, method, spec, client) {
     path_args = p$args,
     method = tolower(method),
     response_handlers = response_handlers,
-    endpoint = function(path_params, query_params, pass_error = NULL) {
-      ## TODO: for non-GET methods there is a body to deal with here too.
+    endpoint = function(path_params, query_params,
+                        body = NULL, pass_error = NULL) {
       url <- client$url(sprintfn(p$fmt, path_params), params = query_params)
-      res <- client$request2(method, url)
+      res <- client$request2(method, url, body)
       status_code <- res$status_code
       if (status_code < 300) {
         handler <- response_handlers[[as.character(res$status_code)]]

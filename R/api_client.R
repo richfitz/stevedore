@@ -6,17 +6,18 @@
 ##
 ## This section will hold all the low-level communication bits
 
-handle <- function(base_url) {
+handle <- function(base_url, headers = NULL) {
+  headers <- c("User-Agent" = DEFAULT_USER_AGENT, headers)
   h <- curl::new_handle()
   curl::handle_setopt(h, UNIX_SOCKET_PATH = base_url)
-  curl::handle_setheaders(h, c("User-Agent" = DEFAULT_USER_AGENT))
+  curl::handle_setheaders(h, .list = headers)
   h
 }
 
 make_handle <- function(base_url) {
   force(base_url)
-  function() {
-    handle(base_url)
+  function(...) {
+    handle(base_url, ...)
   }
 }
 
@@ -62,11 +63,10 @@ R6_api_client <- R6::R6Class(
     handle = NULL,
     api_version = NULL,
     base_url = NULL,
-    ## handle = NULL,
 
     initialize = function(base_url = NULL, api_version = NULL) {
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
-      self$handle <- handle(base_url)
+      self$handle <- make_handle(base_url)
       self$base_url <- "http://localhost"
       if (is.null(api_version)) {
         api_version <- daemon_version(self, FALSE)$ApiVersion
@@ -93,13 +93,25 @@ R6_api_client <- R6::R6Class(
       self$request("DELETE", ...)
     },
     request = function(verb, url, as = "text", stop_on_error = TRUE) {
-      curl::handle_setopt(self$handle, customrequest = verb)
-      res <- curl::curl_fetch_memory(url, self$handle)
+      h <- self$handle()
+      curl::handle_setopt(h, customrequest = verb)
+      res <- curl::curl_fetch_memory(url, h)
       response_result(res, as, stop_on_error)
     },
-    request2 = function(verb, url) {
-      curl::handle_setopt(self$handle, customrequest = verb)
-      curl::curl_fetch_memory(url, self$handle)
+    request2 = function(verb, url, body = NULL) {
+      if (!is.null(body)) {
+        body_raw <- charToRaw(body)
+        h <- self$handle(headers = c("Content-Type" = "application/json"))
+        curl::handle_setopt(h,
+                            post = TRUE,
+                            postfieldsize = length(body_raw),
+                            postfields = body_raw,
+                            customrequest = verb)
+      } else {
+        h <- self$handle()
+        curl::handle_setopt(h, customrequest = verb)
+      }
+      curl::curl_fetch_memory(url, h)
     },
     url = function(path, ..., params = NULL, versioned_api = FALSE) {
       v <- if (versioned_api) self$api_version else NULL
