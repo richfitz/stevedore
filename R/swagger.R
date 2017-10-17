@@ -35,6 +35,7 @@
 ##              "raw") # I think
 
 make_endpoint <- function(method, path, spec) {
+  message(sprintf("%s %s", toupper(method), path))
   path_data <- parse_path(path)
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
@@ -115,7 +116,9 @@ make_response_handlers <- function(responses, spec, produces) {
 make_response_handler <- function(response, spec) {
   schema <- resolve_schema_ref(response$schema, spec)
 
-  if (schema$type == "object") {
+  if (is.null(schema)) {
+    make_response_handler_null()
+  } else if (schema$type == "object") {
     make_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
     make_response_handler_array(schema, spec)
@@ -130,6 +133,16 @@ make_response_handler <- function(response, spec) {
   }
 }
 
+make_response_handler_null <- function() {
+  function(data, convert = TRUE) {
+    if (length(data) > 0L) {
+      message("Expected an empty response")
+      browser()
+    }
+    invisible(NULL)
+  }
+}
+
 make_response_handler_object <- function(schema, spec) {
   ## TODO: there's considerable overlap here with
   ## 'make_response_handler_array_object', though it's not *quite* the
@@ -137,13 +150,13 @@ make_response_handler_object <- function(schema, spec) {
   els <- names(schema$properties)
 
   properties <- lapply(schema$properties, resolve_schema_ref, spec)
-  type <- vcapply(properties, "[[", "type")
+  type <- vcapply(properties, schema_get_type)
 
   atomic <- atomic_types()
 
   els_atomic <- names(type)[type %in% atomic$names]
   els_array <- names(type)[vlapply(properties, function(x)
-    x$type == "array" && x$items %in% atomic$names)]
+    schema_get_type(x) == "array" && x$items %in% atomic$names)]
   els_object <- setdiff(els, c(els_atomic, els_array))
 
   ## NOTE: we could filter the use of 'pick' via whether things are
@@ -185,7 +198,7 @@ make_response_handler_array <- function(schema, spec) {
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
   properties <- lapply(items$properties, resolve_schema_ref, spec)
-  type <- vcapply(properties, "[[", "type")
+  type <- vcapply(properties, schema_get_type)
 
   atomic <- atomic_types()
 
@@ -282,4 +295,16 @@ atomic_types <- function() {
        type = type,
        missing = missing,
        empty = empty)
+}
+
+schema_get_type <- function(x) {
+  ret <- x$type
+  if (is.null(ret)) {
+    if ("allOf" %in% names(x)) {
+      ret <- "object"
+    } else {
+      stop("Could not determine type")
+    }
+  }
+  ret
 }

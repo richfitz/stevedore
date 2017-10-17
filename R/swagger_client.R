@@ -15,7 +15,7 @@ endpoints <-
        ## GET /containers/{id}/logs (hijack)
        container_list       = c("get",    "/containers/json"),
        container_create     = c("post",   "/containers/create"),
-       ## container_inspect = c("get",    "/containers/{id}/json"),
+       container_inspect    = c("get",    "/containers/{id}/json"),
        container_top        = c("get",    "/containers/{id}/top"),
        container_export     = c("get",    "/containers/{id}/export"),
        container_changes    = c("get",    "/containers/{id}/changes"),
@@ -36,7 +36,7 @@ endpoints <-
        container_prune      = c("post",   "/containers/prune"),
 
        image_list           = c("get",    "/images/json"),
-       ## image_build          = c("post",   "/build"),
+       image_build          = c("post",   "/build"),
        ## image_create         = c("post",   "/images/create"),
        image_inspect        = c("get",    "/images/{name}/json"),
        image_history        = c("get",    "/images/{name}/history"),
@@ -64,6 +64,7 @@ endpoints <-
        volume_delete        = c("delete", "/volumes/{name}"),
        volume_prune         = c("post",   "/volumes/prune"),
 
+       ## POST /exec/{id}/start (hijack?)
        exec_create          = c("post",   "/containers/{id}/exec"),
        ## exec_start           = c("post",   "/exec/{id}/start"),
        exec_resize          = c("post",   "/exec/{id}/resize"),

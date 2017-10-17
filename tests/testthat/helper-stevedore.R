@@ -16,14 +16,14 @@ run_sample_response <- function(x, spec) {
       if (!is.null(ex)) {
         found_example <- TRUE
         message(crayon::blue("  - ", code))
-        expect_silent(x$response_handlers[[code]](ex, FALSE))
+        testthat::expect_silent(x$response_handlers[[code]](ex, FALSE))
       }
       ex <- response[["examples"]]
       if (!is.null(ex)) {
         found_example <- TRUE
         message(crayon::blue("  - ", code))
         for (e in ex) {
-          expect_silent(x$response_handlers[[code]](ex, FALSE))
+          testthat::expect_silent(x$response_handlers[[code]](ex, FALSE))
         }
       }
       if (!found_example) {
