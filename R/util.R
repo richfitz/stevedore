@@ -33,3 +33,10 @@ pick <- function(x, el, missing) {
     missing
   }
 }
+
+set_attributes <- function(x, attr) {
+  for (i in names(attr)) {
+    attr(x, i) <- attr[[i]]
+  }
+  x
+}

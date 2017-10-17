@@ -136,3 +136,13 @@ build_url <- function(base_url, api_version, path, params = NULL) {
     sprintf("%s/v%s%s", base_url, api_version, path)
   }
 }
+
+parse_headers <- function(headers) {
+  re <- ":\\s+"
+  h <- curl::parse_headers(headers)
+  d <- strsplit(h[grepl(re, h)], ":\\s+")
+  nms <- vcapply(d, "[[", 1L)
+  vals <- vcapply(d, "[[", 2L)
+  names(vals) <- nms
+  vals
+}

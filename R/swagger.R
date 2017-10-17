@@ -40,17 +40,25 @@ make_endpoint <- function(method, path, spec) {
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
   response_handlers <- make_response_handlers(x$responses, spec, produces)
+  header_handlers <- make_header_handlers(x$responses, spec)
+  endpoint <- make_endpoint_function(path_data, method,
+                                     response_handlers,
+                                     header_handlers)
+
   list(
     path = path,
     path_args = path_data$args,
     method = tolower(method),
     response_handlers = response_handlers,
-    endpoint = make_endpoint_function(path_data, method, response_handlers))
+    header_handlers = header_handlers,
+    endpoint = endpoint)
 }
 
-make_endpoint_function <- function(path_data, method, response_handlers) {
+make_endpoint_function <- function(path_data, method, response_handlers,
+                                   header_handlers) {
   method <- toupper(method)
   force(response_handlers)
+  force(header_handlers)
   path_fmt <- path_data$fmt
 
   function(client, path_params, query_params,
@@ -59,11 +67,17 @@ make_endpoint_function <- function(path_data, method, response_handlers) {
     res <- client$request2(method, url, body)
     status_code <- res$status_code
     if (status_code < 300) {
-      handler <- response_handlers[[as.character(res$status_code)]]
-      if (is.null(handler)) {
+      r_handler <- response_handlers[[as.character(res$status_code)]]
+      if (is.null(r_handler)) {
         stop("unexpected response code ", res$status_code)
       }
-      handler(res$content)
+      ret <- r_handler(res$content)
+      h_handler <- header_handlers[[as.character(res$status_code)]]
+      if (!is.null(h_handler)) {
+        headers <- h_handler(res$headers)
+        ret <- set_attributes(ret, headers)
+      }
+      ret
     } else if (status_code %in% pass_error) {
       list(status_code = status_code,
            message = response_to_json(res)$message)
@@ -245,12 +259,47 @@ make_response_handler_binary <- function(...) {
   }
 }
 
+make_response_handler_header <- function(...) {
+  function(data, convert = TRUE) {
+  }
+}
+
 make_response_handler_text <- function(...) {
   function(data, convert = TRUE) {
     if (convert) {
       data <- response_text(data)
     }
     data
+  }
+}
+
+make_header_handlers <- function(responses, spec) {
+  responses <- responses[as.integer(names(responses)) < 300]
+  lapply(responses, make_header_handler, spec)
+}
+
+make_header_handler <- function(response, spec) {
+  if ("headers" %in% names(response)) {
+    els <- names(response$headers)
+    type <- vcapply(response$headers, "[[", "type")
+    atomic <- atomic_types()
+    f_atomic <- function(v, data) {
+      msg <- atomic$missing[[type[[v]]]]
+      x <- pick(data, tolower(v), msg)
+      if (!is.na(x)) {
+        storage.mode(x) <- storage.mode(msg)
+      }
+      x
+    }
+    function(headers) {
+      h <- parse_headers(headers)
+      names(h) <- tolower(names(h))
+      ret <- lapply(els, f_atomic, h)
+      names(ret) <- els
+      ret
+    }
+  } else {
+    NULL
   }
 }
 
