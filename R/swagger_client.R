@@ -41,9 +41,7 @@ read_spec <- function(version) {
 
 docker_client_data <- function(version) {
   spec <- read_spec(version)
-  client <- R6_api_client$new()
   list(spec = spec,
-       client = client,
        endpoints = lapply(endpoints, function(x)
-         make_endpoint(x[[1]], x[[2]], spec, client)))
+         make_endpoint(x[[1]], x[[2]], spec)))
 }
