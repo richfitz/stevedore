@@ -37,7 +37,7 @@ endpoints <-
 
        image_list           = c("get",    "/images/json"),
        image_build          = c("post",   "/build"),
-       ## image_create         = c("post",   "/images/create"),
+       image_create         = c("post",   "/images/create"),
        image_inspect        = c("get",    "/images/{name}/json"),
        image_history        = c("get",    "/images/{name}/history"),
        image_push           = c("post",   "/images/{name}/push"),
@@ -48,7 +48,7 @@ endpoints <-
        image_commit         = c("post",   "/commit"),
        image_tarball        = c("get",    "/images/{name}/get"),
        image_export         = c("get",    "/images/get"),
-       ## image_import         = c("post",   "/images/load"),
+       image_import         = c("post",   "/images/load"),
 
        network_list         = c("get",    "/networks"),
        network_inspect      = c("get",    "/networks/{id}"),
