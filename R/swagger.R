@@ -113,7 +113,8 @@ make_response_handlers <- function(responses, spec, produces) {
 }
 
 make_response_handler <- function(response, spec) {
-  schema <- resolve_schema_ref(response, "schema", spec)$schema
+  schema <- resolve_schema_ref(response$schema, spec)
+
   if (schema$type == "object") {
     make_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
@@ -135,7 +136,7 @@ make_response_handler_object <- function(schema, spec) {
   ## same and I don't know if the code can sensibly be shared.
   els <- names(schema$properties)
 
-  properties <- lapply(schema$properties, resolve_schema_ref2, spec)
+  properties <- lapply(schema$properties, resolve_schema_ref, spec)
   type <- vcapply(properties, "[[", "type")
 
   atomic <- atomic_types()
@@ -171,7 +172,7 @@ make_response_handler_object <- function(schema, spec) {
 }
 
 make_response_handler_array <- function(schema, spec) {
-  items <- resolve_schema_ref(schema, "items", spec)$items
+  items <- resolve_schema_ref(schema$items, spec)
 
   if (items$type == "object") {
     make_response_handler_array_object(items, spec)
@@ -183,7 +184,7 @@ make_response_handler_array <- function(schema, spec) {
 
 make_response_handler_array_object <- function(items, spec) {
   cols <- names(items$properties)
-  properties <- lapply(items$properties, resolve_schema_ref2, spec)
+  properties <- lapply(items$properties, resolve_schema_ref, spec)
   type <- vcapply(properties, "[[", "type")
 
   atomic <- atomic_types()
@@ -240,20 +241,9 @@ make_response_handler_text <- function(...) {
   }
 }
 
-resolve_schema_ref <- function(defn, v, spec) {
-  if (identical(names(defn[[v]]), "$ref")) {
-    ref <- strsplit(sub("^#/", "", defn[[v]][["$ref"]]), "/",
-                    fixed = TRUE)[[1]]
-    defn[[v]] <- spec[[ref]]
-  }
-  defn
-}
-
-## This one is probably the one to actually use.
-resolve_schema_ref2 <- function(x, spec) {
+resolve_schema_ref <- function(x, spec) {
   if (identical(names(x), "$ref")) {
-    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/",
-                    fixed = TRUE)[[1]]
+    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
     x <- spec[[ref]]
   }
   x
