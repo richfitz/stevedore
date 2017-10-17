@@ -4,24 +4,49 @@
 ## versions, and annotations for the parameter handling (which is not
 ## yet written)
 endpoints <-
-  list(ping            = c("get",     "/_ping"),
-       version         = c("get",    "/version"),
-       system_events   = c("get",    "/events"),
-       system_info     = c("get",    "/info"),
-       system_df       = c("get",    "/system/df"),
+  list(ping              = c("get",     "/_ping"),
+       version           = c("get",    "/version"),
+       system_events     = c("get",    "/events"),
+       system_info       = c("get",    "/info"),
+       system_df         = c("get",    "/system/df"),
 
-       image_delete    = c("delete", "/images/{name}"),
-       image_tarball   = c("get",    "/images/{name}/get"),
-       image_history   = c("get",    "/images/{name}/history"),
-       image_inspect   = c("get",    "/images/{name}/json"),
-       image_export    = c("get",    "/images/get"),
-       image_list      = c("get",    "/images/json"),
+       image_delete      = c("delete", "/images/{name}"),
+       image_tarball     = c("get",    "/images/{name}/get"),
+       image_history     = c("get",    "/images/{name}/history"),
+       image_inspect     = c("get",    "/images/{name}/json"),
+       image_export      = c("get",    "/images/get"),
+       image_list        = c("get",    "/images/json"),
 
-       network_list    = c("get",    "/networks"),
-       network_inspect = c("get",    "/networks/{id}"),
-       network_prune   = c("post",   "/networks/prune"),
-       network_create  = c("post",   "/networks/create"),
-       network_delete  = c("delete", "/networks/{id}"))
+       network_list      = c("get",    "/networks"),
+       network_inspect   = c("get",    "/networks/{id}"),
+       network_prune     = c("post",   "/networks/prune"),
+       network_create    = c("post",   "/networks/create"),
+       network_delete    = c("delete", "/networks/{id}"),
+
+       ## POST /containers/{id}/attach (hijack)
+       ## HEAD /containers/{id}/archive
+       ## GET /containers/{id}/logs (hijack)
+       container_list    = c("get",    "/containers/json"),
+       container_create  = c("post",   "/containers/create"),
+       ## container_inspect = c("get",    "/containers/{id}/json"),
+       container_top     = c("get",    "/containers/{id}/top"),
+       container_export  = c("get",    "/containers/{id}/export"),
+       container_changes = c("get",    "/containers/{id}/changes"),
+       container_stats   = c("get",    "/containers/{id}/stats"),
+       container_resize  = c("post",   "/containers/{id}/resize"),
+       container_start   = c("post",   "/containers/{id}/start"),
+       container_stop    = c("post",   "/containers/{id}/stop"),
+       container_restart = c("post",   "/containers/{id}/restart"),
+       container_kill    = c("post",   "/containers/{id}/kill"),
+       container_update  = c("post",   "/containers/{id}/update"),
+       container_rename  = c("post",   "/containers/{id}/rename"),
+       container_pause   = c("post",   "/containers/{id}/pause"),
+       container_unpause = c("post",   "/containers/{id}/unpause"),
+       container_wait    = c("post",   "/containers/{id}/wait"),
+       container_delete  = c("delete", "/containers/{id}"),
+       container_archive = c("get",    "/containers/{id}/archive"),
+       container_import  = c("put",    "/containers/{id}/archive"),
+       container_prune   = c("post",   "/containers/prune"))
 
 ## memoise reading the spec:
 spec <- new.env(parent = emptyenv())
