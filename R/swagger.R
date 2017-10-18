@@ -30,60 +30,48 @@ make_endpoint <- function(method, path, spec) {
   produces <- get_response_type(method, path, x)
   response_handlers <- make_response_handlers(x$responses, spec, produces)
   header_handlers <- make_header_handlers(x$responses, spec)
-  endpoint <- make_endpoint_function(path_data, method,
-                                     response_handlers,
-                                     header_handlers)
 
   list(
     path = path,
+    path_fmt = path_data$fmt,
     path_args = path_data$args,
-    method = tolower(method),
+    method = toupper(method),
     response_handlers = response_handlers,
-    header_handlers = header_handlers,
-    endpoint = endpoint)
+    header_handlers = header_handlers)
 }
 
-make_endpoint_function <- function(path_data, method, response_handlers,
-                                   header_handlers) {
-  method <- toupper(method)
-  force(response_handlers)
-  force(header_handlers)
-  path_fmt <- path_data$fmt
-
-  ## TODO: there's no actual need to do scope capture here - we can
-  ## just pass around the actual data; so this function lifts out to
-  ## become a free function instead?
-  function(client, path_params, query_params,
-           body = NULL, pass_error = NULL, hijack = FALSE) {
-    url <- client$url(sprintfn(path_fmt, path_params), params = query_params)
-    res <- client$request2(method, url, body, hijack)
-    if (hijack) {
-      return(res)
+run_endpoint <- function(client, endpoint,
+                         path_params, query_params, body = NULL,
+                         pass_error = NULL, hijack = FALSE) {
+  path <- sprintfn(endpoint$path_fmt, path_params)
+  url <- client$url(path, params = query_params)
+  res <- client$request2(endpoint$method, url, body, hijack)
+  if (hijack) {
+    return(res)
+  }
+  status_code <- res$status_code
+  if (status_code < 300) {
+    r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
+    if (is.null(r_handler)) {
+      stop("unexpected response code ", res$status_code)
     }
-    status_code <- res$status_code
-    if (status_code < 300) {
-      r_handler <- response_handlers[[as.character(res$status_code)]]
-      if (is.null(r_handler)) {
-        stop("unexpected response code ", res$status_code)
+    ret <- r_handler(res$content)
+    h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
+    if (!is.null(h_handler)) {
+      headers <- h_handler(res$headers)
+      if (endpoint$method == "HEAD") {
+        ## There cannot be a body here
+        ret <- headers
+      } else {
+        ret <- set_attributes(ret, headers)
       }
-      ret <- r_handler(res$content)
-      h_handler <- header_handlers[[as.character(res$status_code)]]
-      if (!is.null(h_handler)) {
-        headers <- h_handler(res$headers)
-        if (method == "HEAD") {
-          ## There cannot be a body here
-          ret <- headers
-        } else {
-          ret <- set_attributes(ret, headers)
-        }
-      }
-      ret
-    } else if (status_code %in% pass_error) {
-      list(status_code = status_code,
-           message = response_to_json(res)$message)
-    } else {
-      response_to_error(res)
     }
+    ret
+  } else if (status_code %in% pass_error) {
+    list(status_code = status_code,
+         message = response_to_json(res)$message)
+  } else {
+    response_to_error(res)
   }
 }
 
