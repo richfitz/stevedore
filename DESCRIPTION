@@ -7,7 +7,7 @@ Author: Rich FitzJohn
 Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 Imports:
     crayon,
-    curl,
+    curl (>= 2.3.0),
     jsonlite,
     yaml
 Suggests:

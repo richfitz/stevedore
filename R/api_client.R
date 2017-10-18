@@ -98,7 +98,7 @@ R6_api_client <- R6::R6Class(
       res <- curl::curl_fetch_memory(url, h)
       response_result(res, as, stop_on_error)
     },
-    request2 = function(verb, url, body = NULL) {
+    request2 = function(verb, url, body = NULL, hijack = FALSE) {
       if (!is.null(body)) {
         body_raw <- charToRaw(body)
         h <- self$handle(headers = c("Content-Type" = "application/json"))
@@ -114,7 +114,11 @@ R6_api_client <- R6::R6Class(
       if (verb == "HEAD") {
         curl::handle_setopt(h, nobody = TRUE)
       }
-      curl::curl_fetch_memory(url, h)
+      if (hijack) {
+        curl::curl(url, handle = h)
+      } else {
+        curl::curl_fetch_memory(url, h)
+      }
     },
     url = function(path, ..., params = NULL, versioned_api = FALSE) {
       v <- if (versioned_api) self$api_version else NULL

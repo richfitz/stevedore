@@ -61,10 +61,16 @@ make_endpoint_function <- function(path_data, method, response_handlers,
   force(header_handlers)
   path_fmt <- path_data$fmt
 
+  ## TODO: there's no actual need to do scope capture here - we can
+  ## just pass around the actual data; so this function lifts out to
+  ## become a free function instead?
   function(client, path_params, query_params,
-           body = NULL, pass_error = NULL) {
+           body = NULL, pass_error = NULL, hijack = FALSE) {
     url <- client$url(sprintfn(path_fmt, path_params), params = query_params)
-    res <- client$request2(method, url, body)
+    res <- client$request2(method, url, body, hijack)
+    if (hijack) {
+      return(res)
+    }
     status_code <- res$status_code
     if (status_code < 300) {
       r_handler <- response_handlers[[as.character(res$status_code)]]
@@ -119,7 +125,8 @@ get_response_type <- function(method, path, data) {
 make_response_handlers <- function(responses, spec, produces) {
   responses <- responses[as.integer(names(responses)) < 300]
   binary_types <- c("application/octet-stream",
-                    "application/x-tar")
+                    "application/x-tar",
+                    "application/vnd.docker.raw-stream")
 
   if (produces == "application/json") {
     lapply(responses, make_response_handler, spec)

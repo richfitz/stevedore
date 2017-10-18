@@ -10,12 +10,11 @@ endpoints <-
        system_info          = c("get",    "/info"),
        system_df            = c("get",    "/system/df"),
 
-       ## POST /containers/{id}/attach (hijack)
-       ## GET /containers/{id}/logs (hijack)
        container_list       = c("get",    "/containers/json"),
        container_create     = c("post",   "/containers/create"),
        container_inspect    = c("get",    "/containers/{id}/json"),
        container_top        = c("get",    "/containers/{id}/top"),
+       ## container_logs       = c("get",    "/containers/{id}/logs"),
        container_export     = c("get",    "/containers/{id}/export"),
        container_changes    = c("get",    "/containers/{id}/changes"),
        container_stats      = c("get",    "/containers/{id}/stats"),
@@ -28,6 +27,7 @@ endpoints <-
        container_rename     = c("post",   "/containers/{id}/rename"),
        container_pause      = c("post",   "/containers/{id}/pause"),
        container_unpause    = c("post",   "/containers/{id}/unpause"),
+       container_attach     = c("post",   "/containers/{id}/attach"),
        container_wait       = c("post",   "/containers/{id}/wait"),
        container_delete     = c("delete", "/containers/{id}"),
        container_files      = c("head",   "/containers/{id}/archive"),
@@ -66,7 +66,7 @@ endpoints <-
 
        ## POST /exec/{id}/start (hijack?)
        exec_create          = c("post",   "/containers/{id}/exec"),
-       ## exec_start           = c("post",   "/exec/{id}/start"),
+       exec_start           = c("post",   "/exec/{id}/start"),
        exec_resize          = c("post",   "/exec/{id}/resize"),
        exec_inspect         = c("get",    "/exec/{id}/json")
        )
