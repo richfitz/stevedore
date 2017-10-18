@@ -33,7 +33,7 @@ run_sample_response <- function(x, spec) {
   }
 }
 
-describe <- function(x) {
+describe_api <- function(x) {
   endpoints <- lapply(x$spec$paths, names)
   tag <- lapply(x$spec$paths, vcapply, function(el) el$tags %||% NA_character_)
   n <- lengths(endpoints)
