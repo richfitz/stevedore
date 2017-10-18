@@ -24,18 +24,7 @@
 ## code and automatically allow for differences in the schema over
 ## time.
 
-## some methods will switch output type based on input
-##
-## as <- switch(x$produces,
-##              "application/json" = "json",
-##              "text/plain" = "text",
-##              "application/octet-stream" = "raw",
-##              "application/x-tar" = "raw",
-##              "application/vnd.docker.raw-stream" = "response",
-##              "raw") # I think
-
 make_endpoint <- function(method, path, spec) {
-  message(sprintf("%s %s", toupper(method), path))
   path_data <- parse_path(path)
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
@@ -99,6 +88,7 @@ make_endpoint_function <- function(path_data, method, response_handlers,
 }
 
 get_response_type <- function(method, path, data) {
+  f <- function(x) x$responses[as.integer(names(x$responses)) < 300]
   if (is.null(data)) {
     stop("stevedore bug")
   }
@@ -107,14 +97,16 @@ get_response_type <- function(method, path, data) {
     responses <- data$responses
     if (any(vlapply(responses[as.integer(names(responses)) < 300],
                     function(x) "schema" %in% names(x)))) {
-      ## GET /system/df - not sure about others
+      ## GET /system/df
+      ## GET /containers/{id}/top
+      ## GET /containers/{id}/logs
       produces <- "application/json"
+      message(sprintf("assuming %s endpoint for %s %s",
+                      produces, toupper(method), path))
     } else {
-      ## DELETE /networks/{id}
-      produces <- "text/plain"
+      ## DELETE /networks/{id} & many others
+      produces <- "null"
     }
-    message(sprintf("assuming %s endpoint for %s %s",
-                    produces, toupper(method), path))
   } else if (length(produces) > 1) {
     browser()
     stop("Multi-output production needs work")
@@ -128,7 +120,9 @@ make_response_handlers <- function(responses, spec, produces) {
                     "application/x-tar",
                     "application/vnd.docker.raw-stream")
 
-  if (produces == "application/json") {
+  if (produces == "null") {
+    lapply(responses, make_response_handler_null, spec)
+  } else if (produces == "application/json") {
     lapply(responses, make_response_handler, spec)
   } else if (produces %in% binary_types) {
     lapply(responses, make_response_handler_binary)
@@ -143,29 +137,22 @@ make_response_handler <- function(response, spec) {
   schema <- resolve_schema_ref(response$schema, spec)
 
   if (is.null(schema)) {
-    make_response_handler_null()
+    make_response_handler_null(schema, spec)
   } else if (schema$type == "object") {
     make_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
     make_response_handler_array(schema, spec)
-  } else if (schema$type == "object") {
-    make_response_handler_object(schema, spec)
   } else if (schema$type == "string") {
     make_response_handler_string(schema, spec)
   } else {
-    message("make_Response_Handler")
-    browser()
-    ## if (schema$type == "object") {
-    ##   make_response_handler_object(schema, spec)
-    ## } else {
+    stop("not sure how to make this response handler")
   }
 }
 
-make_response_handler_null <- function() {
+make_response_handler_null <- function(response, spec) {
   function(data, convert = TRUE) {
     if (length(data) > 0L) {
-      message("Expected an empty response")
-      browser()
+      stop("Expected an empty response")
     }
     invisible(NULL)
   }
