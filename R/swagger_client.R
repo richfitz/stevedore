@@ -14,7 +14,7 @@ endpoints <-
        container_create     = c("post",   "/containers/create"),
        container_inspect    = c("get",    "/containers/{id}/json"),
        container_top        = c("get",    "/containers/{id}/top"),
-       ## container_logs       = c("get",    "/containers/{id}/logs"),
+       container_logs       = c("get",    "/containers/{id}/logs"),
        container_export     = c("get",    "/containers/{id}/export"),
        container_changes    = c("get",    "/containers/{id}/changes"),
        container_stats      = c("get",    "/containers/{id}/stats"),

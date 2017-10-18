@@ -150,6 +150,8 @@ make_response_handler <- function(response, spec) {
     make_response_handler_array(schema, spec)
   } else if (schema$type == "object") {
     make_response_handler_object(schema, spec)
+  } else if (schema$type == "string") {
+    make_response_handler_string(schema, spec)
   } else {
     message("make_Response_Handler")
     browser()
@@ -166,6 +168,16 @@ make_response_handler_null <- function() {
       browser()
     }
     invisible(NULL)
+  }
+}
+
+make_response_handler_string <- function(schema, spec) {
+  as_character <- !identical(schema$format, "binary")
+  function(data, convert = TRUE) {
+    if (as_character) {
+      data <- rawToChar(data)
+    }
+    data
   }
 }
 
