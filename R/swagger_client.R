@@ -11,7 +11,6 @@ endpoints <-
        system_df            = c("get",    "/system/df"),
 
        ## POST /containers/{id}/attach (hijack)
-       ## HEAD /containers/{id}/archive
        ## GET /containers/{id}/logs (hijack)
        container_list       = c("get",    "/containers/json"),
        container_create     = c("post",   "/containers/create"),
@@ -31,6 +30,7 @@ endpoints <-
        container_unpause    = c("post",   "/containers/{id}/unpause"),
        container_wait       = c("post",   "/containers/{id}/wait"),
        container_delete     = c("delete", "/containers/{id}"),
+       container_files      = c("head",   "/containers/{id}/archive"),
        container_archive    = c("get",    "/containers/{id}/archive"),
        container_import     = c("put",    "/containers/{id}/archive"),
        container_prune      = c("post",   "/containers/prune"),

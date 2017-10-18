@@ -75,7 +75,12 @@ make_endpoint_function <- function(path_data, method, response_handlers,
       h_handler <- header_handlers[[as.character(res$status_code)]]
       if (!is.null(h_handler)) {
         headers <- h_handler(res$headers)
-        ret <- set_attributes(ret, headers)
+        if (method == "HEAD") {
+          ## There cannot be a body here
+          ret <- headers
+        } else {
+          ret <- set_attributes(ret, headers)
+        }
       }
       ret
     } else if (status_code %in% pass_error) {

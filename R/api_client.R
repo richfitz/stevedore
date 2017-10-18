@@ -111,6 +111,9 @@ R6_api_client <- R6::R6Class(
         h <- self$handle()
         curl::handle_setopt(h, customrequest = verb)
       }
+      if (verb == "HEAD") {
+        curl::handle_setopt(h, nobody = TRUE)
+      }
       curl::curl_fetch_memory(url, h)
     },
     url = function(path, ..., params = NULL, versioned_api = FALSE) {
