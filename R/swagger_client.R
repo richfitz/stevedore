@@ -4,10 +4,11 @@
 ## versions, and annotations for the parameter handling (which is not
 ## yet written)
 endpoints <-
-  list(ping                 = c("get",     "/_ping"),
-       version              = c("get",    "/version"),
-       system_events        = c("get",    "/events"),
+  list(system_auth          = c("post",   "/auth"),
        system_info          = c("get",    "/info"),
+       system_version       = c("get",    "/version"),
+       system_ping          = c("get",    "/_ping"),
+       system_events        = c("get",    "/events"),
        system_df            = c("get",    "/system/df"),
 
        container_list       = c("get",    "/containers/json"),
@@ -64,7 +65,6 @@ endpoints <-
        volume_delete        = c("delete", "/volumes/{name}"),
        volume_prune         = c("post",   "/volumes/prune"),
 
-       ## POST /exec/{id}/start (hijack?)
        exec_create          = c("post",   "/containers/{id}/exec"),
        exec_start           = c("post",   "/exec/{id}/start"),
        exec_resize          = c("post",   "/exec/{id}/resize"),
