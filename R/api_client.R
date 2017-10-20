@@ -115,7 +115,11 @@ R6_api_client <- R6::R6Class(
         curl::handle_setopt(h, nobody = TRUE)
       }
       if (hijack) {
-        curl::curl(url, handle = h)
+        con <- curl::curl(url, handle = h)
+        open(con, mode = mode, blocking = FALSE)
+        data <- curl::handle_data(h)
+        data$connection <- data
+        data
       } else {
         curl::curl_fetch_memory(url, h)
       }
