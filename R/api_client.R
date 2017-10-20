@@ -98,17 +98,19 @@ R6_api_client <- R6::R6Class(
       res <- curl::curl_fetch_memory(url, h)
       response_result(res, as, stop_on_error)
     },
-    request2 = function(verb, url, body = NULL, hijack = FALSE) {
+    request2 = function(verb, url, body = NULL, headers = NULL,
+                        hijack = FALSE, mode = "rb") {
       if (!is.null(body)) {
         body_raw <- charToRaw(body)
-        h <- self$handle(headers = c("Content-Type" = "application/json"))
+        h <- self$handle(headers = c("Content-Type" = "application/json",
+                                     headers))
         curl::handle_setopt(h,
                             post = TRUE,
                             postfieldsize = length(body_raw),
                             postfields = body_raw,
                             customrequest = verb)
       } else {
-        h <- self$handle()
+        h <- self$handle(headers = headers)
         curl::handle_setopt(h, customrequest = verb)
       }
       if (verb == "HEAD") {

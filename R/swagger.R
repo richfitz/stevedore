@@ -41,11 +41,12 @@ make_endpoint <- function(method, path, spec) {
 }
 
 run_endpoint <- function(client, endpoint,
-                         path_params, query_params, body = NULL,
+                         path_params = character(), query_params = NULL,
+                         header_params = NULL, body = NULL,
                          pass_error = NULL, hijack = FALSE) {
   path <- sprintfn(endpoint$path_fmt, path_params)
   url <- client$url(path, params = query_params)
-  res <- client$request2(endpoint$method, url, body, hijack)
+  res <- client$request2(endpoint$method, url, body, header_params, hijack)
   if (hijack) {
     return(res)
   }
