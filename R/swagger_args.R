@@ -35,6 +35,7 @@ foo <- function(method, path, spec) {
   pars_name_r <- pars_name
   pars_name_r[pars_in == "header"] <-
     name_header_to_r(pars_name[pars_in == "header"])
+  pars_name_r <- camel_to_snake(pars_name_r)
 
   if (any(duplicated(pars_name))) {
     stop("fix duplicated names")
@@ -141,7 +142,8 @@ arg_collect_body <- function(p, dest) {
 
 arg_collect_header <- function(p, dest) {
   stopifnot(p$type == "string")
-  r_nm <- as.symbol(name_header_to_r(p$name))
+  ## TODO: this does duplicate some argument handling above...
+  r_nm <- as.symbol(camel_to_snake(name_header_to_r(p$name)))
   if (is.null(p$enum)) {
     expr <- bquote(assert_scalar_character(.(r_nm)))
   } else {

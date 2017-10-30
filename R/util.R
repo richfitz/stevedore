@@ -84,6 +84,9 @@ partial1 <- function(FUN, x, env = parent.frame(),
 }
 
 camel_to_snake <- function(x) {
+  if (length(x) != 1L) {
+    return(vcapply(x, camel_to_snake))
+  }
   re <- "(?<=[^A-Z])([A-Z])"
   repeat {
     m <- regexec(re, x, perl = TRUE)[[1]][[1]]
@@ -97,6 +100,9 @@ camel_to_snake <- function(x) {
 }
 
 snake_to_camel <- function(x) {
+  if (length(x) != 1L) {
+    return(vcapply(x, snake_to_camel))
+  }
   re <- "_([a-z])"
   repeat {
     m <- regexec(re, x, perl = TRUE)[[1]][[1]] + 1L
