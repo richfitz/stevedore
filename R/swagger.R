@@ -42,13 +42,12 @@ make_endpoint <- function(method, path, spec) {
     header_handlers = header_handlers)
 }
 
-run_endpoint <- function(client, endpoint,
-                         path_params = character(), query_params = NULL,
-                         header_params = NULL, body = NULL,
+run_endpoint <- function(client, endpoint, params,
                          pass_error = NULL, hijack = FALSE) {
-  path <- sprintfn(endpoint$path_fmt, path_params)
-  url <- client$url(path, params = query_params)
-  res <- client$request2(endpoint$method, url, body, header_params, hijack)
+  path <- sprintfn(endpoint$path_fmt, params$path)
+  url <- client$url(path, params = params$query)
+  res <- client$request2(endpoint$method, url, params$body, params$header,
+                         hijack)
   if (hijack) {
     return(res)
   }
