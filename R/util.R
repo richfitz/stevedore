@@ -62,3 +62,23 @@ download_file <- function(url, dest, quiet = FALSE) {
   }
   dest
 }
+
+## This is *not* a general purpose partialling function (c.f.,
+## purrr::partial) but one designed to provide an interface via the
+## function arguments of the generated function suitable for end
+## users.  So preserving argument names etc is important.  It's also
+## very likely that the functions being partialled are themselves
+## generated and I want to make sure that is found in the right place.
+## This relies on the name of the partialled argument not being the
+## same as the function being partialled.
+partial1 <- function(FUN, x, env = parent.frame(),
+                     name = deparse(substitute(FUN))) {
+  args <- formals(FUN)
+
+  env <- new.env(parent = env)
+  env[[name]] <- FUN
+  env[[names(args)[[1]]]] <- x
+
+  body <- as.call(lapply(c(name, names(args)), as.name))
+  as.function(c(args[-1], body), env)
+}

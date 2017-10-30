@@ -4,6 +4,11 @@
 ## also lots of translation required so that we can keep the primarily
 ## snake-case interface to the package working.
 
+## I think that we'll write these functions to take a client as the
+## first argument and then partial that out when creating the
+## interface.  That way we can memoise creating the clients by
+## version.
+
 foo <- function(method, path, spec) {
   ## All the stopifnot bits are assertions that have more to do with
   ## making sure that the spec confirms to what we are expecting.
