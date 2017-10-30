@@ -9,12 +9,17 @@
 ## interface.  That way we can memoise creating the clients by
 ## version.
 
-foo <- function(method, path, spec) {
+
+## The other way of achiving the same real goal is some sort of
+## builder pattern where we take a reciever and a handler and build
+## functions with it.  That's probably better actually as it involves
+## a bit less straight up magic.
+
+make_argument_handler <- function(method, path, x) {
   ## All the stopifnot bits are assertions that have more to do with
   ## making sure that the spec confirms to what we are expecting.
   ## They'd probably be better done with debugme because I don't think
   ## they should be run by users.
-  x <- spec$paths[[path]][[method]]
 
   pars <- x$parameters
   pars_in <- vcapply(pars, "[[", "in")

@@ -30,12 +30,14 @@ make_endpoint <- function(method, path, spec) {
   produces <- get_response_type(method, path, x)
   response_handlers <- make_response_handlers(x$responses, spec, produces)
   header_handlers <- make_header_handlers(x$responses, spec)
+  argument_handler <- make_argument_handler(method, path, x)
 
   list(
     path = path,
     path_fmt = path_data$fmt,
     path_args = path_data$args,
     method = toupper(method),
+    argument_handler = argument_handler,
     response_handlers = response_handlers,
     header_handlers = header_handlers)
 }
