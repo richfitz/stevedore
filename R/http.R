@@ -159,3 +159,8 @@ parse_headers <- function(headers) {
   names(vals) <- nms
   vals
 }
+
+daemon_version <- function(client, versioned_api = TRUE) {
+  url <- client$url('/version', versioned_api = versioned_api)
+  client$GET(url, as = "json")$data
+}
