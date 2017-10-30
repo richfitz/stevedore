@@ -114,3 +114,16 @@ snake_to_camel <- function(x) {
   }
   x
 }
+
+lock_environment <- function(env) {
+  for (nm in ls(env)) {
+    lockBinding(as.name(nm), env)
+  }
+  lockEnvironment(env)
+  invisible(env)
+}
+
+set_names <- function(x, nms) {
+  names(x) <- nms
+  x
+}
