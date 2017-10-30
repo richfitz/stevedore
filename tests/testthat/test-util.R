@@ -10,3 +10,10 @@ test_that("partial1: simple", {
   expect_equal(g(), 101)
   expect_equal(g(2), 3)
 })
+
+test_that("camel <-> snake", {
+  expect_equal(camel_to_snake("fooBar"), "foo_bar")
+  expect_equal(camel_to_snake("foo_bar"), "foo_bar")
+  expect_equal(snake_to_camel("fooBar"), "fooBar")
+  expect_equal(snake_to_camel("foo_bar"), "fooBar")
+})

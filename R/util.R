@@ -82,3 +82,29 @@ partial1 <- function(FUN, x, env = parent.frame(),
   body <- as.call(lapply(c(name, names(args)), as.name))
   as.function(c(args[-1], body), env)
 }
+
+camel_to_snake <- function(x) {
+  re <- "(?<=[^A-Z])([A-Z])"
+  repeat {
+    m <- regexec(re, x, perl = TRUE)[[1]][[1]]
+    if (m > 0) {
+      x <- sub(re, paste0("_", tolower(substr(x, m, m))), x, perl = TRUE)
+    } else {
+      break
+    }
+  }
+  x
+}
+
+snake_to_camel <- function(x) {
+  re <- "_([a-z])"
+  repeat {
+    m <- regexec(re, x, perl = TRUE)[[1]][[1]] + 1L
+    if (m > 0) {
+      x <- sub(re, toupper(substr(x, m, m)), x, perl = TRUE)
+    } else {
+      break
+    }
+  }
+  x
+}
