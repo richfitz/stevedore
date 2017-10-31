@@ -168,6 +168,9 @@ as_query_logical <- function(x, name = deparse(substitute(x))) {
 }
 
 as_query_json <- function(x, name = deparse(substitute(x))) {
+  ## TODO: need to convert case here; most cases will actually need
+  ## proper handlers I suspect, and these will end up in their own bit
+  ## of configuration.
   browser()
 }
 

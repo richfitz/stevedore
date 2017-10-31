@@ -1,10 +1,9 @@
 ## For now hard code up as the domain socket only; these are
 ## nontrivial changes required to support more than this!
 ##
-## AIM: all 'curl::' calls go in this file only so that we can decide
-## to swap it out for httr later if need be.
-##
-## This section will hold all the low-level communication bits
+## All 'curl::' calls go in this file; this isolates all the low-level
+## communication bits.  The only major overlap is that we also do a
+## version check here before we start using the generated api.
 
 handle <- function(base_url, headers = NULL) {
   headers <- c("User-Agent" = DEFAULT_USER_AGENT, headers)
@@ -68,37 +67,9 @@ R6_api_client <- R6::R6Class(
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
       self$handle <- make_handle(base_url)
       self$base_url <- "http://localhost"
-      if (is.null(api_version)) {
-        api_version <- daemon_version(self, FALSE)$ApiVersion
-      }
-      if (!identical(api_version, FALSE)) {
-        ## TODO: santise this properly
-        numeric_version(api_version) # or throw
-        self$api_version <- api_version
-      }
+      self$api_version <- client_api_version(api_version, self)
     },
-    GET = function(...) {
-      self$request("GET", ...)
-    },
-    POST = function(...) {
-      browser()
-      self$request("POST", ...)
-    },
-    PUT = function(...) {
-      browser()
-      self$request("PUT", ...)
-    },
-    DELETE = function(...) {
-      browser()
-      self$request("DELETE", ...)
-    },
-    request = function(verb, url, as = "text", stop_on_error = TRUE) {
-      h <- self$handle()
-      curl::handle_setopt(h, customrequest = verb)
-      res <- curl::curl_fetch_memory(url, h)
-      response_result(res, as, stop_on_error)
-    },
-    request2 = function(verb, url, body = NULL, headers = NULL,
+    request = function(verb, url, body = NULL, headers = NULL,
                         hijack = FALSE, mode = "rb") {
       if (!is.null(body)) {
         body_raw <- charToRaw(body)
@@ -160,7 +131,21 @@ parse_headers <- function(headers) {
   vals
 }
 
-daemon_version <- function(client, versioned_api = TRUE) {
-  url <- client$url('/version', versioned_api = versioned_api)
-  client$GET(url, as = "json")$data
+client_api_version <- function(api_version, client) {
+  if (is.null(api_version)) {
+    api_version <- DEFAULT_DOCKER_API_VERSION
+  } else if (inherits(api_version, "numeric_version")) {
+    assert_scalar(api_version)
+    api_version <- as.character(api_version)
+  } else {
+    assert_scalar_character("api_version")
+    if (tolower(api_version) == "detect") {
+      url <- client$url('/version', versioned_api = FALSE)
+      res <- client$request("GET", url)
+      api_version <- response_result(res, "json")$data$ApiVersion
+    } else {
+      numeric_version(api_version) # or throw
+    }
+  }
+  api_version
 }
