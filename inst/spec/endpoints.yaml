@@ -1,0 +1,69 @@
+## These are the set of supported endpoints.
+
+## Further fields to this will be added because we'll get min/max
+## versions, and annotations for the parameter handling.
+system_auth:        {method: post,   path: "/auth"}
+system_info:        {method: get,    path: "/info"}
+system_version:     {method: get,    path: "/version"}
+system_ping:        {method: get,    path: "/_ping"}
+system_events:      {method: get,    path: "/events"}
+system_df:          {method: get,    path: "/system/df"}
+
+container_list:     {method: get,    path: "/containers/json"}
+container_create:   {method: post,   path: "/containers/create"}
+container_inspect:  {method: get,    path: "/containers/{id}/json"}
+container_top:      {method: get,    path: "/containers/{id}/top"}
+container_logs:     {method: get,    path: "/containers/{id}/logs"}
+container_export:   {method: get,    path: "/containers/{id}/export"}
+container_changes:  {method: get,    path: "/containers/{id}/changes"}
+container_stats:    {method: get,    path: "/containers/{id}/stats"}
+container_resize:   {method: post,   path: "/containers/{id}/resize"}
+container_start:    {method: post,   path: "/containers/{id}/start"}
+container_stop:     {method: post,   path: "/containers/{id}/stop"}
+container_restart:  {method: post,   path: "/containers/{id}/restart"}
+container_kill:     {method: post,   path: "/containers/{id}/kill"}
+container_update:   {method: post,   path: "/containers/{id}/update"}
+container_rename:   {method: post,   path: "/containers/{id}/rename"}
+container_pause:    {method: post,   path: "/containers/{id}/pause"}
+container_unpause:  {method: post,   path: "/containers/{id}/unpause"}
+container_attach:   {method: post,   path: "/containers/{id}/attach"}
+container_wait:     {method: post,   path: "/containers/{id}/wait"}
+container_delete:   {method: delete, path: "/containers/{id}"}
+container_files:    {method: head,   path: "/containers/{id}/archive"}
+container_archive:  {method: get,    path: "/containers/{id}/archive"}
+container_import:   {method: put,    path: "/containers/{id}/archive"}
+container_prune:    {method: post,   path: "/containers/prune"}
+
+image_list:         {method: get,    path: "/images/json"}
+image_build:        {method: post,   path: "/build"}
+image_create:       {method: post,   path: "/images/create"}
+image_inspect:      {method: get,    path: "/images/{name}/json"}
+image_history:      {method: get,    path: "/images/{name}/history"}
+image_push:         {method: post,   path: "/images/{name}/push"}
+image_tag:          {method: post,   path: "/images/{name}/tag"}
+image_delete:       {method: delete, path: "/images/{name}"}
+image_search:       {method: get,    path: "/images/search"}
+image_prune:        {method: post,   path: "/images/prune"}
+image_commit:       {method: post,   path: "/commit"}
+image_tarball:      {method: get,    path: "/images/{name}/get"}
+image_export:       {method: get,    path: "/images/get"}
+image_import:       {method: post,   path: "/images/load"}
+
+network_list:       {method: get,    path: "/networks"}
+network_inspect:    {method: get,    path: "/networks/{id}"}
+network_delete:     {method: delete, path: "/networks/{id}"}
+network_create:     {method: post,   path: "/networks/create"}
+network_connect:    {method: post,   path: "/networks/{id}/connect"}
+network_disconnect: {method: post,   path: "/networks/{id}/disconnect"}
+network_prune:      {method: post,   path: "/networks/prune"}
+
+volume_list:        {method: get,    path: "/volumes"}
+volume_create:      {method: post,   path: "/volumes/create"}
+volume_inspect:     {method: get,    path: "/volumes/{name}"}
+volume_delete:      {method: delete, path: "/volumes/{name}"}
+volume_prune:       {method: post,   path: "/volumes/prune"}
+
+exec_create:        {method: post,   path: "/containers/{id}/exec"}
+exec_start:         {method: post,   path: "/exec/{id}/start"}
+exec_resize:        {method: post,   path: "/exec/{id}/resize"}
+exec_inspect:       {method: get,    path: "/exec/{id}/json"}

@@ -33,3 +33,9 @@ client_endpoints <- function(client, endpoints) {
   nms <- names(endpoints)
   set_names(lapply(names(endpoints), client_endpoint, env), nms)
 }
+
+stevedore_read_endpoints <- function() {
+  path <- system.file("spec/endpoints.yaml", package = "stevedore",
+                      mustWork = TRUE)
+  yaml::yaml.load_file(path)
+}
