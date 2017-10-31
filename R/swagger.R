@@ -69,11 +69,8 @@ run_endpoint <- function(client, endpoint, params,
       }
     }
     ret
-  } else if (status_code %in% pass_error) {
-    list(status_code = status_code,
-         message = response_to_json(res)$message)
   } else {
-    response_to_error(res)
+    response_to_error(response, pass_error)
   }
 }
 
@@ -188,7 +185,7 @@ make_response_handler_object <- function(schema, spec) {
 
   function(data, convert = TRUE) {
     if (convert) {
-      data <- from_json(response_text(data))
+      data <- raw_to_json(data)
     }
     ret <- vector("list", length(type))
     names(ret) <- els
@@ -242,7 +239,7 @@ make_response_handler_array_object <- function(items, spec) {
 
   function(data, convert = TRUE) {
     if (convert) {
-      data <- from_json(response_text(data))
+      data <- raw_to_json(data)
     }
     ret <- vector("list", length(type))
     names(ret) <- cols
@@ -268,7 +265,7 @@ make_response_handler_header <- function(...) {
 make_response_handler_text <- function(...) {
   function(data, convert = TRUE) {
     if (convert) {
-      data <- response_text(data)
+      data <- raw_to_char(data)
     }
     data
   }

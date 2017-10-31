@@ -119,3 +119,16 @@ set_names <- function(x, nms) {
   names(x) <- nms
   x
 }
+
+from_json <- function(x) {
+  jsonlite::fromJSON(x, simplifyVector = FALSE)
+}
+
+raw_to_char <- function(bin) {
+  ## iconv(readBin(bin, character()), from = "UTF-8", to = "UTF-8")
+  rawToChar(bin)
+}
+
+raw_to_json <- function(bin) {
+  from_json(raw_to_char(bin))
+}
