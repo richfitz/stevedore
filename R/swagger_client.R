@@ -1,9 +1,7 @@
 docker_client_data <- function(version) {
-  path <- system.file("spec/map.yml", package = "stevedore", mustWork = TRUE)
-  endpoints <- yaml::yaml.load_file(path)
   spec <- read_spec(version)
   list(spec = spec,
-       endpoints = lapply(endpoints, function(x)
+       endpoints = lapply(.stevedore$endpoints, function(x)
          make_endpoint(x$method, x$path, spec)))
 }
 
