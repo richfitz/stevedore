@@ -41,6 +41,9 @@ make_argument_handler <- function(method, path, x) {
   pars_name_r[pars_in == "header"] <-
     name_header_to_r(pars_name[pars_in == "header"])
   pars_name_r <- camel_to_snake(pars_name_r)
+  for (i in seq_along(pars)) {
+    pars[[i]]$name_r <- pars_name_r[[i]]
+  }
 
   if (any(duplicated(pars_name))) {
     stop("fix duplicated names")
@@ -62,7 +65,11 @@ make_argument_handler <- function(method, path, x) {
   }
   if (any(pars_in == "body")) {
     fbody_body <- arg_collect_body(pars[[which(pars_in == "body")]], dest)
-    fbody_body <- bquote(.(dest)$body <- .(fbody_body))
+    ## TODO: this will not work for non-json cases and we'll need to
+    ## handle scalars more gracefully than auto_unbox (wrap them all
+    ## in unbox as we build the thing I think).
+    fbody_body <- bquote(.(dest)$body <- jsonlite::toJSON(.(fbody_body),
+                                                          auto_unbox = TRUE))
   } else {
     fbody_body <- NULL
   }
@@ -95,7 +102,7 @@ arg_collect_path <- function(p, dest) {
     stop("all path parameters assumed required")
   }
   validate <- quote(assert_scalar_character)
-  bquote(.(validate)(.(as.symbol(p$name))))
+  bquote(.(validate)(.(as.symbol(p$name_r))))
 }
 
 arg_collect_query <- function(p, dest) {
@@ -120,44 +127,52 @@ arg_collect_query <- function(p, dest) {
     stop("Can't handle this sort of thing")
   }
   nm <- as.symbol(p$name)
-  expr <- bquote(.(dest)$query[[.(p$name)]] <- .(validate)(.(nm)))
+  nm_r <- as.symbol(p$name_r)
+  expr <- bquote(.(dest)$query[[.(p$name)]] <- .(validate)(.(nm_r)))
   if (!isTRUE(p$required)) {
-    expr <- bquote(if (!is.null(.(nm))) .(expr))
+    expr <- bquote(if (!is.null(.(nm_r))) .(expr))
   }
   expr
 }
 
 arg_collect_body <- function(p, dest) {
   ## These ones here pretty much will require a bunch of work; we can
-  ## probably outsource a lot of the common bits but all bodies are
-  ## nontrivial
-  ## POST /containers/create (json data)
-  ## POST /conatainers/{id}/update (json data)
-  ## PUT /containers/{id}/update (tar string)
-  ## POST /build (tar string)
-  ## POST /images/create (tar string)
-  ## POST /auth (json data)
-  ## POST /commit (json data)
-  ## POST /images/load (tar string)
-  ## POST /containers/{id}/exec (json data)
-  ##
-  ## For now I can just arrange to pause when I get the data
-  expr <- quote(browser())
+  ## probably outsource a lot of the common bits but most bodies are
+  ## nontrivial (a few are just a couple of keys).  It also looks like
+  ## we can't reliably pull information on requiredness from the
+  ## schema.
+
+  ## POST /auth (json)
+  ## POST /containers/create (json)
+  ## POST /containers/{id}/update (json)
+  ## PUT /containers/{id}/archive (tar)
+  ## POST /build (tar)
+  ## POST /images/create (json)
+  ## POST /commit (json)
+  ## POST /images/load (tar)
+  ## POST /networks/create (json)
+  ## POST /networks/{id}/connect (json)
+  ## POST /networks/{id}/disconnect (json)
+  ## POST /volumes/create (json)
+  ## POST /containers/{id}/exec (json)
+  ## POST /exec/{id}/start (json)
+
+  nm <- as.symbol(p$name_r)
+  nm
 }
 
 arg_collect_header <- function(p, dest) {
   stopifnot(p$type == "string")
-  ## TODO: this does duplicate some argument handling above...
-  r_nm <- as.symbol(camel_to_snake(name_header_to_r(p$name)))
+  nm <- p$name_r
   if (is.null(p$enum)) {
-    expr <- bquote(assert_scalar_character(.(r_nm)))
+    expr <- bquote(assert_scalar_character(.(nm)))
   } else {
     values <- as.call(c(quote(c), p$enum))
-    expr <- bquote(match_value(.(r_nm), .(values)))
+    expr <- bquote(match_value(.(nm), .(values)))
   }
   expr <- bquote(.(dest)$header[[.(p$name)]] <- .(expr))
   if (!isTRUE(p$required)) {
-    expr <- bquote(if (!is.null(.(r_nm))) .(expr))
+    expr <- bquote(if (!is.null(.(nm))) .(expr))
   }
   expr
 }
