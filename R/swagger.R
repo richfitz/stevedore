@@ -70,7 +70,7 @@ run_endpoint <- function(client, endpoint, params,
     }
     ret
   } else {
-    response_to_error(response, pass_error)
+    response_to_error(res, pass_error)
   }
 }
 
