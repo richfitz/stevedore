@@ -17,3 +17,9 @@ test_that("camel <-> snake", {
   expect_equal(snake_to_camel("fooBar"), "fooBar")
   expect_equal(snake_to_camel("foo_bar"), "fooBar")
 })
+
+test_that("case convert with consecutive capitals", {
+  expect_equal(pascal_to_snake("NanoCPUs"), "nano_cpus")
+  ## The conversion is lossy though:
+  expect_equal(snake_to_pascal("nano_cpus"), "NanoCpus")
+})

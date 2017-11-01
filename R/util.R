@@ -75,15 +75,26 @@ partial1 <- function(FUN, x, env = parent.frame(),
   as.function(c(args[-1], body), env)
 }
 
+pascal_to_snake <- function(x) {
+  camel_to_snake(paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x))))
+}
+
+snake_to_pascal <- function(x) {
+  x <- snake_to_camel(x)
+  paste0(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)))
+}
+
 camel_to_snake <- function(x) {
   if (length(x) != 1L) {
-    return(vcapply(x, camel_to_snake))
+    return(vcapply(x, camel_to_snake, USE.NAMES = FALSE))
   }
-  re <- "(?<=[^A-Z])([A-Z])"
+  re <- "(?<=[^A-Z])([A-Z]+)"
   repeat {
-    m <- regexec(re, x, perl = TRUE)[[1]][[1]]
-    if (m > 0) {
-      x <- sub(re, paste0("_", tolower(substr(x, m, m))), x, perl = TRUE)
+    m <- regexec(re, x, perl = TRUE)[[1]]
+    i <- m[[1]]
+    j <- i + attr(m, "match.length")[[1]] - 1L
+    if (i > 0) {
+      x <- sub(re, paste0("_", tolower(substr(x, i, j))), x, perl = TRUE)
     } else {
       break
     }
@@ -93,7 +104,7 @@ camel_to_snake <- function(x) {
 
 snake_to_camel <- function(x) {
   if (length(x) != 1L) {
-    return(vcapply(x, snake_to_camel))
+    return(vcapply(x, snake_to_camel, USE.NAMES = FALSE))
   }
   re <- "_([a-z])"
   repeat {
