@@ -30,7 +30,7 @@ make_endpoint <- function(method, path, spec) {
   produces <- get_response_type(method, path, x)
   response_handlers <- make_response_handlers(x$responses, spec, produces)
   header_handlers <- make_header_handlers(x$responses, spec)
-  argument_handler <- make_argument_handler(method, path, x)
+  argument_handler <- make_argument_handler(method, path, x, spec)
 
   list(
     path = path,
@@ -106,6 +106,22 @@ resolve_schema_ref <- function(x, spec) {
   if (identical(names(x), "$ref")) {
     ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
     x <- spec[[ref]]
+  }
+  x
+}
+
+resolve_schema_ref2 <- function(x, spec) {
+  if ("allOf" %in% names(x)) {
+    tmp <- lapply(x$allOf, resolve_schema_ref2, spec)
+    type <- vcapply(tmp, "[[", "type")
+    if (!all(type == "object")) {
+      stop("work out how to combine non-objects")
+    }
+    x <- list(type = "object",
+              properties = unlist(lapply(tmp, "[[", "properties"), FALSE))
+  } else if ("$ref" %in% names(x)) {
+    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
+    x <- c(x[names(x) != "$ref"], resolve_schema_ref2(spec[[ref]], spec))
   }
   x
 }

@@ -143,3 +143,19 @@ raw_to_char <- function(bin) {
 raw_to_json <- function(bin) {
   from_json(raw_to_char(bin))
 }
+
+as_call <- function(...) {
+  as.call(list(...))
+}
+
+dollar <- function(...) {
+  f <- function(a, b) {
+    as_call(quote(`$`), a, b)
+  }
+  args <- list(...)
+  ret <- args[[1]]
+  for (i in seq_along(args)[-1L]) {
+    ret <- f(ret, args[[i]])
+  }
+  ret
+}

@@ -137,6 +137,9 @@ http_client_api_version <- function(api_version, client) {
   } else {
     assert_scalar_character("api_version")
     if (tolower(api_version) == "detect") {
+      ## TODO; temporarily set the version here to the default version
+      ## (i.e., whatever we ship with) to avoid hitting the deprecated
+      ## api-without-version issue.
       res <- client$request("GET", "/version", versioned_api = FALSE)
       api_version <- raw_to_json(res$content)$ApiVersion
     } else {

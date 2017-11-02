@@ -223,6 +223,7 @@ schema_get_type <- function(x) {
   if (is.null(ret)) {
     ## TODO: this is likely incorrect in some cases, but I suspect
     ## that it's ok most of the time.
+    ## TODO; remove this once we roll over to the new resolver
     if ("allOf" %in% names(x)) {
       ret <- "object"
     } else {

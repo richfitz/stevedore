@@ -1,100 +1,125 @@
-## Autoatic argument handling; read through the swagger spec and
-## create a *default* argument handler.  This is going to require
-## quite a bit of case-by-case work for nontrivial things.  There's
-## also lots of translation required so that we can keep the primarily
-## snake-case interface to the package working.
-
-## I think that we'll write these functions to take a client as the
-## first argument and then partial that out when creating the
-## interface.  That way we can memoise creating the clients by
-## version.
-
-
-## The other way of achiving the same real goal is some sort of
-## builder pattern where we take a reciever and a handler and build
-## functions with it.  That's probably better actually as it involves
-## a bit less straight up magic.
-
-make_argument_handler <- function(method, path, x) {
-  ## All the stopifnot bits are assertions that have more to do with
-  ## making sure that the spec confirms to what we are expecting.
-  ## They'd probably be better done with debugme because I don't think
-  ## they should be run by users.
-
+endpoint_args <- function(method, path, x, spec) {
   pars <- x$parameters
+  if (is.null(pars)) {
+    return(NULL)
+  }
   pars_in <- vcapply(pars, "[[", "in")
-  pars_optional <- !vlapply(pars, function(x)
-    isTRUE(x$required) || x[["in"]] == "body")
 
-  i <- match(pars_in, c("path", "body", "query", "header"))
-  stopifnot(all(!is.na(i)))
-  ord <- order(pars_optional, i)
+  is_body <- pars_in == "body"
+  if (any(is_body)) {
+    stopifnot(sum(is_body) == 1L)
+    i_body <- which(is_body)
+    body <- pars[[i_body]]
+    body$schema <- resolve_schema_ref2(body$schema, spec)
 
-  if (!identical(ord, seq_along(ord))) {
-    pars_in <- pars_in[ord]
-    pars_optional <- pars_optional[ord]
-    pars <- pars[ord]
+    if (body$schema$type == "object") {
+      to_par <- function(x) {
+        c(list(name = x, "in" = "body"), body$schema$properties[[x]])
+      }
+      pars_body <- lapply(names(body$schema$properties), to_par)
+
+      ## TODO; we'll expand this a little if there are more - the idea
+      ## is that there is no way of determining from the yaml spec
+      ## which parameters are compulsary, so this way we can flag them
+      ## one-by-one.  So it's something that will get updated as the
+      ## underlying spec changes, but _hopefully_ not too badly with
+      ## version and not too often.  Later we can move this
+      ## information into the endpoints.yaml file perhaps.  We might
+      ## want to arbitrarily patch parameters with additional
+      ## information and then process them during argument parsing?
+      if (method == "POST" && path == "/containers/create") {
+        pars_body$image$required <- TRUE
+      }
+
+      i1 <- seq_len(i_body - 1L)
+      i2 <- setdiff(seq_along(pars), c(i1, i_body))
+      pars <- c(pars[i1], pars_body, pars[i2])
+      pars_in <- c(pars_in[i1], rep("body", length(pars_body)), pars_in[i2])
+      body_type <- "combine"
+    } else { # body$schema$type == "string"
+      body_type <- "single"
+      p <- pars[[i_body]]
+      pars[[i_body]] <- c(p[names(p) != "schema"], p$schema)
+    }
+  } else {
+    body_type <- NULL
   }
 
   pars_name <- vcapply(pars, "[[", "name")
   pars_name_r <- pars_name
   pars_name_r[pars_in == "header"] <-
     name_header_to_r(pars_name[pars_in == "header"])
-  pars_name_r <- camel_to_snake(pars_name_r)
+  pars_name_r <- pascal_to_snake(pars_name_r)
   for (i in seq_along(pars)) {
     pars[[i]]$name_r <- pars_name_r[[i]]
+    pars[[i]] <- resolve_schema_ref2(pars[[i]], spec)
   }
 
-  if (any(duplicated(pars_name))) {
+  if (any(duplicated(pars_name)) || any(duplicated(pars_name_r))) {
     stop("fix duplicated names")
   }
   stopifnot(identical(pars_name[pars_in == "path"], parse_path(path)$args))
-  stopifnot(sum(pars_in == "body") <= 1L)
+
+  i <- match(pars_in, c("path", "body", "query", "header"))
+  stopifnot(all(!is.na(i)))
+  pars_req <- vlapply(pars, function(x) isTRUE(x$required))
+  pars <- pars[order(!pars_req, i)]
+
+  attr(pars, "body_type") <- body_type
+
+  pars
+}
+
+make_argument_handler <- function(method, path, x, spec) {
+  ## All the stopifnot bits are assertions that have more to do with
+  ## making sure that the spec confirms to what we are expecting.
+  ## They'd probably be better done with debugme because I don't think
+  ## they should be run by users.
+
+  pars <- endpoint_args(method, path, x, spec)
 
   ## These bits here can likely get completely overhauled as there's
   ## heaps of duplication!
   dest <- quote(dest)
-  fbody_path <- lapply(pars[pars_in == "path"], arg_collect_path)
-  if (length(fbody_path) > 0L) {
-    fbody_path <- as.call(c(list(quote(c)), fbody_path))
-    fbody_path <- bquote(.(dest)$path <- .(fbody_path))
-  }
-  fbody_query <- lapply(pars[pars_in == "query"], arg_collect_query, dest)
-  if (length(fbody_query) > 0L) {
-    fbody_query <- c(bquote(.(dest)$query <- list()), fbody_query)
-  }
-  if (any(pars_in == "body")) {
-    fbody_body <- arg_collect_body(pars[[which(pars_in == "body")]], dest)
-    ## TODO: this will not work for non-json cases and we'll need to
-    ## handle scalars more gracefully than auto_unbox (wrap them all
-    ## in unbox as we build the thing I think).
-    fbody_body <- bquote(.(dest)$body <- jsonlite::toJSON(.(fbody_body),
-                                                          auto_unbox = TRUE))
+
+  body_type <- attr(pars, "body_type")
+  if (is.null(body_type)) {
+    fbody_body_combine <- NULL
   } else {
-    fbody_body <- NULL
-  }
-  fbody_header <- lapply(pars[pars_in == "header"], arg_collect_header, dest)
-  if (length(fbody_header) > 0L) {
-    fbody_header <- c(bquote(.(dest)$header <- list()), fbody_header)
+    if (body_type == "combine") {
+      fbody_body_combine <- as_call(quote(jsonlite::toJSON), dollar(dest, quote(body)))
+    } else if (body_type == "single") {
+      ## We'd be better off doing this within the core body function
+      ## probably but that requires a bit of faff.
+      nm <- as.symbol(pars[[which(vcapply(pars, "[[", "in") == "body")]]$name)
+      fbody_body_combine <- dollar(dest, quote(body), nm)
+    }
+    fbody_body_combine <- bquote(.(dollar(dest, quote(body))) <- .(fbody_body_combine))
   }
 
-  fbody <- as.call(c(quote(`{`), bquote(.(dest) <- list()),
-                     fbody_path, fbody_query, fbody_body, fbody_header,
-                     dest))
+  fbody_collect <- lapply(pars, arg_collect, dest)
+  fbody <- c(quote(`{`),
+            bquote(.(dest) <- list()),
+            fbody_collect,
+            fbody_body_combine,
+            dest)
+
+  pars_optional <- !vlapply(pars, function(x) isTRUE(x$required))
+  pars_name_r <- vcapply(pars, "[[", "name_r")
 
   a <- rep(alist(. =, . = NULL), c(sum(!pars_optional), sum(pars_optional)))
   names(a) <- pars_name_r
   env <- parent.env(environment())
-  as.function(c(a, fbody), env)
+  as.function(c(a, as.call(fbody)), env)
 }
 
-arg_collector <- function(p, dest) {
+arg_collect <- function(p, dest) {
   switch(p[["in"]],
-         path = arg_collect_path,
-         query = arg_collect_query,
-         body = arg_collect_body,
-         header = arg_collect_header,
-         stop("assertion error"))(p, dest)
+         path = arg_collect_path(p, dest),
+         query = arg_collect_query(p, dest),
+         body = arg_collect_body(p, dest),
+         header = arg_collect_header(p, dest),
+         stop("assertion error"))
 }
 
 arg_collect_path <- function(p, dest) {
@@ -105,60 +130,80 @@ arg_collect_path <- function(p, dest) {
   bquote(.(validate)(.(as.symbol(p$name_r))))
 }
 
+## some of the 'query' bits within here must change - we might need to
+## construct different validators depending on what sort of input
+## we're getting?  It might be better to realise that avoiding
+## duplication here is just making this function worse, not better!
 arg_collect_query <- function(p, dest) {
   type <- p$type
+  stopifnot(length(type) == 1L)
   if (type == "boolean") {
-    validate <- quote(as_query_logical)
+    validate <- assert_scalar_logical
   } else if (type == "integer") {
     validate <- quote(assert_scalar_integer)
   } else if (type == "string") {
-    if (grepl("json", p$description, ignore.case = TRUE)) {
-      validate <- quote(as_query_json)
-    } else {
-      validate <- quote(assert_scalar_character)
-    }
+    validate <- quote(assert_scalar_character)
   } else if (type == "array") {
     if (identical(p$items, list(type = "string"))) {
       validate <- quote(as_query_array_string)
     } else {
-      stop("Can't handle this sort of array")
+      message("Skipping validation (array)")
+      validate <- quote(identity)
     }
   } else {
-    stop("Can't handle this sort of thing")
+    message("Skipping validation (other)")
+    validate <- quote(identity)
   }
+
   nm <- as.symbol(p$name)
   nm_r <- as.symbol(p$name_r)
-  expr <- bquote(.(dest)$query[[.(p$name)]] <- .(validate)(.(nm_r)))
+  rhs <- as_call(validate, nm_r)
+  lhs <- dollar(dest, as.name(p[["in"]]), nm)
+  expr <- as_call(quote(`<-`), lhs, rhs)
   if (!isTRUE(p$required)) {
     expr <- bquote(if (!is.null(.(nm_r))) .(expr))
   }
   expr
 }
 
+## This is really similar to above but not *that* similar really -
+## when combined they're clumsy and hard to reason about.
 arg_collect_body <- function(p, dest) {
-  ## These ones here pretty much will require a bunch of work; we can
-  ## probably outsource a lot of the common bits but most bodies are
-  ## nontrivial (a few are just a couple of keys).  It also looks like
-  ## we can't reliably pull information on requiredness from the
-  ## schema.
+  type <- p$type
+  if (setequal(type, c("array", "string"))) {
+    is_scalar <- FALSE
+    validate <- quote(as_body_array_string)
+  } else if (type == "boolean") {
+    validate <- assert_scalar_logical
+    is_scalar <- TRUE
+  } else if (type == "integer") {
+    validate <- quote(assert_scalar_integer)
+    is_scalar <- TRUE
+  } else if (type == "string") {
+    validate <- quote(assert_scalar_character)
+    is_scalar <- TRUE
+  } else if (type == "array") {
+    message("Skipping validation (array)")
+    validate <- quote(identity)
+    is_scalar <- FALSE
+  } else {
+    message("Skipping validation (other)")
+    validate <- quote(identity)
+    is_scalar <- FALSE
+  }
 
-  ## POST /auth (json)
-  ## POST /containers/create (json)
-  ## POST /containers/{id}/update (json)
-  ## PUT /containers/{id}/archive (tar)
-  ## POST /build (tar)
-  ## POST /images/create (json)
-  ## POST /commit (json)
-  ## POST /images/load (tar)
-  ## POST /networks/create (json)
-  ## POST /networks/{id}/connect (json)
-  ## POST /networks/{id}/disconnect (json)
-  ## POST /volumes/create (json)
-  ## POST /containers/{id}/exec (json)
-  ## POST /exec/{id}/start (json)
-
-  nm <- as.symbol(p$name_r)
-  nm
+  nm <- as.symbol(p$name)
+  nm_r <- as.symbol(p$name_r)
+  rhs <- as_call(validate, nm_r)
+  if (is_scalar) {
+    rhs <- as_call(quote(jsonlite::unbox), rhs)
+  }
+  lhs <- dollar(dest, quote(body), nm)
+  expr <- as_call(quote(`<-`), lhs, rhs)
+  if (!isTRUE(p$required)) {
+    expr <- bquote(if (!is.null(.(nm_r))) .(expr))
+  }
+  expr
 }
 
 arg_collect_header <- function(p, dest) {
@@ -167,7 +212,7 @@ arg_collect_header <- function(p, dest) {
   if (is.null(p$enum)) {
     expr <- bquote(assert_scalar_character(.(nm)))
   } else {
-    values <- as.call(c(quote(c), p$enum))
+    values <- as_call(quote(c), p$enum)
     expr <- bquote(match_value(.(nm), .(values)))
   }
   expr <- bquote(.(dest)$header[[.(p$name)]] <- .(expr))
@@ -177,15 +222,11 @@ arg_collect_header <- function(p, dest) {
   expr
 }
 
-as_query_logical <- function(x, name = deparse(substitute(x))) {
-  assert_scalar_logical(x, name)
-  if (x) "true" else "false"
-}
-
 as_query_json <- function(x, name = deparse(substitute(x))) {
   ## TODO: need to convert case here; most cases will actually need
   ## proper handlers I suspect, and these will end up in their own bit
   ## of configuration.
+  message("as query json")
   browser()
 }
 
@@ -195,7 +236,18 @@ as_query_array_string <- function(x, name = deparse(substitute(x))) {
 }
 
 as_body <- function(x, name = deparse(substitute(x))) {
+  message("as body")
   browser()
+}
+
+as_body_array_string <- function(x, name = deparse(substitute(x))) {
+  assert_character(x, name)
+  if (inherits(x, "AsIs")) {
+    assert_scalar(x, name)
+    jsonlite::unbox(x)
+  } else {
+    x
+  }
 }
 
 name_header_to_r <- function(x) {
