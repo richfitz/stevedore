@@ -89,18 +89,32 @@ response_to_error <- function(response, pass_error) {
 ## quoting/escaping etc needed here (the python client includes space
 ## -> '+' at least).
 build_url <- function(base_url, api_version, path, params = NULL) {
-  if (length(params) > 0L) {
-    stopifnot(is.list(params),
-              !is.null(names(params)),
-              all(nzchar(names(params))))
-    q <- paste(sprintf("%s=%s", names(params), vcapply(params, identity)),
-               collapse = "&")
-    path <- sprintf("%s?%s", path, q)
-  }
+  path <- paste0(path, build_url_query(params) %||% "")
   if (is.null(api_version)) {
     sprintf("%s%s", base_url, path)
   } else {
     sprintf("%s/v%s%s", base_url, api_version, path)
+  }
+}
+
+## TODO: escape parameters; consider 'curl::curl_escape' but also
+## gsub(' ', '+', x) which is what the python client used (though I
+## don't see this mentioned in the spec itself)
+build_url_query <- function(params) {
+  if (length(params) > 0L) {
+    stopifnot(is.list(params),
+              !is.null(names(params)),
+              all(nzchar(names(params))))
+    to_character <- function(x) {
+      if (is.logical(x)) {
+        if (x) "true" else "false"
+      } else {
+        as.character(x)
+      }
+    }
+    q <- paste(sprintf("%s=%s", names(params), vcapply(params, to_character)),
+               collapse = "&")
+    paste0("?", q)
   }
 }
 
