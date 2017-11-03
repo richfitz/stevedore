@@ -13,11 +13,6 @@ endpoint_args <- function(method, path, x, spec) {
     body$schema <- resolve_schema_ref2(body$schema, spec)
 
     if (body$schema$type == "object") {
-      to_par <- function(x) {
-        c(list(name = x, "in" = "body"), body$schema$properties[[x]])
-      }
-      pars_body <- lapply(names(body$schema$properties), to_par)
-
       ## TODO; we'll expand this a little if there are more - the idea
       ## is that there is no way of determining from the yaml spec
       ## which parameters are compulsary, so this way we can flag them
@@ -27,9 +22,13 @@ endpoint_args <- function(method, path, x, spec) {
       ## information into the endpoints.yaml file perhaps.  We might
       ## want to arbitrarily patch parameters with additional
       ## information and then process them during argument parsing?
-      if (method == "POST" && path == "/containers/create") {
-        pars_body$image$required <- TRUE
+      if (method == "post" && path == "/containers/create") {
+        body$schema$properties$Image$required <- TRUE
       }
+      to_par <- function(x) {
+        c(list(name = x, "in" = "body"), body$schema$properties[[x]])
+      }
+      pars_body <- lapply(names(body$schema$properties), to_par)
 
       i1 <- seq_len(i_body - 1L)
       i2 <- setdiff(seq_along(pars), c(i1, i_body))
