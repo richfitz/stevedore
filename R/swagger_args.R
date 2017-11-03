@@ -125,8 +125,9 @@ arg_collect_path <- function(p, dest) {
   if (!isTRUE(p$required)) {
     stop("all path parameters assumed required")
   }
-  validate <- quote(assert_scalar_character)
-  bquote(.(validate)(.(as.symbol(p$name_r))))
+  rhs <- as_call(quote(assert_scalar_character), as.symbol(p$name_r))
+  lhs <- dollar(dest, quote(path), as.symbol(p$name))
+  as_call(quote(`<-`), lhs, rhs)
 }
 
 ## some of the 'query' bits within here must change - we might need to
@@ -137,7 +138,7 @@ arg_collect_query <- function(p, dest) {
   type <- p$type
   stopifnot(length(type) == 1L)
   if (type == "boolean") {
-    validate <- assert_scalar_logical
+    validate <- quote(assert_scalar_logical)
   } else if (type == "integer") {
     validate <- quote(assert_scalar_integer)
   } else if (type == "string") {
@@ -146,18 +147,18 @@ arg_collect_query <- function(p, dest) {
     if (identical(p$items, list(type = "string"))) {
       validate <- quote(as_query_array_string)
     } else {
-      message("Skipping validation (array)")
+      ## message("Skipping validation (array)")
       validate <- quote(identity)
     }
   } else {
-    message("Skipping validation (other)")
+    ## message("Skipping validation (other)")
     validate <- quote(identity)
   }
 
   nm <- as.symbol(p$name)
   nm_r <- as.symbol(p$name_r)
   rhs <- as_call(validate, nm_r)
-  lhs <- dollar(dest, as.name(p[["in"]]), nm)
+  lhs <- dollar(dest, quote(query), nm)
   expr <- as_call(quote(`<-`), lhs, rhs)
   if (!isTRUE(p$required)) {
     expr <- bquote(if (!is.null(.(nm_r))) .(expr))
@@ -173,7 +174,7 @@ arg_collect_body <- function(p, dest) {
     is_scalar <- FALSE
     validate <- quote(as_body_array_string)
   } else if (type == "boolean") {
-    validate <- assert_scalar_logical
+    validate <- quote(assert_scalar_logical)
     is_scalar <- TRUE
   } else if (type == "integer") {
     validate <- quote(assert_scalar_integer)
