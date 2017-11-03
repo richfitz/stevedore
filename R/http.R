@@ -73,9 +73,15 @@ make_handle_socket <- function(base_url) {
 
 ## Generate (and possibly throw) S3 errors out of http errors
 response_to_error <- function(response, pass_error) {
+  headers <- curl::parse_headers_list(response$headers)
+  type <- headers[["content-type"]]
+  if (type == "text/plain") {
+    msg <- raw_to_char(response$content)
+  } else {
+    msg <- raw_to_json(response$content)$message
+  }
   status_code <- response$status_code
-  cond <- list(message = raw_to_json(response$content)$message,
-               code = status_code)
+  cond <- list(message = msg, code = status_code)
   class(cond) <- c("docker_error", "error", "condition")
   if (status_code %in% pass_error) {
     cond
