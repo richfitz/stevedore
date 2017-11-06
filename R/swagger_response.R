@@ -1,8 +1,15 @@
-make_response_handlers <- function(responses, spec, produces) {
+make_response_handlers <- function(responses, spec, produces, override) {
   responses <- responses[as.integer(names(responses)) < 300]
   binary_types <- c("application/octet-stream",
                     "application/x-tar",
                     "application/vnd.docker.raw-stream")
+  if (!is.null(override)) {
+    ## If we need to just override a subset here we should take a list
+    ## in rather than a function.
+    ret <- rep(list(override), length(responses))
+    names(ret) <- names(responses)
+    return(ret)
+  }
 
   if (produces == "null") {
     lapply(responses, make_response_handler_null, spec)
@@ -231,4 +238,31 @@ schema_get_type <- function(x) {
     }
   }
   ret
+}
+
+## NOTE: dots used here for compatibility with 'convert=' argument;
+## this might change later.
+decode_chunked_string <- function(x, ...) {
+  i_size <- 5L:8L
+  to_int <- function(b) {
+    sum(256^(3:0) * as.integer(b))
+  }
+
+  stream <- integer(0)
+  value <- character(0)
+
+  ## TODO: consider dropping newline off here - it's easy enough to
+  ## do?  Or probably creating a classed object that we can work with
+  ## in a reasonable way.
+  while (length(x) > 0L) {
+    len <- to_int(x[i_size])
+
+    stream <- c(stream, x[[1L]])
+    value <- c(value, rawToChar(x[9:(len + 8L)]))
+
+    x <- x[-seq_len(len + 8L)]
+  }
+  attr(value, "stream") <-
+    factor(stream, 1:3, labels = c("stdin", "stdout", "stderr"))
+  value
 }

@@ -235,11 +235,6 @@ as_query_array_string <- function(x, name = deparse(substitute(x))) {
   paste(x, collapse = ",")
 }
 
-as_body <- function(x, name = deparse(substitute(x))) {
-  message("as body")
-  browser()
-}
-
 as_body_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
   if (inherits(x, "AsIs")) {
