@@ -25,13 +25,30 @@ read_spec <- function(version) {
     stop(sprintf("Spec for %s had different md5 than expected (%s, not %s)",
                  version, md5_found, md5_expected))
   }
-  yaml::yaml.load_file(path_yml)
+  ret <- yaml::yaml.load_file(path_yml)
+
+  ## We'll need to do a bunch of these probably; they can probably
+  ## also be moved into a yaml file easily enough with version ranges.
+  if (version == "v1.29") {
+    ret <- spec_patch(ret, c("definitions", "Mount", "properties", "Source"),
+                      type = "string")
+  }
+
+  ret
 }
 
 fetch_spec <- function(version, path) {
   url <- sprintf("https://docs.docker.com/engine/api/%s/swagger.yaml", version)
   dest <- file.path(path, paste0(version, ".yaml"))
   download_file(url, dest)
+}
+
+spec_patch <- function(spec, key, ...) {
+  x <- spec[[key]]
+  data <- list(...)
+  x[names(data)] <- data
+  spec[[key]] <- x
+  spec
 }
 
 spec_path <- function() {
@@ -51,7 +68,7 @@ spec_path <- function() {
 ## This is used only in the package Makefile
 write_spec_index <- function(path) {
   min_version <- 25L
-  max_version <- 32L
+  max_version <- 33L
   versions <- sprintf("v1.%d", min_version:max_version)
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)

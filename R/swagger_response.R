@@ -1,8 +1,19 @@
+## This is significantly harder than customising the input; we read
+## through the swagger spec and write custom handlers for the json.
+## This seems preferable to just relying on the defaults in
+## `jsonlite::fromJSON` because things are more likely to be
+## type-stable - a zero length array of strings will come out as
+## character() and not list(), for example.
+##
+## There is an existing R package 'rapiclient' for generic swagger
+## bindings, but it does not offer hooks that we can use to get just
+## the processing part of swagger, and is bound heavily to httr (which
+## doesn't work nicely with the unix socket and connection hijacking).
+## It also does not handle the spec as provided by docker (it also
+## does not have automatically generated handler functions so this
+## might be worth pushing upstream).
 make_response_handlers <- function(responses, spec, produces, override) {
   responses <- responses[as.integer(names(responses)) < 300]
-  binary_types <- c("application/octet-stream",
-                    "application/x-tar",
-                    "application/vnd.docker.raw-stream")
   if (!is.null(override)) {
     ## If we need to just override a subset here we should take a list
     ## in rather than a function.
@@ -11,37 +22,47 @@ make_response_handlers <- function(responses, spec, produces, override) {
     return(ret)
   }
 
+  lapply(responses, make_response_handler, spec, produces)
+}
+
+make_response_handler <- function(response, spec, produces) {
+  binary_types <- c("application/octet-stream",
+                    "application/x-tar",
+                    "application/vnd.docker.raw-stream")
   if (produces == "null") {
-    lapply(responses, make_response_handler_null, spec)
+    make_response_handler_null(response, spec)
   } else if (produces == "application/json") {
-    lapply(responses, make_response_handler, spec)
+    make_response_handler_json(response, spec)
   } else if (produces %in% binary_types) {
-    lapply(responses, make_response_handler_binary)
+    make_response_handler_binary(response)
   } else if (produces == "text/plain") {
-    lapply(responses, make_response_handler_text)
+    make_response_handler_text(response)
   } else {
     stop("Unhandled response type ", produces)
   }
 }
 
-make_response_handler <- function(response, spec) {
-  schema <- resolve_schema_ref(response$schema, spec)
+make_response_handler_json <- function(response, spec) {
+  schema <- resolve_schema_ref2(response$schema, spec)
 
   if (is.null(schema)) {
-    make_response_handler_null(schema, spec)
+    h <- make_response_handler_null(schema, spec)
   } else if (schema$type == "object") {
-    make_response_handler_object(schema, spec)
+    h <- make_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
-    make_response_handler_array(schema, spec)
+    h <- make_response_handler_array(schema, spec)
   } else if (schema$type == "string") {
-    make_response_handler_string(schema, spec)
+    h <- make_response_handler_string(schema, spec)
   } else {
     stop("not sure how to make this response handler")
+  }
+  function(data, as_is_names) {
+    h(raw_to_json(data), as_is_names)
   }
 }
 
 make_response_handler_null <- function(response, spec) {
-  function(data, convert = TRUE) {
+  function(data) {
     if (length(data) > 0L) {
       stop("Expected an empty response")
     }
@@ -49,128 +70,253 @@ make_response_handler_null <- function(response, spec) {
   }
 }
 
+## TODO: there's a big problem here with binary strings - these should
+## be treated separately _above_ this function.  We know they're
+## coming.
 make_response_handler_string <- function(schema, spec) {
   as_character <- !identical(schema$format, "binary")
-  function(data, convert = TRUE) {
-    if (as_character) {
-      data <- rawToChar(data)
-    }
+  function(data, as_is_names) {
+    ## if (as_character)) {
+    ##   data <- rawToChar(data)
+    ## }
     data
   }
 }
 
 make_response_handler_object <- function(schema, spec) {
-  ## TODO: there's considerable overlap here with
-  ## 'make_response_handler_array_object', though it's not *quite* the
-  ## same and I don't know if the code can sensibly be shared.
-  els <- names(schema$properties)
-
-  properties <- lapply(schema$properties, resolve_schema_ref, spec)
-  type <- vcapply(properties, schema_get_type)
-
   atomic <- atomic_types()
 
-  els_atomic <- names(type)[type %in% atomic$names]
-  els_array <- names(type)[vlapply(properties, function(x)
-    schema_get_type(x) == "array" && x$items %in% atomic$names)]
-  els_object <- setdiff(els, c(els_atomic, els_array))
-
-  ## NOTE: we could filter the use of 'pick' via whether things are
-  ## actually optional but I don't think there's much gained there.
-  f_atomic <- function(v, data) {
-    pick(data, v, atomic$missing[[type[[v]]]])
-  }
-  f_array <- function(v, data) {
-    pick(data, v, NULL) %||% atomic$empty[[properties[[v]]$items$type]]
-  }
-  f_object <- function(v, data) {
-    pick(data, v, NULL)
-  }
-
-  function(data, convert = TRUE) {
-    if (convert) {
-      data <- raw_to_json(data)
+  additional_properties <- additional_properties_handler <- NULL
+  if (!is.null(schema$additionalProperties)) {
+    ap <- resolve_schema_ref2(schema$additionalProperties, spec)
+    if (ap$type == "object") {
+      additional_properties <- "object"
+      if (!is.null(ap$properties)) {
+        additional_properties_handler <- make_response_handler_object(ap, spec)
+      }
+    } else if (identical(ap, list(type = "string"))) {
+      additional_properties <- "string"
+    } else {
+      additional_properties <- "other"
     }
+    ## TODO: register appropriate handlers here for some of the object case
+  }
+
+  els <- names(schema$properties)
+  els_r <- pascal_to_snake(els)
+
+  properties <- lapply(schema$properties, resolve_schema_ref2, spec)
+  type <- vcapply(properties, schema_get_type)
+  ## This is the simplest check now:
+  stopifnot(all(type %in% c(atomic$names, "object", "array")))
+
+  els_atomic <- names(type)[type %in% atomic$names]
+  els_object <- names(type)[type == "object"]
+  els_array <- names(type)[type == "array"]
+
+  ## Quick check here that we found everything ok
+  found <- c(els_atomic, els_array, els_object)
+  stopifnot(length(found) == length(els) && setequal(found, els))
+
+  object_handlers <- lapply(schema$properties[els_object], function(x)
+    make_response_handler_object(x, spec))
+  array_handlers <- lapply(schema$properties[els_array], function(x)
+    make_response_handler_array(x, spec))
+
+  f_atomic <- function(v, data) {
+    pick(data, v, atomic$missing[[type[[v]]]])[[1L]]
+  }
+  f_object <- function(v, data, as_is_names) {
+    x <- pick(data, v, NULL)
+    x %&&% object_handlers[[v]](x, as_is_names)
+  }
+  f_array <- function(v, data, as_is_names) {
+    array_handlers[[v]](pick(data, v, NULL), as_is_names)
+  }
+
+  function(data, as_is_names) {
     ret <- vector("list", length(type))
     names(ret) <- els
     ret[els_atomic] <- lapply(els_atomic, f_atomic, data)
-    ret[els_object] <- lapply(els_object, f_object, data)
-    ret[els_array]  <- lapply(els_array,  f_array,  data)
+    ret[els_object] <- lapply(els_object, f_object, data, as_is_names)
+    ret[els_array]  <- lapply(els_array,  f_array,  data, as_is_names)
+    if (!as_is_names && length(ret) > 0L) {
+      names(ret) <- els_r
+    }
+
+    if (!is.null(additional_properties)) {
+      extra <- data[setdiff(names(data), els)]
+      if (additional_properties == "string" && length(els) == 0L) {
+        ## This deals with the case like the `Options` field in GET
+        ## /volumes; it is defined *only* as `AdditionalProperties:
+        ## "string"`, in which case it's a named character vector;
+        ret <- character(0)
+        extra <- vcapply(extra, "[[", 1L)
+      }
+      if (length(extra) > 0L) {
+        if (!is.null(additional_properties_handler)) {
+          extra <- lapply(extra, additional_properties_handler, as_is_names)
+        }
+        if (additional_properties == "other") {
+          ## Before processing this I'd like to see what else uses it.
+          message("additional properties need processing")
+        }
+        if (!as_is_names && length(extra) > 0L) {
+          names(extra) <- pascal_to_snake(names(extra))
+        }
+        ret <- c(ret, extra)
+      }
+    }
+
     ret
   }
 }
 
 make_response_handler_array <- function(schema, spec) {
-  items <- resolve_schema_ref(schema$items, spec)
+  items <- resolve_schema_ref2(schema$items, spec)
+  atomic <- atomic_types()
 
+  if (is.null(items$type)) browser()
   if (items$type == "object") {
     make_response_handler_array_object(items, spec)
+  } else if (items$type == "array") {
+    make_response_handler_array_array(items, spec)
   } else {
-    message("mmrh_array")
-    browser()
+    make_response_handler_array_atomic(atomic$missing[[items$type]])
+  }
+}
+
+make_response_handler_array_atomic <- function(missing) {
+  force(missing)
+  function(x, as_is_names) {
+    if (is.null(x)) missing else vapply(x, identity, missing, USE.NAMES = FALSE)
+  }
+}
+
+make_response_handler_array_array <- function(items, spec) {
+  handler <- make_response_handler_array(items, spec)
+  rm(spec)
+  function(x, as_is_names) {
+    lapply(x, handler, as_is_names)
   }
 }
 
 make_response_handler_array_object <- function(items, spec) {
-  cols <- names(items$properties)
-  properties <- lapply(items$properties, resolve_schema_ref, spec)
-  type <- vcapply(properties, schema_get_type)
+  if (!is.null(items$additionalProperties)) {
+    return(make_response_handler_array_object_list(items, spec))
+  } else {
+    return(make_response_handler_array_object_df(items, spec))
+  }
+}
 
+## This one is the nasty case; we handle an object but after
+## collection convert it into a data frame.  There's some duplication
+## here with make_response_handler_object but it's not avoidable
+## because we need to iterate over each element in the array - we're
+## basically transposing it but doing some type conversion at the same
+## time!
+make_response_handler_array_object_df <- function(items, spec) {
   atomic <- atomic_types()
+  items$properties <- lapply(items$properties, resolve_schema_ref2, spec)
+  properties <- lapply(items$properties, resolve_schema_ref2, spec)
+
+  cols <- names(properties)
+  cols_r <- pascal_to_snake(cols)
+
+  type <- vcapply(properties, "[[", "type")
+  stopifnot(all(type %in% c(atomic$names, "object", "array")))
 
   cols_atomic <- names(type)[type %in% atomic$names]
-  cols_array <- names(type)[vlapply(properties, function(x)
-    x$type == "array" && x$items %in% atomic$names)]
-  cols_object <- setdiff(cols, c(cols_atomic, cols_array))
+  cols_object <- names(type)[type == "object"]
+  cols_array <- names(type)[type == "array"]
 
-  ## NOTE: we could filter the use of 'pick' via whether things are
-  ## actually optional but I don't think there's much gained there.
+  object_handlers <- lapply(properties[cols_object], function(x)
+    make_response_handler_object(x, spec))
+  array_handlers <- lapply(properties[cols_array], function(x)
+    make_response_handler_array(x, spec))
+
   f_atomic <- function(v, data) {
     vapply(data, pick, atomic$type[[type[[v]]]], v, atomic$missing[[type[[v]]]],
            USE.NAMES = FALSE)
   }
-  f_array <- function(v, data) {
-    ret <- lapply(data, pick, v, NULL)
-    i <- lengths(ret) == 0
-    if (any(i)) {
-      ret[i] <- list(atomic$empty[[properties[[v]]$items$type]])
-    }
-    I(ret)
+  f_array <- function(v, data, as_is_names) {
+    x <- lapply(data, pick, v, NULL)
+    I(lapply(x, array_handlers[[v]], as_is_names))
   }
-  f_object <- function(v, data) {
-    I(lapply(data, pick, v, NULL))
+  f_object <- function(v, data, as_is_names) {
+    ## Ah bollocks - I've totally messed this up here and the
+    ## recursion is not working correctly I think - the data as coming
+    ## in here is missing a layer of listing.  This could come from a
+    ## bunch of places unfortunately.
+    x <- lapply(data, pick, v, NULL)
+    I(lapply(x, object_handlers[[v]], as_is_names))
   }
 
-  function(data, convert = TRUE) {
-    if (convert) {
-      data <- raw_to_json(data)
-    }
-    ret <- vector("list", length(type))
+  function(data, as_is_names) {
+    ret <- vector("list", length(cols))
     names(ret) <- cols
     ret[cols_atomic] <- lapply(cols_atomic, f_atomic, data)
-    ret[cols_object] <- lapply(cols_object, f_object, data)
-    ret[cols_array]  <- lapply(cols_array,  f_array,  data)
-    ret <- as.data.frame(ret, stringsAsFactors = FALSE)
-    ret
+    ret[cols_object] <- lapply(cols_object, f_object, data, as_is_names)
+    ret[cols_array]  <- lapply(cols_array,  f_array,  data, as_is_names)
+    if (!as_is_names && length(ret) > 0L) {
+      names(ret) <- cols_r
+    }
+    as.data.frame(ret, stringsAsFactors = FALSE, check.names = FALSE)
   }
 }
 
-make_response_handler_binary <- function(...) {
-  function(data, convert = TRUE) {
+make_response_handler_array_object_list <- function(items, spec) {
+  properties <- lapply(items$properties, resolve_schema_ref2, spec)
+  if (length(properties) != 0L) {
+    stop("This is not supported")
+  }
+
+  items$additionalProperties <-
+    resolve_schema_ref2(items$additionalProperties, spec)
+  if (identical(items$additionalProperties, list(type = "object"))) {
+    additional_properties <- "object"
+  } else if (identical(items$additionalProperties, list(type = "string"))) {
+    additional_properties <- "string"
+  } else {
+    additional_properties <- "other"
+  }
+
+  function(data, as_is_names) {
+    if (additional_properties == "string") {
+      data <- lapply(data, vcapply, identity)
+    } else if (additional_properties != "object") {
+      message("extra handling needed here")
+    }
+    if (!as_is_names) {
+      rename <- function(x) {
+        if (!is.null(names(x))) {
+          names(x) <- pascal_to_snake(names(x))
+        }
+        x
+      }
+      data <- lapply(data, rename)
+    }
     data
   }
 }
 
-make_response_handler_header <- function(...) {
-  function(data, convert = TRUE) {
+make_response_handler_binary <- function(...) {
+  function(data, as_is_names) {
+    data
   }
 }
 
 make_response_handler_text <- function(...) {
-  function(data, convert = TRUE) {
-    if (convert) {
-      data <- raw_to_char(data)
-    }
+  function(data, as_is_names) {
+    ## TODO: this needs dealing with - sometimes we're getting raw in
+    ## here and we can't always blindly do the conversion here.  I'm
+    ## going to comment this out until I come back for things like the
+    ## .../logs endpoint where we need to treat this as a binary
+    ## stream.
+    ##
+    ## if (convert) {
+    ##   data <- raw_to_char(data)
+    ## }
     data
   }
 }
@@ -183,6 +329,7 @@ make_header_handlers <- function(responses, spec) {
 make_header_handler <- function(response, spec) {
   if ("headers" %in% names(response)) {
     els <- names(response$headers)
+    els_r <- name_header_to_r(els)
     type <- vcapply(response$headers, "[[", "type")
     atomic <- atomic_types()
     f_atomic <- function(v, data) {
@@ -193,11 +340,11 @@ make_header_handler <- function(response, spec) {
       }
       x
     }
-    function(headers) {
+    function(headers, as_is_names) {
       h <- parse_headers(headers)
       names(h) <- tolower(names(h))
       ret <- lapply(els, f_atomic, h)
-      names(ret) <- els
+      names(ret) <- if (as_is_names) els else els_r
       ret
     }
   } else {
@@ -228,10 +375,14 @@ sprintfn <- function(fmt, args) {
 schema_get_type <- function(x) {
   ret <- x$type
   if (is.null(ret)) {
-    ## TODO: this is likely incorrect in some cases, but I suspect
-    ## that it's ok most of the time.
-    ## TODO; remove this once we roll over to the new resolver
-    if ("allOf" %in% names(x)) {
+    if (!is.null(x$enum)) {
+      ret <- "string"
+    } else if ("allOf" %in% names(x)) {
+      ## TODO: this is likely incorrect in some cases, but I suspect
+      ## that it's ok most of the time.
+      ## TODO; remove this once we roll over to the new resolver
+      message("FIXME?")
+      browser()
       ret <- "object"
     } else {
       stop("Could not determine type")

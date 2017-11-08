@@ -5,25 +5,29 @@ run_sample_responses <- function(obj) {
 }
 
 run_sample_response <- function(x, spec) {
-  responses <- spec$paths[[x$path]][[x$method]]$responses
+  responses <- spec$paths[[x$path]][[tolower(x$method)]]$responses
   message(sprintf("%s %s", toupper(x$method), x$path))
+  ret <- vector("list", length(responses))
+  names(ret) <- names(responses)
   for (code in names(responses)) {
     if (as.integer(code) < 300) {
       found_example <- FALSE
       response <- responses[[code]]
-      response$schema <- resolve_schema_ref(response$schema, spec)
+      response$schema <- resolve_schema_ref2(response$schema, spec)
       ex <- response[["schema"]][["example"]]
       if (!is.null(ex)) {
         found_example <- TRUE
         message(crayon::blue("  - ", code))
-        testthat::expect_silent(x$response_handlers[[code]](ex, FALSE))
+        testthat::expect_silent(
+          ret[[code]] <- x$response_handlers[[code]](ex, FALSE))
       }
       ex <- response[["examples"]]
       if (!is.null(ex)) {
         found_example <- TRUE
         message(crayon::blue("  - ", code))
         for (e in ex) {
-          testthat::expect_silent(x$response_handlers[[code]](ex, FALSE))
+          testthat::expect_silent(
+            ret[[code]] <- x$response_handlers[[code]](e, FALSE))
         }
       }
       if (!found_example) {
@@ -31,6 +35,7 @@ run_sample_response <- function(x, spec) {
       }
     }
   }
+  invisible(ret)
 }
 
 describe_api <- function(x) {

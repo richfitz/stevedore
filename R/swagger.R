@@ -51,7 +51,8 @@ make_endpoint <- function(method, path, spec) {
 }
 
 run_endpoint <- function(client, endpoint, params,
-                         pass_error = NULL, hijack = FALSE) {
+                         pass_error = NULL, hijack = FALSE,
+                         as_is_names = FALSE) {
   path <- sprintfn(endpoint$path_fmt, params$path)
   res <- client$request(endpoint$method, path,
                         params$query, params$body, params$header,
@@ -65,10 +66,10 @@ run_endpoint <- function(client, endpoint, params,
     if (is.null(r_handler)) {
       stop("unexpected response code ", res$status_code)
     }
-    ret <- r_handler(res$content)
+    ret <- r_handler(res$content, as_is_names = as_is_names)
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
     if (!is.null(h_handler)) {
-      headers <- h_handler(res$headers)
+      headers <- h_handler(res$headers, as_is_names = as_is_names)
       if (endpoint$method == "HEAD") {
         ## There cannot be a body here
         ret <- headers

@@ -1,6 +1,9 @@
 `%||%` <- function(a, b) {
   if (is.null(a)) b else a
 }
+`%&&%` <- function(a, b) {
+  if (is.null(a)) a else b
+}
 
 vlapply <- function(X, FUN, ...) {
   vapply(X, FUN, logical(1), ...)
@@ -75,6 +78,18 @@ partial1 <- function(FUN, x, env = parent.frame(),
   as.function(c(args[-1], body), env)
 }
 
+## FIXME: ID -> i_d (id)
+## FIXME: OStype -> o_stype (os_type)
+## FIXME: IPv4Forwarding -> i_pv4_forwarding (ipv4_forwarding)
+## FIXME: IPAM -> i_pam (ipam)
+##
+## In general - all single character entries need warning about and
+## checking.  It's possible that we'll need to special case some
+## words, but it looks like here that I am going to need to lowercase
+## consecutive uppercase leading letters?  Though that means we can't
+## easily deal with NCPU, NGoroutines, NFd, etc.  Treating `^N` in the
+## current way and everything else separately might be a reasonable
+## call.
 pascal_to_snake <- function(x) {
   camel_to_snake(paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x))))
 }
