@@ -1,0 +1,69 @@
+context("spec (responses)")
+
+test_that("object, atomic scalar components (/auth)", {
+  dat <- read_sample_response("sample_responses/system_ping.R")
+  ans <- dat$handler(dat$response_object, FALSE)
+  expect_equal(ans, dat$reference)
+})
+
+test_that("null (/containers/{id}/start)", {
+  dat <- read_sample_response("sample_responses/container_start.R")
+  ans <- dat$handler(dat$response_object)
+  expect_equal(ans, dat$reference)
+})
+
+test_that("object, atomic scalar components (/auth)", {
+  dat <- read_sample_response("sample_responses/system_auth.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("object, array of array (/containers/{id}/top)", {
+  dat <- read_sample_response("sample_responses/container_top.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("object of objects (volume_inspect)", {
+  dat <- read_sample_response("sample_responses/volume_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+  expect_equal(names(ans1$status), pascal_to_snake(names(ans2$Status)))
+})
+
+test_that("complex object (volume_list)", {
+  dat <- read_sample_response("sample_responses/volume_list.R")
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+  ## TODO: test recursive bits
+})
+
+test_that("complex objects (network_list)", {
+  dat <- read_sample_response("sample_responses/network_list.R")
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+  ## TODO: test recursive bits
+})

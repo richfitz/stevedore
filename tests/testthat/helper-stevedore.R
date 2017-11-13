@@ -71,3 +71,55 @@ describe_api <- function(x) {
 
   invisible(info)
 }
+
+read_sample_response <- function(path) {
+  txt <- readLines(path)
+  i <- grep("^[^#]", txt)[[1]]
+  head <- sub("^#+\\s*", "", txt[seq_len(i - 1L)])
+  re <- "(^[^ ]+): +(.*)\\s*$"
+  stopifnot(all(grepl(re, head)))
+  value <- sub(re, "\\2", head)
+  empty <- value == "~"
+  ret <- set_names(as.list(value), sub(re, "\\1", head))
+
+  msg <- setdiff(names(ret), c("version", "method", "path", "code", "response"))
+  if (length(msg) > 0L) {
+    stop(sprintf("Missing expected fields %s", paste(msg, collapse = ", ")))
+  }
+
+  ret[empty] <- list(raw())
+  ret$method <- tolower(ret$method)
+  spec <- read_spec(ret$version)
+
+  endpoint <- spec$paths[[ret$path]][[ret$method]]
+  ret$schema <- endpoint$responses[[ret$code]]
+
+  produces <- get_response_type(ret$method, ret$path, endpoint)
+  if (produces == "application/json") {
+    ret$response_object <- from_json(ret$response)
+    ret$response <- charToRaw(ret$response)
+  } else {
+    ret$response_object <- ret$response
+  }
+
+  ret$handler <- make_response_handler(ret$schema, spec, produces)
+  ret$reference <- eval(parse(text = txt))
+
+  ret
+}
+
+read_sample_response_str <- function(method, path, code, spec) {
+  r <- spec$paths[[path]][[tolower(method)]]$responses[[as.character(code)]]
+  to_str <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE)
+
+  schema <- resolve_schema_ref2(r$schema, spec)
+  ex <- schema[["example"]]
+  if (!is.null(ex)) {
+    return(to_str(ex))
+  }
+  ex <- r[["examples"]]
+  if (!is.null(ex)) {
+    return(to_str(ex[[1]]))
+  }
+  stop("did not find example")
+}
