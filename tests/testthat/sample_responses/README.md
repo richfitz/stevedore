@@ -28,3 +28,10 @@ Generate response strings with (for example)
 ```r
 read_sample_response_str("get", "/volumes/{name}", 200, spec_1_29)
 ```
+
+Or generate whole files with
+
+``` r
+add_sample_response("sample_responses/system_df.R", "get", "/system/df",
+                    "200", "v1.29")
+```

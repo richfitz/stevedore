@@ -123,3 +123,25 @@ read_sample_response_str <- function(method, path, code, spec) {
   }
   stop("did not find example")
 }
+
+dput2 <- function(x) {
+  paste(capture.output(dput(x)), collapse = "\n")
+}
+
+dput_list <- function(obj) {
+  tmp <- vcapply(obj, dput2)
+  els <- paste(sprintf("  %s = %s", names(tmp), unname(tmp)), collapse = ",\n")
+  sprintf("list(\n%s\n  )", els)
+}
+
+add_sample_response <- function(filename, method, path, code, version) {
+  if (file.exists(filename)) {
+    stop("filename already exists")
+  }
+  spec <- read_spec(version)
+  response <- read_sample_response_str(method, path, code, spec)
+  dat <- list(version = version, method = method, path = path, code = code,
+              response = response)
+  txt <- c(sprintf("## %s: %s", names(dat), unname(dat)), "NULL")
+  writeLines(txt, filename)
+}
