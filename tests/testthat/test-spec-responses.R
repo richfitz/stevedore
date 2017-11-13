@@ -67,3 +67,15 @@ test_that("complex objects (network_list)", {
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
   ## TODO: test recursive bits
 })
+
+test_that("complex objects (container_inspect)", {
+  dat <- read_sample_response("sample_responses/container_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+  ## TODO: test recursive bits
+})
