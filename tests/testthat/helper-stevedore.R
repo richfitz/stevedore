@@ -79,7 +79,6 @@ read_sample_response <- function(path) {
   re <- "(^[^ ]+): +(.*)\\s*$"
   stopifnot(all(grepl(re, head)))
   value <- sub(re, "\\2", head)
-  empty <- value == "~"
   ret <- set_names(as.list(value), sub(re, "\\1", head))
 
   msg <- setdiff(names(ret), c("version", "method", "path", "code", "response"))
@@ -87,7 +86,10 @@ read_sample_response <- function(path) {
     stop(sprintf("Missing expected fields %s", paste(msg, collapse = ", ")))
   }
 
-  ret[empty] <- list(raw())
+  if (ret$response == "~") {
+    ret$response <- raw()
+  }
+
   ret$method <- tolower(ret$method)
   spec <- read_spec(ret$version)
 
