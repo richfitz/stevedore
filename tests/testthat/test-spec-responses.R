@@ -1,18 +1,18 @@
 context("spec (responses)")
 
-test_that("object, atomic scalar components (/auth)", {
+test_that("object, atomic scalar components (system_ping)", {
   dat <- read_sample_response("sample_responses/system_ping.R")
-  ans <- dat$handler(dat$response_object, FALSE)
+  ans <- dat$handler(dat$response, FALSE)
   expect_equal(ans, dat$reference)
 })
 
-test_that("null (/containers/{id}/start)", {
+test_that("null (container_start)", {
   dat <- read_sample_response("sample_responses/container_start.R")
-  ans <- dat$handler(dat$response_object)
+  ans <- dat$handler(dat$response)
   expect_equal(ans, dat$reference)
 })
 
-test_that("object, atomic scalar components (/auth)", {
+test_that("object, atomic scalar components (system_auth)", {
   dat <- read_sample_response("sample_responses/system_auth.R")
 
   ans1 <- dat$handler(dat$response, FALSE)
@@ -23,7 +23,7 @@ test_that("object, atomic scalar components (/auth)", {
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
 })
 
-test_that("object, array of array (/containers/{id}/top)", {
+test_that("object, array of array (container_top)", {
   dat <- read_sample_response("sample_responses/container_top.R")
 
   ans1 <- dat$handler(dat$response, FALSE)
