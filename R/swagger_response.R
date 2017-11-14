@@ -253,11 +253,16 @@ make_response_handler_array_object_df <- function(items, spec) {
   }
 
   function(data, as_is_names) {
+    if (!is.null(names(data))) {
+      message("Was handed the wrong sort of thing")
+      data <- list(data)
+    }
     ret <- vector("list", length(cols))
     names(ret) <- cols
     ret[cols_atomic] <- lapply(cols_atomic, f_atomic, data)
     ret[cols_object] <- lapply(cols_object, f_object, data, as_is_names)
     ret[cols_array]  <- lapply(cols_array,  f_array,  data, as_is_names)
+
     if (!as_is_names && length(ret) > 0L) {
       names(ret) <- cols_r
     }

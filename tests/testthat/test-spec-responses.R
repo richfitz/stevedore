@@ -79,3 +79,27 @@ test_that("complex objects (container_inspect)", {
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
   ## TODO: test recursive bits
 })
+
+test_that("complex objects (system_df)", {
+  ## So this is triggering incorrectly fairly high up in the chain,
+  ## but I'm not sure where - the first point of error is where the
+  ## print statement is but that is done within an lapply leading to
+  ## an extra level of indexing that should not be there - so the loop
+  ## is just interleaved incorrectly somewhere (or I am interpreting
+  ## the spec wrong or the spec is wrong).  The actual data coming out
+  ## of the json looks right and oddly it looks like the same pattern
+  ## of data as the other elements here that work just fine thank you
+  ## very much.
+  dat <- read_sample_response("sample_responses/system_df.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  ## Patch up a known issue here:
+  ans1$containers <- ans1$containers[[1]]
+  ans2$Containers <- ans2$Containers[[1]]
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})

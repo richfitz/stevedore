@@ -82,6 +82,7 @@ partial1 <- function(FUN, x, env = parent.frame(),
 ## FIXME: OStype -> o_stype (os_type)
 ## FIXME: IPv4Forwarding -> i_pv4_forwarding (ipv4_forwarding)
 ## FIXME: IPAM -> i_pam (ipam)
+## FIXME: IPv6Gateway, IPPrefixLen, IPAddress, IPAMConfig...
 ##
 ## In general - all single character entries need warning about and
 ## checking.  It's possible that we'll need to special case some
