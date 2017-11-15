@@ -23,8 +23,10 @@ options <- c(
   com.docker.network.bridge.name = "docker0",
   com.docker.network.driver.mtu = "1500")
 
-## TODO: FIXME
-i_pam <- list()
+i_pam <- list(
+  driver = "default",
+  config = list(c(subnet = "172.19.0.0/16", gateway = "172.19.0.1")),
+  options = list(foo = c("bar" = "bar")))
 
 list(
   name = "net01",

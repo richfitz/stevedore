@@ -118,9 +118,9 @@ make_response_handler_object <- function(schema, spec) {
   found <- c(els_atomic, els_array, els_object)
   stopifnot(length(found) == length(els) && setequal(found, els))
 
-  object_handlers <- lapply(schema$properties[els_object], function(x)
+  object_handlers <- lapply(properties[els_object], function(x)
     make_response_handler_object(x, spec))
-  array_handlers <- lapply(schema$properties[els_array], function(x)
+  array_handlers <- lapply(properties[els_array], function(x)
     make_response_handler_array(x, spec))
 
   f_atomic <- function(v, data) {
@@ -368,13 +368,6 @@ atomic_types <- function() {
        type = type,
        missing = missing,
        empty = empty)
-}
-
-sprintfn <- function(fmt, args) {
-  switch(as.character(length(args)),
-         "0" = fmt,
-         "1" = sprintf(fmt, args),
-         "2" = sprintf(fmt, args[[1]], args[[2]]))
 }
 
 schema_get_type <- function(x) {

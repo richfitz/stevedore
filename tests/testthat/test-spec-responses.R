@@ -183,15 +183,14 @@ test_that("auto: exec_inspect", {
   ans1 <- dat$handler(dat$response, FALSE)
   ans2 <- dat$handler(dat$response, TRUE)
 
-  dat$reference$process_config <- list()
-
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
 
   skip("Missing elements")
-  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
-               character(0))
+  msg <- setdiff(names(raw_to_json(dat$response)),
+                 c(names(ans2), "CanRemove", "DetachKeys"))
+  expect_equal(msg, character(0))
 })
 
 test_that("auto: image_delete", {
