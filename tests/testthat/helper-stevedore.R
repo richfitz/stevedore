@@ -96,21 +96,21 @@ read_sample_response <- function(path) {
   endpoint <- spec$paths[[ret$path]][[ret$method]]
   ret$schema <- endpoint$responses[[ret$code]]
 
-  produces <- get_response_type(ret$method, ret$path, endpoint)
-  if (produces == "application/json") {
+  ret$produces <- get_response_type(ret$method, ret$path, endpoint)
+  if (ret$produces == "application/json") {
     ret$response_object <- from_json(ret$response)
     ret$response <- charToRaw(ret$response)
   } else {
     ret$response_object <- ret$response
   }
 
-  ret$handler <- make_response_handler(ret$schema, spec, produces)
+  ret$handler <- make_response_handler(ret$schema, spec, ret$produces)
   ret$reference <- eval(parse(text = txt))
 
   ret
 }
 
-read_sample_response_str <- function(method, path, code, spec) {
+read_sample_response_str <- function(method, path, code, spec, error = TRUE) {
   r <- spec$paths[[path]][[tolower(method)]]$responses[[as.character(code)]]
   to_str <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE)
 
@@ -123,7 +123,10 @@ read_sample_response_str <- function(method, path, code, spec) {
   if (!is.null(ex)) {
     return(to_str(ex[[1]]))
   }
-  stop("did not find example")
+  if (error) {
+    stop("did not find example")
+  }
+  NULL
 }
 
 dput2 <- function(x) {
@@ -134,6 +137,11 @@ dput_list <- function(obj) {
   tmp <- vcapply(obj, dput2)
   els <- paste(sprintf("  %s = %s", names(tmp), unname(tmp)), collapse = ",\n")
   sprintf("list(\n%s\n  )", els)
+}
+
+dput_cvec <- function(x) {
+  els <- paste(sprintf('  %s = "%s"', names(x), unname(x)), collapse = ",\n")
+  sprintf("c(\n%s\n  )", els)
 }
 
 add_sample_response <- function(filename, method, path, code, version) {

@@ -21,6 +21,9 @@ test_that("object, atomic scalar components (system_auth)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
 })
 
 test_that("object, array of array (container_top)", {
@@ -32,6 +35,9 @@ test_that("object, array of array (container_top)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
 })
 
 test_that("object of objects (volume_inspect)", {
@@ -44,6 +50,9 @@ test_that("object of objects (volume_inspect)", {
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
   expect_equal(names(ans1$status), pascal_to_snake(names(ans2$Status)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
 })
 
 test_that("complex object (volume_list)", {
@@ -54,7 +63,9 @@ test_that("complex object (volume_list)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
-  ## TODO: test recursive bits
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
 })
 
 test_that("complex objects (network_list)", {
@@ -65,7 +76,9 @@ test_that("complex objects (network_list)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
-  ## TODO: test recursive bits
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)[[1]]), names(ans2)),
+               character(0))
 })
 
 test_that("complex objects (container_inspect)", {
@@ -77,7 +90,9 @@ test_that("complex objects (container_inspect)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
-  ## TODO: test recursive bits
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
 })
 
 test_that("complex objects (system_df)", {
@@ -102,4 +117,220 @@ test_that("complex objects (system_df)", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
+})
+
+test_that("auto: container_changes", {
+  dat <- read_sample_response("sample_responses/container_changes.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)[[1]]), names(ans2)),
+               character(0))
+})
+
+test_that("auto: container_create", {
+  dat <- read_sample_response("sample_responses/container_create.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
+})
+
+test_that("auto: container_list", {
+  dat <- read_sample_response("sample_responses/container_list.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)[[1]]), names(ans2)),
+               character(0))
+})
+
+test_that("auto: container_stats", {
+  skip("broken")
+  ## This one returns just list()!
+  dat <- read_sample_response("sample_responses/container_stats.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: exec_inspect", {
+  dat <- read_sample_response("sample_responses/exec_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  dat$reference$process_config <- list()
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  skip("Missing elements")
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
+})
+
+test_that("auto: image_delete", {
+  dat <- read_sample_response("sample_responses/image_delete.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)[[1]]), names(ans2)),
+               character(0))
+})
+
+test_that("auto: image_history", {
+  dat <- read_sample_response("sample_responses/image_history.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)[[1]]), names(ans2)),
+               character(0))
+})
+
+test_that("auto: image_inspect", {
+  dat <- read_sample_response("sample_responses/image_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  ## TODO: ans1$config incorrect
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
+               character(0))
+})
+
+test_that("auto: image_list", {
+  dat <- read_sample_response("sample_responses/image_list.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: image_search", {
+  dat <- read_sample_response("sample_responses/image_search.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: network_create", {
+  dat <- read_sample_response("sample_responses/network_create.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: network_inspect", {
+  dat <- read_sample_response("sample_responses/network_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: system_events", {
+  dat <- read_sample_response("sample_responses/system_events.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: system_info", {
+  dat <- read_sample_response("sample_responses/system_info.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: system_version", {
+  dat <- read_sample_response("sample_responses/system_version.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("auto: volume_create", {
+  dat <- read_sample_response("sample_responses/volume_create.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("all spec files read", {
+  txt <- readLines("test-spec-responses.R")
+  re <- '^.*read_sample_response\\("([^)]+)"\\).*'
+  used <- sub(re, "\\1", grep(re, txt, value = TRUE))
+  msg <- setdiff(dir("sample_responses", full.names = TRUE, pattern = "\\.R$"),
+                 used)
+  expect_equal(msg, character(0))
 })
