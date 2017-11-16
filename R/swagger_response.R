@@ -333,16 +333,7 @@ make_response_handler_binary <- function(...) {
 
 make_response_handler_text <- function(...) {
   function(data, as_is_names) {
-    ## TODO: this needs dealing with - sometimes we're getting raw in
-    ## here and we can't always blindly do the conversion here.  I'm
-    ## going to comment this out until I come back for things like the
-    ## .../logs endpoint where we need to treat this as a binary
-    ## stream.
-    ##
-    ## if (convert) {
-    ##   data <- raw_to_char(data)
-    ## }
-    data
+    raw_to_char(data)
   }
 }
 

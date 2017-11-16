@@ -88,6 +88,8 @@ read_sample_response <- function(path) {
 
   if (ret$response == "~") {
     ret$response <- raw()
+  } else {
+    ret$response <- charToRaw(ret$response)
   }
 
   ret$method <- tolower(ret$method)
@@ -97,12 +99,6 @@ read_sample_response <- function(path) {
   ret$schema <- endpoint$responses[[ret$code]]
 
   ret$produces <- get_response_type(ret$method, ret$path, endpoint)
-  if (ret$produces == "application/json") {
-    ret$response_object <- from_json(ret$response)
-    ret$response <- charToRaw(ret$response)
-  } else {
-    ret$response_object <- ret$response
-  }
 
   ret$handler <- make_response_handler(ret$schema, spec, ret$produces)
   ret$reference <- eval(parse(text = txt))
