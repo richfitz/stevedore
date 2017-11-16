@@ -93,6 +93,7 @@ test_that("complex objects (container_inspect)", {
 
   expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
                character(0))
+  skip("network_settings still not right")
 })
 
 test_that("complex objects (system_df)", {
@@ -120,6 +121,7 @@ test_that("complex objects (system_df)", {
 
   expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
                character(0))
+  skip("This is still a bit broken")
 })
 
 test_that("auto: container_changes", {
@@ -187,7 +189,6 @@ test_that("auto: exec_inspect", {
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
 
-  skip("Missing elements")
   msg <- setdiff(names(raw_to_json(dat$response)),
                  c(names(ans2), "CanRemove", "DetachKeys"))
   expect_equal(msg, character(0))
