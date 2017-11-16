@@ -1,15 +1,30 @@
 context("spec (responses)")
 
+## Known issues:
+##
+## image_inspect is producing a rogue
+##   volumes = list(additional_properties = NULL)
+## system_df is interleaving list output incorrectly
+## network_inspect$i_pam$options is not right, but that looks like we're not trimming names correctly
+
 test_that("object, atomic scalar components (system_ping)", {
   dat <- read_sample_response("sample_responses/system_ping.R")
-  ans <- dat$handler(dat$response, FALSE)
-  expect_equal(ans, dat$reference)
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
 })
 
 test_that("null (container_start)", {
   dat <- read_sample_response("sample_responses/container_start.R")
-  ans <- dat$handler(dat$response)
-  expect_equal(ans, dat$reference)
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
 })
 
 test_that("object, atomic scalar components (system_auth)", {
