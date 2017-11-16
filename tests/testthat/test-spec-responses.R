@@ -227,8 +227,6 @@ test_that("auto: image_inspect", {
   ans1 <- dat$handler(dat$response, FALSE)
   ans2 <- dat$handler(dat$response, TRUE)
 
-  ## TODO: ans1$config incorrect
-
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))

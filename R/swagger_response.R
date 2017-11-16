@@ -107,6 +107,16 @@ make_response_handler_object <- function(schema, spec) {
 
   properties <- lapply(schema$properties, resolve_schema_ref2, spec)
   type <- vcapply(properties, schema_get_type)
+
+  is_array_string <- type == "array_string"
+  if (any(is_array_string)) {
+    for (i in which(is_array_string)) {
+      properties[[i]]$type <-
+        list(type = "array", items = list(type = "string"))
+    }
+    type[is_array_string] <- "array"
+  }
+
   ## This is the simplest check now:
   stopifnot(all(type %in% c(atomic$names, "object", "array")))
 
@@ -140,6 +150,11 @@ make_response_handler_object <- function(schema, spec) {
     ret[els_atomic] <- lapply(els_atomic, f_atomic, data)
     ret[els_object] <- lapply(els_object, f_object, data, as_is_names)
     ret[els_array]  <- lapply(els_array,  f_array,  data, as_is_names)
+    ## TODO: where we have array strings it might be good to
+    ## distinguish between a length 1 array and a string - these have
+    ## differecnes in how they're interpreted.  I need to think about
+    ## this on the args side too and probably the solution here should
+    ## reflect the solution there.  Probably a "scalar" attribute?
     if (!as_is_names && length(ret) > 0L) {
       names(ret) <- els_r
     }
@@ -385,6 +400,9 @@ schema_get_type <- function(x) {
     } else {
       stop("Could not determine type")
     }
+  }
+  if (setequal(ret, c("array", "string"))) {
+    ret <- "array_string"
   }
   ret
 }
