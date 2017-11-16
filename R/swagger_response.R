@@ -105,6 +105,11 @@ make_response_handler_object <- function(schema, spec) {
   els <- names(schema$properties)
   els_r <- pascal_to_snake(els)
 
+  if (length(els) == 0 && is.null(additional_properties)) {
+    ## This is required for container_stats at least
+    additional_properties <- "object"
+  }
+
   properties <- lapply(schema$properties, resolve_schema_ref2, spec)
   type <- vcapply(properties, schema_get_type)
 

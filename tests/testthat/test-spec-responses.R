@@ -167,8 +167,6 @@ test_that("auto: container_list", {
 })
 
 test_that("auto: container_stats", {
-  skip("broken")
-  ## This one returns just list()!
   dat <- read_sample_response("sample_responses/container_stats.R")
 
   ans1 <- dat$handler(dat$response, FALSE)
