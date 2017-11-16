@@ -13,7 +13,7 @@ run_sample_response <- function(x, spec) {
     if (as.integer(code) < 300) {
       found_example <- FALSE
       response <- responses[[code]]
-      response$schema <- resolve_schema_ref2(response$schema, spec)
+      response$schema <- resolve_schema_ref(response$schema, spec)
       ex <- response[["schema"]][["example"]]
       if (!is.null(ex)) {
         found_example <- TRUE
@@ -114,7 +114,7 @@ read_sample_response_str <- function(method, path, code, spec, error = TRUE) {
   r <- spec$paths[[path]][[tolower(method)]]$responses[[as.character(code)]]
   to_str <- function(x) jsonlite::toJSON(x, auto_unbox = TRUE)
 
-  schema <- resolve_schema_ref2(r$schema, spec)
+  schema <- resolve_schema_ref(r$schema, spec)
   ex <- schema[["example"]]
   if (!is.null(ex)) {
     return(to_str(ex))

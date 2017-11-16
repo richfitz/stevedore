@@ -112,16 +112,8 @@ get_response_type <- function(method, path, data) {
 
 
 resolve_schema_ref <- function(x, spec) {
-  if (identical(names(x), "$ref")) {
-    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
-    x <- spec[[ref]]
-  }
-  x
-}
-
-resolve_schema_ref2 <- function(x, spec) {
   if ("allOf" %in% names(x)) {
-    tmp <- lapply(x$allOf, resolve_schema_ref2, spec)
+    tmp <- lapply(x$allOf, resolve_schema_ref, spec)
     type <- vcapply(tmp, "[[", "type")
     if (!all(type == "object")) {
       stop("work out how to combine non-objects")
@@ -130,7 +122,7 @@ resolve_schema_ref2 <- function(x, spec) {
               properties = unlist(lapply(tmp, "[[", "properties"), FALSE))
   } else if ("$ref" %in% names(x)) {
     ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
-    x <- c(x[names(x) != "$ref"], resolve_schema_ref2(spec[[ref]], spec))
+    x <- c(x[names(x) != "$ref"], resolve_schema_ref(spec[[ref]], spec))
   }
   x
 }

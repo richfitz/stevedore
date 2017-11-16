@@ -43,7 +43,7 @@ make_response_handler <- function(response, spec, produces) {
 }
 
 make_response_handler_json <- function(response, spec) {
-  schema <- resolve_schema_ref2(response$schema, spec)
+  schema <- resolve_schema_ref(response$schema, spec)
 
   if (is.null(schema)) {
     h <- make_response_handler_null(schema, spec)
@@ -88,7 +88,7 @@ make_response_handler_object <- function(schema, spec) {
 
   additional_properties <- additional_properties_handler <- NULL
   if (!is.null(schema$additionalProperties)) {
-    ap <- resolve_schema_ref2(schema$additionalProperties, spec)
+    ap <- resolve_schema_ref(schema$additionalProperties, spec)
     if (ap$type == "object") {
       additional_properties <- "object"
       if (!is.null(ap$properties)) {
@@ -110,7 +110,7 @@ make_response_handler_object <- function(schema, spec) {
     additional_properties <- "object"
   }
 
-  properties <- lapply(schema$properties, resolve_schema_ref2, spec)
+  properties <- lapply(schema$properties, resolve_schema_ref, spec)
   type <- vcapply(properties, schema_get_type)
 
   is_array_string <- type == "array_string"
@@ -193,7 +193,7 @@ make_response_handler_object <- function(schema, spec) {
 }
 
 make_response_handler_array <- function(schema, spec) {
-  items <- resolve_schema_ref2(schema$items, spec)
+  items <- resolve_schema_ref(schema$items, spec)
   atomic <- atomic_types()
 
   if (is.null(items$type)) browser()
@@ -237,8 +237,8 @@ make_response_handler_array_object <- function(items, spec) {
 ## time!
 make_response_handler_array_object_df <- function(items, spec) {
   atomic <- atomic_types()
-  items$properties <- lapply(items$properties, resolve_schema_ref2, spec)
-  properties <- lapply(items$properties, resolve_schema_ref2, spec)
+  items$properties <- lapply(items$properties, resolve_schema_ref, spec)
+  properties <- lapply(items$properties, resolve_schema_ref, spec)
 
   cols <- names(properties)
   cols_r <- pascal_to_snake(cols)
@@ -291,13 +291,13 @@ make_response_handler_array_object_df <- function(items, spec) {
 }
 
 make_response_handler_array_object_list <- function(items, spec) {
-  properties <- lapply(items$properties, resolve_schema_ref2, spec)
+  properties <- lapply(items$properties, resolve_schema_ref, spec)
   if (length(properties) != 0L) {
     stop("This is not supported")
   }
 
   items$additionalProperties <-
-    resolve_schema_ref2(items$additionalProperties, spec)
+    resolve_schema_ref(items$additionalProperties, spec)
   if (identical(items$additionalProperties, list(type = "object"))) {
     additional_properties <- "object"
   } else if (identical(items$additionalProperties, list(type = "string"))) {

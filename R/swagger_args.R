@@ -10,7 +10,7 @@ endpoint_args <- function(method, path, x, spec) {
     stopifnot(sum(is_body) == 1L)
     i_body <- which(is_body)
     body <- pars[[i_body]]
-    body$schema <- resolve_schema_ref2(body$schema, spec)
+    body$schema <- resolve_schema_ref(body$schema, spec)
 
     if (body$schema$type == "object") {
       ## TODO; we'll expand this a little if there are more - the idea
@@ -51,7 +51,7 @@ endpoint_args <- function(method, path, x, spec) {
   pars_name_r <- pascal_to_snake(pars_name_r)
   for (i in seq_along(pars)) {
     pars[[i]]$name_r <- pars_name_r[[i]]
-    pars[[i]] <- resolve_schema_ref2(pars[[i]], spec)
+    pars[[i]] <- resolve_schema_ref(pars[[i]], spec)
   }
 
   if (any(duplicated(pars_name)) || any(duplicated(pars_name_r))) {
