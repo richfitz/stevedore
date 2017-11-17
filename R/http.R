@@ -134,6 +134,23 @@ parse_headers <- function(headers) {
   vals
 }
 
+## TODO: through here (and again through the package code that calls
+## this) we need to be able to pin down the maxmimum api version - the
+## swagger spec is published only up to 1.32 but the mac version
+## (experimental) uses the 1.34 spec.  So we should do something like:
+##
+## * detect version
+## * while above floor:
+##   * check to see if version available locally
+##   * check remotely
+##   * decrement version
+## * store that information somewhere sensible perhaps?
+##
+## This behaviour would be modified by:
+##
+## * do we ever look? Or require a match?
+## * do we ever look *remotely*
+## * what is our floor version number
 http_client_api_version <- function(api_version, client) {
   if (is.null(api_version)) {
     api_version <- DEFAULT_DOCKER_API_VERSION

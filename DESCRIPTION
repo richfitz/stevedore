@@ -1,14 +1,21 @@
 Package: stevedore
 Title: Docker Client
 Version: 0.0.1
-Description: Work with containers over the Docker 'API'.
+Description: Work with containers over the Docker 'API'.  Rather than
+    using system calls to interact with a docker client, using the
+    'API' directly means that we can recieve richer information from
+    docker.  The interface in the package is automatically generated
+    using the 'OpenAPI' (a.k.a., 'swagger') specification, and all
+    return values are checked in order to make them type stable.
 License: MIT + file LICENSE
 Author: Rich FitzJohn
 Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
 Imports:
+    R6,
     crayon,
     curl (>= 2.3.0),
     jsonlite,
     yaml
 Suggests:
     testthat
+SystemRequirements: docker
