@@ -426,6 +426,44 @@ decode_chunked_string <- function(x, ...) {
     x <- x[-seq_len(len + 8L)]
   }
   attr(value, "stream") <-
-    factor(stream, 1:3, labels = c("stdin", "stdout", "stderr"))
+    factor(stream, 0:2, labels = c("stdin", "stdout", "stderr"))
+  class(value) <- "docker_stream"
   value
+}
+
+##' @export
+format.docker_stream <- function(x, ..., style = "auto",
+                                 colour_stdin = "yellow",
+                                 colour_stdout = "blue",
+                                 colour_stderr = "red",
+                                 prefix_stdin = "I< ",
+                                 prefix_stdout = "O> ",
+                                 prefix_stderr = "E> ") {
+  stream <- attr(x, "stream")
+  attributes(x) <- NULL
+  i_i <- stream == "stdin"
+  i_o <- stream == "stdout"
+  i_e <- stream == "stderr"
+  has_color <- crayon::has_color()
+  if (style == "auto") {
+    style <- if (has_color) "colour" else "prefix"
+  }
+  if (style == "plain") {
+    x <- x
+  } else if (style == "prefix") {
+    x[i_i] <- paste0(prefix_stdin, x[i_i])
+    x[i_o] <- paste0(prefix_stdout, x[i_o])
+    x[i_e] <- paste0(prefix_stderr, x[i_e])
+  } else if (style == "colour") {
+    x[i_i] <- crayon::style(x[i_i], colour_stdin)
+    x[i_o] <- crayon::style(x[i_o], colour_stdout)
+    x[i_e] <- crayon::style(x[i_e], colour_stdin)
+  }
+  x
+}
+
+##' @export
+print.docker_stream <- function(x, ...) {
+  cat(format(x, ...), sep = "")
+  invisible(x)
 }
