@@ -1,4 +1,4 @@
-## version: v1.29
+## version: 1.29
 ## method: post
 ## path: /volumes/create
 ## code: 201

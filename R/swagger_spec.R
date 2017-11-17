@@ -1,6 +1,8 @@
 stevedore_read_index <- function() {
   path <- system.file("spec/index.yaml", package = "stevedore", mustWork = TRUE)
-  yaml::yaml.load_file(path)
+  dat <- yaml::yaml.load_file(path)
+  names(dat) <- sub("^v", "", names(dat))
+  dat
 }
 
 read_spec <- function(version) {
@@ -29,7 +31,7 @@ read_spec <- function(version) {
 
   ## We'll need to do a bunch of these probably; they can probably
   ## also be moved into a yaml file easily enough with version ranges.
-  if (version == "v1.29") {
+  if (version == "1.29") {
     ret <- spec_patch(ret, c("definitions", "Mount", "properties", "Source"),
                       type = "string")
   }
@@ -38,8 +40,8 @@ read_spec <- function(version) {
 }
 
 fetch_spec <- function(version, path) {
-  url <- sprintf("https://docs.docker.com/engine/api/%s/swagger.yaml", version)
-  dest <- file.path(path, paste0(version, ".yaml"))
+  url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
+  dest <- file.path(path, sprintf("v%s.yaml", version))
   download_file(url, dest)
 }
 
@@ -69,7 +71,7 @@ spec_path <- function() {
 write_spec_index <- function(path) {
   min_version <- 25L
   max_version <- 33L
-  versions <- sprintf("v1.%d", min_version:max_version)
+  versions <- sprintf("1.%d", min_version:max_version)
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)
   names(md5) <- names(files)
