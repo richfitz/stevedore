@@ -78,6 +78,21 @@ partial1 <- function(FUN, x, env = parent.frame(),
   as.function(c(args[-1], body), env)
 }
 
+drop_args <- function(FUN, names, env = parent.frame(),
+                      name = deparse(substitute(FUN))) {
+  ## This is the beginning of work to make nice functions for the user
+  ## facing part of the package - first thing is to drop the
+  ## arguments.  That's not going to be the lot though because we'll
+  ## need to add additional ones (or rather concatenate functions
+  ## argument lists and direct them difference places).
+  args <- formals(FUN)
+  args_keep <- args[setdiff(names(args), names)]
+  env <- new.env(parent = env)
+  env[[name]] <- FUN
+  body <- as.call(lapply(c(name, names(args_keep)), as.name))
+  as.function(c(args_keep, body), env)
+}
+
 ## FIXME: ID -> i_d (id)
 ## FIXME: OStype -> o_stype (os_type)
 ## FIXME: IPv4Forwarding -> i_pv4_forwarding (ipv4_forwarding)
