@@ -23,22 +23,31 @@ docker_client_container_collection <- function(..., cl) {
   get_container <- function(id) {
     docker_client_container(id, cl)
   }
+  after_create <- function(dat) {
+    if (!is.na(dat$warnings)) {
+      warning(dat$warnings, call. = FALSE, immediate. = TRUE)
+    }
+    get_container(dat$id)
+  }
+
   stevedore_object(
     "docker_container_collection",
     ## TODO:
     ## run - this one is complex
     create = modify_args(cl$endpoints$container_create, .internal_args,
-                         after = get_container, name = "container_create"),
+                         after = after_create, name = "container_create"),
     get = get_container,
     list = strip_api_args("container_list", cl$endpoints),
     prune = strip_api_args("container_prune", cl$endpoints))
 }
 
 docker_client_container <- function(id, client) {
-  attrs <- cl$endpoints$container_inspect(id)
+  attrs <- client$endpoints$container_inspect(id)
   id <- attrs$id
+  self <- NULL
   reload <- function() {
-    attrs <<- cl$endpoints$container_inspect(id)
+    attrs <<- client$endpoints$container_inspect(id)
+    invisible(self)
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
@@ -50,10 +59,14 @@ docker_client_container <- function(id, client) {
   ##
   ## TODO: the vast bulk of this can be done more nicely with a simple
   ## list of functions.  That will plug into an eventual help system.
-  stevedore_object(
+  self <- stevedore_object(
     "docker_container",
+    id = function() attrs$id,
     name = function() sub("^/", "", attrs$name),
-    image = function() strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]],
+    image = function() {
+      docker_client_image(
+        strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], client)
+    },
     labels = function() attrs$config$labels,
     status = function() attrs$state$status,
     ## TODO: this one is hard because it might need to hijack the connection
@@ -67,7 +80,9 @@ docker_client_container <- function(id, client) {
     kill = make_fn("container_kill"),
     logs = make_fn("container_logs"),
     pause = make_fn("container_pause"),
+    ## This should invalidate our container afterwards
     remove = make_fn("container_delete"),
+    ## This might force refresh?
     rename = make_fn("container_rename"),
     resize = make_fn("container_resize"),
     restart = make_fn("container_restart"),
@@ -79,6 +94,7 @@ docker_client_container <- function(id, client) {
     update = make_fn("container_update"),
     wait = make_fn("container_wait"),
     reload = reload)
+  self
 }
 
 docker_client_image_collection <- function(..., cl) {
@@ -99,10 +115,10 @@ docker_client_image_collection <- function(..., cl) {
 }
 
 docker_client_image <- function(id, client) {
-  attrs <- cl$endpoints$image_inspect(id)
+  attrs <- client$endpoints$image_inspect(id)
   id <- attrs$id
   reload <- function() {
-    attrs <<- cl$endpoints$image_inspect(id)
+    attrs <<- client$endpoints$image_inspect(id)
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
@@ -135,10 +151,10 @@ docker_client_network_collection <- function(..., cl) {
 }
 
 docker_client_network <- function(id, client) {
-  attrs <- cl$endpoints$network_inspect(id)
+  attrs <- client$endpoints$network_inspect(id)
   id <- attrs$id
   reload <- function() {
-    attrs <<- cl$endpoints$network_inspect(id)
+    attrs <<- client$endpoints$network_inspect(id)
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
@@ -175,10 +191,10 @@ docker_client_volume_collection <- function(..., cl) {
 }
 
 docker_client_volume <- function(id, client) {
-  attrs <- cl$endpoints$volume_inspect(id)
+  attrs <- client$endpoints$volume_inspect(id)
   id <- attrs$id
   reload <- function() {
-    attrs <<- cl$endpoints$volume_inspect(id)
+    attrs <<- client$endpoints$volume_inspect(id)
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
