@@ -23,3 +23,12 @@ test_that("case convert with consecutive capitals", {
   ## The conversion is lossy though:
   expect_equal(snake_to_pascal("nano_cpus"), "NanoCpus")
 })
+
+test_that("modify_args", {
+  f <- function(a = 1, b = 2, c = 3, d = 4) {
+    list(a = a, b = b, c = c, d = d)
+  }
+  g <- modify_args(f, "b", list(a = 10))
+  expect_equal(g(), list(a = 10, b = 2, c = 3, d = 4))
+  expect_equal(g(30, 40), list(a = 10, b = 2, c = 30, d = 40))
+})
