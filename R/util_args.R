@@ -36,7 +36,8 @@ drop_args <- function(FUN, names, env = parent.frame(),
   as.function(c(args_keep, body), env)
 }
 
-modify_args <- function(FUN, drop = NULL, fix = NULL, env = parent.frame(),
+modify_args <- function(FUN, drop = NULL, fix = NULL, after = NULL,
+                        env = parent.frame(),
                         name = deparse(substitute(FUN))) {
   env <- new.env(parent = env)
   ## NOTE: this introduces the restriction that the name must not
@@ -53,6 +54,10 @@ modify_args <- function(FUN, drop = NULL, fix = NULL, env = parent.frame(),
   args <- formals(FUN)
   args_call <- setdiff(names(args), drop)
   body <- as.call(lapply(c(name, set_names(args_call, args_call)), as.name))
+  if (!is.null(after)) {
+    env[["after"]] <- after
+    body <- as.call(c(list(quote(after)), body))
+  }
   args_keep <- args[setdiff(names(args), c(drop, names(fix)))]
   as.function(c(args_keep, body), env)
 }

@@ -155,3 +155,7 @@ dollar <- function(...) {
   }
   ret
 }
+
+string_starts_with <- function(x, sub) {
+  substr(x, 1, nchar(sub)) == sub
+}

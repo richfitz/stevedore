@@ -3,7 +3,6 @@ context("docker client")
 ## The most simple nontrivial thing with the docker client
 test_that("construction", {
   docker <- docker_client(api_version)
-  cl <- docker_client_base()
   expect_is(docker, "stevedore_object")
   expect_is(docker, "docker_client")
   ok <- docker$ping()

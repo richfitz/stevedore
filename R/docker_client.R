@@ -20,15 +20,16 @@ docker_client <- function(..., api_version = NULL) {
 }
 
 docker_client_container_collection <- function(..., cl) {
+  get_container <- function(id) {
+    docker_client_container(id, cl)
+  }
   stevedore_object(
     "docker_container_collection",
     ## TODO:
-    ##
-    ## run
-    create = strip_api_args("container_create", cl$endpoints),
-    get = function(id) {
-      docker_client_container(id, cl)
-    },
+    ## run - this one is complex
+    create = modify_args(cl$endpoints$container_create, .internal_args,
+                         after = get_container, name = "container_create"),
+    get = get_container,
     list = strip_api_args("container_list", cl$endpoints),
     prune = strip_api_args("container_prune", cl$endpoints))
 }
@@ -41,8 +42,7 @@ docker_client_container <- function(id, client) {
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
-    modify_args(client$endpoints[[name]],
-                c("pass_error", "hijack","as_is_names"), fix, name = name)
+    modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
   }
 
   ## TODO: friendly "copy" interface needed here, but that requires a
@@ -81,6 +81,122 @@ docker_client_container <- function(id, client) {
     reload = reload)
 }
 
+docker_client_image_collection <- function(..., cl) {
+  get_image <- function(id) {
+    docker_client_image(id, cl)
+  }
+  stevedore_object(
+    "docker_image_collection",
+    build = modify_args(cl$endpoints$image_build, .internal_args,
+                        after = get_image, name = "image_build"),
+    get = get_image,
+    list = strip_api_args("image_list", cl$endpoints),
+    import = strip_api_args("image_import", cl$endpoints),
+    ## pull = strip_api_args("image_pull", cl$endpoints), # via create?
+    push = strip_api_args("image_push", cl$endpoints),
+    search = strip_api_args("image_search", cl$endpoints),
+    prune = strip_api_args("image_prune", cl$endpoints))
+}
+
+docker_client_image <- function(id, client) {
+  attrs <- cl$endpoints$image_inspect(id)
+  id <- attrs$id
+  reload <- function() {
+    attrs <<- cl$endpoints$image_inspect(id)
+  }
+  make_fn <- function(name, fix_name = FALSE) {
+    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
+    modify_args(client$endpoints[[name]],
+                .internal_args, fix, name = name)
+  }
+  stevedore_object(
+    "docker_network",
+    name = function() attrs$name,
+    labels = function() attrs$config$labels,
+    short_id = function() short_id(attrs$id),
+    tags = function() attrs$repo_tags[attrs$repo_tags != "<none>:<none>"],
+    history = make_fn("image_history"),
+    save = make_fn("image_get"),
+    tag = make_fn("image_tag"),
+    remove = make_fn("image_delete"))
+}
+
+docker_client_network_collection <- function(..., cl) {
+  get_network <- function(id) {
+    docker_client_network(id, cl)
+  }
+  stevedore_object(
+    "docker_network_collection",
+    create = modify_args(cl$endpoints$network_create, .internal_args,
+                         after = get_network, name = "network_create"),
+    get = get_network,
+    list = strip_api_args("network_list", cl$endpoints),
+    prune = strip_api_args("network_prune", cl$endpoints))
+}
+
+docker_client_network <- function(id, client) {
+  attrs <- cl$endpoints$network_inspect(id)
+  id <- attrs$id
+  reload <- function() {
+    attrs <<- cl$endpoints$network_inspect(id)
+  }
+  make_fn <- function(name, fix_name = FALSE) {
+    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
+    modify_args(client$endpoints[[name]],
+                .internal_args, fix, name = name)
+  }
+
+  ## TODO: friendly "copy" interface needed here, but that requires a
+  ## bit more general work really.
+  ##
+  ## TODO: the vast bulk of this can be done more nicely with a simple
+  ## list of functions.  That will plug into an eventual help system.
+  stevedore_object(
+    "docker_network",
+    name = function() attrs$name,
+    containers = function() lapply(attrs$containers, docker_client_container),
+    ## TODO: run container through container_id()
+    connect = make_fn("network_connect"),
+    disconnect = make_fn("network_disconnect"),
+    remove = make_fn("network_delete"))
+}
+
+docker_client_volume_collection <- function(..., cl) {
+  get_volume <- function(id) {
+    docker_client_volume(id, cl)
+  }
+  stevedore_object(
+    "docker_volume_collection",
+    create = modify_args(cl$endpoints$volume_create, .internal_args,
+                         after = get_volume, name = "volume_create"),
+    get = get_volume,
+    list = strip_api_args("volume_list", cl$endpoints),
+    prune = strip_api_args("volume_prune", cl$endpoints))
+}
+
+docker_client_volume <- function(id, client) {
+  attrs <- cl$endpoints$volume_inspect(id)
+  id <- attrs$id
+  reload <- function() {
+    attrs <<- cl$endpoints$volume_inspect(id)
+  }
+  make_fn <- function(name, fix_name = FALSE) {
+    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
+    modify_args(client$endpoints[[name]],
+                .internal_args, fix, name = name)
+  }
+
+  ## TODO: friendly "copy" interface needed here, but that requires a
+  ## bit more general work really.
+  ##
+  ## TODO: the vast bulk of this can be done more nicely with a simple
+  ## list of functions.  That will plug into an eventual help system.
+  stevedore_object(
+    "docker_volume",
+    name = function() attrs$name,
+    remove = make_fn("volume_delete"))
+}
+
 docker_client_base <- function(..., api_version = NULL) {
   base_url <- NULL
   api_version <- NULL
@@ -106,6 +222,22 @@ stevedore_object <- function(class, ...) {
 
 ## There's a certain amount of transformation required here
 strip_api_args <- function(name, list) {
-  drop_args(list[[name]], c("pass_error", "hijack","as_is_names"),
+  drop_args(list[[name]], .internal_args,
             name = name)
 }
+
+container_id <- function(container) {
+  if (inherits(container, "docker_container")) {
+    container$id()
+  } else {
+    assert_scalar_character(container)
+    container
+  }
+}
+
+short_id <- function(x) {
+  end <- if (string_starts_with(x, "sha256:")) 17L else 10L
+  substr(x, 1, end)
+}
+
+.internal_args <- c("pass_error", "hijack", "as_is_names")
