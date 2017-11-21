@@ -30,9 +30,14 @@ R6_http_client <- R6::R6Class(
       v <- if (versioned_api) self$api_version else NULL
       url <- build_url(self$base_url, v, path, query)
       if (!is.null(body)) {
-        body_raw <- charToRaw(body)
-        h <- self$handle(headers = c("Content-Type" = "application/json",
-                                     headers))
+        if (is.raw(body)) {
+          body_raw <- body
+          content_type <- "application/octet-stream" # or application/x-tar
+        } else {
+          body_raw <- charToRaw(body)
+          content_type <- "application/json"
+        }
+        h <- self$handle(headers = c("Content-Type" = content_type, headers))
         curl::handle_setopt(h,
                             post = TRUE,
                             postfieldsize = length(body_raw),

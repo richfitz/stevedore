@@ -151,3 +151,7 @@ add_sample_response <- function(filename, method, path, code, version) {
   txt <- c(sprintf("## %s: %s", names(dat), unname(dat)), "NULL")
   writeLines(txt, filename)
 }
+
+rand_str <- function(n) {
+  paste0(sample(letters, n, replace = TRUE), collapse = "")
+}

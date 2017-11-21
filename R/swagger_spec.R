@@ -34,6 +34,10 @@ read_spec <- function(version) {
   if (version == "1.29") {
     ret <- spec_patch(ret, c("definitions", "Mount", "properties", "Source"),
                       type = "string")
+    ## Empirically, this is not the correct return type here.  Issue
+    ## persists through 1.32 at least.
+    p <- c("paths", "/images/load", "post", "responses", "200")
+    ret <- spec_patch(ret, p, schema = list(type = "object"))
   }
 
   ret

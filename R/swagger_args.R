@@ -86,14 +86,16 @@ make_argument_handler <- function(method, path, x, spec) {
     fbody_body_combine <- NULL
   } else {
     if (body_type == "combine") {
-      fbody_body_combine <- as_call(quote(jsonlite::toJSON), dollar(dest, quote(body)))
+      fbody_body_combine <-
+        as_call(quote(jsonlite::toJSON), dollar(dest, quote(body)))
     } else if (body_type == "single") {
       ## We'd be better off doing this within the core body function
       ## probably but that requires a bit of faff.
       nm <- as.symbol(pars[[which(vcapply(pars, "[[", "in") == "body")]]$name)
       fbody_body_combine <- dollar(dest, quote(body), nm)
     }
-    fbody_body_combine <- bquote(.(dollar(dest, quote(body))) <- .(fbody_body_combine))
+    fbody_body_combine <- bquote(
+      .(dollar(dest, quote(body))) <- .(fbody_body_combine))
   }
 
   fbody_collect <- lapply(pars, arg_collect, dest)
@@ -180,8 +182,13 @@ arg_collect_body <- function(p, dest) {
     validate <- quote(assert_scalar_integer)
     is_scalar <- TRUE
   } else if (type == "string") {
-    validate <- quote(assert_scalar_character)
-    is_scalar <- TRUE
+    if (identical(p$format, "binary")) {
+      validate <- quote(assert_raw)
+      is_scalar <- FALSE
+    } else {
+      validate <- quote(assert_scalar_character)
+      is_scalar <- TRUE
+    }
   } else if (type == "array") {
     message("Skipping validation (array)")
     validate <- quote(identity)

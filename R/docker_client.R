@@ -7,10 +7,16 @@ docker_client <- function(..., api_version = NULL) {
   cl <- docker_client_base(..., api_version = api_version)
 
   containers <- docker_client_container_collection(cl = cl)
+  images <- docker_client_image_collection(cl = cl)
+  networks <- docker_client_network_collection(cl = cl)
+  volumes <- docker_client_volume_collection(cl = cl)
 
   stevedore_object(
     "docker_client",
     containers = containers,
+    images = images,
+    networks = networks,
+    volumes = volumes,
     events = strip_api_args("system_events", cl$endpoints),
     df = strip_api_args("system_df", cl$endpoints),
     info = strip_api_args("system_info", cl$endpoints),
@@ -111,30 +117,63 @@ docker_client_image_collection <- function(..., cl) {
     ## pull = strip_api_args("image_pull", cl$endpoints), # via create?
     push = strip_api_args("image_push", cl$endpoints),
     search = strip_api_args("image_search", cl$endpoints),
+    remove = strip_api_args("image_delete", cl$endpoints),
     prune = strip_api_args("image_prune", cl$endpoints))
 }
 
 docker_client_image <- function(id, client) {
   attrs <- client$endpoints$image_inspect(id)
   id <- attrs$id
+  self <- NULL
   reload <- function() {
     attrs <<- client$endpoints$image_inspect(id)
+    invisible(self)
   }
   make_fn <- function(name, fix_name = FALSE) {
-    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
+    ## NOTE: this treatment differs to that for containers
+    fix <- if (fix_name) list(name = id) else list(id = id)
     modify_args(client$endpoints[[name]],
                 .internal_args, fix, name = name)
   }
-  stevedore_object(
-    "docker_network",
-    name = function() attrs$name,
+  self <- stevedore_object(
+    "docker_image",
+    id = function() attrs$id,
     labels = function() attrs$config$labels,
     short_id = function() short_id(attrs$id),
     tags = function() attrs$repo_tags[attrs$repo_tags != "<none>:<none>"],
-    history = make_fn("image_history"),
-    save = make_fn("image_get"),
-    tag = make_fn("image_tag"),
-    remove = make_fn("image_delete"))
+    inspect = function(reload = TRUE) {
+      if (reload) {
+        reload()
+      }
+      attrs
+    },
+    history = make_fn("image_history", TRUE),
+    ## TODO: this needs to add a 'filename' option for saving
+    export = make_fn("image_tarball", TRUE),
+    tag = make_fn("image_tag", TRUE),
+    ## TODO: this would best be done with a wrapper around the
+    ## incoming argument for 'repo_tag' but with the core function
+    ## passed through make_fn/modify_args so that we can pass around
+    ## defaults.  We'll be doing that with other functions later too.
+    untag = function(repo_tag) {
+      assert_scalar_character(repo_tag)
+      if (!grepl(":", repo_tag, fixed = TRUE)) {
+        repo_tag <- paste0(repo_tag, ":latest")
+      }
+      valid <- setdiff(client$endpoints$image_inspect(id)$repo_tags,
+                       "<none:<none>")
+      if (!(repo_tag %in% valid)) {
+        stop(sprintf("Invalid repo_tag '%s' for image '%s'",
+                     repo_tag, attrs$id))
+      }
+      client$endpoints$image_delete(repo_tag, noprune = TRUE)
+    },
+    ## NOTE: this removes by *id* which will not always work without a
+    ## force - the name is not preserved on the way through this
+    ## function.  Doing that might make more sense perhaps?
+    remove = make_fn("image_delete", TRUE),
+    reload = reload)
+  self
 }
 
 docker_client_network_collection <- function(..., cl) {
