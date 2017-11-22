@@ -220,23 +220,42 @@ docker_client_volume_collection <- function(..., cl) {
   get_volume <- function(id) {
     docker_client_volume(id, cl)
   }
+  after_create <- function(dat) {
+    get_volume(dat$name)
+  }
+  after_list <- function(dat) {
+    ## TODO: the NA bit can come out here later - it's there because
+    ## of a type error
+    if (length(dat$warnings) > 0L && !identical(dat$warnings, NA_character_)) {
+      warning(sprintf(
+        "%s while reading volume list:\n%s",
+        ngettext(length(dat$warnings), "warning", "warnings"),
+        paste0("- %s", dat$warnings, collapse = "\n")),
+        call. = FALSE, immediate. = TRUE)
+    }
+    dat$volumes
+  }
   stevedore_object(
     "docker_volume_collection",
     create = modify_args(cl$endpoints$volume_create, .internal_args,
-                         after = get_volume, name = "volume_create"),
+                         after = after_create, name = "volume_create"),
     get = get_volume,
-    list = strip_api_args("volume_list", cl$endpoints),
+    list = modify_args(cl$endpoints$volume_list,
+                       after = after_list, name = "volume_list"),
+    remove = strip_api_args("volume_delete", cl$endpoints),
     prune = strip_api_args("volume_prune", cl$endpoints))
 }
 
 docker_client_volume <- function(id, client) {
   attrs <- client$endpoints$volume_inspect(id)
-  id <- attrs$id
+  name <- attrs$name
+  self <- NULL
   reload <- function() {
-    attrs <<- client$endpoints$volume_inspect(id)
+    attrs <<- client$endpoints$volume_inspect(name)
+    invisible(self)
   }
-  make_fn <- function(name, fix_name = FALSE) {
-    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
+  make_fn <- function(name) {
+    fix <- list(name = attrs$name)
     modify_args(client$endpoints[[name]],
                 .internal_args, fix, name = name)
   }
@@ -246,10 +265,19 @@ docker_client_volume <- function(id, client) {
   ##
   ## TODO: the vast bulk of this can be done more nicely with a simple
   ## list of functions.  That will plug into an eventual help system.
-  stevedore_object(
+
+  self <- stevedore_object(
     "docker_volume",
     name = function() attrs$name,
-    remove = make_fn("volume_delete"))
+    inspect = function(reload = TRUE) {
+      if (reload) {
+        reload()
+      }
+      attrs
+    },
+    remove = make_fn("volume_delete"),
+    reload = reload)
+  self
 }
 
 docker_client_base <- function(..., api_version = NULL) {

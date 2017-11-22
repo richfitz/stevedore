@@ -152,6 +152,10 @@ add_sample_response <- function(filename, method, path, code, version) {
   writeLines(txt, filename)
 }
 
-rand_str <- function(n) {
-  paste0(sample(letters, n, replace = TRUE), collapse = "")
+rand_str <- function(n, prefix = "") {
+  paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
+}
+
+get_error <- function(expr) {
+  tryCatch(expr, error = identity)
 }

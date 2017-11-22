@@ -80,7 +80,7 @@ test_that("import", {
 
   ## TODO: need to make the errors here a bit easier to work with
   ## programmatically.  At least they're captured for now!
-  e <- tryCatch(cl$images$get("hello-world"), error = identity)
+  e <- get_error(cl$images$get("hello-world"))
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
 
