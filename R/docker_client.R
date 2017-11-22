@@ -35,6 +35,17 @@ docker_client_container_collection <- function(..., cl) {
     }
     get_container(dat$id)
   }
+  after_list <- function(dat) {
+    ## TODO: I'm not really sure of the situation where we get more
+    ## than one name here; there might be a better way of dealing with
+    ## this.  One option would be to refuse to treat this as a list
+    ## column unless explicitly asked for, returning generally the
+    ## first element.  But I don't know how reasonable that is.
+    dat$names[] <- lapply(dat$names, drop_leading_slash)
+    dat$name <- vcapply(dat$names, function(x)
+      if (length(x) > 0) x[[1]] else NA_character_)
+    dat
+  }
 
   stevedore_object(
     "docker_container_collection",
@@ -43,7 +54,9 @@ docker_client_container_collection <- function(..., cl) {
     create = modify_args(cl$endpoints$container_create, .internal_args,
                          after = after_create, name = "container_create"),
     get = get_container,
-    list = strip_api_args("container_list", cl$endpoints),
+    list = modify_args(cl$endpoints$container_list,
+                       after = after_list, name = "container_list"),
+    remove = strip_api_args("container_delete", cl$endpoints),
     prune = strip_api_args("container_prune", cl$endpoints))
 }
 
@@ -68,13 +81,19 @@ docker_client_container <- function(id, client) {
   self <- stevedore_object(
     "docker_container",
     id = function() attrs$id,
-    name = function() sub("^/", "", attrs$name),
+    name = function() drop_leading_slash(attrs$name),
     image = function() {
       docker_client_image(
         strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], client)
     },
     labels = function() attrs$config$labels,
     status = function() attrs$state$status,
+    inspect = function(reload = TRUE) {
+      if (reload) {
+        reload()
+      }
+      attrs
+    },
     ## TODO: this one is hard because it might need to hijack the connection
     ## attach = make_fn("container_attach"), # needs to hijack?
     commit = make_fn("image_commit", TRUE),
@@ -335,6 +354,10 @@ container_id <- function(container) {
 short_id <- function(x) {
   end <- if (string_starts_with(x, "sha256:")) 17L else 10L
   substr(x, 1, end)
+}
+
+drop_leading_slash <- function(x) {
+  sub("^/", "", x)
 }
 
 .internal_args <- c("pass_error", "hijack", "as_is_names")
