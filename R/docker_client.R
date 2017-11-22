@@ -180,20 +180,26 @@ docker_client_network_collection <- function(..., cl) {
   get_network <- function(id) {
     docker_client_network(id, cl)
   }
+  after_create <- function(dat) {
+    get_network(dat$id)
+  }
   stevedore_object(
     "docker_network_collection",
     create = modify_args(cl$endpoints$network_create, .internal_args,
-                         after = get_network, name = "network_create"),
+                         after = after_create, name = "network_create"),
     get = get_network,
     list = strip_api_args("network_list", cl$endpoints),
+    remove = strip_api_args("network_delete", cl$endpoints),
     prune = strip_api_args("network_prune", cl$endpoints))
 }
 
 docker_client_network <- function(id, client) {
   attrs <- client$endpoints$network_inspect(id)
   id <- attrs$id
+  self <- NULL
   reload <- function() {
     attrs <<- client$endpoints$network_inspect(id)
+    invisible(self)
   }
   make_fn <- function(name, fix_name = FALSE) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
@@ -206,14 +212,22 @@ docker_client_network <- function(id, client) {
   ##
   ## TODO: the vast bulk of this can be done more nicely with a simple
   ## list of functions.  That will plug into an eventual help system.
-  stevedore_object(
+  self <- stevedore_object(
     "docker_network",
     name = function() attrs$name,
+    inspect = function(reload = TRUE) {
+      if (reload) {
+        reload()
+      }
+      attrs
+    },
     containers = function() lapply(attrs$containers, docker_client_container),
     ## TODO: run container through container_id()
     connect = make_fn("network_connect"),
     disconnect = make_fn("network_disconnect"),
-    remove = make_fn("network_delete"))
+    remove = make_fn("network_delete"),
+    reload = reload)
+  self
 }
 
 docker_client_volume_collection <- function(..., cl) {
