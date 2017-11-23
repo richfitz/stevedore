@@ -172,7 +172,8 @@ test_that("logs", {
                "^Reticulating spline \\d+...\n$")
   expect_match(format(logs, style = "prefix"),
                "^O> Reticulating spline \\d+...\n")
-  expect_true(all(crayon::has_style(format(logs, style = "colour"))))
+  expect_equal(all(crayon::has_style(format(logs, style = "colour"))),
+               crayon::has_color())
   expect_match(capture.output(print(logs, style = "plain")),
                "^Reticulating spline \\d+...$")
   expect_match(capture.output(print(logs, style = "prefix")),
