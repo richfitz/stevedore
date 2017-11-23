@@ -73,8 +73,8 @@ spec_path <- function() {
 
 ## This is used only in the package Makefile
 write_spec_index <- function(path) {
-  min_version <- 25L
-  max_version <- 32L
+  min_version <- unclass(numeric_version(MIN_DOCKER_API_VERSION))[[c(1, 2)]]
+  max_version <- unclass(numeric_version(MAX_DOCKER_API_VERSION))[[c(1, 2)]]
   versions <- sprintf("1.%d", min_version:max_version)
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)

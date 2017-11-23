@@ -22,7 +22,11 @@ R6_http_client <- R6::R6Class(
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
       self$handle <- make_handle_socket(base_url)
       self$base_url <- "http://localhost"
-      self$api_version <- http_client_api_version(api_version, self)
+      max_version <- max(numeric_version(names(.stevedore$index)))
+      self$api_version <-
+        http_client_api_version(api_version, self,
+                                MIN_DOCKER_API_VERSION,
+                                MAX_DOCKER_API_VERSION)
     },
 
     request = function(verb, path, query = NULL, body = NULL, headers = NULL,
@@ -162,7 +166,9 @@ parse_headers <- function(headers) {
 ## * do we ever look? Or require a match?
 ## * do we ever look *remotely*
 ## * what is our floor version number
-http_client_api_version <- function(api_version, client) {
+http_client_api_version <- function(api_version, client,
+                                    min_version, max_version) {
+  version_type <- "Requested"
   if (is.null(api_version)) {
     api_version <- DEFAULT_DOCKER_API_VERSION
   } else if (inherits(api_version, "numeric_version")) {
@@ -171,6 +177,7 @@ http_client_api_version <- function(api_version, client) {
   } else {
     assert_scalar_character("api_version")
     if (tolower(api_version) == "detect") {
+      version_type <- "Detected"
       ## TODO; temporarily set the version here to the default version
       ## (i.e., whatever we ship with) to avoid hitting the deprecated
       ## api-without-version issue.
@@ -180,5 +187,19 @@ http_client_api_version <- function(api_version, client) {
       numeric_version(api_version) # or throw
     }
   }
+
+  if (numeric_version(api_version) > numeric_version(max_version)) {
+    message(sprintf(
+      "%s API version '%s' is above max version '%s'; downgrading",
+      version_type, api_version, max_version))
+    api_version <- max_version
+  }
+  if (numeric_version(api_version) < numeric_version(min_version)) {
+    message(sprintf(
+      "%s API version '%s' is below min version '%s'; upgrading",
+      version_type, api_version, min_version))
+    api_version <- min_version
+  }
+
   api_version
 }
