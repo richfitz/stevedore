@@ -17,6 +17,7 @@ Imports:
     jsonlite,
     yaml
 Suggests:
-    testthat
+    testthat,
+    withr
 SystemRequirements: docker
 RoxygenNote: 6.0.1

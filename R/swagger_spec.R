@@ -74,10 +74,10 @@ spec_path <- function() {
 ## This is used only in the package Makefile
 write_spec_index <- function(path) {
   min_version <- 25L
-  max_version <- 33L
+  max_version <- 32L
   versions <- sprintf("1.%d", min_version:max_version)
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)
-  names(md5) <- names(files)
+  names(md5) <- paste0("v", names(files))
   writeLines(yaml::as.yaml(as.list(md5)), file.path(path, "index.yaml"))
 }
