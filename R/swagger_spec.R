@@ -38,6 +38,12 @@ read_spec <- function(version) {
     ## persists through 1.32 at least.
     p <- c("paths", "/images/load", "post", "responses", "200")
     ret <- spec_patch(ret, p, schema = list(type = "object"))
+
+    p <- c("paths", "/containers/{id}/archive", "put", "parameters")
+    tmp <- ret[[p]]
+    i <- which(vcapply(tmp, "[[", "name") == "inputStream")
+    tmp[[i]]$schema$format <- "binary"
+    ret[[p]] <- tmp
   }
 
   ret

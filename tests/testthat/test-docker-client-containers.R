@@ -116,7 +116,6 @@ test_that("archive export", {
 })
 
 test_that("archive import", {
-  skip("This is broken")
   d <- docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
@@ -133,6 +132,10 @@ test_that("archive import", {
 
   ## Down here, we need to get the types correct for handling.
   x$put_archive(bin, "/")
+  bin2 <- x$get_archive("foo")
+  p <- untar_bin(bin2)
+  expect_true(file.exists(file.path(p, "foo")))
+  expect_identical(readLines(file.path(p, "foo")), dat)
 })
 
 test_that("kill", {
