@@ -2,3 +2,4 @@
 .Rhistory
 .RData
 inst/spec/v*.yaml
+inst/doc

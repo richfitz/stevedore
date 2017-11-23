@@ -17,7 +17,10 @@ Imports:
     jsonlite,
     yaml
 Suggests:
+    knitr,
+    rmarkdown,
     testthat,
     withr
 SystemRequirements: docker
 RoxygenNote: 6.0.1
+VignetteBuilder: knitr

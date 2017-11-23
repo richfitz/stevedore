@@ -1,0 +1,16 @@
+---
+title: "Using docker with stevedore"
+author: "Rich FitzJohn"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using docker with stevedore}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+`stevedore` is an R package that interacts with docker directly
+over docker's API.  This gives a more direct access to docker than
+going via the command line.  Everything is pretty much up for grabs
+design-wise at the moment.  This vignette exists primarily so I can
+lay out a few use cases.
