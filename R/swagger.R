@@ -58,13 +58,14 @@ run_endpoint <- function(client, endpoint, params,
                         params$query, params$body, params$header,
                         hijack)
   if (hijack) {
+    ## TODO: there's probably lots more work needed here!
     return(res)
   }
   status_code <- res$status_code
   if (status_code < 300) {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {
-      stop("unexpected response code ", res$status_code)
+      stop("unexpected response code ", res$status_code) # nocov [stevedore bug]
     }
     ret <- r_handler(res$content, as_is_names = as_is_names)
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
@@ -86,7 +87,7 @@ run_endpoint <- function(client, endpoint, params,
 get_response_type <- function(method, path, data) {
   f <- function(x) x$responses[as.integer(names(x$responses)) < 300]
   if (is.null(data)) {
-    stop("stevedore bug")
+    stop("stevedore bug") # nocov [stevedore bug]
   }
   produces <- data$produces
   if (length(produces) == 0L) {
@@ -104,7 +105,6 @@ get_response_type <- function(method, path, data) {
       produces <- "null"
     }
   } else if (length(produces) > 1) {
-    browser()
     stop("Multi-output production needs work")
   }
   produces
@@ -116,7 +116,7 @@ resolve_schema_ref <- function(x, spec) {
     tmp <- lapply(x$allOf, resolve_schema_ref, spec)
     type <- vcapply(tmp, "[[", "type")
     if (!all(type == "object")) {
-      stop("work out how to combine non-objects")
+      stop("should never happen") # nocov [stevedore bug]
     }
     x <- list(type = "object",
               properties = unlist(lapply(tmp, "[[", "properties"), FALSE))

@@ -16,6 +16,11 @@ test_that("camel <-> snake", {
   expect_equal(camel_to_snake("foo_bar"), "foo_bar")
   expect_equal(snake_to_camel("fooBar"), "fooBar")
   expect_equal(snake_to_camel("foo_bar"), "fooBar")
+
+  expect_equal(camel_to_snake(c("fooBar", "fizzBuzz")),
+               c("foo_bar", "fizz_buzz"))
+  expect_equal(snake_to_camel(c("foo_bar", "fizz_buzz")),
+               c("fooBar", "fizzBuzz"))
 })
 
 test_that("case convert with consecutive capitals", {

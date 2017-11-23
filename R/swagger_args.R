@@ -55,7 +55,7 @@ endpoint_args <- function(method, path, x, spec) {
   }
 
   if (any(duplicated(pars_name)) || any(duplicated(pars_name_r))) {
-    stop("fix duplicated names")
+    stop("fix duplicated names") # nocov [stevedore bug]
   }
   stopifnot(identical(pars_name[pars_in == "path"], parse_path(path)$args))
 
@@ -125,7 +125,7 @@ arg_collect <- function(p, dest) {
 
 arg_collect_path <- function(p, dest) {
   if (!isTRUE(p$required)) {
-    stop("all path parameters assumed required")
+    stop("all path parameters assumed required") # nocov [stevedore bug]
   }
   rhs <- as_call(quote(assert_scalar_character), as.symbol(p$name_r))
   lhs <- dollar(dest, quote(path), as.symbol(p$name))
@@ -149,12 +149,12 @@ arg_collect_query <- function(p, dest) {
     if (identical(p$items, list(type = "string"))) {
       validate <- quote(as_query_array_string)
     } else {
-      ## message("Skipping validation (array)")
-      validate <- quote(identity)
+      stop("Unknown query type") # nocov [stevedore bug]
+      ## validate <- quote(identity)
     }
   } else {
-    ## message("Skipping validation (other)")
-    validate <- quote(identity)
+    stop("Unknown query type") # nocov [stevedore bug]
+    ## validate <- quote(identity)
   }
 
   nm <- as.symbol(p$name)
@@ -190,11 +190,11 @@ arg_collect_body <- function(p, dest) {
       is_scalar <- TRUE
     }
   } else if (type == "array") {
-    message("Skipping validation (array)")
+    ## message("Skipping validation (array)") # TODO
     validate <- quote(identity)
     is_scalar <- FALSE
   } else {
-    message("Skipping validation (other)")
+    ## message("Skipping validation (other)") # TODO
     validate <- quote(identity)
     is_scalar <- FALSE
   }
@@ -227,14 +227,6 @@ arg_collect_header <- function(p, dest) {
     expr <- bquote(if (!is.null(.(nm))) .(expr))
   }
   expr
-}
-
-as_query_json <- function(x, name = deparse(substitute(x))) {
-  ## TODO: need to convert case here; most cases will actually need
-  ## proper handlers I suspect, and these will end up in their own bit
-  ## of configuration.
-  message("as query json")
-  browser()
 }
 
 as_query_array_string <- function(x, name = deparse(substitute(x))) {

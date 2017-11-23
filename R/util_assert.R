@@ -73,6 +73,19 @@ assert_integer <- function(x, strict = FALSE, name = deparse(substitute(x))) {
   invisible(x)
 }
 
+assert_named <- function(x, unique = FALSE, name = deparse(substitute(x))) {
+  nms <- names(x)
+  if (is.null(nms)) {
+    stop(sprintf("'%s' must be named", name), call. = FALSE)
+  }
+  if (!all(nzchar(nms))) {
+    stop(sprintf("All elements of '%s' must be named", name), call. = FALSE)
+  }
+  if (unique && any(duplicated(nms))) {
+    stop(sprintf("'%s' must have unique names", name), call. = FALSE)
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {

@@ -178,6 +178,7 @@ test_that("logs", {
                "^Reticulating spline \\d+...$")
   expect_match(capture.output(print(logs, style = "prefix")),
                "^O> Reticulating spline \\d+...$")
+  expect_match(capture.output(print(logs)), "Reticulating spline \\d+...")
 })
 
 test_that("pause/unpause", {
@@ -230,6 +231,8 @@ test_that("restart", {
   logs2 <- x$logs(stdout = TRUE)
 
   expect_equal(sum(logs2 == "Reticulating spline 1...\n"), 2)
+  x$kill()
+  x$remove()
 })
 
 test_that("stats", {
@@ -298,4 +301,14 @@ test_that("prune", {
   e <- get_error(x$reload()$status())
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
+})
+
+test_that("image", {
+  d <- docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("hello-world", name = nm)
+  img <- x$image()
+  cmp <- d$images$get("hello-world")
+  expect_equal(cmp$inspect(), img$inspect())
+  x$remove()
 })

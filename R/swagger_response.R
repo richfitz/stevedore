@@ -38,7 +38,7 @@ make_response_handler <- function(response, spec, produces) {
   } else if (produces == "text/plain") {
     make_response_handler_text(response)
   } else {
-    stop("Unhandled response type ", produces)
+    stop("Unhandled response type ", produces) # nocov [stevedore bug]
   }
 }
 
@@ -52,9 +52,10 @@ make_response_handler_json <- function(response, spec) {
   } else if (schema$type == "array") {
     h <- make_response_handler_array(schema, spec)
   } else if (schema$type == "string") {
+    ## This is no longer used here
     h <- make_response_handler_string(schema, spec)
   } else {
-    stop("not sure how to make this response handler")
+    stop("not sure how to make this response handler") # nocov [stevedore bug]
   }
   function(data, as_is_names) {
     h(raw_to_json(data), as_is_names)
@@ -97,9 +98,8 @@ make_response_handler_object <- function(schema, spec) {
     } else if (identical(ap, list(type = "string"))) {
       additional_properties <- "string"
     } else {
-      additional_properties <- "other"
+      stop("Unsupported additionalProperties") # nocov [stevedore bug]
     }
-    ## TODO: register appropriate handlers here for some of the object case
   }
 
   els <- names(schema$properties)
@@ -176,10 +176,6 @@ make_response_handler_object <- function(schema, spec) {
       if (length(extra) > 0L) {
         if (!is.null(additional_properties_handler)) {
           extra <- lapply(extra, additional_properties_handler, as_is_names)
-        }
-        if (additional_properties == "other") {
-          ## Before processing this I'd like to see what else uses it.
-          message("additional properties need processing")
         }
         if (!as_is_names && length(extra) > 0L) {
           names(extra) <- pascal_to_snake(names(extra))
@@ -293,7 +289,7 @@ make_response_handler_array_object_df <- function(items, spec) {
 make_response_handler_array_object_list <- function(items, spec) {
   properties <- lapply(items$properties, resolve_schema_ref, spec)
   if (length(properties) != 0L) {
-    stop("This is not supported")
+    stop("This is not supported") # nocov
   }
 
   items$additionalProperties <-
@@ -303,14 +299,14 @@ make_response_handler_array_object_list <- function(items, spec) {
   } else if (identical(items$additionalProperties, list(type = "string"))) {
     additional_properties <- "string"
   } else {
-    additional_properties <- "other"
+    stop("Unsupported additionalProperties") # nocov [stevedore bug]
   }
 
   function(data, as_is_names) {
     if (additional_properties == "string") {
       data <- lapply(data, vcapply, identity)
     } else if (additional_properties != "object") {
-      message("extra handling needed here")
+      stop("extra handling needed here") # nocov [stevedore bug]
     }
     if (!as_is_names) {
       rename <- function(x) {
@@ -387,14 +383,9 @@ schema_get_type <- function(x) {
     if (!is.null(x$enum)) {
       ret <- "string"
     } else if ("allOf" %in% names(x)) {
-      ## TODO: this is likely incorrect in some cases, but I suspect
-      ## that it's ok most of the time.
-      ## TODO; remove this once we roll over to the new resolver
-      message("FIXME?")
-      browser()
-      ret <- "object"
+      stop("Should not happen") # nocov [stevedore bug]
     } else {
-      stop("Could not determine type")
+      stop("Could not determine type") # nocov [stevedore bug]
     }
   }
   if (setequal(ret, c("array", "string"))) {

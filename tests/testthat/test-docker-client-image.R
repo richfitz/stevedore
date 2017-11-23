@@ -49,6 +49,12 @@ test_that("tag/reload/untag", {
                           stringsAsFactors = FALSE))
 })
 
+test_that("untag - invalid tag", {
+  img <- docker_client()$images$get("hello-world")
+  tag <- rand_str(10)
+  expect_error(img$untag(tag), sprintf("Invalid repo_tag '%s:latest'", tag))
+})
+
 test_that("history", {
   img <- docker_client()$images$get("hello-world")
   h <- img$history()

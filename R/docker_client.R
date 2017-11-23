@@ -30,9 +30,7 @@ docker_client_container_collection <- function(..., cl) {
     docker_client_container(id, cl)
   }
   after_create <- function(dat) {
-    if (!is.na(dat$warnings)) {
-      warning(dat$warnings, call. = FALSE, immediate. = TRUE)
-    }
+    report_warnings(dat$warnings)
     get_container(dat$id)
   }
   after_list <- function(dat) {
@@ -346,10 +344,7 @@ docker_client_base <- function(..., api_version = NULL) {
 
 stevedore_object <- function(class, ...) {
   els <- list(...)
-  nms <- names(els)
-  if (is.null(nms) && any(!nzchar(nms)) && any(duplicated(nms))) {
-    stop("Invalid names")
-  }
+  assert_named(els, TRUE, "stevedore_object elements")
   ret <- list2env(els, parent = emptyenv())
   class(ret) <- c(class, "stevedore_object")
   lock_environment(ret)

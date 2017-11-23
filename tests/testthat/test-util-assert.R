@@ -72,6 +72,18 @@ test_that("assert_integer", {
   expect_error(assert_integer(1, strict = TRUE), "must be integer")
 })
 
+test_that("assert_named", {
+  object <- list(1, 2, 3)
+  expect_error(assert_named(object), "'object' must be named")
+
+  expect_error(assert_named(set_names(object, c("a", "b", "")), name = "x"),
+               "All elements of 'x' must be named")
+  expect_error(assert_named(set_names(object, c("a", "b", "b")), TRUE, "x"),
+               "'x' must have unique names")
+  expect_silent(assert_named(set_names(object, c("a", "b", "b")), FALSE, "x"))
+  expect_silent(assert_named(set_names(object, c("a", "b", "c")), TRUE, "x"))
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")
