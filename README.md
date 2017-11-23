@@ -4,6 +4,8 @@
 
 A docker client for R
 
+**WARNING**: package is in early development. If you run the test suite it may do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f`
+
 ## Approach
 
 Docker provides _very_ rich information about running containers - much of the work of this package is converting this information back into R's native structures in a way that is both useful and predictable.  For example, the API equivalent of `docker ps` (`GET /containers/json`) returns a json array of dicts - each element of has an expected set of keys.
