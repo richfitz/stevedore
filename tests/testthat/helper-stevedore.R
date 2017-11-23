@@ -159,3 +159,21 @@ rand_str <- function(n, prefix = "") {
 get_error <- function(expr) {
   tryCatch(expr, error = identity)
 }
+
+untar_bin <- function(bin, path = tempfile()) {
+  tmp <- tempfile()
+  writeBin(bin, tmp)
+  on.exit(file.remove(tmp))
+  dir.create(path, FALSE, TRUE)
+  untar(tmp, exdir = path)
+  invisible(path)
+}
+
+tar_bin <- function(path, setwd = TRUE) {
+  owd <- setwd(path)
+  on.exit(setwd(owd))
+  tmp <- tempfile()
+  on.exit(file.remove(tmp), add = TRUE)
+  tar(tmp, ".")
+  readBin(tmp, raw(), file.size(tmp))
+}

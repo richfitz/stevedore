@@ -72,6 +72,20 @@ docker_client_container <- function(id, client) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
     modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
   }
+  after_path_stat <- function(x) {
+    from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
+  }
+  after_top <- function(x) {
+    m <- matrix(unlist(x$processes), byrow = TRUE, nrow = length(x$processes))
+    colnames(m) <- x$titles
+    ## TODO: some of these can be non-text.  Not sure how to safely do
+    ## that though.  So for now it's all going to be character.
+    as.data.frame(m, stringsAsFactors = FALSE)
+  }
+  after_update <- function(x) {
+    report_warnings(x$warnings, "updating container")
+    invisible(self)
+  }
 
   ## TODO: friendly "copy" interface needed here, but that requires a
   ## bit more general work really.
@@ -80,7 +94,7 @@ docker_client_container <- function(id, client) {
   ## list of functions.  That will plug into an eventual help system.
   self <- stevedore_object(
     "docker_container",
-    id = function() attrs$id,
+    id = function() id,
     name = function() drop_leading_slash(attrs$name),
     image = function() {
       docker_client_image(
@@ -100,9 +114,14 @@ docker_client_container <- function(id, client) {
     diff = make_fn("container_changes"),
     ## TODO: exec (complex - start a new exec instance)
     export = make_fn("container_export"),
+    path_stat = modify_args(client$endpoints$container_path_stat,
+                            .internal_args, fix = list(id = id),
+                            after = after_path_stat,
+                            name = "container_path_stat"),
     get_archive = make_fn("container_archive"),
     put_archive = make_fn("container_import"),
     kill = make_fn("container_kill"),
+    ## TODO: stdout/stderr args become TRUE by default?
     logs = make_fn("container_logs"),
     pause = make_fn("container_pause"),
     ## This should invalidate our container afterwards
@@ -112,11 +131,18 @@ docker_client_container <- function(id, client) {
     resize = make_fn("container_resize"),
     restart = make_fn("container_restart"),
     start = make_fn("container_start"),
-    stats = make_fn("container_stats"),
+    ## TODO: expose stream (but with nice printing?)
+    stats = modify_args(client$endpoints$container_stats,
+                        .internal_args, fix = list(id = id, stream = FALSE),
+                        name = "container_stats"),
     stop = make_fn("container_stop"),
-    top = make_fn("container_top"),
+    top = modify_args(client$endpoints$container_top,
+                      .internal_args, fix = list(id = id),
+                      after = after_top, name = "container_top"),
     unpause = make_fn("container_unpause"),
-    update = make_fn("container_update"),
+    update = modify_args(client$endpoints$container_update,
+                         .internal_args, fix = list(id = id),
+                         after = after_update, name = "container_update"),
     wait = make_fn("container_wait"),
     reload = reload)
   self
@@ -259,13 +285,7 @@ docker_client_volume_collection <- function(..., cl) {
   after_list <- function(dat) {
     ## TODO: the NA bit can come out here later - it's there because
     ## of a type error
-    if (length(dat$warnings) > 0L && !identical(dat$warnings, NA_character_)) {
-      warning(sprintf(
-        "%s while reading volume list:\n%s",
-        ngettext(length(dat$warnings), "warning", "warnings"),
-        paste0("- %s", dat$warnings, collapse = "\n")),
-        call. = FALSE, immediate. = TRUE)
-    }
+    report_warnings(dat$warnings, "reading volume list")
     dat$volumes
   }
   stevedore_object(
@@ -361,3 +381,16 @@ drop_leading_slash <- function(x) {
 }
 
 .internal_args <- c("pass_error", "hijack", "as_is_names")
+
+## TODO: the NA bit can come out here later - it's there because
+## of a type error
+report_warnings <- function(x, action) {
+  if (length(x) > 0L && !identical(x, NA_character_)) {
+    warning(sprintf(
+      "%s while %s:\n%s",
+      ngettext(length(x), "warning", "warnings"),
+      action,
+      paste0("- %s", x, collapse = "\n")),
+      call. = FALSE, immediate. = TRUE)
+  }
+}

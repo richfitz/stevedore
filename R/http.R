@@ -80,10 +80,16 @@ make_handle_socket <- function(base_url) {
 response_to_error <- function(response, pass_error) {
   headers <- curl::parse_headers_list(response$headers)
   type <- headers[["content-type"]]
-  if (type == "text/plain") {
-    msg <- raw_to_char(response$content)
+  if (length(response$content) > 0L) {
+    if (type == "text/plain") {
+      msg <- raw_to_char(response$content)
+    } else {
+      msg <- raw_to_json(response$content)$message
+    }
   } else {
-    msg <- raw_to_json(response$content)$message
+    ## TODO: this needs fixing but I do not know what the right answer
+    ## is, frankly
+    msg <- "An error occured but HEAD is obscuring it"
   }
   status_code <- response$status_code
   cond <- list(message = msg, code = status_code)
