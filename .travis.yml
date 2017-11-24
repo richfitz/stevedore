@@ -11,3 +11,7 @@ before_script:
   - docker pull bfirsh/reticulate-splines
 after_success:
   - Rscript -e 'covr::codecov()'
+addons:
+  apt:
+    packages:
+      - libcurl4-openssl-dev
