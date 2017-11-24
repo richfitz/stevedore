@@ -5,5 +5,9 @@ services:
   - docker
 r_packages:
   - covr
+before_script:
+  - docker pull hello-world
+  - docker pull alpine
+  - docker pull bfirsh/reticulate-splines
 after_success:
   - Rscript -e 'covr::codecov()'
