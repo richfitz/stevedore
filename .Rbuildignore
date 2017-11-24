@@ -1,3 +1,4 @@
 ^Makefile$
 ^CONDUCT.md$
 ^TODO.md$
+^\.travis\.yml$
