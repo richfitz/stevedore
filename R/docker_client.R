@@ -389,3 +389,19 @@ report_warnings <- function(x, action) {
       call. = FALSE, immediate. = TRUE)
   }
 }
+
+subset_stevedore_object <- function(x, name) {
+  .subset2(x, name) %||%
+    stop(sprintf("No element '%s' within '%s' object", name, class(x)[[1]]))
+}
+
+##' @export
+`$.stevedore_object` <- function(x, name) {
+  subset_stevedore_object(x, name)
+}
+
+##' @export
+`[[.stevedore_object` <- function(x, i, ...) {
+  assert_scalar_character(i)
+  subset_stevedore_object(x, i)
+}

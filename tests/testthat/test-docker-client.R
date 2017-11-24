@@ -49,3 +49,16 @@ test_that("children", {
   expect_is(d$volumes, "docker_volume_collection")
   expect_is(d$volumes, "stevedore_object")
 })
+
+test_that("Prevent invalid access", {
+  d <- docker_client()
+  expect_error(d$foo, "No element 'foo' within 'docker_client' object")
+  expect_error(d[["foo"]], "No element 'foo' within 'docker_client' object")
+  expect_error(d[[1]], "'i' must be a character")
+
+  expect_error(d$containers$foo,
+               "No element 'foo' within 'docker_container_collection' object")
+  expect_error(d[["containers"]][["foo"]],
+               "No element 'foo' within 'docker_container_collection' object")
+  expect_error(d$containers[[1]], "'i' must be a character")
+})
