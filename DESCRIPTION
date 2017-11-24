@@ -15,6 +15,7 @@ Imports:
     crayon,
     curl (>= 2.3.0),
     jsonlite,
+    openssl,
     yaml
 Suggests:
     knitr,
