@@ -1,12 +1,12 @@
 context("docker client: images")
 
 test_that("list", {
-  d <- docker_client()$images$list()
+  d <- test_docker_client()$images$list()
   expect_is(d, "data.frame")
 })
 
 test_that("get", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   expect_is(img, "docker_image")
   expect_is(img, "stevedore_object")
 
@@ -14,13 +14,13 @@ test_that("get", {
 })
 
 test_that("get by reference", {
-  img <- docker_client()$images$get("sha256:f2a9173236")
+  img <- test_docker_client()$images$get("sha256:f2a9173236")
   expect_true("hello-world:latest" %in% img$tags())
 })
 
 test_that("id/short_id", {
-  img <- docker_client()$images$get("hello-world")
-  d <- docker_client()$images$list()
+  img <- test_docker_client()$images$get("hello-world")
+  d <- test_docker_client()$images$list()
   i1 <- img$id()
   i2 <- img$short_id()
   expect_true(i1 %in% d$id)
@@ -30,13 +30,13 @@ test_that("id/short_id", {
 })
 
 test_that("inspect", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   d <- img$inspect()
   expect_is(d, "list")
 })
 
 test_that("tag/reload/untag", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   tag <- rand_str(10)
   expect <- paste0(tag, ":latest")
   img$tag(tag)
@@ -50,20 +50,20 @@ test_that("tag/reload/untag", {
 })
 
 test_that("untag - invalid tag", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   tag <- rand_str(10)
   expect_error(img$untag(tag), sprintf("Invalid repo_tag '%s:latest'", tag))
 })
 
 test_that("history", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   h <- img$history()
   expect_is(h, "data.frame")
   expect_equal(h$id[[1]], img$id())
 })
 
 test_that("export", {
-  img <- docker_client()$images$get("hello-world")
+  img <- test_docker_client()$images$get("hello-world")
   tar <- img$export()
   expect_is(tar, "raw")
 
@@ -77,7 +77,7 @@ test_that("export", {
 })
 
 test_that("import", {
-  cl <- docker_client()
+  cl <- test_docker_client()
   img <- cl$images$get("hello-world")
   id <- img$id()
   tar <- img$export()

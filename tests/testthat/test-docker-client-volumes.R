@@ -1,7 +1,7 @@
 context("docker client: volumes")
 
 test_that("create", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   v <- d$volumes$create(nm)
   expect_is(v, "docker_volume")
@@ -19,7 +19,7 @@ test_that("create", {
 })
 
 test_that("get", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   v1 <- d$volumes$create(nm)
   v2 <- d$volumes$get(nm)
@@ -32,7 +32,7 @@ test_that("get", {
 })
 
 test_that("list", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   v <- d$volumes$create(nm)
 
@@ -43,7 +43,7 @@ test_that("list", {
 })
 
 test_that("prune", {
-  d <- docker_client()
+  d <- test_docker_client()
   ans <- d$volumes$prune()
   expect_match(ans$volumes_deleted, "^stevedore_", all = FALSE)
 })

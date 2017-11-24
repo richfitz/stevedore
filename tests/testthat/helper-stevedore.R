@@ -177,3 +177,19 @@ tar_bin <- function(path, setwd = TRUE) {
   tar(tmp, ".")
   readBin(tmp, raw(), file.size(tmp))
 }
+
+## TODO: at some point a variant of this will move into the main
+## constructor, with a proper error message advising on solutions.
+CURL_HAS_SOCKET_SUPPORT <-
+  !inherits(try(curl::curl_options()[["unix_socket_path"]], silent = TRUE),
+            "try-error")
+skip_if_no_curl_socket <- function() {
+  if (!CURL_HAS_SOCKET_SUPPORT) {
+    testthat::skip("libcurl does not have support for unix sockets")
+  }
+}
+
+test_docker_client <- function() {
+  skip_if_no_curl_socket()
+  docker_client()
+}

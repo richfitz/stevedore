@@ -1,7 +1,7 @@
 context("docker client: networks")
 
 test_that("create", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw <- d$networks$create(nm)
   expect_is(nw, "docker_network")
@@ -19,7 +19,7 @@ test_that("create", {
 })
 
 test_that("get", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw1 <- d$networks$create(nm)
   nw2 <- d$networks$get(nm)
@@ -32,7 +32,7 @@ test_that("get", {
 })
 
 test_that("list", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw <- d$networks$create(nm)
 
@@ -43,7 +43,7 @@ test_that("list", {
 })
 
 test_that("prune", {
-  d <- docker_client()
+  d <- test_docker_client()
   ans <- d$networks$prune()
   expect_match(ans$networks_deleted, "^stevedore_", all = FALSE)
 })

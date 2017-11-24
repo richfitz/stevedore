@@ -2,7 +2,7 @@ context("http")
 
 test_that("version", {
   cl <- R6_http_client$new()
-  d <- docker_client()
+  d <- test_docker_client()
 
   min <- MIN_DOCKER_API_VERSION
   max <- MAX_DOCKER_API_VERSION

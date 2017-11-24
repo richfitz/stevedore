@@ -1,7 +1,7 @@
 context("docker client: containers")
 
 test_that("create", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
   expect_is(x, "docker_container")
@@ -19,7 +19,7 @@ test_that("create", {
 })
 
 test_that("get", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x1 <- d$containers$create("hello-world", name = nm)
   x2 <- d$containers$get(nm)
@@ -33,7 +33,7 @@ test_that("get", {
 })
 
 test_that("list", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -45,7 +45,7 @@ test_that("list", {
 })
 
 test_that("prune", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -57,7 +57,7 @@ test_that("diff", {
   ## TODO: need to get a better test in here - one that actually shows
   ## we can report this.  For now it should be ok to show that the
   ## endpoint works, I guess.
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
   xd <- x$diff()
@@ -67,7 +67,7 @@ test_that("diff", {
 })
 
 test_that("export", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -90,7 +90,7 @@ test_that("export", {
 })
 
 test_that("path_stat", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -106,7 +106,7 @@ test_that("path_stat", {
 
 test_that("archive export", {
   ## TODO: another tar endpoint
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -116,7 +116,7 @@ test_that("archive export", {
 })
 
 test_that("archive import", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
@@ -146,7 +146,7 @@ test_that("kill", {
   ## become necessary to separate out the tests into "short" and
   ## "long" tests so that I can keep the test cycle reasonable
   ## locally.
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("alpine", cmd = c("sleep", "10000"), name = nm)
   expect_null(x$start())
@@ -157,7 +157,7 @@ test_that("kill", {
 })
 
 test_that("logs", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
@@ -185,7 +185,7 @@ test_that("logs", {
 })
 
 test_that("pause/unpause", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
@@ -211,7 +211,7 @@ test_that("pause/unpause", {
 })
 
 test_that("rename", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm1 <- rand_str(10, "stevedore_")
   nm2 <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
@@ -223,7 +223,7 @@ test_that("rename", {
 })
 
 test_that("restart", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
@@ -239,7 +239,7 @@ test_that("restart", {
 })
 
 test_that("stats", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   s <- x$stats()
@@ -251,7 +251,7 @@ test_that("stats", {
 })
 
 test_that("stop", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
@@ -261,7 +261,7 @@ test_that("stop", {
 })
 
 test_that("top", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
@@ -273,7 +273,7 @@ test_that("top", {
 })
 
 test_that("update", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   info <- x$inspect(FALSE)
@@ -287,7 +287,7 @@ test_that("update", {
 })
 
 test_that("wait", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
   x$start()
@@ -296,7 +296,7 @@ test_that("wait", {
 })
 
 test_that("prune", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
   ans <- d$containers$prune()
@@ -307,7 +307,7 @@ test_that("prune", {
 })
 
 test_that("image", {
-  d <- docker_client()
+  d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
   img <- x$image()

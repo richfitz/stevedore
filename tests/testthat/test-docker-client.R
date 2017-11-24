@@ -2,7 +2,7 @@ context("docker client")
 
 ## The most simple nontrivial thing with the docker client
 test_that("ping", {
-  d <- docker_client()
+  d <- test_docker_client()
   expect_is(d, "stevedore_object")
   expect_is(d, "docker_client")
   ok <- d$ping()
@@ -12,13 +12,13 @@ test_that("ping", {
 })
 
 test_that("info", {
-  d <- docker_client()
+  d <- test_docker_client()
   info <- d$info()
   expect_is(info, "list")
 })
 
 test_that("version", {
-  d <- docker_client()
+  d <- test_docker_client()
   v <- d$version()
   expect_is(v, "list")
   expect_is(v$api_version, "character")
@@ -26,17 +26,17 @@ test_that("version", {
 
 test_that("df", {
   skip("df containers output looks broken to me")
-  d <- docker_client()
+  d <- test_docker_client()
   df <- d$df()
 })
 
 test_that("events", {
   skip("events this needs some streaming support")
-  d <- docker_client()
+  d <- test_docker_client()
 })
 
 test_that("children", {
-  d <- docker_client()
+  d <- test_docker_client()
   expect_is(d$containers, "docker_container_collection")
   expect_is(d$containers, "stevedore_object")
 
@@ -51,7 +51,7 @@ test_that("children", {
 })
 
 test_that("Prevent invalid access", {
-  d <- docker_client()
+  d <- test_docker_client()
   expect_error(d$foo, "No element 'foo' within 'docker_client' object")
   expect_error(d[["foo"]], "No element 'foo' within 'docker_client' object")
   expect_error(d[[1]], "'i' must be a character")
