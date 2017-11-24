@@ -16,6 +16,7 @@ Imports:
     curl (>= 2.3.0),
     jsonlite,
     openssl,
+    prettyunits,
     yaml
 Suggests:
     knitr,

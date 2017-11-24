@@ -30,7 +30,7 @@ R6_http_client <- R6::R6Class(
     },
 
     request = function(verb, path, query = NULL, body = NULL, headers = NULL,
-                       hijack = FALSE, mode = "rb", versioned_api = TRUE) {
+                       hijack = NULL, mode = "rb", versioned_api = TRUE) {
       v <- if (versioned_api) self$api_version else NULL
       url <- build_url(self$base_url, v, path, query)
       if (!is.null(body)) {
@@ -54,12 +54,9 @@ R6_http_client <- R6::R6Class(
       if (verb == "HEAD") {
         curl::handle_setopt(h, nobody = TRUE)
       }
-      if (hijack) {
-        con <- curl::curl(url, handle = h)
-        open(con, mode = mode, blocking = FALSE)
-        data <- curl::handle_data(h)
-        data$connection <- data
-        data
+      if (!is.null(hijack)) {
+        assert_is(hijack, "function")
+        curl::curl_fetch_stream(url, hijack, h)
       } else {
         curl::curl_fetch_memory(url, h)
       }
@@ -202,4 +199,16 @@ http_client_api_version <- function(api_version, client,
   }
 
   api_version
+}
+
+streaming_json <- function(callback) {
+  force(callback)
+  res <- raw()
+  ret <- function(x) {
+    res <<- c(res, x)
+    lapply(strsplit(raw_to_char(x), "\r\n")[[1]],
+           function(line) callback(from_json(line)))
+  }
+  attr(ret, "content") <- function() res
+  ret
 }

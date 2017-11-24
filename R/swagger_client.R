@@ -20,7 +20,7 @@ client_endpoint <- function(name, env) {
     params <- get_params
     run_endpoint(client, endpoint, params, pass_error, hijack, as_is_names)
   }), subs)[[2]]
-  base_args <- alist(pass_error = FALSE, hijack = FALSE, as_is_names = FALSE)
+  base_args <- alist(pass_error = FALSE, hijack = NULL, as_is_names = FALSE)
   as.function(c(args, base_args, body), env)
 }
 

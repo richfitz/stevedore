@@ -109,7 +109,20 @@ test_that("build", {
 })
 
 test_that("pull", {
-  skip("not yet implemented")
+  skip_if_no_internet()
+
+  tmp <- tempfile()
+  con <- file(tmp, "wb")
+  on.exit(close(con))
+
+  cl <- test_docker_client()
+  cl$images$remove("alpine:latest")
+  img <- cl$images$pull("alpine:latest", stream = con)
+  close(con)
+  on.exit()
+
+  expect_true("alpine:latest" %in% img$tags())
+  readLines(tmp)
 })
 
 test_that("push", {

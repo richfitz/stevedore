@@ -163,6 +163,13 @@ docker_client_image_collection <- function(..., cl) {
   get_image <- function(id) {
     docker_client_image(id, cl)
   }
+  pull_image <- function(repository, tag = NULL, stream = stdout()) {
+    hijack <- streaming_json(pull_status_printer(stream))
+    ans <- cl$endpoints$image_create(from_image = repository, tag = tag,
+                                     hijack = hijack)
+    name <- if (is.null(tag)) repository else sprintf("%s:%s", repository, tag)
+    get_image(name)
+  }
   stevedore_object(
     "docker_image_collection",
     build = modify_args(cl$endpoints$image_build, .internal_args,
@@ -170,7 +177,9 @@ docker_client_image_collection <- function(..., cl) {
     get = get_image,
     list = strip_api_args("image_list", cl$endpoints),
     import = strip_api_args("image_import", cl$endpoints),
-    ## pull = strip_api_args("image_pull", cl$endpoints), # via create?
+    ## TODO: need to do some argument sanitisation and renaming here.
+    ## So I'm going to do this one manually
+    pull = pull_image,
     push = strip_api_args("image_push", cl$endpoints),
     search = strip_api_args("image_search", cl$endpoints),
     remove = strip_api_args("image_delete", cl$endpoints),
@@ -417,4 +426,47 @@ subset_stevedore_object <- function(x, name) {
 `[[.stevedore_object` <- function(x, i, ...) {
   assert_scalar_character(i)
   subset_stevedore_object(x, i)
+}
+
+pull_status_printer <- function(stream = stdout()) {
+  if (is.null(stream)) {
+    return(function(x) {})
+  }
+  assert_is(stream, "connection")
+  last_is_progress <- FALSE
+  width <- getOption("width")
+  endl <- if (isatty(stream)) "" else "\n"
+
+  function(x) {
+    if (last_is_progress) {
+      reset_line(stream, width)
+    }
+    status <- x$status
+    if (length(x$progressDetail > 0L)) {
+      last_is_progress <<- TRUE
+      cur <- x$progressDetail[["current"]]
+      tot <- x$progressDetail[["total"]]
+      tmp <- prettyunits::pretty_bytes(c(cur, tot))
+      tmp[[1]] <- sub(" .*", "", tmp[[1]])
+      str <- sprintf("%s: %s %s/%s %d%%%s", x[["id"]], x[["status"]],
+                     prettyunits::pretty_bytes(cur),
+                     prettyunits::pretty_bytes(tot),
+                     round(cur / tot * 100),
+                     endl)
+    } else {
+      last_is_progress <<- FALSE
+      if (!is.null(x$error)) {
+        ## TODO: there's also errorDetail$message here too
+        str <- paste0(x$error, "\n")
+      } else if (!is.null(x$status) && is.null(x$id)) {
+        str <- paste0(x$status, "\n")
+      } else if (!is.null(x$status) && !is.null(x$id)) {
+        str <- sprintf("%s %s\n", x$status, x$id)
+      } else {
+        str <- ""
+      }
+    }
+
+    cat(str, file = stream)
+  }
 }

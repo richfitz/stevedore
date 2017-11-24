@@ -193,3 +193,14 @@ test_docker_client <- function() {
   skip_if_no_curl_socket()
   docker_client()
 }
+
+has_internet <- function() {
+  !is.null(suppressWarnings(utils::nsl("www.google.com")))
+}
+
+skip_if_no_internet <- function() {
+  if (has_internet()) {
+    return()
+  }
+  testthat::skip("no internet")
+}

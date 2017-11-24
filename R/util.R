@@ -159,3 +159,9 @@ dollar <- function(...) {
 string_starts_with <- function(x, sub) {
   substr(x, 1, nchar(sub)) == sub
 }
+
+reset_line <- function(stream, width) {
+  if (isatty(stream)) {
+    cat(paste0(c("\r", strrep(" ", width), "\r"), collapse = ""), file = stream)
+  }
+}

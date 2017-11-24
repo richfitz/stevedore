@@ -51,36 +51,41 @@ make_endpoint <- function(method, path, spec) {
 }
 
 run_endpoint <- function(client, endpoint, params,
-                         pass_error = NULL, hijack = FALSE,
+                         pass_error = NULL, hijack = NULL,
                          as_is_names = FALSE) {
   path <- sprintfn(endpoint$path_fmt, params$path)
   res <- client$request(endpoint$method, path,
                         params$query, params$body, params$header,
                         hijack)
-  if (hijack) {
-    ## TODO: there's probably lots more work needed here!
-    return(res)
-  }
   status_code <- res$status_code
-  if (status_code < 300) {
+  if (status_code >= 300) {
+    if (!is.null(hijack) && !is.null(attr(hijack, "content"))) {
+      res$content <- attr(hijack, "content")()
+    }
+    response_to_error(res, pass_error)
+  } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {
       stop("unexpected response code ", res$status_code) # nocov [stevedore bug]
     }
-    ret <- r_handler(res$content, as_is_names = as_is_names)
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
-    if (!is.null(h_handler)) {
-      headers <- h_handler(res$headers, as_is_names = as_is_names)
-      if (endpoint$method == "HEAD") {
-        ## There cannot be a body here
-        ret <- headers
-      } else {
-        ret <- set_attributes(ret, headers)
+    if (!is.null(hijack)) {
+      list(response = res,
+           content_handler = r_handler,
+           header_handler = h_handler)
+    } else {
+      ret <- r_handler(res$content, as_is_names = as_is_names)
+      if (!is.null(h_handler)) {
+        headers <- h_handler(res$headers, as_is_names = as_is_names)
+        if (endpoint$method == "HEAD") {
+          ## There cannot be a body here
+          ret <- headers
+        } else {
+          ret <- set_attributes(ret, headers)
+        }
       }
+      ret
     }
-    ret
-  } else {
-    response_to_error(res, pass_error)
   }
 }
 
