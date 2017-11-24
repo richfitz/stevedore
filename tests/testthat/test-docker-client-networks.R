@@ -47,3 +47,15 @@ test_that("prune", {
   ans <- d$networks$prune()
   expect_match(ans$networks_deleted, "^stevedore_", all = FALSE)
 })
+
+test_that("containers", {
+  skip("containers is untested")
+})
+
+test_that("connect", {
+  skip("connect is untested")
+})
+
+test_that("disconnect", {
+  skip("disconnect is untested")
+})

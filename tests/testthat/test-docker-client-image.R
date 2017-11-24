@@ -103,3 +103,19 @@ test_that("import", {
 test_that("prune", {
   skip("Not yet testable")
 })
+
+test_that("build", {
+  skip("not yet tested")
+})
+
+test_that("pull", {
+  skip("not yet implemented")
+})
+
+test_that("push", {
+  skip("not yet tested")
+})
+
+test_that("search", {
+  skip("not yet tested")
+})

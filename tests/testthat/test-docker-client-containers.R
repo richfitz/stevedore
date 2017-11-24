@@ -315,3 +315,23 @@ test_that("image", {
   expect_equal(cmp$inspect(), img$inspect())
   x$remove()
 })
+
+test_that("resize", {
+  skip("untested")
+})
+
+test_that("attach", {
+  skip("attach is not yet implemented")
+})
+
+test_that("exec", {
+  skip("attach is not yet implemented")
+})
+
+test_that("logs (streaming)", {
+  skip("log streaming is not yet implemented")
+})
+
+test_that("run", {
+  skip("run is not yet implemented")
+})
