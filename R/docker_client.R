@@ -446,8 +446,6 @@ pull_status_printer <- function(stream = stdout()) {
       last_is_progress <<- TRUE
       cur <- x$progressDetail[["current"]]
       tot <- x$progressDetail[["total"]]
-      tmp <- prettyunits::pretty_bytes(c(cur, tot))
-      tmp[[1]] <- sub(" .*", "", tmp[[1]])
       str <- sprintf("%s: %s %s/%s %d%%%s", x[["id"]], x[["status"]],
                      prettyunits::pretty_bytes(cur),
                      prettyunits::pretty_bytes(tot),
