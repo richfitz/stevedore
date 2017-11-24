@@ -1,9 +1,22 @@
-## The design through here mimics the Python docker library; we have a
-## concept of a "foo collection" (e.g., a container collection) that
-## produces instances of "foo" objects (e.g., containers).  This will
-## be replicated for networks, volumes, etc.  Unlike the Python
-## inteface we're not doing this with any fancy inheritance etc.
+##' Create a docker client object
+##' @title Create docker client
+##' @param ... Reserved for future use
+##'
+##' @param api_version Version of the API request from the api.
+##'   Options are \code{NULL} (the default) - use the package's
+##'   default version (currently 1.29), a version as a string or
+##'   \code{\link{numeric_version}} object (supported between 1.25 and
+##'   1.32), or the string \code{detect} which will use the highest
+##'   version out of the version reported by the api and 1.32
+##'
+##' @export
 docker_client <- function(..., api_version = NULL) {
+  ## The design through here mimics the Python docker library; we have
+  ## a concept of a "foo collection" (e.g., a container collection)
+  ## that produces instances of "foo" objects (e.g., containers).
+  ## This will be replicated for networks, volumes, etc.  Unlike the
+  ## Python inteface we're not doing this with any fancy inheritance
+  ## etc.
   cl <- docker_client_base(..., api_version = api_version)
 
   containers <- docker_client_container_collection(cl = cl)
