@@ -1,0 +1,23 @@
+#!/bin/sh
+set -e
+
+if [ "$#" -ge 1 ]; then
+    TIMES=$1
+else
+    TIMES=10
+fi
+
+if [ "$#" -ge 2 ]; then
+    INTERVAL=$2
+else
+    INTERVAL=1
+fi
+
+echo "Doing $TIMES iterations with interval $INTERVAL"
+i=0
+while [ $i -lt $TIMES ]; do
+    let i+=1
+    echo "Iteration $i..."
+    sleep $INTERVAL
+done
+echo "Done!"
