@@ -45,7 +45,7 @@ containers <- data_frame(
           i_pamconfig = list(
             i_pv4_address = NA_character_,
             i_pv6_address = NA_character_,
-            link_local_ips = NA_character_
+            link_local_ips = character(0)
           ),
           links = character(),
           aliases = character(),

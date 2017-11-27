@@ -21,7 +21,7 @@ config <- list(
   image = "91e54dfb11794fad694460162bf0cb0a4fa710cfa3f60979c177d920813e267c",
   volumes = NULL,
   working_dir = "",
-  entrypoint = NA_character_,
+  entrypoint = character(0),
   network_disabled = FALSE,
   mac_address = "",
   on_build = character(0),
@@ -31,7 +31,7 @@ config <- list(
     com.example.license = "GPL"),
   stop_signal = NA_character_,
   stop_timeout = NA_integer_,
-  shell = NA_character_)
+  shell = character(0))
 
 container_config <- list(
   hostname = "e611e15f9c9d",
@@ -54,7 +54,7 @@ container_config <- list(
   image = "91e54dfb11794fad694460162bf0cb0a4fa710cfa3f60979c177d920813e267c",
   volumes = NULL,
   working_dir = "",
-  entrypoint = NA_character_,
+  entrypoint = character(0),
   network_disabled = FALSE,
   mac_address = "",
   on_build = character(0),
@@ -64,7 +64,7 @@ container_config <- list(
     com.example.vendor = "Acme"),
   stop_signal = NA_character_,
   stop_timeout = NA_integer_,
-  shell = NA_character_)
+  shell = character(0))
 
 graph_driver <- list(name = "aufs", data = character())
 

@@ -5,7 +5,7 @@
 ## response: {"Architecture":"x86_64","ClusterStore":"etcd://localhost:2379","CgroupDriver":"cgroupfs","Containers":11,"ContainersRunning":7,"ContainersStopped":3,"ContainersPaused":1,"CpuCfsPeriod":true,"CpuCfsQuota":true,"Debug":false,"DockerRootDir":"/var/lib/docker","Driver":"btrfs","DriverStatus":"","ExperimentalBuild":false,"HttpProxy":"http://test:test@localhost:8080","HttpsProxy":"https://test:test@localhost:8080","ID":"7TRN:IPZB:QYBB:VPBQ:UMPP:KARE:6ZNR:XE6T:7EWV:PKF4:ZOJD:TPYS","IPv4Forwarding":true,"Images":16,"IndexServerAddress":"https://index.docker.io/v1/","InitPath":"/usr/bin/docker","InitSha1":"","KernelMemory":true,"KernelVersion":"3.12.0-1-amd64","Labels":"storage=ssd","MemTotal":2099236864,"MemoryLimit":true,"NCPU":1,"NEventsListener":0,"NFd":11,"NGoroutines":21,"Name":"prod-server-42","NoProxy":"9.81.1.160","OomKillDisable":true,"OSType":"linux","OperatingSystem":"Boot2Docker","Plugins":{"Volume":"local","Network":["null","host","bridge"]},"RegistryConfig":{"IndexConfigs":{"docker.io":{"Name":"docker.io","Official":true,"Secure":true}},"InsecureRegistryCIDRs":"127.0.0.0/8"},"SecurityOptions":[{"Key":"Name","Value":"seccomp"},{"Key":"Profile","Value":"default"},{"Key":"Name","Value":"apparmor"},{"Key":"Name","Value":"selinux"},{"Key":"Name","Value":"userns"}],"ServerVersion":"1.9.0","SwapLimit":false,"SystemStatus":"c(\"State\", \"Healthy\")","SystemTime":"2015-03-10T11:11:23.730591467-07:00"}
 index_config <- list(
   docker.io = list(
-    mirrors = NA_character_,
+    mirrors = character(0),
     name = "docker.io",
     official = TRUE,
     secure = TRUE))

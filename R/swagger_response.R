@@ -198,14 +198,16 @@ make_response_handler_array <- function(schema, spec) {
   } else if (items$type == "array") {
     make_response_handler_array_array(items, spec)
   } else {
-    make_response_handler_array_atomic(atomic$missing[[items$type]])
+    make_response_handler_array_atomic(atomic$missing[[items$type]],
+                                       atomic$empty[[items$type]])
   }
 }
 
-make_response_handler_array_atomic <- function(missing) {
+make_response_handler_array_atomic <- function(missing, empty) {
   force(missing)
+  force(empty)
   function(x, as_is_names) {
-    if (is.null(x)) missing else vapply(x, identity, missing, USE.NAMES = FALSE)
+    if (is.null(x)) empty else vapply(x, identity, missing, USE.NAMES = FALSE)
   }
 }
 

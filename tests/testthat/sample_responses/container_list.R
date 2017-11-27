@@ -27,8 +27,8 @@ mounts <- I(list(mounts, mounts[0, ], mounts[0, ], mounts[0, ]))
 
 nw1 <- list(
   i_pamconfig = NULL,
-  links = NA_character_,
-  aliases = NA_character_,
+  links = character(0),
+  aliases = character(0),
   network_id = "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812",
   endpoint_id = "2cdc4edb1ded3631c81f57966563e5c8525b81121bb3706a9a9a3ae102711f3f",
   gateway = "172.17.0.1",
@@ -40,8 +40,8 @@ nw1 <- list(
   mac_address = "02:42:ac:11:00:02")
 nw2 <- list(
   i_pamconfig = NULL,
-  links = NA_character_,
-  aliases = NA_character_,
+  links = character(0),
+  aliases = character(0),
   network_id = "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812",
   endpoint_id = "88eaed7b37b38c2a3f0c4bc796494fdf51b270c2d22656412a2ca5d559a64d7a",
   gateway = "172.17.0.1",
@@ -53,8 +53,8 @@ nw2 <- list(
   mac_address = "02:42:ac:11:00:08")
 nw3 <- list(
   i_pamconfig = NULL,
-  links = NA_character_,
-  aliases = NA_character_,
+  links = character(0),
+  aliases = character(0),
   network_id = "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812",
   endpoint_id = "8b27c041c30326d59cd6e6f510d4f8d1d570a228466f956edf7815508f78e30d",
   gateway = "172.17.0.1",
@@ -66,8 +66,8 @@ nw3 <- list(
   mac_address = "02:42:ac:11:00:06")
 nw4 <- list(
   i_pamconfig = NULL,
-  links = NA_character_,
-  aliases = NA_character_,
+  links = character(0),
+  aliases = character(0),
   network_id = "7ea29fc1412292a2d7bba362f9253545fecdfa8ce9a6e37dd10ba8bee7129812",
   endpoint_id = "d91c7b2f0644403d7ef3095985ea0e2370325cd2332ff3a3225c4247328e66e9",
   gateway = "172.17.0.1",

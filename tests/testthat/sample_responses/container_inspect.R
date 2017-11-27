@@ -33,7 +33,7 @@ host_config <- list(
     path_on_host = character(),
     path_in_container = character(),
     cgroup_permissions = character()),
-  device_cgroup_rules = NA_character_,
+  device_cgroup_rules = character(0),
   disk_quota = NA_integer_,
   kernel_memory = 0L,
   memory_reservation = 0L,
@@ -50,7 +50,7 @@ host_config <- list(
   cpu_percent = 80L,
   i_omaximum_iops = NA_integer_,
   i_omaximum_bandwidth = NA_integer_,
-  binds = NA_character_,
+  binds = character(0),
   container_idfile = "",
   log_config = list(
     type = "json-file",
@@ -62,7 +62,7 @@ host_config <- list(
     maximum_retry_count = 2L),
   auto_remove = NA,
   volume_driver = "",
-  volumes_from = NA_character_,
+  volumes_from = character(0),
   mounts = data_frame(
     target = character(),
     source = character(),
@@ -72,22 +72,22 @@ host_config <- list(
     bind_options = I(list()),
     volume_options = I(list()),
     tmpfs_options = I(list())),
-  cap_add = NA_character_,
-  cap_drop = NA_character_,
-  dns = NA_character_,
-  dns_options = NA_character_,
-  dns_search = NA_character_,
-  extra_hosts = NA_character_,
-  group_add = NA_character_,
+  cap_add = character(0),
+  cap_drop = character(0),
+  dns = character(0),
+  dns_options = character(0),
+  dns_search = character(0),
+  extra_hosts = character(0),
+  group_add = character(0),
   ipc_mode = "",
   cgroup = NA_character_,
-  links = NA_character_,
+  links = character(0),
   oom_score_adj = 500L,
   pid_mode = "",
   privileged = FALSE,
   publish_all_ports = FALSE,
   readonly_rootfs = FALSE,
-  security_opt = NA_character_,
+  security_opt = character(0),
   storage_opt = NULL,
   tmpfs = NULL,
   u_tsmode = NA_character_,
@@ -95,7 +95,7 @@ host_config <- list(
   shm_size = 67108864L,
   sysctls = c("net.ipv4.ip_forward" = "1"),
   runtime = NA_character_,
-  console_size = NA_integer_,
+  console_size = integer(0),
   isolation = NA_character_)
 
 config <- list(
@@ -117,17 +117,17 @@ config <- list(
   ## TODO: this looks incorrect
   volumes = list(additional_properties = NULL),
   working_dir = "",
-  entrypoint = NA_character_,
+  entrypoint = character(0),
   network_disabled = FALSE,
   mac_address = "",
-  on_build = NA_character_,
+  on_build = character(0),
   labels = c(
     com.example.vendor = "Acme",
     com.example.license = "GPL",
     com.example.version = "1.0"),
   stop_signal = "SIGTERM",
   stop_timeout = 10L,
-  shell = NA_character_)
+  shell = character(0))
 
 ## TODO: this is totally wrong - I see quite a bit of network settings
 ## in the underlying object, but this is filling in an empty one.

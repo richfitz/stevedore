@@ -345,3 +345,19 @@ test_that("all spec files read", {
                  used)
   expect_equal(msg, character(0))
 })
+
+test_that("auto: containe_prune", {
+  dat <- read_sample_response("sample_responses/container_prune.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+
+  bytes <- charToRaw("{\"ContainersDeleted\":null,\"SpaceReclaimed\":0}")
+  ans3 <- dat$handler(bytes, FALSE)
+  expect_equal(ans3, list(containers_deleted = character(0),
+                          space_reclaimed = 0L))
+})
