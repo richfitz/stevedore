@@ -105,7 +105,18 @@ test_that("prune", {
 })
 
 test_that("build", {
-  skip("not yet tested")
+  context <- tar_bin("images/iterate")
+
+  txt <- capture.output({
+    cl <- test_docker_client()
+    ## TODO: providing multiple tag parameters seems unlikely to work
+    ## out of the box
+    ans <- cl$images$build(context, nocache = TRUE, rm = TRUE,
+                           t = "richfitz/iterate:testing")})
+
+  expect_match(txt, "Successfully built", all = FALSE)
+  expect_is(ans, "docker_image")
+  expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
 test_that("pull", {

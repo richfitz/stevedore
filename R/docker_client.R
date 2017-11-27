@@ -183,10 +183,35 @@ docker_client_image_collection <- function(..., cl) {
     name <- if (is.null(tag)) repository else sprintf("%s:%s", repository, tag)
     get_image(name)
   }
+  ## TODO: this is no good; we want to construct a *new* streamer each
+  ## time with the result of 'stream'.  And then close that out if
+  ## it's a file.
+  after_build <- function(x) {
+    lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
+    ## This is the regular expression used in the python package (but
+    ## with a newline following, which I have made optional here).
+    re <- "(^Successfully built |sha256:)([0-9a-f]+)\n?$"
+    dat <- lapply(lines, from_json)
+    is_id <- vlapply(dat, function(el)
+      "stream" %in% names(el) && grepl(re, el$stream))
+    if (!any(is_id)) {
+      stop("Could not determine created image id")
+    }
+    id <- sub(re, "\\2", dat[[max(which(is_id))]]$stream)
+    get_image(id)
+  }
   stevedore_object(
     "docker_image_collection",
-    build = modify_args(cl$endpoints$image_build, .internal_args,
-                        after = get_image, name = "image_build"),
+    ## TODO: rename 'input_stream' to 'context' and then eventually to path
+    ## TODO: rename 't' -> 'tag'
+    ## TODO: allow specifying the stream we output to (this is required
+    ## for capture.output to work in an expected way).
+    build = modify_args(
+      cl$endpoints$image_build,
+      setdiff(.internal_args, "hijack"),
+      fix = list(hijack = streaming_json(build_status_printer(stdout()))),
+      after = after_build,
+      name = "image_build"),
     get = get_image,
     list = strip_api_args("image_list", cl$endpoints),
     import = strip_api_args("image_import", cl$endpoints),
@@ -519,6 +544,22 @@ pull_status_printer <- function(stream = stdout()) {
     }
 
     cat(str, file = stream)
+  }
+}
+
+build_status_printer <- function(stream = stdout()) {
+  print_output <- !is.null(stream)
+  if (print_output) {
+    assert_is(stream, "connection")
+  }
+  function(x) {
+    if ("error" %in% names(x)) {
+      ## Build error - this should  be easy to trigger
+      stop(x$error)
+    }
+    if (print_output && "stream" %in% names(x)) {
+      cat(x$stream, file = stream)
+    }
   }
 }
 

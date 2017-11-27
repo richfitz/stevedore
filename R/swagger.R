@@ -57,11 +57,12 @@ run_endpoint <- function(client, endpoint, params,
   res <- client$request(endpoint$method, path,
                         params$query, params$body, params$header,
                         hijack)
+  if (!is.null(hijack)) {
+    res$content <- hijacked_content(hijack)
+  }
+
   status_code <- res$status_code
   if (status_code >= 300) {
-    if (!is.null(hijack) && !is.null(attr(hijack, "content"))) {
-      res$content <- attr(hijack, "content")()
-    }
     response_to_error(res, pass_error)
   } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
@@ -70,6 +71,8 @@ run_endpoint <- function(client, endpoint, params,
     }
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
     if (!is.null(hijack)) {
+      ## It's most common here that the any handler is incorrect, so
+      ## we'll skip the handler but pass them back directly instead.
       list(response = res,
            content_handler = r_handler,
            header_handler = h_handler)
@@ -152,4 +155,10 @@ sprintfn <- function(fmt, args) {
          "0" = fmt,
          "1" = sprintf(fmt, args),
          "2" = sprintf(fmt, args[[1]], args[[2]]))
+}
+
+hijacked_content <- function(hijack) {
+  if (!is.null(attr(hijack, "content"))) {
+    attr(hijack, "content")()
+  }
 }
