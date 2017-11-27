@@ -36,18 +36,6 @@ set_attributes <- function(x, attr) {
   x
 }
 
-read_pending <- function(con, what = raw()) {
-  dat <- what
-  while (isIncomplete(con)) {
-    res <- readBin(con, what, 1024)
-    if (length(res) == 0L) {
-      break
-    }
-    dat <- c(dat, res)
-  }
-  dat
-}
-
 download_file <- function(url, dest, quiet = FALSE) {
   if (!file.exists(dest)) {
     tmp <- tempfile()

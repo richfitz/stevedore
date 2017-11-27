@@ -116,12 +116,12 @@ test_that("pull", {
   on.exit(close(con))
 
   cl <- test_docker_client()
-  cl$images$remove("alpine:latest")
-  img <- cl$images$pull("alpine:latest", stream = con)
+  try(cl$images$remove("alpine:3.1"), silent = TRUE)
+  img <- cl$images$pull("alpine:3.1", stream = con)
   close(con)
   on.exit()
 
-  expect_true("alpine:latest" %in% img$tags())
+  expect_true("alpine:3.1" %in% img$tags())
   readLines(tmp)
 })
 

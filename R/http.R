@@ -56,6 +56,11 @@ R6_http_client <- R6::R6Class(
       }
       if (!is.null(hijack)) {
         assert_is(hijack, "function")
+        ## TODO: if I need to use a connection (e.g., to write to
+        ## stdin) then curl::handle_data is the way to get the
+        ## information out of the headers.  curl::curl is the same as
+        ## curl:::curl_collection (see the body of curl_fetch_stream.
+        ## Jeroen has certainly made this nice to work with!
         curl::curl_fetch_stream(url, hijack, h)
       } else {
         curl::curl_fetch_memory(url, h)
@@ -199,6 +204,29 @@ http_client_api_version <- function(api_version, client,
   }
 
   api_version
+}
+
+## This is the lowest level of the streaming functions - others can be
+## done in terms of this.
+streaming_raw <- function(callback = NULL) {
+  res <- raw()
+  if (is.null(callback)) {
+    ret <- function(x) {
+      res <<- c(res, x)
+    }
+  } else {
+    ret <- function(x) {
+      res <<- c(res, x)
+      callback(x)
+    }
+  }
+  attr(ret, "content") <- function() res
+  ret
+}
+
+streaming_text <- function(callback = NULL) {
+  force(callback)
+  streaming_raw(function(x) callback(decode_chunked_string(x)))
 }
 
 streaming_json <- function(callback) {

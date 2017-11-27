@@ -442,9 +442,12 @@ format.docker_stream <- function(x, ..., style = "auto",
   if (style == "plain") {
     x <- x
   } else if (style == "prefix") {
-    x[i_i] <- paste0(prefix_stdin, x[i_i])
-    x[i_o] <- paste0(prefix_stdout, x[i_o])
-    x[i_e] <- paste0(prefix_stderr, x[i_e])
+    f <- function(str, prefix) {
+      paste0(prefix, gsub("\n(?=.)", paste0("\n", prefix), str, perl = TRUE))
+    }
+    x[i_i] <- f(x[i_i], prefix_stdin)
+    x[i_o] <- f(x[i_o], prefix_stdout)
+    x[i_e] <- f(x[i_e], prefix_stderr)
   } else if (style == "colour") {
     x[i_i] <- crayon::style(x[i_i], colour_stdin)
     x[i_o] <- crayon::style(x[i_o], colour_stdout)
