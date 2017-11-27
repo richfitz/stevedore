@@ -83,6 +83,12 @@ docker_client_container <- function(id, client) {
     fix <- if (fix_name) list(name = attrs$name) else list(id = id)
     modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
   }
+  after_exec <- function(x) {
+    ## TODO: eventually we'll be passing start etc through here and
+    ## doing things with them.
+    ret <- docker_client_exec(x$id, client)
+    ret
+  }
   after_path_stat <- function(x) {
     from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
   }
@@ -123,7 +129,13 @@ docker_client_container <- function(id, client) {
     ## attach = make_fn("container_attach"), # needs to hijack?
     commit = make_fn("image_commit", TRUE),
     diff = make_fn("container_changes"),
-    ## TODO: exec (complex - start a new exec instance)
+    ## TODO: inject 'start' into here too, which then requires passing
+    ## detach through as well.
+    ##
+    ## TODO: set stdout and stderr to TRUE by default
+    exec = modify_args(client$endpoints$exec_create,
+                       .internal_args, fix = list(id = id),
+                       after = after_exec, name = "exec_create"),
     export = make_fn("container_export"),
     path_stat = modify_args(client$endpoints$container_path_stat,
                             .internal_args, fix = list(id = id),
@@ -349,6 +361,47 @@ docker_client_volume <- function(id, client) {
       attrs
     },
     remove = make_fn("volume_delete"),
+    reload = reload)
+  self
+}
+
+docker_client_exec <- function(id, client) {
+  attrs <- client$endpoints$exec_inspect(id)
+  self <- NULL
+  make_fn <- function(name) {
+    fix <- list(id = id)
+    modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
+  }
+  reload <- function() {
+    attrs <<- client$endpoints$exec_inspect(id)
+    invisible(self)
+  }
+  ## TODO: eventually do this with argument remapping based on
+  ## endpoints$exec_start rather than duplicating the args here.
+  exec_start <- function(detach = FALSE, tty = NULL, stream = TRUE,
+                         collect = TRUE) {
+    hijack <- if (stream) streaming_text(print) else streaming_raw(NULL)
+    res <- client$endpoints$exec_start(id = id, detach = detach, tty = tty,
+                                       hijack = hijack)
+    if (collect) {
+      decode_chunked_string(attr(hijack, "content")())
+    }
+  }
+  ## Even though it feels like there *should* be a way, there is no
+  ## way to get back to a detached exec instance.
+  ## https://github.com/moby/moby/issues/9527
+  self <- stevedore_object(
+    "docker_exec",
+    id = function() id,
+    ## TODO: after start, return self
+    start = exec_start,
+    inspect = function(reload = TRUE) {
+      if (reload) {
+        reload()
+      }
+      attrs
+    },
+    resize = make_fn("exec_resize"),
     reload = reload)
   self
 }

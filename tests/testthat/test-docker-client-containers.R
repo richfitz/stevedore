@@ -316,15 +316,44 @@ test_that("image", {
   x$remove()
 })
 
+test_that("exec", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  ## this sets up a container that will run forever
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm)
+  x$start()
+  ans <- x$exec(cmd = "ls", attach_stdout = TRUE, attach_stderr = TRUE)
+
+  expect_is(ans, "docker_exec")
+  expect_is(ans, "stevedore_object")
+
+  info <- ans$inspect()
+  expect_false(info$running)
+  expect_true(info$open_stdout)
+  expect_true(info$open_stderr)
+
+  ## This all looks pretty good really!  But streaming must also be
+  ## possible so we need to do some work here in order to get that to
+  ## work!
+  expect_silent(res <- ans$start(stream = FALSE, collect = TRUE))
+  expect_is(res, "docker_stream")
+
+  ans2 <- x$exec(cmd = "ls", attach_stdout = TRUE, attach_stderr = TRUE)
+  out2 <- capture.output(res2 <- ans2$start(stream = TRUE, collect = FALSE))
+  expect_null(res2)
+  expect_equal(out2, strsplit(format(res, style = "prefix"), "\n")[[1]])
+
+  x$kill()
+  x$remove()
+})
+
 test_that("resize", {
   skip("untested")
 })
 
 test_that("attach", {
-  skip("attach is not yet implemented")
-})
-
-test_that("exec", {
   skip("attach is not yet implemented")
 })
 
