@@ -65,7 +65,7 @@ docker_client_container_collection <- function(..., cl) {
     create = modify_args(cl$endpoints$container_create, .internal_args,
                          after = after_create, name = "container_create"),
     get = get_container,
-    list = modify_args(cl$endpoints$container_list,
+    list = modify_args(cl$endpoints$container_list, .internal_args,
                        after = after_list, name = "container_list"),
     remove = strip_api_args("container_delete", cl$endpoints),
     prune = strip_api_args("container_prune", cl$endpoints))
