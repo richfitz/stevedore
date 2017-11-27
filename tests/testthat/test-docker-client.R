@@ -64,7 +64,7 @@ test_that("Prevent invalid access", {
 })
 
 test_that("print", {
-  d <- docker_client()
+  d <- test_docker_client()
   out <- capture.output(x <- print(d))
   expect_identical(x, d)
   expect_true(any(out == "<docker_client>"))
@@ -74,4 +74,12 @@ test_that("print", {
   expect_identical(x, d$containers)
   expect_true(any(out == "<docker_container_collection>"))
   expect_true(any(out == "  get(id)"))
+})
+
+test_that("api_version", {
+  d <- test_docker_client()
+  expect_equal(d$api_version(), DEFAULT_DOCKER_API_VERSION)
+
+  d <- test_docker_client(api_version = "1.30")
+  expect_equal(d$api_version(), "1.30")
 })

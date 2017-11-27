@@ -22,7 +22,6 @@ R6_http_client <- R6::R6Class(
       base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
       self$handle <- make_handle_socket(base_url)
       self$base_url <- "http://localhost"
-      max_version <- max(numeric_version(names(.stevedore$index)))
       self$api_version <-
         http_client_api_version(api_version, self,
                                 MIN_DOCKER_API_VERSION,

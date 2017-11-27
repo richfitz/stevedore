@@ -189,9 +189,10 @@ skip_if_no_curl_socket <- function() {
   }
 }
 
-test_docker_client <- function() {
+test_docker_client <- function(...) {
   skip_if_no_curl_socket()
-  docker_client()
+  ## TODO: stop here if connection fails too
+  docker_client(...)
 }
 
 has_internet <- function() {

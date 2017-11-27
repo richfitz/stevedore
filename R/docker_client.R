@@ -35,7 +35,8 @@ docker_client <- function(..., api_version = NULL) {
     info = strip_api_args("system_info", cl$endpoints),
     login = strip_api_args("system_auth", cl$endpoints),
     ping = strip_api_args("system_ping", cl$endpoints),
-    version = strip_api_args("system_version", cl$endpoints))
+    version = strip_api_args("system_version", cl$endpoints),
+    api_version = function() cl$cl$api_version)
 }
 
 docker_client_container_collection <- function(..., cl) {
@@ -408,7 +409,6 @@ docker_client_exec <- function(id, client) {
 
 docker_client_base <- function(..., api_version = NULL) {
   base_url <- NULL
-  api_version <- NULL
   self <- new.env(parent = emptyenv())
   self$cl <- R6_http_client$new(base_url, api_version)
   ## I think that we can combine these two a bit?
