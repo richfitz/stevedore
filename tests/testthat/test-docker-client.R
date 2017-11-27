@@ -62,3 +62,16 @@ test_that("Prevent invalid access", {
                "No element 'foo' within 'docker_container_collection' object")
   expect_error(d$containers[[1]], "'i' must be a character")
 })
+
+test_that("print", {
+  d <- docker_client()
+  out <- capture.output(x <- print(d))
+  expect_identical(x, d)
+  expect_true(any(out == "<docker_client>"))
+  expect_true(any(out == "  ping()"))
+
+  out <- capture.output(x <- print(d$containers))
+  expect_identical(x, d$containers)
+  expect_true(any(out == "<docker_container_collection>"))
+  expect_true(any(out == "  get(id)"))
+})

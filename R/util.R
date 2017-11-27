@@ -165,3 +165,13 @@ reset_line <- function(stream, width) {
     cat(paste0(c("\r", strrep(" ", width), "\r"), collapse = ""), file = stream)
   }
 }
+
+capture_args <- function(f, name, indent = 4) {
+  w <- getOption("width")
+  oo <- options(width = w - indent)
+  on.exit(options(oo))
+  args <- capture.output(args(f))
+  txt <- sub("^function ", name, args[-length(args)])
+  paste0(trimws(sprintf("%s%s\n", strrep(" " , indent), txt), "right"),
+         collapse = "\n")
+}
