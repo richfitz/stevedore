@@ -477,10 +477,8 @@ drop_leading_slash <- function(x) {
 
 .internal_args <- c("pass_error", "hijack", "as_is_names")
 
-## TODO: the NA bit can come out here later - it's there because
-## of a type error
 report_warnings <- function(x, action) {
-  if (length(x) > 0L && !identical(x, NA_character_)) {
+  if (length(x) > 0L) {
     warning(sprintf(
       "%s while %s:\n%s",
       ngettext(length(x), "warning", "warnings"),
