@@ -23,7 +23,7 @@ as_na <- function(x) {
 
 pick <- function(x, el, missing) {
   if (el %in% names(x)) {
-    x[[el]]
+    x[[el]] %||% missing
   } else {
     missing
   }

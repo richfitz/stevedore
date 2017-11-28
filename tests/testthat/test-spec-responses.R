@@ -205,6 +205,11 @@ test_that("auto: exec_inspect", {
   msg <- setdiff(names(raw_to_json(dat$response)),
                  c(names(ans2), "CanRemove", "DetachKeys"))
   expect_equal(msg, character(0))
+
+  ## This was incorrectly NULL because pick was not picky enough
+  str <- sub('"ExitCode":2', '"ExitCode":null', rawToChar(dat$response))
+  ans3 <- dat$handler(charToRaw(str), FALSE)
+  expect_equal(ans3$exit_code, NA_integer_)
 })
 
 test_that("auto: image_delete", {
