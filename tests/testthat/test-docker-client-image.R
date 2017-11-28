@@ -119,6 +119,23 @@ test_that("build", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+test_that("build failure", {
+  path <- tempfile()
+  dir.create(path)
+  file.copy("images/iterate/Dockerfile", path)
+
+  context <- tar_bin(path)
+
+  txt <- capture.output({
+    cl <- test_docker_client()
+    ## TODO: providing multiple tag parameters seems unlikely to work
+    ## out of the box
+    ans <- get_error(cl$images$build(context, nocache = TRUE, rm = TRUE,
+                                     t = "richfitz/iterate:failure"))})
+  expect_is(ans, "build_error")
+  expect_match(ans$message, "COPY")
+})
+
 test_that("pull", {
   skip_if_no_internet()
 

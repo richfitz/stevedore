@@ -545,6 +545,12 @@ pull_status_printer <- function(stream = stdout()) {
   }
 }
 
+build_error <- function(message) {
+  ret <- list(message = message, call = NULL)
+  class(ret) <- c("build_error", "error", "condition")
+  ret
+}
+
 build_status_printer <- function(stream = stdout()) {
   print_output <- !is.null(stream)
   if (print_output) {
@@ -552,8 +558,7 @@ build_status_printer <- function(stream = stdout()) {
   }
   function(x) {
     if ("error" %in% names(x)) {
-      ## Build error - this should  be easy to trigger
-      stop(x$error)
+      stop(build_error(x$error))
     }
     if (print_output && "stream" %in% names(x)) {
       cat(x$stream, file = stream)
