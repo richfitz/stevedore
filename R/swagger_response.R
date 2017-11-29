@@ -95,6 +95,9 @@ make_response_handler_object <- function(schema, spec) {
       if (!is.null(ap$properties)) {
         additional_properties_handler <- make_response_handler_object(ap, spec)
       }
+    } else if (ap$type == "array") {
+      additional_properties <- "array"
+      additional_properties_handler <- make_response_handler_array(ap, spec)
     } else if (identical(ap, list(type = "string"))) {
       additional_properties <- "string"
     } else {

@@ -39,11 +39,29 @@ read_spec <- function(version) {
     p <- c("paths", "/images/load", "post", "responses", "200")
     ret <- spec_patch(ret, p, schema = list(type = "object"))
 
+    ## This one is really hard to programmatically patch and is a
+    ## sticking point for moving out of code and into yaml...
     p <- c("paths", "/containers/{id}/archive", "put", "parameters")
     tmp <- ret[[p]]
     i <- which(vcapply(tmp, "[[", "name") == "inputStream")
     tmp[[i]]$schema$format <- "binary"
     ret[[p]] <- tmp
+
+    ## This one *definitely* changes by version - it's fixed in 1.32
+    ## at least
+    p <- c("definitions", "PortBinding")
+    ret[[p]] <- list(
+      type = "object",
+      properties = list(
+        HostIp = list(type = "string"),
+        HostPort = list(type = "string")))
+
+    p <- c("definitions", "NetworkConfig", "properties", "Ports")
+    ret[[p]] <- list(
+      type = "object",
+      additionalProperties =
+        list(type = "array",
+             items = list("$ref" = "#/definitions/PortBinding")))
   }
 
   ret

@@ -140,11 +140,7 @@ network_settings <- list(
   i_pprefix_len = 0L,
   mac_address = "",
   port_mapping = NA_character_,
-  ports = data_frame(
-    i_p = character(0),
-    private_port = integer(0),
-    public_port = integer(0),
-    type = character(0)))
+  ports = NULL)
 
 list(
   id = "ba033ac4401106a3b513bc9d639eee123ad78ca3616b921167cd74b20e25ed39",

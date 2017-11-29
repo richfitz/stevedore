@@ -366,3 +366,26 @@ test_that("auto: containe_prune", {
   expect_equal(ans3, list(containers_deleted = character(0),
                           space_reclaimed = 0L))
 })
+
+## The spec is incorrect about the PortBinding type which is used in
+##
+##     GET /containers/{id}/json => NetworkSettings => Ports
+##
+## See:
+##
+##   raw_to_json(dat$response)$NetworkSettings$Ports
+##   dat$reference$network_settings$ports
+##
+## There are other issues with the spec but this one was causing
+## problems that weren't silent.
+test_that("regression: container_inspect", {
+  ## In this case the json is exactly the response returned from the
+  dat <- read_sample_response("sample_responses/regression/container_inspect.R")
+
+  ans1 <- dat$handler(dat$response, FALSE)
+  ans2 <- dat$handler(dat$response, TRUE)
+
+  expect_equal(ans1, dat$reference)
+  expect_equal(ans2, dat$reference, check.attributes = FALSE)
+  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
