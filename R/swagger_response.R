@@ -192,7 +192,9 @@ make_response_handler_array <- function(schema, spec) {
   items <- resolve_schema_ref(schema$items, spec)
   atomic <- atomic_types()
 
-  if (is.null(items$type)) browser()
+  if (is.null(items$type)) {
+    stop("Missing type in items") # nocov [stevedore bug]
+  }
   if (items$type == "object") {
     make_response_handler_array_object(items, spec)
   } else if (items$type == "array") {
