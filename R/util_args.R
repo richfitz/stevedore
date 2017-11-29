@@ -56,7 +56,10 @@ modify_args <- function(FUN, drop = NULL, fix = NULL, after = NULL,
   body <- as.call(lapply(c(name, set_names(args_call, args_call)), as.name))
   if (!is.null(after)) {
     env[["after"]] <- after
-    body <- as.call(c(list(quote(after)), body))
+    body <- bquote({
+      response <- .(body)
+      after(response)
+    })
   }
   args_keep <- args[setdiff(names(args), c(drop, names(fix)))]
   as.function(c(args_keep, body), env)
