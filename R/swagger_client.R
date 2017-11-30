@@ -79,7 +79,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   if (!is.null(after)) {
     n <- length(body)
     body[[n]] <- call("<-", quote(response), body[[n]])
-    body[[n + 1L]] <- quote(after(response))
+    body[[n + 1L]] <- quote(after(response, params))
   }
 
   args_keep <- args[setdiff(names(args), c(names(fix), drop))]

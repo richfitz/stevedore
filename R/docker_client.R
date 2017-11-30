@@ -43,11 +43,11 @@ docker_client_container_collection <- function(..., cl) {
   get_container <- function(id) {
     docker_client_container(id, cl)
   }
-  after_create <- function(dat) {
+  after_create <- function(dat, ...) {
     report_warnings(dat$warnings)
     get_container(dat$id)
   }
-  after_list <- function(dat) {
+  after_list <- function(dat, ...) {
     ## TODO: I'm not really sure of the situation where we get more
     ## than one name here; there might be a better way of dealing with
     ## this.  One option would be to refuse to treat this as a list
@@ -79,23 +79,21 @@ docker_client_container <- function(id, client) {
     attrs <<- container_inspect(id)
     invisible(self)
   }
-  after_exec <- function(x) {
-    ## TODO: eventually we'll be passing start etc through here and
-    ## doing things with them.
+  after_exec <- function(x, ...) {
     ret <- docker_client_exec(x$id, client)
     ret
   }
-  after_path_stat <- function(x) {
+  after_path_stat <- function(x, ...) {
     from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
   }
-  after_top <- function(x) {
+  after_top <- function(x, ...) {
     m <- matrix(unlist(x$processes), byrow = TRUE, nrow = length(x$processes))
     colnames(m) <- x$titles
     ## TODO: some of these can be non-text.  Not sure how to safely do
     ## that though.  So for now it's all going to be character.
     as.data.frame(m, stringsAsFactors = FALSE)
   }
-  after_update <- function(x) {
+  after_update <- function(x, ...) {
     report_warnings(x$warnings, "updating container")
     invisible(self)
   }
@@ -128,7 +126,8 @@ docker_client_container <- function(id, client) {
                              fix = list(name = attrs$name)),
     diff = docker_endpoint("container_changes", client, fix = fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
-    ## detach through as well.
+    ## detach through as well and dealing with those through the
+    ## 'after' function.
     ##
     ## TODO: set stdout and stderr to TRUE by default
     exec = docker_endpoint("exec_create", client, fix = fix_id,
@@ -170,7 +169,7 @@ docker_client_image_collection <- function(..., cl) {
   ## TODO: this is no good; we want to construct a *new* streamer each
   ## time with the result of 'stream'.  And then close that out if
   ## it's a file.
-  after_build <- function(x) {
+  after_build <- function(x, ...) {
     lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
     ## This is the regular expression used in the python package (but
     ## with a newline following, which I have made optional here).
@@ -184,14 +183,12 @@ docker_client_image_collection <- function(..., cl) {
     id <- sub(re, "\\2", dat[[max(which(is_id))]]$stream)
     get_image(id)
   }
-  after_pull <- function(x) {
-    ## TODO: need to work out a pattern here for passing back
-    ## arguments.  Otherwise this is just fairly nasty.
-    repository <- sub(".*fromImage=([^?&]+).*", "\\1", x$response$url)
-    if (!grepl(":", repository)) {
-      repository <- paste0(repository, ":latest")
-    }
-    get_image(repository)
+  after_pull <- function(x, params) {
+    ## TODO: check with the python version, but if called as
+    ## pull("foo", tag = NULL) then *all* tags are pulled.  I don't
+    ## think that is clever because I think this should only ever pull
+    ## one image.
+    get_image(params$query$fromImage)
   }
   stevedore_object(
     "docker_image_collection",
@@ -278,7 +275,7 @@ docker_client_network_collection <- function(..., cl) {
   get_network <- function(id) {
     docker_client_network(id, cl)
   }
-  after_create <- function(dat) {
+  after_create <- function(dat, ...) {
     get_network(dat$id)
   }
   stevedore_object(
@@ -322,12 +319,10 @@ docker_client_volume_collection <- function(..., cl) {
   get_volume <- function(id) {
     docker_client_volume(id, cl)
   }
-  after_create <- function(dat) {
+  after_create <- function(dat, ...) {
     get_volume(dat$name)
   }
-  after_list <- function(dat) {
-    ## TODO: the NA bit can come out here later - it's there because
-    ## of a type error
+  after_list <- function(dat, ...) {
     report_warnings(dat$warnings, "reading volume list")
     dat$volumes
   }
@@ -374,7 +369,7 @@ docker_client_exec <- function(id, client) {
     attrs <<- exec_inspect(id)
     invisible(self)
   }
-  after_start <- function(x) {
+  after_start <- function(x, params) {
     ## TODO: this also wants to catch an input argument (which does
     ## not yet exist) that controls if output is to be returned.  The
     ## argument will be 'collect' or something.  Alternatively we
