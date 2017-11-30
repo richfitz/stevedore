@@ -9,35 +9,62 @@ docker_client_data <- function(version) {
   .stevedore$client_data[[version]]
 }
 
-client_endpoint <- function(name, env) {
-  args <- formals(env$endpoints[[name]]$argument_handler)
-  subs <- list(
-    name = name,
-    get_params = as.call(c(list(quote(endpoint$argument_handler)),
-                           lapply(names(args), as.name))))
-  body <- substitute(expression({
-    endpoint <- endpoints$name
-    params <- get_params
-    run_endpoint(client, endpoint, params, pass_error, hijack, as_is_names)
-  }), subs)[[2]]
-  base_args <- alist(pass_error = FALSE, hijack = NULL, as_is_names = FALSE)
-  as.function(c(args, base_args, body), env)
-}
-
-client_endpoints <- function(client, endpoints) {
-  env <- new.env(parent = baseenv())
-  env$client <- client
-  env$endpoints <- endpoints
-  ## We can either move this over or set things so that the parent
-  ## environment is namespace:stevedore
-  env$run_endpoint <- run_endpoint
-  lock_environment(env)
-  nms <- names(endpoints)
-  set_names(lapply(names(endpoints), client_endpoint, env), nms)
-}
-
 stevedore_read_endpoints <- function() {
   path <- system.file("spec/endpoints.yaml", package = "stevedore",
                       mustWork = TRUE)
   yaml::yaml.load_file(path)
+}
+
+docker_client_base <- function(..., api_version = NULL) {
+  base_url <- NULL
+  self <- new.env(parent = parent.env(environment()))
+  self$http_client <- R6_http_client$new(base_url, api_version)
+  dat <- suppressMessages(docker_client_data(self$http_client$api_version))
+  self$endpoints <- dat$endpoints
+  lock_environment(self)
+  self
+}
+
+## TODO: parameter renaming
+## TODO: set defaults
+## TODO: after gets a client option perhaps?
+docker_endpoint <- function(name, client, fix = NULL, after = NULL,
+                           hijack = NULL) {
+  stopifnot(c("endpoints", "http_client") %in% names(client))
+  endpoint <- client$endpoints[[name]]
+
+  if (!is.null(hijack)) {
+    assert_is(hijack, "call")
+  }
+
+  fenv <- new.env(parent = client, hash = FALSE)
+  fenv$endpoint <- endpoint
+  if (!is.null(after)) {
+    fenv$after <- after
+  }
+
+  if (!is.null(fix)) {
+    list2env(fix, fenv)
+  }
+
+  args <- formals(endpoint$argument_handler)
+  subs <- list(
+    name = name,
+    hijack = hijack,
+    get_params = as.call(c(list(quote(endpoint$argument_handler)),
+                           lapply(names(args), as.name))))
+
+  body <- substitute(expression({
+    params <- get_params
+    run_endpoint(http_client, endpoint, params, hijack = hijack)
+  }), subs)[[2]]
+
+  if (!is.null(after)) {
+    n <- length(body)
+    body[[n]] <- call("<-", quote(response), body[[n]])
+    body[[n + 1L]] <- quote(after(response))
+  }
+
+  args_keep <- args[setdiff(names(args), names(fix))]
+  as.function(c(args_keep, body), fenv)
 }

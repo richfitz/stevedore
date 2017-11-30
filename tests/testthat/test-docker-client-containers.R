@@ -337,13 +337,9 @@ test_that("exec", {
   ## This all looks pretty good really!  But streaming must also be
   ## possible so we need to do some work here in order to get that to
   ## work!
-  expect_silent(res <- ans$start(stream = FALSE, collect = TRUE))
+  txt <- capture.output(res <- ans$start(detach = FALSE))
   expect_is(res, "docker_stream")
-
-  ans2 <- x$exec(cmd = "ls", attach_stdout = TRUE, attach_stderr = TRUE)
-  out2 <- capture.output(res2 <- ans2$start(stream = TRUE, collect = FALSE))
-  expect_null(res2)
-  expect_equal(out2, strsplit(format(res, style = "prefix"), "\n")[[1]])
+  expect_equal(txt, strsplit(format(res, style = "prefix"), "\n")[[1]])
 
   x$kill()
   x$remove()
@@ -359,8 +355,12 @@ test_that("attach", {
 
 test_that("logs (streaming)", {
   skip("log streaming is not yet implemented")
+  ## Do this after build - then we can build a small alpine image that
+  ## prints n things over m seconds perhaps
 })
 
 test_that("run", {
   skip("run is not yet implemented")
+  ## This is simply a convenience function - and one place I think we
+  ## might use dots.
 })

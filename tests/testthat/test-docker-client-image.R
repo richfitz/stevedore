@@ -105,12 +105,10 @@ test_that("prune", {
 })
 
 test_that("build", {
+  cl <- test_docker_client()
   context <- tar_bin("images/iterate")
 
   txt <- capture.output({
-    cl <- test_docker_client()
-    ## TODO: providing multiple tag parameters seems unlikely to work
-    ## out of the box
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE,
                            t = "richfitz/iterate:testing")})
 
@@ -120,16 +118,14 @@ test_that("build", {
 })
 
 test_that("build failure", {
+  cl <- test_docker_client()
+  ## As above, but missing a resource:
   path <- tempfile()
   dir.create(path)
   file.copy("images/iterate/Dockerfile", path)
-
   context <- tar_bin(path)
 
   txt <- capture.output({
-    cl <- test_docker_client()
-    ## TODO: providing multiple tag parameters seems unlikely to work
-    ## out of the box
     ans <- get_error(cl$images$build(context, nocache = TRUE, rm = TRUE,
                                      t = "richfitz/iterate:failure"))})
   expect_is(ans, "build_error")
@@ -139,18 +135,12 @@ test_that("build failure", {
 test_that("pull", {
   skip_if_no_internet()
 
-  tmp <- tempfile()
-  con <- file(tmp, "wb")
-  on.exit(close(con))
-
   cl <- test_docker_client()
   try(cl$images$remove("alpine:3.1"), silent = TRUE)
-  img <- cl$images$pull("alpine:3.1", stream = con)
-  close(con)
-  on.exit()
+  txt <- capture.output(img <- cl$images$pull(from_image = "alpine:3.1"))
 
   expect_true("alpine:3.1" %in% img$tags())
-  readLines(tmp)
+  expect_match(txt, "Downloaded newer", all = FALSE)
 })
 
 test_that("push", {

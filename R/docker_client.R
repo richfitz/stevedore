@@ -30,13 +30,13 @@ docker_client <- function(..., api_version = NULL) {
     images = images,
     networks = networks,
     volumes = volumes,
-    events = strip_api_args("system_events", cl$endpoints),
-    df = strip_api_args("system_df", cl$endpoints),
-    info = strip_api_args("system_info", cl$endpoints),
-    login = strip_api_args("system_auth", cl$endpoints),
-    ping = strip_api_args("system_ping", cl$endpoints),
-    version = strip_api_args("system_version", cl$endpoints),
-    api_version = function() cl$cl$api_version)
+    events = docker_endpoint("system_events", cl),
+    df = docker_endpoint("system_df", cl),
+    info = docker_endpoint("system_info", cl),
+    login = docker_endpoint("system_auth", cl),
+    ping = docker_endpoint("system_ping", cl),
+    version = docker_endpoint("system_version", cl),
+    api_version = function() cl$http_client$api_version)
 }
 
 docker_client_container_collection <- function(..., cl) {
@@ -61,28 +61,23 @@ docker_client_container_collection <- function(..., cl) {
 
   stevedore_object(
     "docker_container_collection",
-    ## TODO:
-    ## run - this one is complex
-    create = modify_args(cl$endpoints$container_create, .internal_args,
-                         after = after_create, name = "container_create"),
+    ## run = ... - this one is complex (TODO)
+    create = docker_endpoint("container_create", cl, after = after_create),
     get = get_container,
-    list = modify_args(cl$endpoints$container_list, .internal_args,
-                       after = after_list, name = "container_list"),
-    remove = strip_api_args("container_delete", cl$endpoints),
-    prune = strip_api_args("container_prune", cl$endpoints))
+    list = docker_endpoint("container_list", cl, after = after_list),
+    remove = docker_endpoint("container_delete", cl),
+    prune = docker_endpoint("container_prune", cl))
 }
 
 docker_client_container <- function(id, client) {
-  attrs <- client$endpoints$container_inspect(id)
+  container_inspect <- docker_endpoint("container_inspect", client)
+  attrs <- container_inspect(id)
   id <- attrs$id
   self <- NULL
+
   reload <- function() {
-    attrs <<- client$endpoints$container_inspect(id)
+    attrs <<- container_inspect(id)
     invisible(self)
-  }
-  make_fn <- function(name, fix_name = FALSE) {
-    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
-    modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
   }
   after_exec <- function(x) {
     ## TODO: eventually we'll be passing start etc through here and
@@ -104,6 +99,7 @@ docker_client_container <- function(id, client) {
     report_warnings(x$warnings, "updating container")
     invisible(self)
   }
+  fix_id <- list(id = id)
 
   ## TODO: friendly "copy" interface needed here, but that requires a
   ## bit more general work really.
@@ -127,47 +123,38 @@ docker_client_container <- function(id, client) {
       attrs
     },
     ## TODO: this one is hard because it might need to hijack the connection
-    ## attach = make_fn("container_attach"), # needs to hijack?
-    commit = make_fn("image_commit", TRUE),
-    diff = make_fn("container_changes"),
+    ## attach = docker_endpoint("container_attach", client, fix_id)
+    commit = docker_endpoint("image_commit", client, list(name = attrs$name)),
+    diff = docker_endpoint("container_changes", client, fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
     ## detach through as well.
     ##
     ## TODO: set stdout and stderr to TRUE by default
-    exec = modify_args(client$endpoints$exec_create,
-                       .internal_args, fix = list(id = id),
-                       after = after_exec, name = "exec_create"),
-    export = make_fn("container_export"),
-    path_stat = modify_args(client$endpoints$container_path_stat,
-                            .internal_args, fix = list(id = id),
-                            after = after_path_stat,
-                            name = "container_path_stat"),
-    get_archive = make_fn("container_archive"),
-    put_archive = make_fn("container_import"),
-    kill = make_fn("container_kill"),
+    exec = docker_endpoint("exec_create", client, fix_id, after_exec),
+    export = docker_endpoint("container_export", client, fix_id),
+    path_stat = docker_endpoint("container_path_stat", client, fix_id,
+                                after_path_stat),
+    get_archive = docker_endpoint("container_archive", client, fix_id),
+    put_archive = docker_endpoint("container_import", client, fix_id),
+    kill = docker_endpoint("container_kill", client, fix_id),
     ## TODO: stdout/stderr args become TRUE by default?
-    logs = make_fn("container_logs"),
-    pause = make_fn("container_pause"),
+    logs = docker_endpoint("container_logs", client, fix_id),
+    pause = docker_endpoint("container_pause", client, fix_id),
     ## This should invalidate our container afterwards
-    remove = make_fn("container_delete"),
+    remove = docker_endpoint("container_delete", client, fix_id),
     ## This might force refresh?
-    rename = make_fn("container_rename"),
-    resize = make_fn("container_resize"),
-    restart = make_fn("container_restart"),
-    start = make_fn("container_start"),
+    rename = docker_endpoint("container_rename", client, fix_id),
+    resize = docker_endpoint("container_resize", client, fix_id),
+    restart = docker_endpoint("container_restart", client, fix_id),
+    start = docker_endpoint("container_start", client, fix_id),
     ## TODO: expose stream (but with nice printing?)
-    stats = modify_args(client$endpoints$container_stats,
-                        .internal_args, fix = list(id = id, stream = FALSE),
-                        name = "container_stats"),
-    stop = make_fn("container_stop"),
-    top = modify_args(client$endpoints$container_top,
-                      .internal_args, fix = list(id = id),
-                      after = after_top, name = "container_top"),
-    unpause = make_fn("container_unpause"),
-    update = modify_args(client$endpoints$container_update,
-                         .internal_args, fix = list(id = id),
-                         after = after_update, name = "container_update"),
-    wait = make_fn("container_wait"),
+    stats = docker_endpoint("container_stats", client,
+                            c(fix_id, stream = FALSE)),
+    stop = docker_endpoint("container_stop", client, fix_id),
+    top = docker_endpoint("container_top", client, fix_id, after_top),
+    unpause = docker_endpoint("container_unpause", client, fix_id),
+    update = docker_endpoint("container_update", client, fix_id, after_update),
+    wait = docker_endpoint("container_wait", client, fix_id),
     reload = reload)
   self
 }
@@ -175,13 +162,6 @@ docker_client_container <- function(id, client) {
 docker_client_image_collection <- function(..., cl) {
   get_image <- function(id) {
     docker_client_image(id, cl)
-  }
-  pull_image <- function(repository, tag = NULL, stream = stdout()) {
-    hijack <- streaming_json(pull_status_printer(stream))
-    ans <- cl$endpoints$image_create(from_image = repository, tag = tag,
-                                     hijack = hijack)
-    name <- if (is.null(tag)) repository else sprintf("%s:%s", repository, tag)
-    get_image(name)
   }
   ## TODO: this is no good; we want to construct a *new* streamer each
   ## time with the result of 'stream'.  And then close that out if
@@ -200,81 +180,92 @@ docker_client_image_collection <- function(..., cl) {
     id <- sub(re, "\\2", dat[[max(which(is_id))]]$stream)
     get_image(id)
   }
+  after_pull <- function(x) {
+    ## TODO: need to work out a pattern here for passing back
+    ## arguments.  Otherwise this is just fairly nasty.
+    repository <- sub(".*fromImage=([^?&]+).*", "\\1", x$response$url)
+    if (!grepl(":", repository)) {
+      repository <- paste0(repository, ":latest")
+    }
+    get_image(repository)
+  }
   stevedore_object(
     "docker_image_collection",
     ## TODO: rename 'input_stream' to 'context' and then eventually to path
     ## TODO: rename 't' -> 'tag'
-    ## TODO: allow specifying the stream we output to (this is required
-    ## for capture.output to work in an expected way).
-    build = modify_args(
-      cl$endpoints$image_build,
-      setdiff(.internal_args, "hijack"),
-      fix = list(hijack = streaming_json(build_status_printer(stdout()))),
-      after = after_build,
-      name = "image_build"),
+    ## TODO: allow specifying the stream we output to
+    ## TODO: control returning output too
+    ## TODO: support multiple tags (accept vector and translate into
+    ##   multiple 't' parameters - not sure who needs to take
+    ##   responsibility for that).
+    build = docker_endpoint(
+      "image_build", cl,
+      hijack = quote(streaming_json(build_status_printer(stdout()))),
+      after = after_build),
     get = get_image,
-    list = strip_api_args("image_list", cl$endpoints),
-    import = strip_api_args("image_import", cl$endpoints),
+    list = docker_endpoint("image_list", cl),
+    import = docker_endpoint("image_import", cl),
     ## TODO: need to do some argument sanitisation and renaming here.
     ## So I'm going to do this one manually
-    pull = pull_image,
-    push = strip_api_args("image_push", cl$endpoints),
-    search = strip_api_args("image_search", cl$endpoints),
-    remove = strip_api_args("image_delete", cl$endpoints),
-    prune = strip_api_args("image_prune", cl$endpoints))
+    ## TODO: rename arguments 'from_image' as 'repository'
+    ## TODO: the 'after' function needs more work here - needs to know name/tag?
+    pull = docker_endpoint(
+      "image_create", cl,
+      hijack = quote(streaming_json(pull_status_printer(stdout()))),
+      after = after_pull),
+    push = docker_endpoint("image_push", cl),
+    search = docker_endpoint("image_search", cl),
+    remove = docker_endpoint("image_delete", cl),
+    prune = docker_endpoint("image_prune", cl))
 }
 
 docker_client_image <- function(id, client) {
-  attrs <- client$endpoints$image_inspect(id)
+  image_inspect <- docker_endpoint("image_inspect", client)
+  attrs <- image_inspect(id)
   id <- attrs$id
   self <- NULL
   reload <- function() {
-    attrs <<- client$endpoints$image_inspect(id)
+    attrs <<- image_inspect(id)
     invisible(self)
   }
-  make_fn <- function(name, fix_name = FALSE) {
-    ## NOTE: this treatment differs to that for containers
-    fix <- if (fix_name) list(name = id) else list(id = id)
-    modify_args(client$endpoints[[name]],
-                .internal_args, fix, name = name)
-  }
+  fix_id_as_name = list(name = id)
   self <- stevedore_object(
     "docker_image",
     id = function() attrs$id,
     labels = function() attrs$config$labels,
     short_id = function() short_id(attrs$id),
-    tags = function() attrs$repo_tags[attrs$repo_tags != "<none>:<none>"],
+    tags = function() setdiff(attrs$repo_tags, "<none>:<none>"),
     inspect = function(reload = TRUE) {
       if (reload) {
         reload()
       }
       attrs
     },
-    history = make_fn("image_history", TRUE),
+    history = docker_endpoint("image_history", client, fix_id_as_name),
     ## TODO: this needs to add a 'filename' option for saving
-    export = make_fn("image_tarball", TRUE),
-    tag = make_fn("image_tag", TRUE),
+    export = docker_endpoint("image_tarball", client, fix_id_as_name),
+    tag = docker_endpoint("image_tag", client, fix_id_as_name),
     ## TODO: this would best be done with a wrapper around the
     ## incoming argument for 'repo_tag' but with the core function
-    ## passed through make_fn/modify_args so that we can pass around
+    ## passed through docker_endpoint so that we can pass around
     ## defaults.  We'll be doing that with other functions later too.
     untag = function(repo_tag) {
       assert_scalar_character(repo_tag)
+      image_delete <- docker_endpoint("image_delete", client)
       if (!grepl(":", repo_tag, fixed = TRUE)) {
         repo_tag <- paste0(repo_tag, ":latest")
       }
-      valid <- setdiff(client$endpoints$image_inspect(id)$repo_tags,
-                       "<none:<none>")
+      valid <- setdiff(image_inspect(id)$repo_tags, "<none>:<none>")
       if (!(repo_tag %in% valid)) {
         stop(sprintf("Invalid repo_tag '%s' for image '%s'",
                      repo_tag, attrs$id))
       }
-      client$endpoints$image_delete(repo_tag, noprune = TRUE)
+      image_delete(repo_tag, noprune = TRUE)
     },
     ## NOTE: this removes by *id* which will not always work without a
     ## force - the name is not preserved on the way through this
     ## function.  Doing that might make more sense perhaps?
-    remove = make_fn("image_delete", TRUE),
+    remove = docker_endpoint("image_delete", client, fix_id_as_name),
     reload = reload)
   self
 }
@@ -288,33 +279,24 @@ docker_client_network_collection <- function(..., cl) {
   }
   stevedore_object(
     "docker_network_collection",
-    create = modify_args(cl$endpoints$network_create, .internal_args,
-                         after = after_create, name = "network_create"),
+    create = docker_endpoint("network_create", cl, after = after_create),
     get = get_network,
-    list = strip_api_args("network_list", cl$endpoints),
-    remove = strip_api_args("network_delete", cl$endpoints),
-    prune = strip_api_args("network_prune", cl$endpoints))
+    list = docker_endpoint("network_list", cl),
+    remove = docker_endpoint("network_delete", cl),
+    prune = docker_endpoint("network_prune", cl))
 }
 
 docker_client_network <- function(id, client) {
-  attrs <- client$endpoints$network_inspect(id)
+  network_inspect <- docker_endpoint("network_inspect", client)
+  attrs <- network_inspect(id)
   id <- attrs$id
   self <- NULL
   reload <- function() {
-    attrs <<- client$endpoints$network_inspect(id)
+    attrs <<- network_inspect(id)
     invisible(self)
   }
-  make_fn <- function(name, fix_name = FALSE) {
-    fix <- if (fix_name) list(name = attrs$name) else list(id = id)
-    modify_args(client$endpoints[[name]],
-                .internal_args, fix, name = name)
-  }
+  fix_id <- list(id = id)
 
-  ## TODO: friendly "copy" interface needed here, but that requires a
-  ## bit more general work really.
-  ##
-  ## TODO: the vast bulk of this can be done more nicely with a simple
-  ## list of functions.  That will plug into an eventual help system.
   self <- stevedore_object(
     "docker_network",
     name = function() attrs$name,
@@ -325,10 +307,9 @@ docker_client_network <- function(id, client) {
       attrs
     },
     containers = function() lapply(attrs$containers, docker_client_container),
-    ## TODO: run container through container_id()
-    connect = make_fn("network_connect"),
-    disconnect = make_fn("network_disconnect"),
-    remove = make_fn("network_delete"),
+    connect = docker_endpoint("network_connect", client, fix_id),
+    disconnect = docker_endpoint("network_disconnect", client, fix_id),
+    remove = docker_endpoint("network_delete", client, fix_id),
     reload = reload)
   self
 }
@@ -348,35 +329,25 @@ docker_client_volume_collection <- function(..., cl) {
   }
   stevedore_object(
     "docker_volume_collection",
-    create = modify_args(cl$endpoints$volume_create, .internal_args,
-                         after = after_create, name = "volume_create"),
+    create = docker_endpoint("volume_create", cl, after = after_create),
     get = get_volume,
-    list = modify_args(cl$endpoints$volume_list,
-                       after = after_list, name = "volume_list"),
-    remove = strip_api_args("volume_delete", cl$endpoints),
-    prune = strip_api_args("volume_prune", cl$endpoints))
+    list = docker_endpoint("volume_list", cl, after = after_list),
+    remove = docker_endpoint("volume_delete", cl),
+    prune = docker_endpoint("volume_prune", cl))
 }
 
 docker_client_volume <- function(id, client) {
-  attrs <- client$endpoints$volume_inspect(id)
+  volume_inspect <- docker_endpoint("volume_inspect", client)
+  attrs <- volume_inspect(id)
   name <- attrs$name
   self <- NULL
   reload <- function() {
-    attrs <<- client$endpoints$volume_inspect(name)
+    attrs <<- volume_inspect(name)
     invisible(self)
-  }
-  make_fn <- function(name) {
-    fix <- list(name = attrs$name)
-    modify_args(client$endpoints[[name]],
-                .internal_args, fix, name = name)
   }
 
   ## TODO: friendly "copy" interface needed here, but that requires a
   ## bit more general work really.
-  ##
-  ## TODO: the vast bulk of this can be done more nicely with a simple
-  ## list of functions.  That will plug into an eventual help system.
-
   self <- stevedore_object(
     "docker_volume",
     name = function() attrs$name,
@@ -386,32 +357,27 @@ docker_client_volume <- function(id, client) {
       }
       attrs
     },
-    remove = make_fn("volume_delete"),
+    remove = docker_endpoint("volume_delete", client, list(name = name)),
     reload = reload)
   self
 }
 
 docker_client_exec <- function(id, client) {
-  attrs <- client$endpoints$exec_inspect(id)
+  exec_inspect <- docker_endpoint("exec_inspect", client)
+  attrs <- exec_inspect(id)
   self <- NULL
-  make_fn <- function(name) {
-    fix <- list(id = id)
-    modify_args(client$endpoints[[name]], .internal_args, fix, name = name)
-  }
   reload <- function() {
-    attrs <<- client$endpoints$exec_inspect(id)
+    attrs <<- exec_inspect(id)
     invisible(self)
   }
-  ## TODO: eventually do this with argument remapping based on
-  ## endpoints$exec_start rather than duplicating the args here.
-  exec_start <- function(detach = FALSE, tty = NULL, stream = TRUE,
-                         collect = TRUE) {
-    hijack <- if (stream) streaming_text(print) else streaming_raw(NULL)
-    res <- client$endpoints$exec_start(id = id, detach = detach, tty = tty,
-                                       hijack = hijack)
-    if (collect) {
-      decode_chunked_string(attr(hijack, "content")())
-    }
+  after_start <- function(x) {
+    ## TODO: this also wants to catch an input argument (which does
+    ## not yet exist) that controls if output is to be returned.  The
+    ## argument will be 'collect' or something.  Alternatively we
+    ## might return 'self' and implement some sort of async on top of
+    ## this (I think Jeroen has written all the required bits into
+    ## curl).
+    invisible(decode_chunked_string(x$response$content))
   }
   ## Even though it feels like there *should* be a way, there is no
   ## way to get back to a detached exec instance.
@@ -419,28 +385,24 @@ docker_client_exec <- function(id, client) {
   self <- stevedore_object(
     "docker_exec",
     id = function() id,
-    ## TODO: after start, return self
-    start = exec_start,
+    ## TODO: control stream (location etc) following the same problem
+    ## in build.
+    ## TODO: explicitly set 'detach' argument
+    start = docker_endpoint("exec_start", client, list(id = id),
+                            hijack = quote(streaming_text(print)),
+                            after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {
         reload()
       }
       attrs
     },
-    resize = make_fn("exec_resize"),
+    resize = docker_endpoint("exec_resize", client, list(id = id)),
     reload = reload)
   self
 }
 
-docker_client_base <- function(..., api_version = NULL) {
-  base_url <- NULL
-  self <- new.env(parent = emptyenv())
-  self$cl <- R6_http_client$new(base_url, api_version)
-  ## I think that we can combine these two a bit?
-  dat <- suppressMessages(docker_client_data(self$cl$api_version))
-  self$endpoints <- client_endpoints(self$cl, dat$endpoints)
-  self
-}
+## TODO: The bits below here could do with some organisation
 
 stevedore_object <- function(class, ...) {
   els <- list(...)
@@ -451,21 +413,6 @@ stevedore_object <- function(class, ...) {
   ret
 }
 
-## There's a certain amount of transformation required here
-strip_api_args <- function(name, list) {
-  drop_args(list[[name]], .internal_args,
-            name = name)
-}
-
-container_id <- function(container) {
-  if (inherits(container, "docker_container")) {
-    container$id()
-  } else {
-    assert_scalar_character(container)
-    container
-  }
-}
-
 short_id <- function(x) {
   end <- if (string_starts_with(x, "sha256:")) 17L else 10L
   substr(x, 1, end)
@@ -474,8 +421,6 @@ short_id <- function(x) {
 drop_leading_slash <- function(x) {
   sub("^/", "", x)
 }
-
-.internal_args <- c("pass_error", "hijack", "as_is_names")
 
 report_warnings <- function(x, action) {
   if (length(x) > 0L) {
