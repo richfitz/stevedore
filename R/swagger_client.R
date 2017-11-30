@@ -31,7 +31,8 @@ docker_client_base <- function(..., api_version = NULL) {
 ##   function(response, params, client)
 ## TODO: drop
 docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
-                            drop = NULL, after = NULL, hijack = NULL) {
+                            drop = NULL, defaults = NULL,
+                            after = NULL, hijack = NULL) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
@@ -65,6 +66,13 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
     list2env(args[drop], fenv)
   }
 
+  args_keep <- args[setdiff(names(args), c(names(fix), drop))]
+
+  if (!is.null(defaults)) {
+    stopifnot(all(names(defaults) %in% names(args_keep)))
+    args_keep[names(defaults)] <- defaults
+  }
+
   subs <- list(
     name = name,
     hijack = hijack,
@@ -82,6 +90,5 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
     body[[n + 1L]] <- quote(after(response, params))
   }
 
-  args_keep <- args[setdiff(names(args), c(names(fix), drop))]
   as.function(c(args_keep, body), fenv)
 }

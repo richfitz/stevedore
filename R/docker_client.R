@@ -212,6 +212,7 @@ docker_client_image_collection <- function(..., cl) {
     pull = docker_endpoint(
       "image_create", cl, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
+      defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stdout()))),
       after = after_pull),
     push = docker_endpoint("image_push", cl),
