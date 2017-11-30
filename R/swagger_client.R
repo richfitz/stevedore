@@ -25,11 +25,13 @@ docker_client_base <- function(..., api_version = NULL) {
   self
 }
 
-## TODO: parameter renaming
+## TODO: reorder (practically _promote_)
 ## TODO: set defaults
-## TODO: after gets a client option perhaps?
-docker_endpoint <- function(name, client, fix = NULL, after = NULL,
-                           hijack = NULL) {
+## TODO: after gets a client option perhaps?  All after functions become
+##   function(response, params, client)
+## TODO: drop
+docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
+                            drop = NULL, after = NULL, hijack = NULL) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
@@ -48,6 +50,21 @@ docker_endpoint <- function(name, client, fix = NULL, after = NULL,
   }
 
   args <- formals(endpoint$argument_handler)
+
+  if (!is.null(rename)) {
+    assert_is(rename, "character")
+    stopifnot(all(unname(rename) %in% names(args)),
+              !any(names(rename) %in% names(args)))
+    i <- match(rename, names(args))
+    names(args)[i] <- names(rename)
+  }
+
+  if (!is.null(drop)) {
+    assert_is(rename, "character")
+    stopifnot(all(drop %in% names(args)))
+    list2env(args[drop], fenv)
+  }
+
   subs <- list(
     name = name,
     hijack = hijack,
@@ -65,6 +82,6 @@ docker_endpoint <- function(name, client, fix = NULL, after = NULL,
     body[[n + 1L]] <- quote(after(response))
   }
 
-  args_keep <- args[setdiff(names(args), names(fix))]
+  args_keep <- args[setdiff(names(args), c(names(fix), drop))]
   as.function(c(args_keep, body), fenv)
 }

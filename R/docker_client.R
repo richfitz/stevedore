@@ -123,38 +123,42 @@ docker_client_container <- function(id, client) {
       attrs
     },
     ## TODO: this one is hard because it might need to hijack the connection
-    ## attach = docker_endpoint("container_attach", client, fix_id)
-    commit = docker_endpoint("image_commit", client, list(name = attrs$name)),
-    diff = docker_endpoint("container_changes", client, fix_id),
+    ## attach = docker_endpoint("container_attach", client, fix = fix_id)
+    commit = docker_endpoint("image_commit", client,
+                             fix = list(name = attrs$name)),
+    diff = docker_endpoint("container_changes", client, fix = fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
     ## detach through as well.
     ##
     ## TODO: set stdout and stderr to TRUE by default
-    exec = docker_endpoint("exec_create", client, fix_id, after_exec),
-    export = docker_endpoint("container_export", client, fix_id),
-    path_stat = docker_endpoint("container_path_stat", client, fix_id,
-                                after_path_stat),
-    get_archive = docker_endpoint("container_archive", client, fix_id),
-    put_archive = docker_endpoint("container_import", client, fix_id),
-    kill = docker_endpoint("container_kill", client, fix_id),
+    exec = docker_endpoint("exec_create", client, fix = fix_id,
+                           after = after_exec),
+    export = docker_endpoint("container_export", client, fix = fix_id),
+    path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
+                                after = after_path_stat),
+    get_archive = docker_endpoint("container_archive", client, fix = fix_id),
+    put_archive = docker_endpoint("container_import", client, fix = fix_id),
+    kill = docker_endpoint("container_kill", client, fix = fix_id),
     ## TODO: stdout/stderr args become TRUE by default?
-    logs = docker_endpoint("container_logs", client, fix_id),
-    pause = docker_endpoint("container_pause", client, fix_id),
+    logs = docker_endpoint("container_logs", client, fix = fix_id),
+    pause = docker_endpoint("container_pause", client, fix = fix_id),
     ## This should invalidate our container afterwards
-    remove = docker_endpoint("container_delete", client, fix_id),
+    remove = docker_endpoint("container_delete", client, fix = fix_id),
     ## This might force refresh?
-    rename = docker_endpoint("container_rename", client, fix_id),
-    resize = docker_endpoint("container_resize", client, fix_id),
-    restart = docker_endpoint("container_restart", client, fix_id),
-    start = docker_endpoint("container_start", client, fix_id),
-    ## TODO: expose stream (but with nice printing?)
+    rename = docker_endpoint("container_rename", client, fix = fix_id),
+    resize = docker_endpoint("container_resize", client, fix = fix_id),
+    restart = docker_endpoint("container_restart", client, fix = fix_id),
+    start = docker_endpoint("container_start", client, fix = fix_id),
+    ## TODO: expose stream (but with nice printing and escape instructions?)
     stats = docker_endpoint("container_stats", client,
-                            c(fix_id, stream = FALSE)),
-    stop = docker_endpoint("container_stop", client, fix_id),
-    top = docker_endpoint("container_top", client, fix_id, after_top),
-    unpause = docker_endpoint("container_unpause", client, fix_id),
-    update = docker_endpoint("container_update", client, fix_id, after_update),
-    wait = docker_endpoint("container_wait", client, fix_id),
+                            fix = c(fix_id, stream = FALSE)),
+    stop = docker_endpoint("container_stop", client, fix = fix_id),
+    top = docker_endpoint("container_top", client, fix = fix_id,
+                          after = after_top),
+    unpause = docker_endpoint("container_unpause", client, fix = fix_id),
+    update = docker_endpoint("container_update", client, fix = fix_id,
+                             after = after_update),
+    wait = docker_endpoint("container_wait", client, fix = fix_id),
     reload = reload)
   self
 }
@@ -205,12 +209,12 @@ docker_client_image_collection <- function(..., cl) {
     get = get_image,
     list = docker_endpoint("image_list", cl),
     import = docker_endpoint("image_import", cl),
-    ## TODO: need to do some argument sanitisation and renaming here.
-    ## So I'm going to do this one manually
-    ## TODO: rename arguments 'from_image' as 'repository'
     ## TODO: the 'after' function needs more work here - needs to know name/tag?
+    ## TODO: need to deal with registry auth properly.  For now I'm just
+    ##   eliminating it from the list.
     pull = docker_endpoint(
-      "image_create", cl,
+      "image_create", cl, rename = c("name" = "from_image"),
+      drop = c("input_image", "from_src", "repo", "registry_auth"),
       hijack = quote(streaming_json(pull_status_printer(stdout()))),
       after = after_pull),
     push = docker_endpoint("image_push", cl),
@@ -241,10 +245,10 @@ docker_client_image <- function(id, client) {
       }
       attrs
     },
-    history = docker_endpoint("image_history", client, fix_id_as_name),
+    history = docker_endpoint("image_history", client, fix = fix_id_as_name),
     ## TODO: this needs to add a 'filename' option for saving
-    export = docker_endpoint("image_tarball", client, fix_id_as_name),
-    tag = docker_endpoint("image_tag", client, fix_id_as_name),
+    export = docker_endpoint("image_tarball", client, fix = fix_id_as_name),
+    tag = docker_endpoint("image_tag", client, fix = fix_id_as_name),
     ## TODO: this would best be done with a wrapper around the
     ## incoming argument for 'repo_tag' but with the core function
     ## passed through docker_endpoint so that we can pass around
@@ -265,7 +269,7 @@ docker_client_image <- function(id, client) {
     ## NOTE: this removes by *id* which will not always work without a
     ## force - the name is not preserved on the way through this
     ## function.  Doing that might make more sense perhaps?
-    remove = docker_endpoint("image_delete", client, fix_id_as_name),
+    remove = docker_endpoint("image_delete", client, fix = fix_id_as_name),
     reload = reload)
   self
 }
@@ -307,9 +311,9 @@ docker_client_network <- function(id, client) {
       attrs
     },
     containers = function() lapply(attrs$containers, docker_client_container),
-    connect = docker_endpoint("network_connect", client, fix_id),
-    disconnect = docker_endpoint("network_disconnect", client, fix_id),
-    remove = docker_endpoint("network_delete", client, fix_id),
+    connect = docker_endpoint("network_connect", client, fix = fix_id),
+    disconnect = docker_endpoint("network_disconnect", client, fix = fix_id),
+    remove = docker_endpoint("network_delete", client, fix = fix_id),
     reload = reload)
   self
 }
@@ -357,7 +361,7 @@ docker_client_volume <- function(id, client) {
       }
       attrs
     },
-    remove = docker_endpoint("volume_delete", client, list(name = name)),
+    remove = docker_endpoint("volume_delete", client, fix = list(name = name)),
     reload = reload)
   self
 }
@@ -388,7 +392,7 @@ docker_client_exec <- function(id, client) {
     ## TODO: control stream (location etc) following the same problem
     ## in build.
     ## TODO: explicitly set 'detach' argument
-    start = docker_endpoint("exec_start", client, list(id = id),
+    start = docker_endpoint("exec_start", client, fix = list(id = id),
                             hijack = quote(streaming_text(print)),
                             after = after_start),
     inspect = function(reload = TRUE) {
@@ -397,7 +401,7 @@ docker_client_exec <- function(id, client) {
       }
       attrs
     },
-    resize = docker_endpoint("exec_resize", client, list(id = id)),
+    resize = docker_endpoint("exec_resize", client, fix = list(id = id)),
     reload = reload)
   self
 }

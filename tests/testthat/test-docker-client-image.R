@@ -137,7 +137,7 @@ test_that("pull", {
 
   cl <- test_docker_client()
   try(cl$images$remove("alpine:3.1"), silent = TRUE)
-  txt <- capture.output(img <- cl$images$pull(from_image = "alpine:3.1"))
+  txt <- capture.output(img <- cl$images$pull("alpine:3.1"))
 
   expect_true("alpine:3.1" %in% img$tags())
   expect_match(txt, "Downloaded newer", all = FALSE)
