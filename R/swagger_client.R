@@ -56,7 +56,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   }
 
   if (!is.null(drop)) {
-    assert_is(rename, "character")
+    assert_is(drop, "character")
     stopifnot(all(drop %in% names(args)))
     list2env(args[drop], fenv)
   }

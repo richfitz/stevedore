@@ -163,7 +163,7 @@ test_that("logs", {
   ## to every 0.1s so that we can run this for less time.
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   expect_null(x$start())
-  logs <- x$logs(stdout = TRUE)
+  logs <- x$logs()
   expect_is(logs, "docker_stream")
   expect_equal(logs[[1]], "Reticulating spline 1...\n")
   x$kill()
@@ -228,10 +228,10 @@ test_that("restart", {
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   Sys.sleep(0.5)
-  logs1 <- x$logs(stdout = TRUE)
+  logs1 <- x$logs()
   expect_null(x$restart(0))
   Sys.sleep(0.5)
-  logs2 <- x$logs(stdout = TRUE)
+  logs2 <- x$logs()
 
   expect_equal(sum(logs2 == "Reticulating spline 1...\n"), 2)
   x$kill()

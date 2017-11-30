@@ -101,9 +101,6 @@ docker_client_container <- function(id, client) {
 
   ## TODO: friendly "copy" interface needed here, but that requires a
   ## bit more general work really.
-  ##
-  ## TODO: the vast bulk of this can be done more nicely with a simple
-  ## list of functions.  That will plug into an eventual help system.
   self <- stevedore_object(
     "docker_container",
     id = function() id,
@@ -128,8 +125,6 @@ docker_client_container <- function(id, client) {
     ## TODO: inject 'start' into here too, which then requires passing
     ## detach through as well and dealing with those through the
     ## 'after' function.
-    ##
-    ## TODO: set stdout and stderr to TRUE by default
     exec = docker_endpoint(
       "exec_create", client, fix = fix_id,
       rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
@@ -143,8 +138,11 @@ docker_client_container <- function(id, client) {
     get_archive = docker_endpoint("container_archive", client, fix = fix_id),
     put_archive = docker_endpoint("container_import", client, fix = fix_id),
     kill = docker_endpoint("container_kill", client, fix = fix_id),
-    ## TODO: stdout/stderr args become TRUE by default?
-    logs = docker_endpoint("container_logs", client, fix = fix_id),
+    ## TODO: bunch of work here for 'follow' because that will then
+    ## run through with hijacking.  It's going to be hard to test too.
+    logs = docker_endpoint("container_logs", client, fix = fix_id,
+                           defaults = list(stdout = TRUE, stderr = TRUE),
+                           drop = "follow"),
     pause = docker_endpoint("container_pause", client, fix = fix_id),
     ## This should invalidate our container afterwards
     remove = docker_endpoint("container_delete", client, fix = fix_id),
@@ -171,9 +169,6 @@ docker_client_image_collection <- function(..., cl) {
   get_image <- function(id) {
     docker_client_image(id, cl)
   }
-  ## TODO: this is no good; we want to construct a *new* streamer each
-  ## time with the result of 'stream'.  And then close that out if
-  ## it's a file.
   after_build <- function(x, ...) {
     lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
     ## This is the regular expression used in the python package (but
@@ -211,9 +206,9 @@ docker_client_image_collection <- function(..., cl) {
     get = get_image,
     list = docker_endpoint("image_list", cl),
     import = docker_endpoint("image_import", cl),
-    ## TODO: the 'after' function needs more work here - needs to know name/tag?
     ## TODO: need to deal with registry auth properly.  For now I'm just
     ##   eliminating it from the list.
+    ## TODO: remove tag argument and fix to inject latest in if needed
     pull = docker_endpoint(
       "image_create", cl, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
