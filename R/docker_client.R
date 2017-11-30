@@ -130,8 +130,13 @@ docker_client_container <- function(id, client) {
     ## 'after' function.
     ##
     ## TODO: set stdout and stderr to TRUE by default
-    exec = docker_endpoint("exec_create", client, fix = fix_id,
-                           after = after_exec),
+    exec = docker_endpoint(
+      "exec_create", client, fix = fix_id,
+      rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
+                 stdin = "attach_stdin"),
+      defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
+      promote = "cmd",
+      after = after_exec),
     export = docker_endpoint("container_export", client, fix = fix_id),
     path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
                                 after = after_path_stat),

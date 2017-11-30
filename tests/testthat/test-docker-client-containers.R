@@ -324,7 +324,7 @@ test_that("exec", {
                            cmd = c("100", "100"),
                            name = nm)
   x$start()
-  ans <- x$exec(cmd = "ls", attach_stdout = TRUE, attach_stderr = TRUE)
+  ans <- x$exec("ls")
 
   expect_is(ans, "docker_exec")
   expect_is(ans, "stevedore_object")

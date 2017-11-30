@@ -25,13 +25,8 @@ docker_client_base <- function(..., api_version = NULL) {
   self
 }
 
-## TODO: reorder (practically _promote_)
-## TODO: set defaults
-## TODO: after gets a client option perhaps?  All after functions become
-##   function(response, params, client)
-## TODO: drop
 docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
-                            drop = NULL, defaults = NULL,
+                            drop = NULL, defaults = NULL, promote = NULL,
                             after = NULL, hijack = NULL) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
@@ -71,6 +66,12 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   if (!is.null(defaults)) {
     stopifnot(all(names(defaults) %in% names(args_keep)))
     args_keep[names(defaults)] <- defaults
+  }
+
+  if (!is.null(promote)) {
+    assert_character(promote, "character")
+    stopifnot(all(promote %in% names(args_keep)))
+    args_keep <- args_keep[c(promote, setdiff(names(args_keep), promote))]
   }
 
   subs <- list(
