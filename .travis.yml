@@ -9,6 +9,7 @@ before_script:
   - docker pull hello-world
   - docker pull alpine
   - docker pull bfirsh/reticulate-splines
+  - (cd tests/testthat/images && ./build.sh)
 after_success:
   - Rscript -e 'covr::codecov()'
 addons:
