@@ -84,6 +84,17 @@ test_that("assert_named", {
   expect_silent(assert_named(set_names(object, c("a", "b", "c")), TRUE, "x"))
 })
 
+test_that("assert_directory", {
+  path <- tempfile()
+  expect_error(assert_directory(path), "'path' must be an existing directory")
+  writeLines(character(0), path)
+  expect_error(assert_directory(path), "'path' must be an existing directory")
+  file.remove(path)
+  dir.create(path)
+  expect_silent(assert_directory(path))
+  unlink(path)
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")

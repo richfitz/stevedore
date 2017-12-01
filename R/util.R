@@ -163,3 +163,7 @@ capture_args <- function(f, name, indent = 4) {
   paste0(trimws(sprintf("%s%s\n", strrep(" " , indent), txt), "right"),
          collapse = "\n")
 }
+
+is_directory <- function(x) {
+  file.exists(x) & file.info(x, extra_cols = FALSE)$isdir
+}

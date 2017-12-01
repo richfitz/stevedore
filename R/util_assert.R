@@ -86,6 +86,12 @@ assert_named <- function(x, unique = FALSE, name = deparse(substitute(x))) {
   }
 }
 
+assert_directory <- function(x, name = deparse(substitute(x))) {
+  if (!is_directory(x)) {
+    stop(sprintf("'%s' must be an existing directory", name), call. = FALSE)
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {
