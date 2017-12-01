@@ -174,7 +174,6 @@ test_that("build: failure", {
     ans <- get_error(cl$images$build(context, nocache = TRUE, rm = TRUE,
                                      tag = "richfitz/iterate:failure"))})
   expect_is(ans, "build_error")
-  expect_match(ans$message, "COPY")
 })
 
 test_that("pull", {
