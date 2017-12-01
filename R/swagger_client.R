@@ -84,13 +84,19 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   run_endpoint <- substitute(
     run_endpoint(http_client, endpoint, params, hijack = hijack),
     list(hijack = hijack))
+  if (is.null(extra)) {
+    add_extra <- NULL
+  } else {
+    add_extra <- bquote(
+      params[.(as.call(c(quote(c), names(extra))))] <-
+        .(as.call(c(quote(list), lapply(names(extra), as.name)))))
+  }
 
   if (!is.null(after)) {
     fenv$after <- after
-    finish <-
-      list(call("<-", quote(response), run_endpoint),
-           bquote(params[.(names(extra))] <- .(lapply(names(extra), as.name))),
-           quote(after(response, params)))
+    finish <- list(call("<-", quote(response), run_endpoint),
+                   add_extra,
+                   quote(after(response, params)))
   } else {
     finish <- run_endpoint
   }
