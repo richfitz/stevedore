@@ -110,7 +110,7 @@ test_that("build: success", {
 
   txt <- capture.output({
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE,
-                           t = "richfitz/iterate:testing")})
+                           tag = "richfitz/iterate:testing")})
 
   expect_match(txt, "Successfully built", all = FALSE)
   expect_is(ans, "docker_image")
@@ -126,7 +126,7 @@ test_that("build: stream output", {
 
   expect_silent(
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = con,
-                           t = "richfitz/iterate:testing"))
+                           tag = "richfitz/iterate:testing"))
   close(con)
   on.exit()
 
@@ -143,8 +143,20 @@ test_that("build: stream output with file arg", {
 
   expect_silent(
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = path,
-                           t = "richfitz/iterate:testing"))
+                           tag = "richfitz/iterate:testing"))
   expect_true(file.exists(path))
+  expect_match(readLines(path), "Successfully built", all = FALSE)
+  expect_is(ans, "docker_image")
+  expect_equal(ans$tags(), "richfitz/iterate:testing")
+})
+
+test_that("build: context as directory name", {
+  path <- tempfile()
+  cl <- test_docker_client()
+  expect_silent(
+    ans <- cl$images$build("images/iterate", nocache = TRUE,
+                           rm = TRUE, stream = path,
+                           tag = "richfitz/iterate:testing"))
   expect_match(readLines(path), "Successfully built", all = FALSE)
   expect_is(ans, "docker_image")
   expect_equal(ans$tags(), "richfitz/iterate:testing")
@@ -160,7 +172,7 @@ test_that("build: failure", {
 
   txt <- capture.output({
     ans <- get_error(cl$images$build(context, nocache = TRUE, rm = TRUE,
-                                     t = "richfitz/iterate:failure"))})
+                                     tag = "richfitz/iterate:failure"))})
   expect_is(ans, "build_error")
   expect_match(ans$message, "COPY")
 })

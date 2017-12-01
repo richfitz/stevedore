@@ -192,16 +192,15 @@ docker_client_image_collection <- function(..., cl) {
   }
   stevedore_object(
     "docker_image_collection",
-    ## TODO: rename 'input_stream' to 'context' and then eventually to path
-    ## TODO: rename 't' -> 'tag'
     ## TODO: control returning output too
     ## TODO: support multiple tags (accept vector and translate into
-    ##   multiple 't' parameters - not sure who needs to take
-    ##   responsibility for that).
+    ##   multiple 't' parameters - needs support in generated handlers
     build = docker_endpoint(
       "image_build", cl,
+      rename = c(context = "input_stream", tag = "t"),
       extra = alist(stream = stdout()),
-      process = list(stream = validate_stream_and_close(quote(stream))),
+      process = list(stream = validate_stream_and_close(quote(stream)),
+                     context = validate_tar_directory(quote(context))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       after = after_build),
     get = get_image,
@@ -536,4 +535,23 @@ validate_stream_and_close <- function(name, mode = "wb") {
       assert_is(name, "connection")
     }
   }), list(name = name, mode = mode))[[2]][[2]]
+}
+
+## TODO: see comments in tar_directory about setting this up for curl
+## streaming from disk
+## if (stream) {
+##   name <- curl_stream_file(tar_directory(name)) # sets attr
+##   on.exit(file.remove(name))
+## } else {
+##   tar_directory(name)
+## }
+validate_tar_directory <- function(name, stream = FALSE) {
+  substitute(expression({
+    if (is.character(name)) {
+      assert_directory(name)
+      name <- tar_directory(name)
+    } else {
+      assert_raw(name)
+    }
+  }), list(name = name))[[2]][[2]]
 }
