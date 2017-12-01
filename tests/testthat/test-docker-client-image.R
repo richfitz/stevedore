@@ -136,6 +136,20 @@ test_that("build: stream output", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+test_that("build: stream output with file arg", {
+  path <- tempfile()
+  cl <- test_docker_client()
+  context <- tar_bin("images/iterate")
+
+  expect_silent(
+    ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = path,
+                           t = "richfitz/iterate:testing"))
+  expect_true(file.exists(path))
+  expect_match(readLines(path), "Successfully built", all = FALSE)
+  expect_is(ans, "docker_image")
+  expect_equal(ans$tags(), "richfitz/iterate:testing")
+})
+
 test_that("build: failure", {
   cl <- test_docker_client()
   ## As above, but missing a resource:

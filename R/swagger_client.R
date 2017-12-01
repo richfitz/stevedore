@@ -27,20 +27,13 @@ docker_client_base <- function(..., api_version = NULL) {
 
 docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
                             drop = NULL, defaults = NULL, extra = NULL,
-                            promote = NULL, after = NULL, hijack = NULL) {
+                            promote = NULL, process = NULL, after = NULL,
+                            hijack = NULL) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
-  if (!is.null(hijack)) {
-    assert_is(hijack, "call")
-  }
-
   fenv <- new.env(parent = client, hash = FALSE)
   fenv$endpoint <- endpoint
-  if (!is.null(after)) {
-    fenv$after <- after
-  }
-
   if (!is.null(fix)) {
     list2env(fix, fenv)
   }
@@ -78,26 +71,34 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
     args_use <- args_use[c(promote, setdiff(names(args_use), promote))]
   }
 
-  subs <- list(
-    name = name,
-    hijack = hijack,
-    get_params = as.call(c(list(quote(endpoint$argument_handler)),
-                           lapply(names(args), as.name))))
-
-  body <- substitute(expression({
-    params <- get_params
-    run_endpoint(http_client, endpoint, params, hijack = hijack)
-  }), subs)[[2]]
-
-  if (!is.null(after)) {
-    n <- length(body)
-    body[[n]] <- call("<-", quote(response), body[[n]])
-    if (!is.null(extra)) {
-      body[[length(body) + 1L]] <-
-        bquote(params[.(names(extra))] <- .(lapply(names(extra), as.name)))
-    }
-    body[[length(body) + 1L]] <- quote(after(response, params))
+  if (!is.null(process)) {
+    stopifnot(vlapply(process, is.language))
   }
 
-  as.function(c(args_use, body), fenv)
+  if (!is.null(hijack)) {
+    assert_is(hijack, "call")
+  }
+
+  get_params <- as.call(c(list(quote(endpoint$argument_handler)),
+                          lapply(names(args), as.name)))
+  run_endpoint <- substitute(
+    run_endpoint(http_client, endpoint, params, hijack = hijack),
+    list(hijack = hijack))
+
+  if (!is.null(after)) {
+    fenv$after <- after
+    finish <-
+      list(call("<-", quote(response), run_endpoint),
+           bquote(params[.(names(extra))] <- .(lapply(names(extra), as.name))),
+           quote(after(response, params)))
+  } else {
+    finish <- run_endpoint
+  }
+
+  body <- c(quote(`{`),
+            unname(process),
+            list(call("<-", quote(params), get_params)),
+            finish)
+
+  as.function(c(args_use, as.call(body)), fenv)
 }

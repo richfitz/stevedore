@@ -194,7 +194,6 @@ docker_client_image_collection <- function(..., cl) {
     "docker_image_collection",
     ## TODO: rename 'input_stream' to 'context' and then eventually to path
     ## TODO: rename 't' -> 'tag'
-    ## TODO: allow specifying the stream we output to
     ## TODO: control returning output too
     ## TODO: support multiple tags (accept vector and translate into
     ##   multiple 't' parameters - not sure who needs to take
@@ -202,6 +201,7 @@ docker_client_image_collection <- function(..., cl) {
     build = docker_endpoint(
       "image_build", cl,
       extra = alist(stream = stdout()),
+      process = list(stream = validate_stream_and_close(quote(stream))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       after = after_build),
     get = get_image,
@@ -525,4 +525,15 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
                    USE.NAMES = FALSE)
   cat(paste0(defns, "\n", collapse = ""))
   invisible(x)
+}
+
+validate_stream_and_close <- function(name, mode = "wb") {
+  substitute(expression({
+    if (is.character(name)) {
+      name <- file(name, mode)
+      on.exit(close(name), add = TRUE)
+    } else {
+      assert_is(name, "connection")
+    }
+  }), list(name = name, mode = mode))[[2]][[2]]
 }
