@@ -79,6 +79,14 @@ docker_client_container <- function(id, client) {
     attrs <<- container_inspect(id)
     invisible(self)
   }
+  after_get_archive <- function(x, params) {
+    if (is.null(params$dest)) {
+      x
+    } else {
+      writeBin(x, params$dest)
+      invisible(params$dest)
+    }
+  }
   after_exec <- function(x, ...) {
     ret <- docker_client_exec(x$id, client)
     ret
@@ -135,7 +143,10 @@ docker_client_container <- function(id, client) {
     export = docker_endpoint("container_export", client, fix = fix_id),
     path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
                                 after = after_path_stat),
-    get_archive = docker_endpoint("container_archive", client, fix = fix_id),
+    get_archive = docker_endpoint(
+      "container_archive", client, fix = fix_id, extra = alist(dest =),
+      process = list(dest = quote(assert_scalar_character_or_null(dest))),
+      after = after_get_archive),
     put_archive = docker_endpoint("container_import", client, fix = fix_id),
     kill = docker_endpoint("container_kill", client, fix = fix_id),
     ## TODO: bunch of work here for 'follow' because that will then

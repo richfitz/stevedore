@@ -92,6 +92,14 @@ assert_directory <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+assert_scalar_character_or_null <- function(x, name = deparse(substitute(x))) {
+  if (!is.null(x)) {
+    ## TODO: this could produce better messages (there's no hint that
+    ## NULL is OK)
+    assert_scalar_character(x, name)
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {

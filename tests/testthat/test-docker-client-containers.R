@@ -110,9 +110,16 @@ test_that("archive export", {
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
 
-  bin <- x$get_archive("hello")
+  bin <- x$get_archive("hello", NULL)
   p <- untar_bin(bin)
   expect_true(file.exists(file.path(p, "hello")))
+
+  path <- x$get_archive("hello", tempfile())
+  expect_true(file.exists(path))
+  expect_identical(readBin(path, raw(), file.size(path)), bin)
+
+  expect_error(x$get_archive("hello", FALSE),
+               "'dest' must be a character")
 })
 
 test_that("archive import", {
