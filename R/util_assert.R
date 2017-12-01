@@ -101,3 +101,19 @@ match_value <- function(x, values, name = deparse(substitute(x))) {
   }
   x
 }
+
+## It's possible that we can do this with streaming but I don't know
+## that's sensible.  One option would be to run as far through as the
+## tar to file step and then pass through something that we can later
+## pass through to curl for streaming upload.  That would be quite a
+## bit nicer but will require some cleanup later.  We can do that with
+## an option through here coupled with some cleanup work in the
+## process functions and significant work to run_endpoint.
+tar_directory <- function(path, setwd = TRUE) {
+  owd <- setwd(path)
+  on.exit(setwd(owd))
+  tmp <- tempfile()
+  on.exit(file.remove(tmp), add = TRUE)
+  tar(tmp, ".")
+  readBin(tmp, raw(), file.size(tmp))
+}

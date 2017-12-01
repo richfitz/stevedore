@@ -169,15 +169,6 @@ untar_bin <- function(bin, path = tempfile()) {
   invisible(path)
 }
 
-tar_bin <- function(path, setwd = TRUE) {
-  owd <- setwd(path)
-  on.exit(setwd(owd))
-  tmp <- tempfile()
-  on.exit(file.remove(tmp), add = TRUE)
-  tar(tmp, ".")
-  readBin(tmp, raw(), file.size(tmp))
-}
-
 ## TODO: at some point a variant of this will move into the main
 ## constructor, with a proper error message advising on solutions.
 CURL_HAS_SOCKET_SUPPORT <-

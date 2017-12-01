@@ -106,7 +106,7 @@ test_that("prune", {
 
 test_that("build: success", {
   cl <- test_docker_client()
-  context <- tar_bin("images/iterate")
+  context <- tar_directory("images/iterate")
 
   txt <- capture.output({
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE,
@@ -122,7 +122,7 @@ test_that("build: stream output", {
   con <- file(path, "wb")
   on.exit(close(con))
   cl <- test_docker_client()
-  context <- tar_bin("images/iterate")
+  context <- tar_directory("images/iterate")
 
   expect_silent(
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = con,
@@ -139,7 +139,7 @@ test_that("build: stream output", {
 test_that("build: stream output with file arg", {
   path <- tempfile()
   cl <- test_docker_client()
-  context <- tar_bin("images/iterate")
+  context <- tar_directory("images/iterate")
 
   expect_silent(
     ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = path,
@@ -156,7 +156,7 @@ test_that("build: failure", {
   path <- tempfile()
   dir.create(path)
   file.copy("images/iterate/Dockerfile", path)
-  context <- tar_bin(path)
+  context <- tar_directory(path)
 
   txt <- capture.output({
     ans <- get_error(cl$images$build(context, nocache = TRUE, rm = TRUE,

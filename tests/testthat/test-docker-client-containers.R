@@ -128,7 +128,7 @@ test_that("archive import", {
   dat <- rand_str(100)
   writeLines(dat, file.path(path, "foo"))
 
-  bin <- tar_bin(path)
+  bin <- tar_directory(path)
 
   ## Down here, we need to get the types correct for handling.
   x$put_archive(bin, "/")
