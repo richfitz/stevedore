@@ -104,7 +104,7 @@ test_that("prune", {
   skip("Not yet testable")
 })
 
-test_that("build", {
+test_that("build: success", {
   cl <- test_docker_client()
   context <- tar_bin("images/iterate")
 
@@ -117,7 +117,26 @@ test_that("build", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
-test_that("build failure", {
+test_that("build: stream output", {
+  path <- tempfile()
+  con <- file(path, "wb")
+  on.exit(close(con))
+  cl <- test_docker_client()
+  context <- tar_bin("images/iterate")
+
+  expect_silent(
+    ans <- cl$images$build(context, nocache = TRUE, rm = TRUE, stream = con,
+                           t = "richfitz/iterate:testing"))
+  close(con)
+  on.exit()
+
+  txt <- readLines(path)
+  expect_match(txt, "Successfully built", all = FALSE)
+  expect_is(ans, "docker_image")
+  expect_equal(ans$tags(), "richfitz/iterate:testing")
+})
+
+test_that("build: failure", {
   cl <- test_docker_client()
   ## As above, but missing a resource:
   path <- tempfile()

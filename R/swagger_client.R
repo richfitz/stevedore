@@ -26,8 +26,8 @@ docker_client_base <- function(..., api_version = NULL) {
 }
 
 docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
-                            drop = NULL, defaults = NULL, promote = NULL,
-                            after = NULL, hijack = NULL) {
+                            drop = NULL, defaults = NULL, extra = NULL,
+                            promote = NULL, after = NULL, hijack = NULL) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
@@ -61,17 +61,21 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
     list2env(args[drop], fenv)
   }
 
-  args_keep <- args[setdiff(names(args), c(names(fix), drop))]
+  args_use <- args[setdiff(names(args), c(names(fix), drop))]
 
   if (!is.null(defaults)) {
-    stopifnot(all(names(defaults) %in% names(args_keep)))
-    args_keep[names(defaults)] <- defaults
+    stopifnot(all(names(defaults) %in% names(args_use)))
+    args_use[names(defaults)] <- defaults
+  }
+
+  if (!is.null(extra)) {
+    args_use <- c(args_use, extra)
   }
 
   if (!is.null(promote)) {
     assert_character(promote, "character")
-    stopifnot(all(promote %in% names(args_keep)))
-    args_keep <- args_keep[c(promote, setdiff(names(args_keep), promote))]
+    stopifnot(all(promote %in% names(args_use)))
+    args_use <- args_use[c(promote, setdiff(names(args_use), promote))]
   }
 
   subs <- list(
@@ -88,8 +92,12 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   if (!is.null(after)) {
     n <- length(body)
     body[[n]] <- call("<-", quote(response), body[[n]])
-    body[[n + 1L]] <- quote(after(response, params))
+    if (!is.null(extra)) {
+      body[[length(body) + 1L]] <-
+        bquote(params[.(names(extra))] <- .(lapply(names(extra), as.name)))
+    }
+    body[[length(body) + 1L]] <- quote(after(response, params))
   }
 
-  as.function(c(args_keep, body), fenv)
+  as.function(c(args_use, body), fenv)
 }

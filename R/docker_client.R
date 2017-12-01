@@ -201,7 +201,8 @@ docker_client_image_collection <- function(..., cl) {
     ##   responsibility for that).
     build = docker_endpoint(
       "image_build", cl,
-      hijack = quote(streaming_json(build_status_printer(stdout()))),
+      extra = alist(stream = stdout()),
+      hijack = quote(streaming_json(build_status_printer(stream))),
       after = after_build),
     get = get_image,
     list = docker_endpoint("image_list", cl),
