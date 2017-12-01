@@ -180,6 +180,6 @@ tar_directory <- function(path, setwd = TRUE) {
   on.exit(setwd(owd))
   tmp <- tempfile()
   on.exit(file.remove(tmp), add = TRUE)
-  util::tar(tmp, ".")
+  utils::tar(tmp, ".")
   readBin(tmp, raw(), file.size(tmp))
 }
