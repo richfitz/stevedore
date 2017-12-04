@@ -1,0 +1,31 @@
+- version: 1.29
+  path: ["definitions", "Mount", "properties", "Source"]
+  value:
+    type: "string"
+
+- version: 1.29
+  path: ["paths", "/images/load", "post", "responses", "200"]
+  value:
+    schema:
+      type: "object"
+
+# This is backported from the 1.32 spec
+- version: 1.29
+  path: ["definitions", "PortBinding"]
+  value:
+    type: "object"
+    properties:
+      HostIp:
+        type: "string"
+      HostPort:
+        type: "string"
+
+- version: 1.29
+  path: ["definitions", "NetworkConfig", "properties", "Ports"]
+  replace: true
+  value:
+    type: "object"
+    additionalProperties:
+      type: "array"
+      items:
+        "$ref": "#/definitions/PortBinding"

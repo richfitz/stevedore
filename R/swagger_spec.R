@@ -29,39 +29,18 @@ read_spec <- function(version) {
   }
   ret <- yaml::yaml.load_file(path_yml)
 
-  ## We'll need to do a bunch of these probably; they can probably
-  ## also be moved into a yaml file easily enough with version ranges.
-  if (version == "1.29") {
-    ret <- spec_patch(ret, c("definitions", "Mount", "properties", "Source"),
-                      type = "string")
-    ## Empirically, this is not the correct return type here.  Issue
-    ## persists through 1.32 at least.
-    p <- c("paths", "/images/load", "post", "responses", "200")
-    ret <- spec_patch(ret, p, schema = list(type = "object"))
+  patch <- yaml::yaml.load_file(system.file(
+    "spec/patch.yaml", package = "stevedore"))
 
-    ## This one is really hard to programmatically patch and is a
-    ## sticking point for moving out of code and into yaml...
+  ret <- spec_apply_patch(ret, patch)
+
+  ## This bit of patching is additional to the bits in yaml
+  if (version == "1.29") {
     p <- c("paths", "/containers/{id}/archive", "put", "parameters")
     tmp <- ret[[p]]
     i <- which(vcapply(tmp, "[[", "name") == "inputStream")
     tmp[[i]]$schema$format <- "binary"
     ret[[p]] <- tmp
-
-    ## This one *definitely* changes by version - it's fixed in 1.32
-    ## at least
-    p <- c("definitions", "PortBinding")
-    ret[[p]] <- list(
-      type = "object",
-      properties = list(
-        HostIp = list(type = "string"),
-        HostPort = list(type = "string")))
-
-    p <- c("definitions", "NetworkConfig", "properties", "Ports")
-    ret[[p]] <- list(
-      type = "object",
-      additionalProperties =
-        list(type = "array",
-             items = list("$ref" = "#/definitions/PortBinding")))
   }
 
   ret
@@ -95,11 +74,41 @@ spec_path <- function() {
   path
 }
 
-## This is used only in the package Makefile
-write_spec_index <- function(path) {
+spec_apply_patch <- function(dat, patch) {
+  v <- numeric_version(dat$info$version)
+  check_version <- function(x) {
+    cmp <- numeric_version(x$version)
+    (length(cmp) == 1 && cmp == v) ||
+      (length(cmp) == 2 && v >= cmp[[1]]) ||
+      (length(cmp) == 2 && v <= cmp[[2]])
+  }
+
+  for (el in patch) {
+    if (check_version(el)) {
+      path <- el$path
+      value <- el$value
+      tmp <- dat[[path]]
+      if (is.null(tmp) || isTRUE(el$replace)) {
+        tmp <- value
+      } else {
+        tmp[names(value)] <- value
+      }
+      dat[[path]] <- tmp
+    }
+  }
+
+  dat
+}
+
+spec_versions <- function() {
   min_version <- unclass(numeric_version(MIN_DOCKER_API_VERSION))[[c(1, 2)]]
   max_version <- unclass(numeric_version(MAX_DOCKER_API_VERSION))[[c(1, 2)]]
-  versions <- sprintf("1.%d", min_version:max_version)
+  sprintf("1.%d", min_version:max_version)
+}
+
+## This is used only in the package Makefile
+write_spec_index <- function(path) {
+  versions <- spec_versions()
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)
   names(md5) <- paste0("v", names(files))
