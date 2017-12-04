@@ -94,9 +94,9 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 
   if (!is.null(after)) {
     fenv$after <- after
-    finish <- list(call("<-", quote(response), run_endpoint),
-                   add_extra,
-                   quote(after(response, params)))
+    finish <- c(call("<-", quote(response), run_endpoint),
+                add_extra,
+                quote(after(response, params)))
   } else {
     finish <- run_endpoint
   }
