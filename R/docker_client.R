@@ -449,7 +449,8 @@ report_warnings <- function(x, action) {
 
 subset_stevedore_object <- function(x, name) {
   .subset2(x, name) %||%
-    stop(sprintf("No element '%s' within '%s' object", name, class(x)[[1]]))
+    stop(sprintf("No element '%s' within '%s' object", name, class(x)[[1]]),
+         call. = FALSE)
 }
 
 ##' @export
