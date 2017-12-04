@@ -148,7 +148,7 @@ test_that("archive import", {
 
   ## Down here, we need to get the types correct for handling.
   x$put_archive(bin, "/")
-  bin2 <- x$get_archive("foo")
+  bin2 <- x$get_archive("foo", NULL)
   p <- untar_bin(bin2)
   expect_true(file.exists(file.path(p, "foo")))
   expect_identical(readLines(file.path(p, "foo")), dat)
