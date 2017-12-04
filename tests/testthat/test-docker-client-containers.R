@@ -18,6 +18,15 @@ test_that("create", {
   expect_equal(e$code, 404L)
 })
 
+test_that("create, using image", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  img <- d$images$get("hello-world")
+  x <- d$containers$create(img, name = nm)
+  expect_equal(x$image()$id(), img$id())
+  x$remove()
+})
+
 test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")

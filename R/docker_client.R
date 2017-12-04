@@ -62,10 +62,15 @@ docker_client_container_collection <- function(..., cl) {
   stevedore_object(
     "docker_container_collection",
     ## run = ... - this one is complex (TODO)
-    create = docker_endpoint("container_create", cl, after = after_create),
+    create = docker_endpoint(
+      "container_create", cl,
+      process = list(image = quote(image <- get_image_id(image))),
+      after = after_create),
     get = get_container,
     list = docker_endpoint("container_list", cl, after = after_list),
-    remove = docker_endpoint("container_delete", cl),
+    remove = docker_endpoint(
+      "container_delete", cl,
+      process = list(image = quote(image <- get_image_id(id)))),
     prune = docker_endpoint("container_prune", cl))
 }
 
@@ -581,4 +586,15 @@ validate_tar_directory <- function(name, stream = FALSE) {
       assert_raw(name)
     }
   }), list(name = name))[[2]][[2]]
+}
+
+## NOTE: if this is not used anywhere else it might be better to do
+## this inlining?
+get_image_id <- function(x, name = deparse(substitute(x))) {
+  if (inherits(x, "docker_image")) {
+    x$id()
+  } else {
+    assert_scalar_character(x, name)
+    x
+  }
 }
