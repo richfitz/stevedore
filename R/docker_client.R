@@ -399,9 +399,12 @@ docker_client_exec <- function(id, client) {
     ## TODO: control stream (location etc) following the same problem
     ## in build.
     ## TODO: explicitly set 'detach' argument
-    start = docker_endpoint("exec_start", client, fix = list(id = id),
-                            hijack = quote(streaming_text(print)),
-                            after = after_start),
+    start = docker_endpoint(
+      "exec_start", client, fix = list(id = id),
+      extra = alist(stream = stdout()),
+      hijack = quote(streaming_text(exec_output_printer(stream))),
+      process = list(stream = validate_stream_and_close(quote(stream))),
+      after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {
         reload()
@@ -522,6 +525,16 @@ build_status_printer <- function(stream = stdout()) {
   }
 }
 
+exec_output_printer <- function(stream) {
+  print_output <- !is.null(stream)
+  if (print_output) {
+    assert_is(stream, "connection")
+  }
+  function(x) {
+    print(x)
+  }
+}
+
 ##' @export
 print.stevedore_object <- function(x, ..., indent = 2L) {
   nms <- sort(names(x))
@@ -537,6 +550,8 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
   invisible(x)
 }
 
+## TODO: these must all be able to take 'NULL' to mean no stream.  But
+## we'll still end up capturing the result.
 validate_stream_and_close <- function(name, mode = "wb") {
   substitute(expression({
     if (is.character(name)) {

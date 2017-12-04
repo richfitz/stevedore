@@ -341,9 +341,6 @@ test_that("exec", {
   expect_true(info$open_stdout)
   expect_true(info$open_stderr)
 
-  ## This all looks pretty good really!  But streaming must also be
-  ## possible so we need to do some work here in order to get that to
-  ## work!
   txt <- capture.output(res <- ans$start(detach = FALSE))
   expect_is(res, "docker_stream")
   expect_equal(txt, strsplit(format(res, style = "prefix"), "\n")[[1]])
