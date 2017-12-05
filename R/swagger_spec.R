@@ -119,6 +119,6 @@ version_check <- function(v, cmp) {
   v <- numeric_version(v)
   cmp <- numeric_version(cmp)
   (length(cmp) == 1 && cmp == v) ||
-    (length(cmp) == 2 && v >= cmp[[1]]) ||
-    (length(cmp) == 2 && v <= cmp[[2]])
+    ((length(cmp) == 2 && v >= cmp[[1]]) &&
+     (length(cmp) == 2 && v <= cmp[[2]]))
 }
