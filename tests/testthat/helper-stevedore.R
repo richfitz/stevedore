@@ -74,17 +74,7 @@ describe_api <- function(x) {
 
 read_sample_response <- function(path) {
   txt <- readLines(path)
-  i <- grep("^[^#]", txt)[[1]]
-  head <- sub("^#+\\s*", "", txt[seq_len(i - 1L)])
-  re <- "(^[^ ]+): +(.*)\\s*$"
-  stopifnot(all(grepl(re, head)))
-  value <- sub(re, "\\2", head)
-  ret <- set_names(as.list(value), sub(re, "\\1", head))
-
-  msg <- setdiff(names(ret), c("version", "method", "path", "code", "response"))
-  if (length(msg) > 0L) {
-    stop(sprintf("Missing expected fields %s", paste(msg, collapse = ", ")))
-  }
+  ret <- parse_sample_response(txt)
 
   if (ret$response == "~") {
     ret$response <- raw()
@@ -92,7 +82,6 @@ read_sample_response <- function(path) {
     ret$response <- charToRaw(ret$response)
   }
 
-  ret$method <- tolower(ret$method)
   spec <- read_spec(ret$version)
 
   endpoint <- spec$paths[[ret$path]][[ret$method]]
@@ -103,6 +92,23 @@ read_sample_response <- function(path) {
   ret$handler <- make_response_handler(ret$schema, spec, ret$produces)
   ret$reference <- eval(parse(text = txt))
 
+  ret
+}
+
+parse_sample_response <- function(txt) {
+  i <- grep("^[^#]", txt)[[1]]
+  head <- sub("^#+\\s*", "", txt[seq_len(i - 1L)])
+  re <- "(^[^ ]+): +(.*)\\s*$"
+  stopifnot(all(grepl(re, head)))
+  value <- sub(re, "\\2", head)
+  ret <- set_names(as.list(value), sub(re, "\\1", head))
+
+  msg <- setdiff(c("version", "method", "path", "code", "response"), names(ret))
+  if (length(msg) > 0L) {
+    stop(sprintf("Missing expected fields %s", paste(msg, collapse = ", ")))
+  }
+
+  ret$method <- tolower(ret$method)
   ret
 }
 
