@@ -87,8 +87,8 @@ spec_path <- function() {
 
 spec_apply_patch <- function(dat, patch) {
   v <- numeric_version(dat$info$version)
-
   for (el in patch) {
+    assert_character(el$version)
     if (version_check(v, el$version)) {
       path <- el$path
       value <- el$value
@@ -124,6 +124,5 @@ version_check <- function(v, cmp) {
   v <- numeric_version(v)
   cmp <- numeric_version(cmp)
   (length(cmp) == 1 && cmp == v) ||
-    ((length(cmp) == 2 && v >= cmp[[1]]) &&
-     (length(cmp) == 2 && v <= cmp[[2]]))
+    (length(cmp) == 2 && v >= cmp[[1]] && v <= cmp[[2]])
 }

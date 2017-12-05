@@ -1,16 +1,16 @@
-- version: 1.29
+- version: "1.29"
   path: ["definitions", "Mount", "properties", "Source"]
   value:
     type: "string"
 
-- version: [1.29, 1.30]
+- version: ["1.29", "1.30"]
   path: ["paths", "/images/load", "post", "responses", "200"]
   value:
     schema:
       type: "object"
 
 # This is backported from the 1.32 spec
-- version: [1.29, 1.30]
+- version: ["1.29", "1.30"]
   path: ["definitions", "PortBinding"]
   value:
     type: "object"
@@ -20,7 +20,7 @@
       HostPort:
         type: "string"
 
-- version: [1.29, 1.30]
+- version: ["1.29", "1.30"]
   path: ["definitions", "NetworkConfig", "properties", "Ports"]
   replace: true
   value:
