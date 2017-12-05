@@ -1,4 +1,4 @@
-## version: 1.29
+## version: 1.30
 ## method: get
 ## path: /info
 ## code: 200
@@ -30,7 +30,8 @@ list(
   driver_status = list(""),
   system_status = list("c(\"State\", \"Healthy\")"),
   plugins = list(volume = "local",
-                 network = c("null", "host", "bridge")),
+                 network = c("null", "host", "bridge"),
+                 log = character(0)),
   experimental_build = FALSE,
   http_proxy = "http://test:test@localhost:8080",
   https_proxy = "https://test:test@localhost:8080",

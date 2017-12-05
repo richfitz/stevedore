@@ -32,10 +32,16 @@ read_spec <- function(version) {
   patch <- yaml::yaml.load_file(system.file(
     "spec/patch.yaml", package = "stevedore"))
 
+  ## if (version != "1.29") {
+  ##   browser()
+  ## }
+
   ret <- spec_apply_patch(ret, patch)
 
-  ## This bit of patching is additional to the bits in yaml
-  if (version == "1.29") {
+  ## This bit of patching is additional to the bits in yaml, but I
+  ## can't see how to make it do-able with the yaml directly because
+  ## it needs to access an element within a list.
+  if (version_check(version, c("1.29", "1.30"))) {
     p <- c("paths", "/containers/{id}/archive", "put", "parameters")
     tmp <- ret[[p]]
     i <- which(vcapply(tmp, "[[", "name") == "inputStream")
