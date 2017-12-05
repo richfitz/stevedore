@@ -35,3 +35,14 @@ Or generate whole files with
 add_sample_response("sample_responses/system_df.R", "get", "/system/df",
                     "200", "v1.29")
 ```
+
+When porting to a new version of the spec, the simplest thing to is to run:
+
+``` r
+create_sample_responses("1.99", "1.98")
+```
+
+which will create a new set of responses for version `1.99` by:
+* cloning the data for `1.98` and then adding the new JSON responses from the spec
+* set up testing by creating a file like `test-spec-responses-1.30.R` for the new version
+* iterate through testing these while patching the [spec](../../../inst/spec/patch.yaml) and the expected responses, as required

@@ -202,3 +202,74 @@ skip_if_no_internet <- function() {
   }
   testthat::skip("no internet")
 }
+
+test_sample_responses <- function(v, skip = NULL) {
+  files <- dir(file.path("sample_responses", paste0("v", v)),
+               full.names = TRUE)
+
+  for (file in files) {
+    base <- sub("\\.R$", "", basename(file))
+    testthat::test_that(sprintf("sample_responses: v%s - %s", v, base), {
+      if (base %in% skip) {
+        testthat::skip("not yet working")
+      }
+      dat <- read_sample_response(file)
+      ans1 <- dat$handler(dat$response, FALSE)
+      ans2 <- dat$handler(dat$response, TRUE)
+      testthat::expect_equal(ans1, dat$reference)
+      testthat::expect_equal(ans2, dat$reference, check.attributes = FALSE)
+    })
+  }
+}
+
+create_sample_responses <- function(target, base) {
+  path_base <- file.path("sample_responses", paste0("v", base))
+  path_target <- file.path("sample_responses", paste0("v", target))
+  spec <- read_spec(target)
+
+  files <- dir(path_base, full.names = TRUE)
+
+  re_fmt <- "^(#+ %s:\\s*)(.+)\\s*$"
+
+  f <- function(x) {
+    x <- readLines(filename)
+    re_version <- sprintf(re_fmt, "version")
+    i <- grep(re_version, x)
+    stopifnot(length(i) == 1L)
+    x[[i]] <- paste0(sub(re_version, "\\1", x[[i]]), target)
+
+    ## Then the response itself
+    re_response <- sprintf(re_fmt, "response")
+    i <- grep(re_response, x)
+    stopifnot(length(i) == 1L)
+    prev <- sub(re_response, "\\2", x[[i]])
+
+    d <- parse_sample_response(x)
+    response <- read_sample_response_str(d$method, d$path, d$code, spec, FALSE)
+    if (is.null(response)) {
+      if (d$response == "~") {
+        response <- "~"
+      } else {
+        message("No response for ", filename)
+        return(NULL)
+      }
+    }
+
+    x[[i]] <- paste0(sub(re_response, "\\1", x[[i]]), response)
+
+    x
+  }
+
+  dir.create(path_target, FALSE, TRUE)
+  for (filename in files) {
+    dest <- file.path(path_target, basename(filename))
+    if (file.exists(dest)) {
+      message(sprintf("Destination %s exists - skipping", dest))
+      next
+    }
+    res <- f(filename)
+    if (!is.null(res)) {
+      writeLines(res, dest)
+    }
+  }
+}
