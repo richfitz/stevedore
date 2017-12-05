@@ -1,4 +1,3 @@
-## untested: CHECKME
 ## version: 1.30
 ## method: get
 ## path: /networks
