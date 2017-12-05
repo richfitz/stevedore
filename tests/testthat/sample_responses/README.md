@@ -46,3 +46,11 @@ which will create a new set of responses for version `1.99` by:
 * cloning the data for `1.98` and then adding the new JSON responses from the spec
 * set up testing by creating a file like `test-spec-responses-1.30.R` for the new version
 * iterate through testing these while patching the [spec](../../../inst/spec/patch.yaml) and the expected responses, as required
+
+For a failure in `v1.xx` path `foo_bar` try
+
+```r
+dat <- read_sample_response("sample_responses/v1.31/foo_bar.R")
+ans1 <- dat$handler(dat$response, FALSE)
+all.equal(ans1, dat$reference)
+```

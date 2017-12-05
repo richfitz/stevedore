@@ -10,7 +10,7 @@
       type: "object"
 
 # This is backported from the 1.32 spec
-- version: ["1.29", "1.30"]
+- version: ["1.29", "1.31"]
   path: ["definitions", "PortBinding"]
   value:
     type: "object"
@@ -20,7 +20,7 @@
       HostPort:
         type: "string"
 
-- version: ["1.29", "1.30"]
+- version: ["1.29", "1.31"]
   path: ["definitions", "NetworkConfig", "properties", "Ports"]
   replace: true
   value:
