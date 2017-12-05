@@ -76,15 +76,9 @@ spec_path <- function() {
 
 spec_apply_patch <- function(dat, patch) {
   v <- numeric_version(dat$info$version)
-  check_version <- function(x) {
-    cmp <- numeric_version(x$version)
-    (length(cmp) == 1 && cmp == v) ||
-      (length(cmp) == 2 && v >= cmp[[1]]) ||
-      (length(cmp) == 2 && v <= cmp[[2]])
-  }
 
   for (el in patch) {
-    if (check_version(el)) {
+    if (version_check(v, el$version)) {
       path <- el$path
       value <- el$value
       tmp <- dat[[path]]
@@ -113,4 +107,12 @@ write_spec_index <- function(path) {
   md5 <- tools::md5sum(files)
   names(md5) <- paste0("v", names(files))
   writeLines(yaml::as.yaml(as.list(md5)), file.path(path, "index.yaml"))
+}
+
+version_check <- function(v, cmp) {
+  v <- numeric_version(v)
+  cmp <- numeric_version(cmp)
+  (length(cmp) == 1 && cmp == v) ||
+    (length(cmp) == 2 && v >= cmp[[1]]) ||
+    (length(cmp) == 2 && v <= cmp[[2]])
 }
