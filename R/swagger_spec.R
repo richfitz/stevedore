@@ -5,8 +5,8 @@ stevedore_read_index <- function() {
   dat
 }
 
-read_spec <- function(version) {
-  if (version %in% names(.stevedore$spec)) {
+read_spec <- function(version, refresh = FALSE) {
+  if (!refresh && version %in% names(.stevedore$spec)) {
     return(.stevedore$spec[[version]])
   }
   ## TODO: in theory we should be ok for versions that are _greater_
