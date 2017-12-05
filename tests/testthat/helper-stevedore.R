@@ -250,7 +250,7 @@ create_sample_responses <- function(target, base) {
       if (d$response == "~") {
         response <- "~"
       } else {
-        message("No response for ", filename)
+        message("No response for ", basename(filename))
         return(NULL)
       }
     }
