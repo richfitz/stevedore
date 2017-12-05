@@ -95,4 +95,8 @@ list(
     layers = c(
       "sha256:1834950e52ce4d5a88a1bbd131c537f4d0e56d10ff0dd69e66be3b7dfa9df7e6",
       "sha256:5f70bf18a086007016e948b04aed3b82103a36bea41755b6cddfaf10ace3c6ef"),
-    base_layer = NA_character_))
+    base_layer = NA_character_),
+  ## TODO: I think that this *should* be coming through as
+  ##
+  ##   metadata = list(last_lag_time = NA_character_)
+  metadata = NULL)

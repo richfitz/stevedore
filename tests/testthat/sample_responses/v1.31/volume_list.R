@@ -7,6 +7,7 @@ list(volumes = data.frame(
        name = "tardis",
        driver = "local",
        mountpoint = "/var/lib/docker/volumes/tardis",
+       created_at = "2017-07-19T12:00:26Z",
        ## TODO: status here should be list(character())
        status = I(list(list())),
        labels = I(list(c("com.example.some-label" = "some-value",

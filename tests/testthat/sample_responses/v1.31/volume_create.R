@@ -6,6 +6,7 @@
 list(name = "tardis",
      driver = "custom",
      mountpoint = "/var/lib/docker/volumes/tardis",
+     created_at = "2016-06-07T20:31:11.853781916Z",
      status = list(hello = "world"),
      labels = c(
        "com.example.some-label" = "some-value",
