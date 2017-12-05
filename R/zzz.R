@@ -10,5 +10,6 @@ DEFAULT_USER_AGENT <- "stevedore/0.0.0"
 .onLoad <- function(...) {
   .stevedore$endpoints <- stevedore_read_endpoints()
   .stevedore$index <- stevedore_read_index()
+  .stevedore$spec <- list()
   .stevedore$client_data <- list()
 }

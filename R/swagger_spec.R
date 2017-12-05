@@ -6,6 +6,9 @@ stevedore_read_index <- function() {
 }
 
 read_spec <- function(version) {
+  if (version %in% names(.stevedore$spec)) {
+    return(.stevedore$spec[[version]])
+  }
   ## TODO: in theory we should be ok for versions that are _greater_
   ## than the biggest we have, but with a warning, so long as the file
   ## can be found on the docker website.  There's a bit of testing to
@@ -48,6 +51,8 @@ read_spec <- function(version) {
     tmp[[i]]$schema$format <- "binary"
     ret[[p]] <- tmp
   }
+
+  .stevedore$spec[[version]] <- ret
 
   ret
 }
