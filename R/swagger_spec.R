@@ -63,14 +63,6 @@ fetch_spec <- function(version, path) {
   download_file(url, dest)
 }
 
-spec_patch <- function(spec, key, ...) {
-  x <- spec[[key]]
-  data <- list(...)
-  x[names(data)] <- data
-  spec[[key]] <- x
-  spec
-}
-
 spec_path <- function() {
   path <- getOption("stevedore.spec.path", NULL)
   if (is.null(path)) {
