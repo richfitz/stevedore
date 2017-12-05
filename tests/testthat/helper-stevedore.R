@@ -254,6 +254,11 @@ create_sample_responses <- function(target, base) {
         return(NULL)
       }
     }
+    ## Special casing required for ping which is the only tested plain
+    ## text endpoint.
+    if (d$path == "/_ping") {
+      response <- from_json(response)
+    }
 
     x[[i]] <- paste0(sub(re_response, "\\1", x[[i]]), response)
 
