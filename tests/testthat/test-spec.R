@@ -12,10 +12,11 @@ test_that("read", {
 ## really checks very little; just that we can create all the bits
 ## that would feed into the high level client functions.
 test_that("build", {
+  expected <- vcapply(.stevedore$endpoints, "[[", "name")
   for (v in spec_versions()) {
     message(v)
     dat <- docker_client_data(v)
     expect_equal(dat$version, v)
-    expect_true(all(names(.stevedore$endpoints) %in% names(dat$endpoints)))
+    expect_true(all(expected %in% names(dat$endpoints)))
   }
 })

@@ -24,7 +24,7 @@
 ## code and automatically allow for differences in the schema over
 ## time.
 
-make_endpoint <- function(method, path, spec) {
+make_endpoint <- function(name, method, path, spec) {
   path_data <- parse_path(path)
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
@@ -41,6 +41,7 @@ make_endpoint <- function(method, path, spec) {
   argument_handler <- make_argument_handler(method, path, x, spec)
 
   list(
+    name = name,
     path = path,
     path_fmt = path_data$fmt,
     path_args = path_data$args,
@@ -63,7 +64,7 @@ run_endpoint <- function(client, endpoint, params,
 
   status_code <- res$status_code
   if (status_code >= 300) {
-    response_to_error(res, pass_error)
+    response_to_error(res, pass_error, endpoint$name)
   } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {

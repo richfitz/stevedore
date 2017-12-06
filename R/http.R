@@ -82,7 +82,7 @@ make_handle_socket <- function(base_url) {
 }
 
 ## Generate (and possibly throw) S3 errors out of http errors
-response_to_error <- function(response, pass_error) {
+response_to_error <- function(response, pass_error, endpoint) {
   headers <- curl::parse_headers_list(response$headers)
   type <- headers[["content-type"]]
   if (length(response$content) > 0L) {
@@ -97,7 +97,7 @@ response_to_error <- function(response, pass_error) {
     msg <- "An error occured but HEAD is obscuring it"
   }
   status_code <- response$status_code
-  cond <- list(message = msg, code = status_code)
+  cond <- list(message = msg, code = status_code, endpoint = endpoint)
   class(cond) <- c("docker_error", "error", "condition")
   if (status_code %in% pass_error) {
     cond

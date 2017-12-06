@@ -16,6 +16,7 @@ test_that("create", {
   e <- get_error(x$inspect())
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
+  expect_equal(e$endpoint, "container_inspect")
 })
 
 test_that("create, using image", {

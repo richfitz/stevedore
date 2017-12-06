@@ -1,11 +1,13 @@
 docker_client_data <- function(version) {
   if (!(version %in% names(.stevedore$client_data))) {
     spec <- read_spec(version)
+    endpoints <- lapply(.stevedore$endpoints, function(x)
+      make_endpoint(x$name, x$method, x$path, spec))
+    names(endpoints) <- vcapply(.stevedore$endpoints, "[[", "name")
     .stevedore$client_data[[version]] <-
       list(spec = spec,
            version = version,
-           endpoints = lapply(.stevedore$endpoints, function(x)
-             make_endpoint(x$method, x$path, spec)))
+           endpoints = endpoints)
   }
   .stevedore$client_data[[version]]
 }
@@ -13,7 +15,11 @@ docker_client_data <- function(version) {
 stevedore_read_endpoints <- function() {
   path <- system.file("spec/endpoints.yaml", package = "stevedore",
                       mustWork = TRUE)
-  yaml::yaml.load_file(path)
+  dat <- yaml::yaml.load_file(path)
+  for (i in seq_along(dat)) {
+    dat[[i]]$name <- names(dat)[[i]]
+  }
+  unname(dat)
 }
 
 docker_client_base <- function(..., api_version = NULL) {
