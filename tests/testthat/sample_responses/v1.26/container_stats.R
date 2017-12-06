@@ -68,7 +68,6 @@ list(
       total_usage = 100215355L,
       usage_in_kernelmode = 30000000L),
     system_cpu_usage = 984437632L,
-    online_cpus = 4L,
     throttling_data = list(
       periods = 0L,
       throttled_periods = 0L,
@@ -80,7 +79,6 @@ list(
       total_usage = 100093996L,
       usage_in_kernelmode = 30000000L),
     system_cpu_usage = 262275840L,
-    online_cpus = 4L,
     throttling_data = list(
       periods = 0L,
       throttled_periods = 0L,
