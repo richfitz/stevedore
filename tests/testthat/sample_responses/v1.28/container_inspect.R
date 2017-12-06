@@ -68,7 +68,6 @@ host_config <- list(
     source = character(),
     type = character(),
     read_only = logical(),
-    consistency = character(),
     bind_options = I(list()),
     volume_options = I(list()),
     tmpfs_options = I(list())),
@@ -129,10 +128,6 @@ config <- list(
   stop_timeout = 10L,
   shell = character(0))
 
-## TODO: this is totally wrong - I see quite a bit of network settings
-## in the underlying object, but this is filling in an empty one.
-## Worse than that, it's missing some of the required fields - there
-## should be a "networks" field here.
 network_settings <- list(
   bridge = "",
   gateway = "",
@@ -140,7 +135,10 @@ network_settings <- list(
   i_pprefix_len = 0L,
   mac_address = "",
   port_mapping = NA_character_,
-  ports = NULL)
+  ports = data_frame(i_p = character(0),
+                     private_port = integer(0),
+                     public_port = integer(0),
+                     type = character(0)))
 
 list(
   id = "ba033ac4401106a3b513bc9d639eee123ad78ca3616b921167cd74b20e25ed39",

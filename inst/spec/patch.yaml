@@ -1,4 +1,6 @@
-- version: "1.29"
+# Without this entry, container_list will fail with a vapply error
+# because definitions$Mount$properties$Source$type is missing
+- version: ["1.28", "1.29"]
   path: ["definitions", "Mount", "properties", "Source"]
   value:
     type: "string"

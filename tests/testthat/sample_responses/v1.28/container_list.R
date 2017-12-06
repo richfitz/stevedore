@@ -17,7 +17,6 @@ mounts <- data_frame(target = NA_character_,
                      source = "/data",
                      type = NA_character_,
                      read_only = NA,
-                     consistency = NA_character_,
                      bind_options = I(list(list(propagation = NA_character_))),
                      volume_options = I(list(list(
                        no_copy = NA, labels = NULL, driver_config = NULL))),
