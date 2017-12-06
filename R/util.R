@@ -155,10 +155,10 @@ reset_line <- function(stream, width) {
 }
 
 capture_args <- function(f, name, indent = 4) {
-  w <- getOption("width")
-  oo <- options(width = w - indent)
-  on.exit(options(oo))
-  args <- utils::capture.output(args(f))
+  ## This could be controlled more nicely (never wrapping but using
+  ## all space) by doing it manually - deparse all pairs into chunks
+  ## and then combine.
+  args <- deparse(args(f), width.cutoff = getOption("width") - 25L)
   txt <- sub("^function ", name, args[-length(args)])
   paste0(trimws(sprintf("%s%s\n", strrep(" " , indent), txt), "right"),
          collapse = "\n")
