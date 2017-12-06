@@ -3,6 +3,7 @@ docker_client_data <- function(version) {
     spec <- read_spec(version)
     .stevedore$client_data[[version]] <-
       list(spec = spec,
+           version = version,
            endpoints = lapply(.stevedore$endpoints, function(x)
              make_endpoint(x$method, x$path, spec)))
   }

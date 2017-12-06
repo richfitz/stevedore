@@ -31,3 +31,8 @@
       type: "array"
       items:
         "$ref": "#/definitions/PortBinding"
+
+- version: ["1.32"]
+  path: ["definitions", "PeerNode"]
+  value:
+    type: "object"
