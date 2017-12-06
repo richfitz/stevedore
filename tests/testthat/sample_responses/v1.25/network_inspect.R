@@ -39,7 +39,6 @@ list(
   enable_ipv6 = FALSE,
   i_pam = i_pam,
   internal = FALSE,
-  attachable = FALSE,
   containers = containers,
   options = options,
   labels = labels)

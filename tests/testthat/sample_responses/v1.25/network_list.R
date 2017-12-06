@@ -22,7 +22,6 @@ data.frame(
     list(driver = "default", config = list(),
          options = list()))),
   internal = FALSE,
-  attachable = FALSE,
   containers = I(list(
     list("39b69226f9d79f5634485fb236a23b2fe4e96a0a94128390a7fbbcc167065867" = list(
            endpoint_id = "ed2419a97c1d9954d05b46e462e7002ea552f216e9b136b80a7db8d98b442eda",
