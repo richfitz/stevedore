@@ -33,7 +33,6 @@ host_config <- list(
     path_on_host = character(),
     path_in_container = character(),
     cgroup_permissions = character()),
-  device_cgroup_rules = character(0),
   disk_quota = NA_integer_,
   kernel_memory = 0L,
   memory_reservation = 0L,

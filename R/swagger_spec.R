@@ -44,6 +44,10 @@ read_spec <- function(version, refresh = FALSE) {
   ## This bit of patching is additional to the bits in yaml, but I
   ## can't see how to make it do-able with the yaml directly because
   ## it needs to access an element within a list.
+  ##
+  ## TODO: this almost certainly needs adding elsewhere too - probably
+  ## for all spec versions that don't already have it!  Probably push
+  ## this into the patch function too.
   if (version_check(version, c("1.29", "1.30"))) {
     p <- c("paths", "/containers/{id}/archive", "put", "parameters")
     tmp <- ret[[p]]

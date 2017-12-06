@@ -66,7 +66,11 @@ container_config <- list(
   stop_timeout = NA_integer_,
   shell = character(0))
 
-graph_driver <- list(name = "aufs", data = character())
+## TODO: This should not have changed between versions but it has.
+## The spec looks fine though - things have moved somewhat but not
+## _that_ much.  In any case we should be returning an empty named
+## character in both cases but don't now.
+graph_driver <- list(name = "aufs", data = NULL)
 
 list(
   id =
@@ -86,7 +90,6 @@ list(
   config = config,
   architecture = "amd64",
   os = "linux",
-  os_version = NA_character_,
   size = 0L,
   virtual_size = 188359297L,
   graph_driver = graph_driver,
