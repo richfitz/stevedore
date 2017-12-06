@@ -6,8 +6,8 @@
 ##'   Options are \code{NULL} (the default) - use the package's
 ##'   default version (currently 1.29), a version as a string or
 ##'   \code{\link{numeric_version}} object (supported between 1.25 and
-##'   1.32), or the string \code{detect} which will use the highest
-##'   version out of the version reported by the api and 1.32
+##'   1.33), or the string \code{detect} which will use the highest
+##'   version out of the version reported by the api and 1.33
 ##'
 ##' @export
 docker_client <- function(..., api_version = NULL) {

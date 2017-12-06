@@ -152,7 +152,7 @@ parse_headers <- function(headers) {
 
 ## TODO: through here (and again through the package code that calls
 ## this) we need to be able to pin down the maxmimum api version - the
-## swagger spec is published only up to 1.32 but the mac version
+## swagger spec is published only up to 1.33 but the mac version
 ## (experimental) uses the 1.34 spec.  So we should do something like:
 ##
 ## * detect version
