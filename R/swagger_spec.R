@@ -113,7 +113,7 @@ write_spec_index <- function(path) {
   files <- vapply(versions, fetch_spec, character(1), path)
   md5 <- tools::md5sum(files)
   names(md5) <- paste0("v", names(files))
-  writeLines(yaml::as.yaml(as.list(md5)), file.path(path, "index.yaml"))
+  cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
 }
 
 version_check <- function(v, cmp) {
