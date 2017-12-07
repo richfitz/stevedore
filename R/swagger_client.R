@@ -26,7 +26,7 @@ docker_client_base <- function(..., api_version = NULL) {
   base_url <- NULL
   self <- new.env(parent = parent.env(environment()))
   self$http_client <- R6_http_client$new(base_url, api_version)
-  dat <- suppressMessages(docker_client_data(self$http_client$api_version))
+  dat <- docker_client_data(self$http_client$api_version)
   self$endpoints <- dat$endpoints
   lock_environment(self)
   self

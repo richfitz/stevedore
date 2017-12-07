@@ -103,12 +103,8 @@ get_response_type <- function(method, path, data) {
     responses <- data$responses
     if (any(vlapply(responses[as.integer(names(responses)) < 300],
                     function(x) "schema" %in% names(x)))) {
-      ## GET /system/df
-      ## GET /containers/{id}/top
-      ## GET /containers/{id}/logs
-      produces <- "application/json"
-      message(sprintf("assuming %s endpoint for %s %s",
-                      produces, toupper(method), path))
+      ## This is now considered a bug: patch the spec explicitly instead
+      stop(sprintf("Can't determine type for %s %s", method, path)) # nocov
     } else {
       ## DELETE /networks/{id} & many others
       produces <- "null"

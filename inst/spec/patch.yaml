@@ -42,3 +42,18 @@
   path: ["definitions", "PeerNode"]
   value:
     type: "object"
+
+- version: ["1.25", "1.33"]
+  path: ["paths", "/system/df", "get"]
+  value:
+    produces: "application/json"
+
+- version: ["1.25", "1.33"]
+  path: ["paths", "/containers/{id}/top", "get"]
+  value:
+    produces: "application/json"
+
+- version: ["1.25", "1.33"]
+  path: ["paths", "/containers/{id}/logs", "get"]
+  value:
+    produces: "application/json"
