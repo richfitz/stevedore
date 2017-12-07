@@ -5,6 +5,12 @@
   value:
     type: "string"
 
+- version: ["1.29", "1.29"]
+  path: ["paths", "/system/df", "get", "responses", "200", "schema", "properties", "Containers"]
+  replace: true
+  value:
+    $ref: "#/definitions/ContainerSummary"
+
 - version: ["1.29", "1.30"]
   path: ["paths", "/images/load", "post", "responses", "200"]
   value:

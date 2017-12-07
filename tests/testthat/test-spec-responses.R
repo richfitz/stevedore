@@ -4,7 +4,6 @@ context("spec (responses)")
 ##
 ## image_inspect is producing a rogue
 ##   volumes = list(additional_properties = NULL)
-## system_df is interleaving list output incorrectly
 ## network_inspect$i_pam$options is not right, but that looks like we're not trimming names correctly
 
 test_that("object, atomic scalar components (system_ping)", {
@@ -126,17 +125,12 @@ test_that("complex objects (system_df)", {
   ans1 <- dat$handler(dat$response, FALSE)
   ans2 <- dat$handler(dat$response, TRUE)
 
-  ## Patch up a known issue here:
-  ans1$containers <- ans1$containers[[1]]
-  ans2$Containers <- ans2$Containers[[1]]
-
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
 
   expect_equal(setdiff(names(raw_to_json(dat$response)), names(ans2)),
                character(0))
-  skip("This is still a bit broken")
 })
 
 test_that("auto: container_changes", {
@@ -388,4 +382,14 @@ test_that("regression: container_inspect", {
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+})
+
+test_that("system_df is a problem for unpacking of lists", {
+  dat <- read_sample_response("sample_responses/regression/system_df_1.R")
+  ans <- dat$handler(dat$response, FALSE)
+  expect_equal(ans, dat$reference)
+
+  dat <- read_sample_response("sample_responses/regression/system_df_2.R")
+  ans <- dat$handler(dat$response, FALSE)
+  expect_equal(ans, dat$reference)
 })

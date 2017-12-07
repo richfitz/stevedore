@@ -199,7 +199,11 @@ make_response_handler_array <- function(schema, spec) {
     stop("Missing type in items") # nocov [stevedore bug]
   }
   if (items$type == "object") {
-    make_response_handler_array_object(items, spec)
+    if (!is.null(items$additionalProperties)) {
+      make_response_handler_array_object_list(items, spec)
+    } else {
+      make_response_handler_array_object_df(items, spec)
+    }
   } else if (items$type == "array") {
     make_response_handler_array_array(items, spec)
   } else {
@@ -221,14 +225,6 @@ make_response_handler_array_array <- function(items, spec) {
   rm(spec)
   function(x, as_is_names) {
     lapply(x, handler, as_is_names)
-  }
-}
-
-make_response_handler_array_object <- function(items, spec) {
-  if (!is.null(items$additionalProperties)) {
-    return(make_response_handler_array_object_list(items, spec))
-  } else {
-    return(make_response_handler_array_object_df(items, spec))
   }
 }
 
@@ -277,7 +273,7 @@ make_response_handler_array_object_df <- function(items, spec) {
 
   function(data, as_is_names) {
     if (!is.null(names(data))) {
-      message("Was handed the wrong sort of thing")
+      stop("Was handed the wrong sort of thing") # nocov [stevedore bug]
       data <- list(data)
     }
     ret <- vector("list", length(cols))
