@@ -68,10 +68,13 @@ docker_client_container_collection <- function(..., cl) {
       process = list(image = quote(image <- get_image_id(image))),
       after = after_create),
     get = get_container,
-    list = docker_endpoint("container_list", cl, after = after_list),
+    list = docker_endpoint(
+      "container_list", cl,
+      process = list(filters = validate_filter("filters")),
+      after = after_list),
     remove = docker_endpoint(
       "container_delete", cl,
-      process = list(image = quote(image <- get_image_id(id)))),
+      process = list(id = quote(id <- get_image_id(id)))),
     prune = docker_endpoint("container_prune", cl))
 }
 
@@ -597,5 +600,26 @@ get_image_id <- function(x, name = deparse(substitute(x))) {
   } else {
     assert_scalar_character(x, name)
     x
+  }
+}
+
+validate_filter <- function(name) {
+  substitute(name <- as_docker_filter(name),
+             list(name = as.name(name)))
+}
+
+as_docker_filter <- function(x, name = deparse(substitute(x))) {
+  if (length(x) == 0L) {
+    NULL
+  } else if (inherits(x, "json")) {
+    x
+  } else {
+    assert_named(x, TRUE, name)
+    if (!(is.character(x) || (is.list(x) && all(vlapply(x, is.character))))) {
+      stop(sprintf(
+        "'%s' must be a character vector or list of character vectors",
+        name))
+    }
+    jsonlite::toJSON(as.list(x))
   }
 }

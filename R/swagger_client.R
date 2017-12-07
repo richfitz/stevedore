@@ -80,6 +80,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 
   if (!is.null(process)) {
     stopifnot(vlapply(process, is.language))
+    stopifnot(all(names(process) %in% names(args_use)))
   }
 
   if (!is.null(hijack)) {

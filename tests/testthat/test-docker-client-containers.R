@@ -52,6 +52,41 @@ test_that("list", {
   expect_true("names" %in% names(cl))
   expect_true(list(nm) %in% cl$names)
   expect_true(nm %in% cl$name)
+
+  x$remove()
+})
+
+test_that("list with arguments", {
+  d <- test_docker_client()
+  cl <- d$containers$list()
+
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("hello-world", name = nm)
+
+  ## First, the easy arguments:
+  cl <- d$containers$list(all = TRUE, limit = 10L, size = TRUE)
+  i <- match(nm, cl$name)
+  expect_false(is.na(i))
+  expect_false(is.na(cl$size_root_fs[i]))
+
+  ## Then the filters
+  f1 <- c(status = "created")
+  f2 <- list(status = "exited")
+
+  cl1 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
+  cl2 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
+  expect_true(nm %in% cl1$name)
+  expect_false(nm %in% cl2$name)
+
+  x$start()
+  x$wait()
+
+  cl1 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
+  cl2 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
+  expect_false(nm %in% cl1$name)
+  expect_true(nm %in% cl2$name)
+
+  x$remove()
 })
 
 test_that("prune", {
