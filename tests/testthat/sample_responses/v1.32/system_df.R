@@ -59,7 +59,8 @@ containers <- data_frame(
           i_pv6_gateway = "",
           global_ipv6_address = "",
           global_ipv6_prefix_len = 0L,
-          mac_address = "02:42:ac:12:00:02"))))),
+          mac_address = "02:42:ac:12:00:02",
+          driver_opts = NULL))))),
     mounts = I(list(data_frame(
       target = character(),
       source = character(),
@@ -73,12 +74,13 @@ containers <- data_frame(
 volumes <- data_frame(
   name = "my-volume",
   driver = "local",
-  mountpoint = "",
+  mountpoint = "/var/lib/docker/volumes/my-volume/_data",
+  created_at = NA_character_,
   status = I(list(list())),
   labels = I(list(character())),
-  scope = "",
+  scope = "local",
   options = I(list(character())),
-  usage_data = I(list(list(size = 0, ref_count = 0))))
+  usage_data = I(list(list(size = 10920104, ref_count = 2))))
 
 list(
   layers_size = 1092588,

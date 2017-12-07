@@ -1,3 +1,3 @@
 context("spec (responses): 1.30")
 
-test_sample_responses("1.30", "system_df")
+test_sample_responses("1.30")

@@ -74,6 +74,7 @@ volumes <- data_frame(
   name = "my-volume",
   driver = "local",
   mountpoint = "",
+  created_at = NA_character_,
   status = I(list(list())),
   labels = I(list(character())),
   scope = "",

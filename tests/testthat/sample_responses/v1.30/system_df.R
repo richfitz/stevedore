@@ -73,12 +73,12 @@ containers <- data_frame(
 volumes <- data_frame(
   name = "my-volume",
   driver = "local",
-  mountpoint = "",
+  mountpoint = "/var/lib/docker/volumes/my-volume/_data",
   status = I(list(list())),
   labels = I(list(character())),
-  scope = "",
+  scope = "local",
   options = I(list(character())),
-  usage_data = I(list(list(size = 0, ref_count = 0))))
+  usage_data = I(list(list(size = 10920104, ref_count = 2))))
 
 list(
   layers_size = 1092588,

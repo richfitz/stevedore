@@ -5,7 +5,7 @@
   value:
     type: "string"
 
-- version: ["1.29", "1.29"]
+- version: ["1.25", "1.33"]
   path: ["paths", "/system/df", "get", "responses", "200", "schema", "properties", "Containers"]
   replace: true
   value:

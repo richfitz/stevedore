@@ -65,7 +65,6 @@ containers <- data_frame(
       source = character(),
       type = character(),
       read_only = logical(),
-      consistency = character(),
       bind_options = I(list()),
       volume_options = I(list()),
       tmpfs_options = I(list())))))
