@@ -114,7 +114,7 @@ get_response_type <- function(method, path, data) {
       produces <- "null"
     }
   } else if (length(produces) > 1) {
-    stop("Multi-output production needs work")
+    stop("Multi-output production needs work") # nocov [stevedore bug]
   }
   produces
 }

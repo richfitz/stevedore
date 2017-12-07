@@ -51,9 +51,6 @@ make_response_handler_json <- function(response, spec) {
     h <- make_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
     h <- make_response_handler_array(schema, spec)
-  } else if (schema$type == "string") {
-    ## This is no longer used here
-    h <- make_response_handler_string(schema, spec)
   } else {
     stop("not sure how to make this response handler") # nocov [stevedore bug]
   }
@@ -68,19 +65,6 @@ make_response_handler_null <- function(response, spec) {
       stop("Expected an empty response")
     }
     invisible(NULL)
-  }
-}
-
-## TODO: there's a big problem here with binary strings - these should
-## be treated separately _above_ this function.  We know they're
-## coming.
-make_response_handler_string <- function(schema, spec) {
-  as_character <- !identical(schema$format, "binary")
-  function(data, as_is_names) {
-    ## if (as_character)) {
-    ##   data <- rawToChar(data)
-    ## }
-    data
   }
 }
 
@@ -297,9 +281,7 @@ make_response_handler_array_object_list <- function(items, spec) {
 
   items$additionalProperties <-
     resolve_schema_ref(items$additionalProperties, spec)
-  if (identical(items$additionalProperties, list(type = "object"))) {
-    additional_properties <- "object"
-  } else if (identical(items$additionalProperties, list(type = "string"))) {
+  if (identical(items$additionalProperties, list(type = "string"))) {
     additional_properties <- "string"
   } else {
     stop("Unsupported additionalProperties") # nocov [stevedore bug]
@@ -308,7 +290,7 @@ make_response_handler_array_object_list <- function(items, spec) {
   function(data, as_is_names) {
     if (additional_properties == "string") {
       data <- lapply(data, vcapply, identity)
-    } else if (additional_properties != "object") {
+    } else {
       stop("extra handling needed here") # nocov [stevedore bug]
     }
     if (!as_is_names) {
