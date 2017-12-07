@@ -258,7 +258,6 @@ make_response_handler_array_object_df <- function(items, spec) {
   function(data, as_is_names) {
     if (!is.null(names(data))) {
       stop("Was handed the wrong sort of thing") # nocov [stevedore bug]
-      data <- list(data)
     }
     ret <- vector("list", length(cols))
     names(ret) <- cols
