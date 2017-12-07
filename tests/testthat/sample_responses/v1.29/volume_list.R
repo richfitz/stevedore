@@ -7,7 +7,6 @@ list(volumes = data.frame(
        name = "tardis",
        driver = "local",
        mountpoint = "/var/lib/docker/volumes/tardis",
-       ## TODO: status here should be list(character())
        status = I(list(list())),
        labels = I(list(c("com.example.some-label" = "some-value",
                          "com.example.some-other-label" =

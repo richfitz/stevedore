@@ -132,7 +132,10 @@ config <- list(
 ## TODO: this is totally wrong - I see quite a bit of network settings
 ## in the underlying object, but this is filling in an empty one.
 ## Worse than that, it's missing some of the required fields - there
-## should be a "networks" field here.
+## should be a "networks" field here.  Looking at the
+## 'sample_responses/regression/container_inspect.R' this is probably
+## due to the sample response here being incorrect - this is fixed in
+## a later version of the spec though.
 network_settings <- list(
   bridge = "",
   gateway = "",
