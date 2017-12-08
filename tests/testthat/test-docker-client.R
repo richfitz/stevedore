@@ -101,7 +101,7 @@ test_that("print endpoints", {
   expect_match(txt, "  email: For authentication to check",
                all = FALSE, fixed = TRUE)
 
-  txt <- capture.output(d$events)
+  txt <- capture.output(print(d$events))
   expect_match(
     txt,
     "        - `type=<string>` object to filter by, one of `container`,",
