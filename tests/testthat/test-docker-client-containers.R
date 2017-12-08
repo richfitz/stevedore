@@ -409,7 +409,9 @@ test_that("logs (streaming)", {
 })
 
 test_that("run", {
-  skip("run is not yet implemented")
-  ## This is simply a convenience function - and one place I think we
-  ## might use dots.
+  d <- test_docker_client()
+  ans <- d$containers$run("hello-world")
+  expect_equal(names(ans), c("container", "logs"))
+  expect_is(ans$container, "docker_container")
+  expect_is(ans$logs, "docker_stream")
 })

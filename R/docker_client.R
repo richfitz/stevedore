@@ -19,27 +19,27 @@ docker_client <- function(..., api_version = NULL) {
   ## etc.
   cl <- docker_client_base(..., api_version = api_version)
 
-  containers <- docker_client_container_collection(cl = cl)
-  images <- docker_client_image_collection(cl = cl)
-  networks <- docker_client_network_collection(cl = cl)
-  volumes <- docker_client_volume_collection(cl = cl)
-
-  stevedore_object(
+  ret <- stevedore_object(
     "docker_client",
-    containers = containers,
-    images = images,
-    networks = networks,
-    volumes = volumes,
     events = docker_endpoint("system_events", cl),
     df = docker_endpoint("system_df", cl),
     info = docker_endpoint("system_info", cl),
     login = docker_endpoint("system_auth", cl),
     ping = docker_endpoint("system_ping", cl),
     version = docker_endpoint("system_version", cl),
-    api_version = function() cl$http_client$api_version)
+    api_version = function() cl$http_client$api_version,
+    lock = FALSE)
+
+  ret$containers <- docker_client_container_collection(cl = cl, parent = ret)
+  ret$images <- docker_client_image_collection(cl = cl, parent = ret)
+  ret$networks <- docker_client_network_collection(cl = cl, parent = ret)
+  ret$volumes <- docker_client_volume_collection(cl = cl, parent = ret)
+
+  lock_environment(ret)
+  ret
 }
 
-docker_client_container_collection <- function(..., cl) {
+docker_client_container_collection <- function(..., cl, parent) {
   get_container <- function(id) {
     docker_client_container(id, cl)
   }
@@ -61,7 +61,7 @@ docker_client_container_collection <- function(..., cl) {
 
   stevedore_object(
     "docker_container_collection",
-    ## run = ... - this one is complex (TODO)
+    run = make_docker_run(parent),
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
@@ -185,7 +185,7 @@ docker_client_container <- function(id, client) {
   self
 }
 
-docker_client_image_collection <- function(..., cl) {
+docker_client_image_collection <- function(..., cl, parent) {
   get_image <- function(id) {
     docker_client_image(id, cl)
   }
@@ -244,6 +244,7 @@ docker_client_image_collection <- function(..., cl) {
 docker_client_image <- function(id, client) {
   image_inspect <- docker_endpoint("image_inspect", client)
   attrs <- image_inspect(id)
+  name <- id
   id <- attrs$id
   self <- NULL
   reload <- function() {
@@ -254,6 +255,7 @@ docker_client_image <- function(id, client) {
   self <- stevedore_object(
     "docker_image",
     id = function() attrs$id,
+    name = function() name,
     labels = function() attrs$config$labels,
     short_id = function() short_id(attrs$id),
     tags = function() setdiff(attrs$repo_tags, "<none>:<none>"),
@@ -292,7 +294,7 @@ docker_client_image <- function(id, client) {
   self
 }
 
-docker_client_network_collection <- function(..., cl) {
+docker_client_network_collection <- function(..., cl, parent) {
   get_network <- function(id) {
     docker_client_network(id, cl)
   }
@@ -336,7 +338,7 @@ docker_client_network <- function(id, client) {
   self
 }
 
-docker_client_volume_collection <- function(..., cl) {
+docker_client_volume_collection <- function(..., cl, parent) {
   get_volume <- function(id) {
     docker_client_volume(id, cl)
   }
@@ -427,12 +429,14 @@ docker_client_exec <- function(id, client) {
 
 ## TODO: The bits below here could do with some organisation
 
-stevedore_object <- function(class, ...) {
+stevedore_object <- function(class, ..., lock = TRUE) {
   els <- list(...)
   assert_named(els, TRUE, "stevedore_object elements")
   ret <- list2env(els, parent = emptyenv())
   class(ret) <- c(class, "stevedore_object")
-  lock_environment(ret)
+  if (lock) {
+    lock_environment(ret)
+  }
   ret
 }
 
@@ -622,4 +626,72 @@ as_docker_filter <- function(x, name = deparse(substitute(x))) {
     }
     jsonlite::toJSON(as.list(x))
   }
+}
+
+docker_get_image <- function(image, client, name = deparse(substitute(image))) {
+  if (inherits(image, "docker_image")) {
+    image
+  } else {
+    assert_scalar_character(image, name)
+    tryCatch(
+      client$images$get(image),
+      docker_error = function(e) {
+        if (is_docker_error_not_found(e)) {
+          message("Unable to find image '%s' locally", image)
+          client$images$pull(image)
+        } else {
+          stop(e)
+        }
+      })
+  }
+}
+
+make_docker_run <- function(client) {
+  force(client)
+  ## TODO: this should pick up all the args from create rather than
+  ## using dots.
+  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
+           host_config = NULL) {
+    if (rm && detach) {
+      ## This is only supported for api versions of 1.25 and up
+      host_config <- list(auto_remove = TRUE)
+    }
+    img <- docker_get_image(image, client)
+    container <- client$containers$create(img, cmd, ...)
+    container$start()
+    if (detach) {
+      return(list(container = container, logs = NULL))
+    }
+
+    ## TODO: add option here to *stream* logs during run - that should
+    ## be easy enough actually once the logs endpoint supports
+    ## streaming.
+    exit_status <- container$wait()
+    out <- container$logs()
+
+    if (rm) {
+      container$inspect(TRUE)
+      container$remove()
+    }
+    if (exit_status != 0L) {
+      stop(container_error(container, exit_status, command, img, out))
+    }
+    list(container = container, logs = out)
+  }
+}
+
+container_error <- function(container, exit_status, command, image, out) {
+  err <- out[attr(out, "stream") == "stderr"]
+  if (length(err) > 0L) {
+    err <- paste0("\n", err, collapse = "")
+  } else {
+    err <- ""
+  }
+  msg <- sprintf(
+    "Command '%s' in image '%s' returned non-zero exit status %s%s",
+    command, img$name(), exit_status, err)
+  ret <- list(container = container, exit_status = exit_status,
+              command = command, image = image, out = out, msg = msg)
+  class(ret) <- c("container_error", "docker_error", "error", "condition")
+  ret
 }
