@@ -1,15 +1,15 @@
 endpoint_args <- function(method, path, x, spec) {
-  pars <- x$parameters
-  if (is.null(pars)) {
+  args <- x$parameters
+  if (is.null(args)) {
     return(NULL)
   }
-  pars_in <- vcapply(pars, "[[", "in")
+  args_in <- vcapply(args, "[[", "in")
 
-  is_body <- pars_in == "body"
+  is_body <- args_in == "body"
   if (any(is_body)) {
     stopifnot(sum(is_body) == 1L)
     i_body <- which(is_body)
-    body <- pars[[i_body]]
+    body <- args[[i_body]]
     body$schema <- resolve_schema_ref(body$schema, spec)
 
     if (body$schema$type == "object") {
@@ -25,63 +25,61 @@ endpoint_args <- function(method, path, x, spec) {
       if (method == "post" && path == "/containers/create") {
         body$schema$properties$Image$required <- TRUE
       }
+      description <- tolower1(body$description) %||% "request body"
       to_par <- function(x) {
-        c(list(name = x, "in" = "body"), body$schema$properties[[x]])
+        el <- resolve_schema_ref(body$schema$properties[[x]], spec)
+        el$description <- el$description %||% paste("For", description)
+        c(list(name = x, "in" = "body"), el)
       }
-      pars_body <- lapply(names(body$schema$properties), to_par)
+      args_body <- lapply(names(body$schema$properties), to_par)
 
       i1 <- seq_len(i_body - 1L)
-      i2 <- setdiff(seq_along(pars), c(i1, i_body))
-      pars <- c(pars[i1], pars_body, pars[i2])
-      pars_in <- c(pars_in[i1], rep("body", length(pars_body)), pars_in[i2])
+      i2 <- setdiff(seq_along(args), c(i1, i_body))
+      args <- c(args[i1], args_body, args[i2])
+      args_in <- c(args_in[i1], rep("body", length(args_body)), args_in[i2])
       body_type <- "combine"
     } else { # body$schema$type == "string"
       body_type <- "single"
-      p <- pars[[i_body]]
-      pars[[i_body]] <- c(p[names(p) != "schema"], p$schema)
+      p <- args[[i_body]]
+      args[[i_body]] <- c(p[names(p) != "schema"], p$schema)
     }
   } else {
     body_type <- NULL
   }
 
-  pars_name <- vcapply(pars, "[[", "name")
-  pars_name_r <- pars_name
-  pars_name_r[pars_in == "header"] <-
-    name_header_to_r(pars_name[pars_in == "header"])
-  pars_name_r <- pascal_to_snake(pars_name_r)
-  for (i in seq_along(pars)) {
-    pars[[i]]$name_r <- pars_name_r[[i]]
-    pars[[i]] <- resolve_schema_ref(pars[[i]], spec)
+  args_name <- vcapply(args, "[[", "name")
+  args_name_r <- args_name
+  args_name_r[args_in == "header"] <-
+    name_header_to_r(args_name[args_in == "header"])
+  args_name_r <- pascal_to_snake(args_name_r)
+  for (i in seq_along(args)) {
+    args[[i]]$name_r <- args_name_r[[i]]
+    args[[i]] <- resolve_schema_ref(args[[i]], spec)
   }
 
-  if (any(duplicated(pars_name)) || any(duplicated(pars_name_r))) {
+  if (any(duplicated(args_name)) || any(duplicated(args_name_r))) {
     stop("fix duplicated names") # nocov [stevedore bug]
   }
-  stopifnot(identical(pars_name[pars_in == "path"], parse_path(path)$args))
+  stopifnot(identical(args_name[args_in == "path"], parse_path(path)$args))
 
-  i <- match(pars_in, c("path", "body", "query", "header"))
+  i <- match(args_in, c("path", "body", "query", "header"))
   stopifnot(all(!is.na(i)))
-  pars_req <- vlapply(pars, function(x) isTRUE(x$required))
-  pars <- pars[order(!pars_req, i)]
+  args_req <- vlapply(args, function(x) isTRUE(x$required))
+  args <- args[order(!args_req, i)]
 
-  attr(pars, "body_type") <- body_type
+  attr(args, "body_type") <- body_type
 
-  pars
+  args
 }
 
-make_argument_handler <- function(method, path, x, spec) {
+make_argument_handler <- function(args) {
   ## All the stopifnot bits are assertions that have more to do with
   ## making sure that the spec confirms to what we are expecting.
   ## They'd probably be better done with debugme because I don't think
   ## they should be run by users.
-
-  pars <- endpoint_args(method, path, x, spec)
-
-  ## These bits here can likely get completely overhauled as there's
-  ## heaps of duplication!
   dest <- quote(dest)
 
-  body_type <- attr(pars, "body_type")
+  body_type <- attr(args, "body_type")
   if (is.null(body_type)) {
     fbody_body_combine <- NULL
   } else {
@@ -91,25 +89,25 @@ make_argument_handler <- function(method, path, x, spec) {
     } else if (body_type == "single") {
       ## We'd be better off doing this within the core body function
       ## probably but that requires a bit of faff.
-      nm <- as.symbol(pars[[which(vcapply(pars, "[[", "in") == "body")]]$name)
+      nm <- as.symbol(args[[which(vcapply(args, "[[", "in") == "body")]]$name)
       fbody_body_combine <- dollar(dest, quote(body), nm)
     }
     fbody_body_combine <- bquote(
       .(dollar(dest, quote(body))) <- .(fbody_body_combine))
   }
 
-  fbody_collect <- lapply(pars, arg_collect, dest)
+  fbody_collect <- lapply(args, arg_collect, dest)
   fbody <- c(quote(`{`),
             bquote(.(dest) <- list()),
             fbody_collect,
             fbody_body_combine,
             dest)
 
-  pars_optional <- !vlapply(pars, function(x) isTRUE(x$required))
-  pars_name_r <- vcapply(pars, "[[", "name_r")
+  args_optional <- !vlapply(args, function(x) isTRUE(x$required))
+  args_name_r <- vcapply(args, "[[", "name_r")
 
-  a <- rep(alist(. =, . = NULL), c(sum(!pars_optional), sum(pars_optional)))
-  names(a) <- pars_name_r
+  a <- rep(alist(. =, . = NULL), c(sum(!args_optional), sum(args_optional)))
+  names(a) <- args_name_r
   env <- parent.env(environment())
   as.function(c(a, as.call(fbody)), env)
 }

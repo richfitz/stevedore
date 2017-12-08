@@ -83,3 +83,28 @@ test_that("api_version", {
   d <- test_docker_client(api_version = "1.30")
   expect_equal(d$api_version(), "1.30")
 })
+
+test_that("print", {
+  d <- test_docker_client()
+  expect_is(d$ping, "docker_endpoint")
+  txt <- capture.output(print(d$ping))
+  expect_equal(txt, c("function()", "----------", "Ping"))
+
+  txt <- capture.output(print(d$login))
+  expect_match(txt, "Check auth configuration",
+               all = FALSE, fixed = TRUE)
+  expect_match(txt, "  email: For authentication to check",
+               all = FALSE, fixed = TRUE)
+
+  txt <- capture.output(d$events)
+  expect_match(
+    txt,
+    "        - `type=<string>` object to filter by, one of `container`,",
+    all = FALSE, fixed = TRUE)
+
+  txt <- capture.output(print(d$login))
+  expect_match(
+    txt,
+    "Check auth configuration: Validate credentials for a registry and, if",
+    all = FALSE, fixed = TRUE)
+})

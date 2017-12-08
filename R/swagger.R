@@ -38,7 +38,10 @@ make_endpoint <- function(name, method, path, spec) {
     make_response_handlers(x$responses, spec, produces, override)
 
   header_handlers <- make_header_handlers(x$responses, spec)
-  argument_handler <- make_argument_handler(method, path, x, spec)
+
+  args <- endpoint_args(method, path, x, spec)
+  argument_handler <- make_argument_handler(args)
+  help <- get_help(x, args)
 
   list(
     name = name,
@@ -48,7 +51,8 @@ make_endpoint <- function(name, method, path, spec) {
     method = toupper(method),
     argument_handler = argument_handler,
     response_handlers = response_handlers,
-    header_handlers = header_handlers)
+    header_handlers = header_handlers,
+    help = help)
 }
 
 run_endpoint <- function(client, endpoint, params,
@@ -123,8 +127,10 @@ resolve_schema_ref <- function(x, spec) {
     if (!all(type == "object")) {
       stop("should never happen") # nocov [stevedore bug]
     }
+    description <- x$description
     x <- list(type = "object",
               properties = unlist(lapply(tmp, "[[", "properties"), FALSE))
+    x$description <- description
   } else if ("$ref" %in% names(x)) {
     ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
     x <- c(x[names(x) != "$ref"], resolve_schema_ref(spec[[ref]], spec))
@@ -158,4 +164,17 @@ hijacked_content <- function(hijack) {
   if (!is.null(attr(hijack, "content"))) {
     attr(hijack, "content")()
   }
+}
+
+get_help <- function(x, args) {
+  if (length(args) == 0L) {
+    args <- NULL
+  } else {
+    args <- set_names(vcapply(args, pick, "description", NA_character_),
+                      vcapply(args, "[[", "name"))
+  }
+  if (!is.null(x$description) && is.na(x$description)) {
+    x$description <- NULL
+  }
+  list(summary = x$summary, description = x$description, args = args)
 }

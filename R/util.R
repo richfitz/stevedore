@@ -183,3 +183,7 @@ tar_directory <- function(path, setwd = TRUE) {
   utils::tar(tmp, ".")
   readBin(tmp, raw(), file.size(tmp))
 }
+
+tolower1 <- function(x) {
+  paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x)))
+}

@@ -114,5 +114,42 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
             list(call("<-", quote(params), get_params)),
             finish)
 
-  as.function(c(args_use, as.call(body)), fenv)
+  ret <- as.function(c(args_use, as.call(body)), fenv)
+  class(ret) <- "docker_endpoint"
+  ## TODO: sort and rename help parameters here (noting casing in
+  ## particular).
+  attr(ret, "help") <- endpoint$help
+
+  ret
+}
+
+##' @export
+print.docker_endpoint <- function(x, indent = 2, exdent = 8, args = TRUE) {
+  call <- capture_args(x, "function", 0L)
+  divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
+  h <- attr(x, "help")
+  if (is.null(h$description)) {
+    summary <- h$summary
+  } else {
+    summary <- sprintf("%s: %s", h$summary, h$description)
+  }
+  summary <- strwrap(summary, indent = 0, exdent = indent)
+  if (!args || is.null(h$args)) {
+    args <- NULL
+  } else {
+    indent <- 2
+    exdent <- 8
+    f <- function(nm, txt) {
+      txt <- strsplit(txt, "\n", fixed = TRUE)[[1]]
+      txt1 <- strwrap(sprintf("%s: %s", nm, txt[[1]]),
+                         indent = indent, exdent = exdent)
+      txt2 <- strwrap(txt[-1], indent = exdent, exdent = exdent)
+      c(txt1, txt2)
+    }
+    args <- mapply(f, names(h$args), unname(h$args), SIMPLIFY = FALSE)
+    args <- c(divider, unlist(unname(args)))
+  }
+  str <- c(call, divider, summary, args)
+  cat(paste0(str, "\n", collapse = ""))
+  invisible(x)
 }
