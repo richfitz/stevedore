@@ -84,11 +84,16 @@ test_that("api_version", {
   expect_equal(d$api_version(), "1.30")
 })
 
-test_that("print", {
+test_that("print endpoints", {
   d <- test_docker_client()
   expect_is(d$ping, "docker_endpoint")
   txt <- capture.output(print(d$ping))
-  expect_equal(txt, c("function()", "----------", "Ping"))
+  expect <- c(
+    "function()",
+    "----------",
+    "Ping: This is a dummy endpoint you can use to test if the server is",
+    "  accessible.")
+  expect_equal(txt, expect)
 
   txt <- capture.output(print(d$login))
   expect_match(txt, "Check auth configuration",
@@ -106,5 +111,11 @@ test_that("print", {
   expect_match(
     txt,
     "Check auth configuration: Validate credentials for a registry and, if",
+    all = FALSE, fixed = TRUE)
+
+  txt <- capture.output(print(d$containers$create))
+  expect_match(
+    txt,
+    "  networking_config: This container's networking configuration.",
     all = FALSE, fixed = TRUE)
 })

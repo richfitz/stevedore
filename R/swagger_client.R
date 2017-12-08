@@ -116,9 +116,25 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 
   ret <- as.function(c(args_use, as.call(body)), fenv)
   class(ret) <- "docker_endpoint"
-  ## TODO: sort and rename help parameters here (noting casing in
-  ## particular).
-  attr(ret, "help") <- endpoint$help
+
+  help <- endpoint$help
+  if (!is.null(rename)) {
+    i <- match(rename, names(help$args))
+    names(help$args)[i] <- names(rename)
+  }
+  if (!is.null(extra)) {
+    ## TODO: pull in some decent help here from somewhere.  I am
+    ## punting on this for a bit as I might move the definitions into
+    ## yaml which would provide a much nicer place to put the extra
+    ## args than in code.
+    help$args[names(extra)] <- names(extra)
+  }
+  if (length(help$args) > 0L || length(args_use) > 0L) {
+    stopifnot(all(names(args_use) %in% names(help$args)))
+    help$args <- help$args[names(args_use)]
+  }
+
+  attr(ret, "help") <- help
 
   ret
 }
