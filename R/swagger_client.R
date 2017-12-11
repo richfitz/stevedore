@@ -140,7 +140,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 }
 
 ##' @export
-print.docker_endpoint <- function(x, indent = 2, exdent = 8, args = TRUE) {
+print.docker_endpoint <- function(x, indent = 2, exdent = 8, args = TRUE, ...) {
   call <- capture_args(x, "function", 0L)
   divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
   h <- attr(x, "help")
