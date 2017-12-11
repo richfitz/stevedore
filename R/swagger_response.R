@@ -400,6 +400,10 @@ decode_chunked_string <- function(x, ...) {
 
     x <- x[-seq_len(len + 8L)]
   }
+  docker_stream(value, stream)
+}
+
+docker_stream <- function(value, stream) {
   attr(value, "stream") <-
     factor(stream, 0:2, labels = c("stdin", "stdout", "stderr"))
   class(value) <- "docker_stream"

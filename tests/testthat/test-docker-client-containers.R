@@ -443,3 +443,42 @@ test_that("run: no such container", {
   }
   expect_equal(e$endpoint, "image_create")
 })
+
+test_that("run: remove", {
+  d <- test_docker_client()
+  ans <- d$containers$run("hello-world", rm = TRUE)
+  expect_equal(names(ans), c("container", "logs"))
+  expect_is(ans$container, "docker_container")
+  expect_is(ans$logs, "docker_stream")
+  e <- get_error(d$containers$get(ans$container$id()))
+  expect_true(is_docker_error_not_found(e))
+})
+
+test_that("run: error", {
+  d <- test_docker_client()
+  e <- get_error(d$containers$run("richfitz/error", "4", rm = TRUE))
+
+  expect_is(e, "container_error")
+
+  expect_equal(
+    e$message,
+    "Command '4' in image 'richfitz/error:latest' returned non-zero exit status 4", fixed = TRUE)
+
+  expect_is(e$container, "docker_container")
+  expect_equal(e$exit_status, 4L)
+  expect_equal(e$cmd, "4")
+  expect_equal(e$image$id(), d$images$get("richfitz/error")$id())
+  expect_is(e$out, "docker_stream")
+  expect_equal(e$out, docker_stream("throwing error 4\n", 1L))
+})
+
+test_that("run: error to stderr", {
+  d <- test_docker_client()
+  e <- get_error(d$containers$run("richfitz/error", "14", rm = TRUE))
+
+  expect_is(e, "container_error")
+
+  expect_equal(
+    e$message,
+    "Command '14' in image 'richfitz/error:latest' returned non-zero exit status 14\nthrowing error 14 to stderr\n", fixed = TRUE)
+})

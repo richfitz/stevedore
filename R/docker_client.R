@@ -660,8 +660,8 @@ make_docker_run <- function(client) {
       ## host_config <- list(auto_remove = jsonlite::unbox(TRUE))
       stop("Not yet implemented")
     }
-    img <- docker_get_image(image, client)
-    container <- client$containers$create(img, cmd, ...)
+    image <- docker_get_image(image, client)
+    container <- client$containers$create(image, cmd, ...)
     container$start()
     if (detach) {
       return(container)
@@ -670,7 +670,7 @@ make_docker_run <- function(client) {
     ## TODO: add option here to *stream* logs during run - that should
     ## be easy enough actually once the logs endpoint supports
     ## streaming.
-    exit_status <- container$wait()
+    exit_status <- container$wait()$status_code
     out <- container$logs()
 
     if (rm) {
@@ -678,13 +678,13 @@ make_docker_run <- function(client) {
       container$remove()
     }
     if (exit_status != 0L) {
-      stop(container_error(container, exit_status, command, img, out))
+      stop(container_error(container, exit_status, cmd, image, out))
     }
     list(container = container, logs = out)
   }
 }
 
-container_error <- function(container, exit_status, command, image, out) {
+container_error <- function(container, exit_status, cmd, image, out) {
   err <- out[attr(out, "stream") == "stderr"]
   if (length(err) > 0L) {
     err <- paste0("\n", err, collapse = "")
@@ -693,9 +693,9 @@ container_error <- function(container, exit_status, command, image, out) {
   }
   msg <- sprintf(
     "Command '%s' in image '%s' returned non-zero exit status %s%s",
-    command, img$name(), exit_status, err)
+    cmd, image$name(), exit_status, err)
   ret <- list(container = container, exit_status = exit_status,
-              command = command, image = image, out = out, msg = msg)
+              cmd = cmd, image = image, out = out, message = msg)
   class(ret) <- c("container_error", "docker_error", "error", "condition")
   ret
 }
