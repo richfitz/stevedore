@@ -198,7 +198,7 @@ docker_client_image_collection <- function(..., cl, parent) {
     is_id <- vlapply(dat, function(el)
       "stream" %in% names(el) && grepl(re, el$stream))
     if (!any(is_id)) {
-      stop("Could not determine created image id")
+      stop("Could not determine created image id") # nocov [stevedore bug]
     }
     id <- sub(re, "\\2", dat[[max(which(is_id))]]$stream)
     get_image(id)

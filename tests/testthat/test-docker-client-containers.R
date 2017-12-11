@@ -482,3 +482,10 @@ test_that("run: error to stderr", {
     e$message,
     "Command '14' in image 'richfitz/error:latest' returned non-zero exit status 14\nthrowing error 14 to stderr\n", fixed = TRUE)
 })
+
+test_that("run with image", {
+  d <- test_docker_client()
+  img <- d$images$get("hello-world")
+  ans <- d$containers$run(img, rm = TRUE)
+  expect_is(ans$logs, "docker_stream")
+})
