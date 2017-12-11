@@ -415,3 +415,31 @@ test_that("run", {
   expect_is(ans$container, "docker_container")
   expect_is(ans$logs, "docker_stream")
 })
+
+test_that("run: detach", {
+  d <- test_docker_client()
+  ans <- d$containers$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
+  expect_is(ans, "docker_container")
+  expect_equal(ans$wait(), list("status_code" = 0L))
+})
+
+test_that("run: no such container", {
+  d <- test_docker_client()
+  msg <- capture_messages(
+    e <- get_error(d$containers$run("richfitz/nosuchcontainer")))
+  expect_match(
+    msg, "Unable to find image 'richfitz/nosuchcontainer:latest' locally",
+    fixed = TRUE, all = FALSE) # allow additional here
+  expect_is(e, "docker_error")
+  ## TODO: the endpoint registering as failed here is image_create,
+  ## not image_pull which is the one that does fail.  This is because
+  ## docker_get_image uses tryCatch and *rethrows* the error but what
+  ## we should do is withCallingHandlers and then avoid throwing at
+  ## all if we can recover.
+  if (has_internet()) {
+    expect_equal(e$code, 404L)
+  } else {
+    expect_equal(e$code, 500L)
+  }
+  expect_equal(e$endpoint, "image_create")
+})

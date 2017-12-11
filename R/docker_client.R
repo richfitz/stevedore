@@ -274,11 +274,8 @@ docker_client_image <- function(id, client) {
     ## passed through docker_endpoint so that we can pass around
     ## defaults.  We'll be doing that with other functions later too.
     untag = function(repo_tag) {
-      assert_scalar_character(repo_tag)
+      repo_tag <- image_name(repo_tag)
       image_delete <- docker_endpoint("image_delete", client)
-      if (!grepl(":", repo_tag, fixed = TRUE)) {
-        repo_tag <- paste0(repo_tag, ":latest")
-      }
       valid <- setdiff(image_inspect(id)$repo_tags, "<none>:<none>")
       if (!(repo_tag %in% valid)) {
         stop(sprintf("Invalid repo_tag '%s' for image '%s'",
@@ -607,6 +604,14 @@ get_image_id <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+image_name <- function(x, name = deparse(substitute(x))) {
+  assert_scalar_character(x, name)
+  if (!grepl(":", x, fixed = TRUE)) {
+    x <- paste0(x, ":latest")
+  }
+  x
+}
+
 validate_filter <- function(name) {
   substitute(name <- as_docker_filter(name),
              list(name = as.name(name)))
@@ -632,12 +637,12 @@ docker_get_image <- function(image, client, name = deparse(substitute(image))) {
   if (inherits(image, "docker_image")) {
     image
   } else {
-    assert_scalar_character(image, name)
+    image <- image_name(image, name)
     tryCatch(
       client$images$get(image),
       docker_error = function(e) {
         if (is_docker_error_not_found(e)) {
-          message("Unable to find image '%s' locally", image)
+          message(sprintf("Unable to find image '%s' locally", image))
           client$images$pull(image)
         } else {
           stop(e)
@@ -650,17 +655,16 @@ make_docker_run <- function(client) {
   force(client)
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
-  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
-           host_config = NULL) {
+  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE) {
     if (rm && detach) {
-      ## This is only supported for api versions of 1.25 and up
-      host_config <- list(auto_remove = TRUE)
+      ## host_config <- list(auto_remove = jsonlite::unbox(TRUE))
+      stop("Not yet implemented")
     }
     img <- docker_get_image(image, client)
     container <- client$containers$create(img, cmd, ...)
     container$start()
     if (detach) {
-      return(list(container = container, logs = NULL))
+      return(container)
     }
 
     ## TODO: add option here to *stream* logs during run - that should
