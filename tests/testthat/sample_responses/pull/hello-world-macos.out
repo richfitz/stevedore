@@ -1,0 +1,6 @@
+Pulling from library/hello-world latest
+Digest: sha256:be0cd392e45be79ffeffa6b05338b98ebb16c87b255f48e297ec7f98e123905c
+Pulling from library/hello-world linux
+Digest: sha256:27f70fe1ab54eebd2569a33f0b86e5db42b8ebda65d0647d8eceb87d34462efd
+Pulling from library/hello-world nanoserver-1709
+no matching manifest for linux/amd64 in the manifest list entries

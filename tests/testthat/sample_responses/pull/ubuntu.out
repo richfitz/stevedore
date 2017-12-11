@@ -1,0 +1,85 @@
+Pulling from library/ubuntu 16.04
+Pulling fs layer 660c48dd555d
+Pulling fs layer 4c7380416e78
+Pulling fs layer 421e436b5f80
+Pulling fs layer e4ce6c3651b3
+Pulling fs layer be588e74bd34
+Waiting e4ce6c3651b3
+Waiting be588e74bd34
+4c7380416e78: Downloading 846 B/846 B 100%
+Verifying Checksum 4c7380416e78
+Download complete 4c7380416e78
+421e436b5f80: Downloading 620 B/620 B 100%
+Verifying Checksum 421e436b5f80
+Download complete 421e436b5f80
+660c48dd555d: Downloading 486.06 kB/47.76 MB 1%
+e4ce6c3651b3: Downloading 849 B/849 B 100%
+Verifying Checksum e4ce6c3651b3
+Download complete e4ce6c3651b3
+be588e74bd34: Downloading 169 B/169 B 100%
+Download complete be588e74bd34
+660c48dd555d: Downloading 2.44 MB/47.76 MB 5%
+660c48dd555d: Downloading 4.89 MB/47.76 MB 10%
+660c48dd555d: Downloading 6.85 MB/47.76 MB 14%
+660c48dd555d: Downloading 9.31 MB/47.76 MB 19%
+660c48dd555d: Downloading 11.73 MB/47.76 MB 25%
+660c48dd555d: Downloading 13.19 MB/47.76 MB 28%
+660c48dd555d: Downloading 14.66 MB/47.76 MB 31%
+660c48dd555d: Downloading 16.12 MB/47.76 MB 34%
+660c48dd555d: Downloading 18.09 MB/47.76 MB 38%
+660c48dd555d: Downloading 20.05 MB/47.76 MB 42%
+660c48dd555d: Downloading 21.52 MB/47.76 MB 45%
+660c48dd555d: Downloading 23.48 MB/47.76 MB 49%
+660c48dd555d: Downloading 25.94 MB/47.76 MB 54%
+660c48dd555d: Downloading 27.39 MB/47.76 MB 57%
+660c48dd555d: Downloading 29.34 MB/47.76 MB 61%
+660c48dd555d: Downloading 31.31 MB/47.76 MB 66%
+660c48dd555d: Downloading 33.77 MB/47.76 MB 71%
+660c48dd555d: Downloading 35.72 MB/47.76 MB 75%
+660c48dd555d: Downloading 37.67 MB/47.76 MB 79%
+660c48dd555d: Downloading 39.62 MB/47.76 MB 83%
+660c48dd555d: Downloading 41.58 MB/47.76 MB 87%
+660c48dd555d: Downloading 43.55 MB/47.76 MB 91%
+660c48dd555d: Downloading 46.98 MB/47.76 MB 98%
+Verifying Checksum 660c48dd555d
+Download complete 660c48dd555d
+660c48dd555d: Extracting 491.52 kB/47.76 MB 1%
+660c48dd555d: Extracting 2.95 MB/47.76 MB 6%
+660c48dd555d: Extracting 4.42 MB/47.76 MB 9%
+660c48dd555d: Extracting 6.88 MB/47.76 MB 14%
+660c48dd555d: Extracting 9.34 MB/47.76 MB 20%
+660c48dd555d: Extracting 12.29 MB/47.76 MB 26%
+660c48dd555d: Extracting 14.25 MB/47.76 MB 30%
+660c48dd555d: Extracting 16.22 MB/47.76 MB 34%
+660c48dd555d: Extracting 18.19 MB/47.76 MB 38%
+660c48dd555d: Extracting 20.15 MB/47.76 MB 42%
+660c48dd555d: Extracting 22.61 MB/47.76 MB 47%
+660c48dd555d: Extracting 24.58 MB/47.76 MB 51%
+660c48dd555d: Extracting 27.03 MB/47.76 MB 57%
+660c48dd555d: Extracting 28.51 MB/47.76 MB 60%
+660c48dd555d: Extracting 29.98 MB/47.76 MB 63%
+660c48dd555d: Extracting 32.44 MB/47.76 MB 68%
+660c48dd555d: Extracting 34.41 MB/47.76 MB 72%
+660c48dd555d: Extracting 36.37 MB/47.76 MB 76%
+660c48dd555d: Extracting 37.85 MB/47.76 MB 79%
+660c48dd555d: Extracting 40.3 MB/47.76 MB 84%
+660c48dd555d: Extracting 42.76 MB/47.76 MB 90%
+660c48dd555d: Extracting 44.73 MB/47.76 MB 94%
+660c48dd555d: Extracting 46.69 MB/47.76 MB 98%
+660c48dd555d: Extracting 47.68 MB/47.76 MB 100%
+660c48dd555d: Extracting 47.76 MB/47.76 MB 100%
+Pull complete 660c48dd555d
+4c7380416e78: Extracting 846 B/846 B 100%
+4c7380416e78: Extracting 846 B/846 B 100%
+Pull complete 4c7380416e78
+421e436b5f80: Extracting 620 B/620 B 100%
+421e436b5f80: Extracting 620 B/620 B 100%
+Pull complete 421e436b5f80
+e4ce6c3651b3: Extracting 849 B/849 B 100%
+e4ce6c3651b3: Extracting 849 B/849 B 100%
+Pull complete e4ce6c3651b3
+be588e74bd34: Extracting 169 B/169 B 100%
+be588e74bd34: Extracting 169 B/169 B 100%
+Pull complete be588e74bd34
+Digest: sha256:7c67a2206d3c04703e5c23518707bdd4916c057562dd51c74b99b2ba26af0f79
+Status: Downloaded newer image for ubuntu:16.04
