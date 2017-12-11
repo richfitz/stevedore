@@ -148,11 +148,9 @@ arg_collect_query <- function(p, dest) {
       validate <- quote(as_query_array_string)
     } else {
       stop("Unknown query type") # nocov [stevedore bug]
-      ## validate <- quote(identity)
     }
   } else {
     stop("Unknown query type") # nocov [stevedore bug]
-    ## validate <- quote(identity)
   }
 
   nm <- as.symbol(p$name)

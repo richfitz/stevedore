@@ -62,7 +62,7 @@ make_response_handler_json <- function(response, spec) {
 make_response_handler_null <- function(response, spec) {
   function(data, as_is_names) {
     if (length(data) > 0L) {
-      stop("Expected an empty response")
+      stop("Expected an empty response") # nocov [stevedore bug]
     }
     invisible(NULL)
   }

@@ -17,3 +17,11 @@ test_that("case convert with consecutive capitals", {
   ## The conversion is lossy though:
   expect_equal(snake_to_pascal("nano_cpus"), "NanoCpus")
 })
+
+test_that("is_error", {
+  expect_false(is_error(NULL))
+
+  cond <- list(message = "foo", code = 404L, endpoint = "pull")
+  class(cond) <- c("docker_error", "error", "condition")
+  expect_true(is_error(cond))
+})

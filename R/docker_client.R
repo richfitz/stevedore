@@ -447,12 +447,12 @@ drop_leading_slash <- function(x) {
 }
 
 report_warnings <- function(x, action) {
-  if (length(x) > 0L) {
+  n <- length(x)
+  if (n > 0L) {
     warning(sprintf(
-      "%s while %s:\n%s",
-      ngettext(length(x), "warning", "warnings"),
-      action,
-      paste0("- %s", x, collapse = "\n")),
+      "%d %s produced while %s:\n%s",
+      n, ngettext(n, "warning", "warnings"), action,
+      paste0("- ", x, collapse = "\n")),
       call. = FALSE, immediate. = TRUE)
   }
 }

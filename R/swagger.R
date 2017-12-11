@@ -173,8 +173,5 @@ get_help <- function(x, args) {
     args <- set_names(vcapply(args, pick, "description", NA_character_),
                       vcapply(args, "[[", "name_r"))
   }
-  if (!is.null(x$description) && is.na(x$description)) {
-    x$description <- NULL
-  }
   list(summary = x$summary, description = x$description, args = args)
 }
