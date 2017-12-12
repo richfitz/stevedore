@@ -1,0 +1,95 @@
+<!-- -*-markdown-*- -->
+# stevedore
+
+[![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Travis-CI Build Status](https://travis-ci.org/richfitz/stevedore.svg?branch=master)](https://travis-ci.org/richfitz/stevedore)
+[![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
+
+A docker client for R
+
+**WARNING**: package is in early development. If you run the test suite it may do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f`
+
+```{r, prep, include = FALSE}
+knitr::opts_chunk$set(error = FALSE)
+has_internet <- function() {
+  !is.null(suppressWarnings(utils::nsl("www.google.com")))
+}
+if (has_internet()) {
+  d <- stevedore::docker_client()
+  try(d$images$remove("alpine:3.1"), silent = TRUE)
+}
+```
+
+## Usage
+
+The main function in the package is `docker_client`; this will construct an object with which we can talk with the docker server.
+
+```{r, create}
+docker <- stevedore::docker_client()
+docker
+```
+
+With this you can run containers:
+
+```{r, run}
+docker$containers$run("alpine:3.1", c("echo", "hello world"))
+```
+
+Or run containers in the background
+
+```{r, background}
+docker$containers$run("bfirsh/reticulate-splines", detach = TRUE)
+```
+
+You can manage containers
+
+```{r, list}
+docker$containers$list()
+id <- docker$containers$list(limit = 1L)$id
+container <- docker$containers$get(id)
+container
+```
+
+And control containers
+
+```{r, control}
+container$inspect()$config$image
+container$logs()
+container$stop(t = 0)
+container$remove()
+```
+
+And manage images
+
+```{r, images}
+head(docker$images$list())
+```
+
+## Approach
+
+Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions `r stevedore:::MIN_DOCKER_API_VERSION` to `r stevedore:::MIN_DOCKER_API_VERSION` (defaulting to `r stevedore:::DEFAULT_DOCKER_API_VERSION`).
+
+This approach means that the output will be type-stable - there is no inference on what to return based on what the server chooses to return.  With a given API version, the same fields will always be returned.  Some of this information is very rich, for example, for the backgrounded container above:
+
+```{r, inspect}
+container$inspect(reload = FALSE)
+```
+
+## Roadmap
+
+There is still a lot of work to do here:
+
+* windows support needs work - the current approach works only for a unix socket
+* unix non-socket (tcp) access, and TLS
+* endpoints that require http hijacking are not fully supported (attach, logs) but the foundations are there to support this - stdin is likely to be a major hassle though
+* endpoints that require tar input and output (equivalents of `docker cp` especially) need major work
+* lots of work on parameter wrangling for the more complicated endpoints (basically things that take anything more complicated than a string array are prone to failure because I've not tested them yet)
+* swarm features (`nodes`, `plugins`, `secrets`, `services` and `swarm`) are not implemented - not because they'd be any harder but just because I've never used them
+* authentication of registries for pull and push (not hard, just not done)
+* some sort of documentation - hard given that the interface is directly pulled from the spec so we need to patch up references to json
+
+## Licence
+
+MIT © [Rich FitzJohn](https://github.com/richfitz).
+
+Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
