@@ -51,19 +51,8 @@ docker$containers$run("alpine:3.1", c("echo", "hello world"))
 ```
 ## Pulling from library/alpine 3.1
 ## Pulling fs layer e823343fc78a
-## e823343fc78a: Downloading 32.26 kB/2.3 MB 1%
-## e823343fc78a: Downloading 228.63 kB/2.3 MB 10%
-## e823343fc78a: Downloading 490.62 kB/2.3 MB 21%
-## e823343fc78a: Downloading 654.46 kB/2.3 MB 28%
-## e823343fc78a: Downloading 785.53 kB/2.3 MB 34%
-## e823343fc78a: Downloading 982.14 kB/2.3 MB 43%
-## e823343fc78a: Downloading 1.18 MB/2.3 MB 51%
-## e823343fc78a: Downloading 1.34 MB/2.3 MB 58%
-## e823343fc78a: Downloading 1.6 MB/2.3 MB 70%
-## e823343fc78a: Downloading 1.8 MB/2.3 MB 78%
-## e823343fc78a: Downloading 1.93 MB/2.3 MB 84%
-## e823343fc78a: Downloading 2.16 MB/2.3 MB 94%
-## Verifying Checksum e823343fc78a
+## e823343fc78a: Downloading 32.77 kB/2.3 MB 1%
+## e823343fc78a: Downloading 1.33 MB/2.3 MB 58%
 ## Download complete e823343fc78a
 ## e823343fc78a: Extracting 32.77 kB/2.3 MB 1%
 ## e823343fc78a: Extracting 557.06 kB/2.3 MB 24%
@@ -124,8 +113,8 @@ docker$containers$run("alpine:3.1", c("echo", "hello world"))
 ##       disk_quota = NULL, kernel_memory = NULL, memory_reservation = NULL,
 ##       memory_swap = NULL, memory_swappiness = NULL, nano_cpus = NULL,
 ##       oom_kill_disable = NULL, pids_limit = NULL, ulimits = NULL,
-##       cpu_count = NULL, cpu_percent = NULL, i_omaximum_iops = NULL,
-##       i_omaximum_bandwidth = NULL, restart_policy = NULL)
+##       cpu_count = NULL, cpu_percent = NULL, io_maximum_iops = NULL,
+##       io_maximum_bandwidth = NULL, restart_policy = NULL)
 ##   wait()
 ##
 ## $logs
@@ -189,8 +178,8 @@ docker$containers$run("bfirsh/reticulate-splines", detach = TRUE)
 ##       disk_quota = NULL, kernel_memory = NULL, memory_reservation = NULL,
 ##       memory_swap = NULL, memory_swappiness = NULL, nano_cpus = NULL,
 ##       oom_kill_disable = NULL, pids_limit = NULL, ulimits = NULL,
-##       cpu_count = NULL, cpu_percent = NULL, i_omaximum_iops = NULL,
-##       i_omaximum_bandwidth = NULL, restart_policy = NULL)
+##       cpu_count = NULL, cpu_percent = NULL, io_maximum_iops = NULL,
+##       io_maximum_bandwidth = NULL, restart_policy = NULL)
 ##   wait()
 ```
 
@@ -203,19 +192,19 @@ docker$containers$list()
 
 ```
 ##                                                                 id
-## 1 86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235
+## 1 54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235
 ##          names
-## 1 infallib....
+## 1 admiring....
 ##                                                                     image
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                                                                  image_id
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                 command    created        ports size_rw size_root_fs
-## 1 /usr/local/bin/run.sh 1513064158 characte....      NA           NA
+## 1 /usr/local/bin/run.sh 1513163999 characte....      NA           NA
 ##   labels   state                status host_config network_settings
 ## 1        running Up Less than a second     default     list(bri....
-##         mounts                  name
-## 1 characte.... infallible_archimedes
+##         mounts           name
+## 1 characte.... admiring_booth
 ```
 
 ```r
@@ -274,8 +263,8 @@ container
 ##       disk_quota = NULL, kernel_memory = NULL, memory_reservation = NULL,
 ##       memory_swap = NULL, memory_swappiness = NULL, nano_cpus = NULL,
 ##       oom_kill_disable = NULL, pids_limit = NULL, ulimits = NULL,
-##       cpu_count = NULL, cpu_percent = NULL, i_omaximum_iops = NULL,
-##       i_omaximum_bandwidth = NULL, restart_policy = NULL)
+##       cpu_count = NULL, cpu_percent = NULL, io_maximum_iops = NULL,
+##       io_maximum_bandwidth = NULL, restart_policy = NULL)
 ##   wait()
 ```
 
@@ -323,33 +312,26 @@ head(docker$images$list())
 
 ```
 ##                                                                        id
-## 1 sha256:7f54bcd17e2b58694ef37197d67974bff932a21a0583481fc2088d20a4a02667
-## 2 sha256:45911c9130ae0ab50a9e1f43c40b881f6fef9428b667d67ee53a0182886e4187
-## 3 sha256:0112e578c86ebbf08ababbb1549f4ec4634d9c99d79917a4332ec4a89ce59a4f
-## 4 sha256:dd1cc6370f449a1edc43f13a01e9b24efc38d28ba5e9ed1cc6ca0f52f6ce0a69
-## 5 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
-## 6 sha256:93fd6b1bc1dcc402e51c51209c4899384541613c10b91546195c70f35fb28931
-##                                                                 parent_id
-## 1 sha256:9519800ba8e79027f05232e4ed6cad432006e1112ea3c7e6477976454b389237
-## 2
-## 3 sha256:07f103c21d4b637713779564e1402218fde383054572d97a0a35b802d70b0c20
-## 4 sha256:7035197e78c82ed0e7d72e01f9132cc1c23e9dbe063d8f2eb14c26b889a2c342
-## 5
-## 6
-##      repo_tags repo_digests    created     size shared_size virtual_size
-## 1 richfitz....              1512985361  3966223          -1      3966223
-## 2   alpine:3.1 alpine@s.... 1512154151  5046830          -1      5046830
-## 3 richfitz....              1512035245  3966223          -1      3966223
-## 4 richfitz....              1511640283  3966223          -1      3966223
-## 5 hello-wo....              1511223798     1848          -1         1848
-## 6 ubuntu:17.04 ubuntu@s.... 1510955978 95437822          -1     95437822
-##   labels containers
-## 1                -1
-## 2                -1
-## 3                -1
-## 4                -1
-## 5                -1
-## 6                -1
+## 1 sha256:45911c9130ae0ab50a9e1f43c40b881f6fef9428b667d67ee53a0182886e4187
+## 2 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
+## 3 sha256:93fd6b1bc1dcc402e51c51209c4899384541613c10b91546195c70f35fb28931
+## 4 sha256:20c44cd7596ff4807aef84273c99588d22749e2a7e15a7545ac96347baa65eda
+## 5 sha256:18d8d3ea70507fd11abb87c56656676f549d0f24ebf8efa57101d624d03d0136
+## 6 sha256:17e4d672aa7968bce4b05294b2c243bebff2ade7ebb14c5c749684d6a81fa2a5
+##   parent_id    repo_tags repo_digests    created      size shared_size
+## 1             alpine:3.1 alpine@s.... 1512154151   5046830          -1
+## 2           hello-wo....              1511223798      1848          -1
+## 3           ubuntu:17.04 ubuntu@s.... 1510955978  95437822          -1
+## 4           ubuntu:16.04 ubuntu@s.... 1510955965 122792927          -1
+## 5           crate:latest crate@sh.... 1502734455 204527823          -1
+## 6           docker.m.... docker.m.... 1499245251 887797278          -1
+##   virtual_size labels containers
+## 1      5046830                -1
+## 2         1848                -1
+## 3     95437822                -1
+## 4    122792927                -1
+## 5    204527823                -1
+## 6    887797278                -1
 ```
 
 ## Approach
@@ -365,10 +347,10 @@ container$inspect(reload = FALSE)
 
 ```
 ## $id
-## [1] "86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235"
+## [1] "54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235"
 ##
 ## $created
-## [1] "2017-12-12T07:35:58.118794858Z"
+## [1] "2017-12-13T11:19:59.640605454Z"
 ##
 ## $path
 ## [1] "/usr/local/bin/run.sh"
@@ -389,14 +371,14 @@ container$inspect(reload = FALSE)
 ## $state$restarting
 ## [1] FALSE
 ##
-## $state$o_omkilled
+## $state$oom_killed
 ## [1] FALSE
 ##
 ## $state$dead
 ## [1] FALSE
 ##
 ## $state$pid
-## [1] 9342
+## [1] 17398
 ##
 ## $state$exit_code
 ## [1] 0
@@ -405,7 +387,7 @@ container$inspect(reload = FALSE)
 ## [1] ""
 ##
 ## $state$started_at
-## [1] "2017-12-12T07:35:58.702924358Z"
+## [1] "2017-12-13T11:20:00.246020254Z"
 ##
 ## $state$finished_at
 ## [1] "0001-01-01T00:00:00Z"
@@ -415,22 +397,22 @@ container$inspect(reload = FALSE)
 ## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"
 ##
 ## $resolv_conf_path
-## [1] "/var/lib/docker/containers/86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235/resolv.conf"
+## [1] "/var/lib/docker/containers/54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235/resolv.conf"
 ##
 ## $hostname_path
-## [1] "/var/lib/docker/containers/86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235/hostname"
+## [1] "/var/lib/docker/containers/54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235/hostname"
 ##
 ## $hosts_path
-## [1] "/var/lib/docker/containers/86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235/hosts"
+## [1] "/var/lib/docker/containers/54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235/hosts"
 ##
 ## $log_path
-## [1] "/var/lib/docker/containers/86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235/86c626a6371667425a2092ad3559642fdff308473cfd980d16661c59f7be8235-json.log"
+## [1] "/var/lib/docker/containers/54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235/54a85878bf03b7a0bccd5c8c0864272744b18c50a44f1801c13a26daff2fd235-json.log"
 ##
 ## $node
 ## NULL
 ##
 ## $name
-## [1] "/infallible_archimedes"
+## [1] "/admiring_booth"
 ##
 ## $restart_count
 ## [1] 0
@@ -542,10 +524,10 @@ container$inspect(reload = FALSE)
 ## $host_config$cpu_percent
 ## [1] 0
 ##
-## $host_config$i_omaximum_iops
+## $host_config$io_maximum_iops
 ## [1] 0
 ##
-## $host_config$i_omaximum_bandwidth
+## $host_config$io_maximum_bandwidth
 ## [1] 0
 ##
 ## $host_config$binds
@@ -644,7 +626,7 @@ container$inspect(reload = FALSE)
 ## $host_config$tmpfs
 ## NULL
 ##
-## $host_config$u_tsmode
+## $host_config$uts_mode
 ## [1] ""
 ##
 ## $host_config$userns_mode
@@ -672,13 +654,13 @@ container$inspect(reload = FALSE)
 ##
 ## $graph_driver$data
 ##                                                                                                                                                                                                                                                                                                                                                                                          lower_dir
-## "/var/lib/docker/overlay2/9dfa8e13dec2ce3c9edcd6d350c0c2db8e0923974b25a7abbbfa73b1e5fd34c6-init/diff:/var/lib/docker/overlay2/7815d9bac55ed4ceb36bd625979dfcd06330e8253b9f71c95795ce5c5b247dd0/diff:/var/lib/docker/overlay2/2b72161d0aefe066769d9334de310b36616ae170f4472a7384324d378dd82cb5/diff:/var/lib/docker/overlay2/d4903c54aa9b839529e6b24e2293abe7cbea0093a5106726c0e93754cb105591/diff"
+## "/var/lib/docker/overlay2/9020701a4df2e96428d62c7f07fc0f8cd8137d497f3ad0a5baa91b970a80dc4d-init/diff:/var/lib/docker/overlay2/7815d9bac55ed4ceb36bd625979dfcd06330e8253b9f71c95795ce5c5b247dd0/diff:/var/lib/docker/overlay2/2b72161d0aefe066769d9334de310b36616ae170f4472a7384324d378dd82cb5/diff:/var/lib/docker/overlay2/d4903c54aa9b839529e6b24e2293abe7cbea0093a5106726c0e93754cb105591/diff"
 ##                                                                                                                                                                                                                                                                                                                                                                                         merged_dir
-##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/9dfa8e13dec2ce3c9edcd6d350c0c2db8e0923974b25a7abbbfa73b1e5fd34c6/merged"
+##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/9020701a4df2e96428d62c7f07fc0f8cd8137d497f3ad0a5baa91b970a80dc4d/merged"
 ##                                                                                                                                                                                                                                                                                                                                                                                          upper_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/9dfa8e13dec2ce3c9edcd6d350c0c2db8e0923974b25a7abbbfa73b1e5fd34c6/diff"
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/9020701a4df2e96428d62c7f07fc0f8cd8137d497f3ad0a5baa91b970a80dc4d/diff"
 ##                                                                                                                                                                                                                                                                                                                                                                                           work_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/9dfa8e13dec2ce3c9edcd6d350c0c2db8e0923974b25a7abbbfa73b1e5fd34c6/work"
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/9020701a4df2e96428d62c7f07fc0f8cd8137d497f3ad0a5baa91b970a80dc4d/work"
 ##
 ##
 ## $size_rw
@@ -689,12 +671,12 @@ container$inspect(reload = FALSE)
 ##
 ## $mounts
 ## [1] type        name        source      destination driver      mode
-## [7] r_w         propagation
+## [7] rw          propagation
 ## <0 rows> (or 0-length row.names)
 ##
 ## $config
 ## $config$hostname
-## [1] "86c626a63716"
+## [1] "54a85878bf03"
 ##
 ## $config$domainname
 ## [1] ""
@@ -779,7 +761,7 @@ container$inspect(reload = FALSE)
 ## $network_settings$address
 ## [1] NA
 ##
-## $network_settings$i_pprefix_len
+## $network_settings$ip_prefix_len
 ## [1] 16
 ##
 ## $network_settings$mac_address
