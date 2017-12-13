@@ -378,8 +378,6 @@ schema_get_type <- function(x) {
   ret
 }
 
-## NOTE: dots used here for compatibility with 'convert=' argument;
-## this might change later.
 decode_chunked_string <- function(x, ...) {
   i_size <- 5L:8L
   to_int <- function(b) {
@@ -389,9 +387,6 @@ decode_chunked_string <- function(x, ...) {
   stream <- integer(0)
   value <- character(0)
 
-  ## TODO: consider dropping newline off here - it's easy enough to
-  ## do?  Or probably creating a classed object that we can work with
-  ## in a reasonable way.
   while (length(x) > 0L) {
     len <- to_int(x[i_size])
 
