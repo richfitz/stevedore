@@ -205,7 +205,7 @@ skip_if_no_internet <- function() {
 
 test_sample_responses <- function(v, skip = NULL) {
   files <- dir(file.path("sample_responses", paste0("v", v)),
-               full.names = TRUE)
+               pattern = "\\.R$", full.names = TRUE)
 
   for (file in files) {
     base <- sub("\\.R$", "", basename(file))

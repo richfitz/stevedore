@@ -7,8 +7,8 @@ containers <- list(
   name = "test",
   endpoint_id = "628cadb8bcb92de107b2a1e516cbffe463e321f548feb37697cce00ad694f21a",
   mac_address = "02:42:ac:13:00:02",
-  i_pv4_address = "172.19.0.2/16",
-  i_pv6_address = "")
+  ipv4_address = "172.19.0.2/16",
+  ipv6_address = "")
 containers <- list(
   "19a4d5d687db25203351ed79d478946f861258f018fe384f229f2efa4b23513c" =
     containers)
@@ -24,7 +24,7 @@ options <- c(
   com.docker.network.bridge.name = "docker0",
   com.docker.network.driver.mtu = "1500")
 
-i_pam <- list(
+ipam <- list(
   driver = "default",
   config = list(c(subnet = "172.19.0.0/16", gateway = "172.19.0.1")),
   options = list(foo = c("bar" = "bar")))
@@ -36,7 +36,7 @@ list(
   scope = "local",
   driver = "bridge",
   enable_ipv6 = FALSE,
-  i_pam = i_pam,
+  ipam = ipam,
   internal = FALSE,
   attachable = FALSE,
   ingress = FALSE,

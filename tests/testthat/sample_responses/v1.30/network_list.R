@@ -13,7 +13,7 @@ data.frame(
   scope = "local",
   driver = c("bridge", "null", "host"),
   enable_ipv6 = FALSE,
-  i_pam = I(list(
+  ipam = I(list(
     list(driver = "default",
          config = list(c(subnet = "172.17.0.0/16")),
          options = list()),

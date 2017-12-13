@@ -13,7 +13,7 @@ data.frame(
   scope = "local",
   driver = c("bridge", "null", "host"),
   enable_ipv6 = FALSE,
-  i_pam = I(list(
+  ipam = I(list(
     list(driver = "default",
          config = list(c(subnet = "172.17.0.0/16")),
          options = list()),
@@ -26,8 +26,8 @@ data.frame(
     list("39b69226f9d79f5634485fb236a23b2fe4e96a0a94128390a7fbbcc167065867" = list(
            endpoint_id = "ed2419a97c1d9954d05b46e462e7002ea552f216e9b136b80a7db8d98b442eda",
            mac_address = "02:42:ac:11:00:02",
-           i_pv4_address = "172.17.0.2/16",
-           i_pv6_address = "")),
+           ipv4_address = "172.17.0.2/16",
+           ipv6_address = "")),
     list(), list())),
   options = I(list(
     c(com.docker.network.bridge.default_bridge = "true",

@@ -7,15 +7,15 @@ data_frame <- function(...) {
   data.frame(..., stringsAsFactors = FALSE)
 }
 bridge <- list(
-  i_pamconfig = NULL,
+  ipam_config = NULL,
   links = character(0),
   aliases = character(0),
   network_id = "",
   endpoint_id = "",
   gateway = "",
-  i_paddress = "",
-  i_pprefix_len = 0L,
-  i_pv6_gateway = "",
+  ip_address = "",
+  ip_prefix_len = 0L,
+  ipv6_gateway = "",
   global_ipv6_address = "",
   global_ipv6_prefix_len = 0L,
   mac_address = "")
@@ -28,7 +28,7 @@ mounts <- data_frame(
   bind_options = I(list()),
   volume_options = I(list()),
   tmpfs_options = I(list()))
-ports <- data_frame(i_p = character(0),
+ports <- data_frame(ip = character(0),
                     private_port = integer(0),
                     public_port = integer(0),
                     type = character(0))

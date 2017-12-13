@@ -13,7 +13,7 @@ process_config <- list(
 ## NOTE: CanRemove is missing in the spec (for 1.29 at least)
 
 list(
-  i_d = "f33bbfb39f5b142420f4759b2348913bd4a8d1a6d7fd56499cb41a1bb91d7b3b",
+  id = "f33bbfb39f5b142420f4759b2348913bd4a8d1a6d7fd56499cb41a1bb91d7b3b",
   running = FALSE,
   exit_code = 2L,
   process_config = process_config,

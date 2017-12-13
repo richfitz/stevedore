@@ -29,7 +29,7 @@ containers <- data_frame(
     command = "top",
     created = 1472592424L,
     ports = I(list(data_frame(
-      i_p = character(),
+      ip = character(),
       private_port = integer(),
       public_port = integer(),
       type = character()))),
@@ -42,9 +42,9 @@ containers <- data_frame(
     network_settings = I(list(list(
       networks = list(
         bridge = list(
-          i_pamconfig = list(
-            i_pv4_address = NA_character_,
-            i_pv6_address = NA_character_,
+          ipam_config = list(
+            ipv4_address = NA_character_,
+            ipv6_address = NA_character_,
             link_local_ips = character(0)
           ),
           links = character(),
@@ -54,9 +54,9 @@ containers <- data_frame(
           endpoint_id =
             "8ed5115aeaad9abb174f68dcf135b49f11daf597678315231a32ca28441dec6a",
           gateway = "172.18.0.1",
-          i_paddress = "172.18.0.2",
-          i_pprefix_len = 16L,
-          i_pv6_gateway = "",
+          ip_address = "172.18.0.2",
+          ip_prefix_len = 16L,
+          ipv6_gateway = "",
           global_ipv6_address = "",
           global_ipv6_prefix_len = 0L,
           mac_address = "02:42:ac:12:00:02"))))),
