@@ -46,21 +46,31 @@ download_file <- function(url, dest, quiet = FALSE) {
   dest
 }
 
-## FIXME: ID -> i_d (id)
-## FIXME: OStype -> o_stype (os_type)
-## FIXME: IPv4Forwarding -> i_pv4_forwarding (ipv4_forwarding)
-## FIXME: IPAM -> i_pam (ipam)
-## FIXME: IPv6Gateway, IPPrefixLen, IPAddress, IPAMConfig...
-##
-## In general - all single character entries need warning about and
-## checking.  It's possible that we'll need to special case some
-## words, but it looks like here that I am going to need to lowercase
-## consecutive uppercase leading letters?  Though that means we can't
-## easily deal with NCPU, NGoroutines, NFd, etc.  Treating `^N` in the
-## current way and everything else separately might be a reasonable
-## call.
+RE_PASCAL_START <- local({
+  special <- c("CA", "CPU", "ID", "IO", "IP", "IPAM",
+               "OOM", "OS", "RW", "TLS", "URL", "UTS")
+  sprintf("^([A-Z]|%s)", paste(special, collapse = "|"))
+})
+
 pascal_to_snake <- function(x) {
-  camel_to_snake(paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x))))
+  ## Uncomment this to record all names for testing
+  ##
+  ##   .stevedore$names <- union(.stevedore$names, x)
+  ##
+  ## Then after running through the test suite run
+  ##
+  ##   nms <- sort(unique(.stevedore$names))
+  ##   write.csv(cbind(from = nms, to = pascal_to_snake(nms)),
+  ##             "names.csv", row.names = FALSE)
+  ##
+  ## This will be used (after checking) in the test suite.
+  len <- attr(regexpr(RE_PASCAL_START, x), "match.length")
+  i <- len > 0L
+  if (any(i)) {
+    x[i] <- paste0(tolower(substr(x[i], 1L, len[i])),
+                   substr(x[i], len[i] + 1L, nchar(x[i])))
+  }
+  camel_to_snake(x)
 }
 
 snake_to_pascal <- function(x) {

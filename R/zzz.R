@@ -12,4 +12,5 @@ DEFAULT_USER_AGENT <- "stevedore/0.0.0"
   .stevedore$index <- stevedore_read_index()
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
+  .stevedore$names <- character()
 }
