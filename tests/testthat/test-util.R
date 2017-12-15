@@ -68,9 +68,40 @@ test_that("is_error", {
   expect_true(is_error(cond))
 })
 
+test_that("split command", {
+  expect_identical(split_command("hello"), "hello")
+  expect_identical(split_command("hello world"), c("hello", "world"))
+
+  ## These we don't handle yet:
+  expect_error(split_command("'foo bar'"), "A proper command splitter")
+  expect_error(split_command("foo 'bar'"), "A proper command splitter")
+  expect_error(split_command('foo "bar"'), "A proper command splitter")
+  expect_error(split_command('"foo bar"'), "A proper command splitter")
+})
+
+test_that("check command", {
+  expect_identical(check_command("hello world"), "hello world")
+  expect_identical(check_command(I("hello world")), c("hello", "world"))
+  expect_null(check_command(NULL))
+  expect_identical(check_command(letters), letters)
+  expect_identical(check_command(I(letters)), I(letters))
+})
+
 ## The new yaml package introduces integer overflow with warnings.
 test_that("yaml overflow", {
   str <- "Resources:\n  NanoCPUs: 4000000000"
   expect_identical(yaml_load(str),
                    list(Resources = list(NanoCPUs = 4e9)))
+})
+
+test_that("stream filtering", {
+  s <- rep(1:2, length.out = 10)
+  x <- paste0(letters[1:10], "\n")
+  obj <- docker_stream(x, s)
+
+  expect_equal(format(obj, style = "plain", filter = "stdout"), x[s == 1])
+  expect_equal(format(obj, style = "plain", filter = "stderr"), x[s == 2])
+  expect_equal(format(obj, style = "plain", filter = c("stdout", "stderr")), x)
+  expect_equal(format(obj, style = "plain", filter = c("stdin")), character(0))
+  expect_equal(format(obj, style = "plain", filter = NULL), x)
 })

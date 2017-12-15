@@ -412,9 +412,17 @@ format.docker_stream <- function(x, ..., style = "auto",
                                  colour_stderr = "red",
                                  prefix_stdin = "I< ",
                                  prefix_stdout = "O> ",
-                                 prefix_stderr = "E> ") {
+                                 prefix_stderr = "E> ",
+                                 filter = NULL) {
   stream <- attr(x, "stream")
   attributes(x) <- NULL
+
+  if (!is.null(filter)) {
+    i <- stream %in% filter
+    stream <- stream[i]
+    x <- x[i]
+  }
+
   i_i <- stream == "stdin"
   i_o <- stream == "stdout"
   i_e <- stream == "stderr"
