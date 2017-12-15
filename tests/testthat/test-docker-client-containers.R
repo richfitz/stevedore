@@ -505,3 +505,23 @@ test_that("scalar cmd", {
                "hello world\n")
   c1$remove()
 })
+
+test_that("scalar exec", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  ## this sets up a container that will run forever
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm)
+  x$start()
+  ans <- x$exec(I("echo hello world"))
+  dat <- ans$inspect(FALSE)
+  expect_equal(dat$process_config$entrypoint, "echo")
+  expect_equal(dat$process_config$arguments, c("hello", "world"))
+  capture.output(res <- ans$start(detach = FALSE))
+
+  expect_equal(format(res, style = "plain", filter = "stdout"),
+               "hello world\n")
+  x$kill()
+  x$remove()
+})

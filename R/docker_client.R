@@ -149,6 +149,7 @@ docker_client_container <- function(id, client) {
                  stdin = "attach_stdin"),
       defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
       promote = "cmd",
+      process = list(cmd = quote(cmd <- check_command(cmd))),
       after = after_exec),
     export = docker_endpoint("container_export", client, fix = fix_id),
     path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
