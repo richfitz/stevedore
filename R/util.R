@@ -197,3 +197,26 @@ tar_directory <- function(path, setwd = TRUE) {
 tolower1 <- function(x) {
   paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x)))
 }
+
+## Previously yaml read in overflowing integers without a warning -
+## the currentl version converts to NA_integer_ with a warning - but I
+## want a number out of theese; just because the number does not have
+## a decimal doesn't mean we don't want it.  Practically this affects
+## the examples in the yaml only.
+yaml_handlers <- function() {
+  list("int" = function(x) {
+    nx <- as.numeric(x)
+    if (abs(nx) < .Machine$integer.max) {
+      nx <- as.integer(nx)
+    }
+    nx
+  })
+}
+
+yaml_load_file <- function(path) {
+  yaml::yaml.load_file(path, handlers = yaml_handlers())
+}
+
+yaml_load <- function(str) {
+  yaml::yaml.load(str, handlers = yaml_handlers())
+}

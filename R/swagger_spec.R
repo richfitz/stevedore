@@ -1,6 +1,6 @@
 stevedore_read_index <- function() {
   path <- system.file("spec/index.yaml", package = "stevedore", mustWork = TRUE)
-  dat <- yaml::yaml.load_file(path)
+  dat <- yaml_load_file(path)
   names(dat) <- sub("^v", "", names(dat))
   dat
 }
@@ -30,9 +30,9 @@ read_spec <- function(version, refresh = FALSE) {
     stop(sprintf("Spec for %s had different md5 than expected (%s, not %s)",
                  version, md5_found, md5_expected))
   }
-  ret <- yaml::yaml.load_file(path_yml)
+  ret <- yaml_load_file(path_yml)
 
-  patch <- yaml::yaml.load_file(system.file(
+  patch <- yaml_load_file(system.file(
     "spec/patch.yaml", package = "stevedore"))
 
   ret <- spec_apply_patch(ret, patch)

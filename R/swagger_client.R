@@ -15,7 +15,7 @@ docker_client_data <- function(version) {
 stevedore_read_endpoints <- function() {
   path <- system.file("spec/endpoints.yaml", package = "stevedore",
                       mustWork = TRUE)
-  dat <- yaml::yaml.load_file(path)
+  dat <- yaml_load_file(path)
   for (i in seq_along(dat)) {
     dat[[i]]$name <- names(dat)[[i]]
   }

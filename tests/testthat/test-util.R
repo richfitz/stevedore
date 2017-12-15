@@ -67,3 +67,10 @@ test_that("is_error", {
   class(cond) <- c("docker_error", "error", "condition")
   expect_true(is_error(cond))
 })
+
+## The new yaml package introduces integer overflow with warnings.
+test_that("yaml overflow", {
+  str <- "Resources:\n  NanoCPUs: 4000000000"
+  expect_identical(yaml_load(str),
+                   list(Resources = list(NanoCPUs = 4e9)))
+})
