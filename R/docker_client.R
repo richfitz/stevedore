@@ -65,7 +65,8 @@ docker_client_container_collection <- function(..., cl, parent) {
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
-      process = list(image = quote(image <- get_image_id(image))),
+      process = list(image = quote(image <- get_image_id(image)),
+                     cmd = quote(cmd <- check_command(cmd))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(

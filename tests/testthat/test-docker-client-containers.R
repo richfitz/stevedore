@@ -489,3 +489,19 @@ test_that("run with image", {
   ans <- d$containers$run(img, rm = TRUE)
   expect_is(ans$logs, "docker_stream")
 })
+
+test_that("scalar cmd", {
+  d <- test_docker_client()
+  c1 <- d$containers$create("alpine:3.1", I("echo hello world"))
+
+  dat <- c1$inspect(FALSE)
+  expect_identical(dat$path, "echo")
+  expect_identical(dat$args, c("hello", "world"))
+
+  c1$start()
+  c1$wait()
+  log <- c1$logs()
+  expect_equal(format(log, style = "plain", filter = "stdout"),
+               "hello world\n")
+  c1$remove()
+})

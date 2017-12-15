@@ -198,6 +198,25 @@ tolower1 <- function(x) {
   paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x)))
 }
 
+check_command <- function(x) {
+  if (length(x) == 1L && inherits(x, "AsIs")) {
+    x <- split_command(x)
+  }
+  x
+}
+
+## The python command looks to split these up a bit; in
+## types/containers.py there's a call to split_command which then goes
+## through shlex.split(); we'll need to do something similar.
+split_command <- function(x) {
+  ## Just going to be exceedingly simple here and try to avoid writing
+  ## a parser yet:
+  if (grepl("[\"']", x)) {
+    stop("A proper command splitter has not yet been written")
+  }
+  strsplit(x, "\\s+")[[1L]]
+}
+
 ## Previously yaml read in overflowing integers without a warning -
 ## the currentl version converts to NA_integer_ with a warning - but I
 ## want a number out of theese; just because the number does not have
