@@ -674,11 +674,24 @@ make_docker_run <- function(client) {
   ## using dots.
   function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE) {
     if (rm && detach) {
-      ## host_config <- list(auto_remove = jsonlite::unbox(TRUE))
-      stop("Not yet implemented")
+      ## This is supported in API 1.25 and up - which agrees with our
+      ## API support.
+      ##
+      ## What I we *do* need to do though is intercept any host_config
+      ## argument here and modify rather than replacing it.
+      ##
+      ## NOTE: Must use PascalCase here because this is directly
+      ## passed though - at the moment!  If I get this fixed up that
+      ## might need to change (the manual unboxing would also not be
+      ## needed).
+      host_config <- list(AutoRemove = jsonlite::unbox(TRUE))
     }
     image <- docker_get_image(image, client)
-    container <- client$containers$create(image, cmd, ...)
+    container <- client$containers$create(image, cmd, ...,
+                                          host_config = host_config)
+    if (rm && !detach) {
+      on.exit(container$remove(), add = TRUE)
+    }
     container$start()
     if (detach) {
       return(container)
@@ -692,7 +705,6 @@ make_docker_run <- function(client) {
 
     if (rm) {
       container$inspect(TRUE)
-      container$remove()
     }
     if (exit_status != 0L) {
       stop(container_error(container, exit_status, cmd, image, out))

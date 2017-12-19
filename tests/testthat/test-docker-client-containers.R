@@ -568,3 +568,36 @@ test_that("fetch, but don't print, logs", {
 
   x$remove()
 })
+
+test_that("auto-remove: create", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create(
+    "alpine:3.1", cmd = c("echo", "hello world"), name = nm,
+    host_config = list(AutoRemove = jsonlite::unbox(TRUE)))
+  expect_true(x$inspect(FALSE)$host_config$auto_remove)
+  x$start()
+  x$wait()
+  e <- get_error(x$inspect())
+  expect_equal(e$code, 404L)
+})
+
+test_that("auto-remove: run", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$run(
+    "alpine:3.1", cmd = c("echo", "hello world"), name = nm,
+    rm = TRUE, detach = TRUE)
+
+  expect_true(x$inspect(FALSE)$host_config$auto_remove)
+  x$wait()
+  for (i in 1:10) {
+    e <- get_error(x$inspect())
+    if (is_error(e)) {
+      break
+    } else {
+      Sys.sleep(0.1)
+    }
+  }
+  expect_equal(e$code, 404L)
+})
