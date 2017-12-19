@@ -672,7 +672,8 @@ make_docker_run <- function(client) {
   force(client)
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
-  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE) {
+  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
+           stream = NULL) {
     if (rm && detach) {
       ## This is supported in API 1.25 and up - which agrees with our
       ## API support.
@@ -685,6 +686,8 @@ make_docker_run <- function(client) {
       ## might need to change (the manual unboxing would also not be
       ## needed).
       host_config <- list(AutoRemove = jsonlite::unbox(TRUE))
+    } else {
+      host_config <- NULL
     }
     image <- docker_get_image(image, client)
     container <- client$containers$create(image, cmd, ...,
@@ -697,11 +700,10 @@ make_docker_run <- function(client) {
       return(container)
     }
 
-    ## TODO: add option here to *stream* logs during run - that should
-    ## be easy enough actually once the logs endpoint supports
-    ## streaming.
+    ## TODO: here, and possibly elsewhere, some simple rules about
+    ## handling stream as an argument - TRUE/FALSE, etc.
+    out <- container$logs(stream = stream, follow = TRUE)
     exit_status <- container$wait()$status_code
-    out <- container$logs()
 
     if (rm) {
       container$inspect(TRUE)

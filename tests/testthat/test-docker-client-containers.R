@@ -601,3 +601,18 @@ test_that("auto-remove: run", {
   }
   expect_equal(e$code, 404L)
 })
+
+## TODO: there is not a test in here (or anywhere really) that this
+## shows that this actually streams logs from the beginning (rather
+## than just going all at the end).
+test_that("stream", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  p <- tempfile()
+  x <- d$containers$run("richfitz/iterate",
+                        cmd = c("10", "0.1"),
+                        name = nm, detach = FALSE,
+                        stream = p)
+  expect_equal(paste0(readLines(p), "\n"),
+               format(x$logs, style = "prefix"))
+})
