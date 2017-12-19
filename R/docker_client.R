@@ -101,6 +101,13 @@ docker_client_container <- function(id, client) {
     ret <- docker_client_exec(x$id, client)
     ret
   }
+  after_logs <- function(x, params) {
+    if (isTRUE(params$query$follow)) {
+      invisible(x$content_handler(x$response$content))
+    } else {
+      x
+    }
+  }
   after_path_stat <- function(x, ...) {
     from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
   }
@@ -160,11 +167,18 @@ docker_client_container <- function(id, client) {
       after = after_get_archive),
     put_archive = docker_endpoint("container_import", client, fix = fix_id),
     kill = docker_endpoint("container_kill", client, fix = fix_id),
-    ## TODO: bunch of work here for 'follow' because that will then
-    ## run through with hijacking.  It's going to be hard to test too.
-    logs = docker_endpoint("container_logs", client, fix = fix_id,
-                           defaults = list(stdout = TRUE, stderr = TRUE),
-                           drop = "follow"),
+    ## Logs; quite complicated in the case of 'follow'
+    ## -  stream has an effect *only* if follow is TRUE
+    logs = docker_endpoint(
+      "container_logs", client, fix = fix_id,
+      defaults = list(stdout = TRUE, stderr = TRUE),
+      process = list(
+        tail = quote(if (is.numeric(tail)) tail <- as.character(tail)),
+        stream = validate_stream_and_close(quote(stream))),
+      extra = alist(stream = stdout()),
+      hijack = quote(if (isTRUE(follow))
+                       streaming_text(exec_output_printer(stream))),
+      after = after_logs),
     pause = docker_endpoint("container_pause", client, fix = fix_id),
     ## This should invalidate our container afterwards
     remove = docker_endpoint("container_delete", client, fix = fix_id),
@@ -513,7 +527,7 @@ pull_status_printer <- function(stream = stdout()) {
       }
     }
 
-    cat(str, file = stream)
+    cat(str, file = stream, sep = "")
   }
 }
 
@@ -533,18 +547,21 @@ build_status_printer <- function(stream = stdout()) {
       stop(build_error(x$error))
     }
     if (print_output && "stream" %in% names(x)) {
-      cat(x$stream, file = stream)
+      cat(x$stream, file = stream, sep = "")
     }
   }
 }
 
-exec_output_printer <- function(stream) {
-  print_output <- !is.null(stream)
-  if (print_output) {
-    assert_is(stream, "connection")
+## TODO: this is not just exec - also logs
+## TODO: arrange for 'style' to be passed through here
+exec_output_printer <- function(stream, style = "auto") {
+  if (is.null(stream)) {
+    return(function(x) {})
   }
+  assert_is(stream, "connection")
   function(x) {
-    print(x)
+    x <- format(x, style = style, dest = stream)
+    cat(x, file = stream, sep = "")
   }
 }
 
@@ -563,14 +580,12 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
   invisible(x)
 }
 
-## TODO: these must all be able to take 'NULL' to mean no stream.  But
-## we'll still end up capturing the result.
 validate_stream_and_close <- function(name, mode = "wb") {
   substitute(expression({
     if (is.character(name)) {
       name <- file(name, mode)
       on.exit(close(name), add = TRUE)
-    } else {
+    } else if (!is.null(name)) {
       assert_is(name, "connection")
     }
   }), list(name = name, mode = mode))[[2]][[2]]

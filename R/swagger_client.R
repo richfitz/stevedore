@@ -84,7 +84,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   }
 
   if (!is.null(hijack)) {
-    assert_is(hijack, "call")
+    assert_is(hijack, c("call", "if"))
   }
 
   get_params <- as.call(c(list(quote(endpoint$argument_handler)),

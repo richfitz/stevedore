@@ -525,3 +525,46 @@ test_that("scalar exec", {
   x$kill()
   x$remove()
 })
+
+test_that("stream logs", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  p <- tempfile()
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("10", "0.1"),
+                           name = nm)
+  x$start()
+  res <- x$logs(follow = TRUE, stream = p)
+  expect_is(res, "docker_stream")
+  cmp <- readLines(p)
+  expect_equal(format(res, style = "prefix"), paste0(cmp, "\n"))
+
+  x$remove()
+})
+
+test_that("fetch, but don't print, logs", {
+  ## Getting some stray beginning of lines using follow on a stopped
+  ## container - I *bet* that there's a cat
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("10", "0.1"),
+                           name = nm)
+  x$start()
+  x$wait()
+  p <- tempfile()
+  expect_silent(v1 <- x$logs(stream = NULL, follow = TRUE))
+  expect_silent(v2 <- x$logs(stream = p, follow = TRUE))
+  txt <- capture.output(v3 <- x$logs(stream = stdout(), follow = TRUE))
+
+  expect_match(txt, "O> Done!", all = FALSE, fixed = TRUE)
+  expect_is(v1, "docker_stream")
+  expect_is(v2, "docker_stream")
+  expect_is(v3, "docker_stream")
+
+  expect_equal(format(v1, style = "prefix"), paste0(txt, "\n"))
+  expect_equal(format(v2, style = "prefix"), paste0(txt, "\n"))
+  expect_equal(format(v3, style = "prefix"), paste0(txt, "\n"))
+
+  x$remove()
+})

@@ -413,6 +413,7 @@ format.docker_stream <- function(x, ..., style = "auto",
                                  prefix_stdin = "I< ",
                                  prefix_stdout = "O> ",
                                  prefix_stderr = "E> ",
+                                 dest = NULL,
                                  filter = NULL) {
   stream <- attr(x, "stream")
   attributes(x) <- NULL
@@ -426,9 +427,11 @@ format.docker_stream <- function(x, ..., style = "auto",
   i_i <- stream == "stdin"
   i_o <- stream == "stdout"
   i_e <- stream == "stderr"
-  has_color <- crayon::has_color()
   if (style == "auto") {
-    style <- if (has_color) "colour" else "prefix"
+    ## I'm not 100% certain that passing this through here is
+    ## necessary but this helps when output is diverted (say to a
+    ## file) in not colourizing the output.
+    style <- if (has_colour(dest)) "colour" else "prefix"
   }
   if (style == "plain") {
     x <- x

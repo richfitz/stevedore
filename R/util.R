@@ -239,3 +239,11 @@ yaml_load_file <- function(path) {
 yaml_load <- function(str) {
   yaml::yaml.load(str, handlers = yaml_handlers())
 }
+
+has_colour <- function(dest) {
+  if (!is.null(dest) && !isatty(dest)) {
+    FALSE
+  } else {
+    crayon::has_color()
+  }
+}
