@@ -17,6 +17,7 @@ test_that("create", {
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
   expect_equal(e$endpoint, "container_inspect")
+  expect_equal(e$reason, "no such container")
 })
 
 test_that("create, using image", {

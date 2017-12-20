@@ -39,6 +39,8 @@ make_endpoint <- function(name, method, path, spec) {
 
   header_handlers <- make_header_handlers(x$responses, spec)
 
+  response_description <- lapply(x$responses, "[[", "description")
+
   args <- endpoint_args(method, path, x, spec)
   argument_handler <- make_argument_handler(args)
   help <- get_help(x, args)
@@ -52,6 +54,7 @@ make_endpoint <- function(name, method, path, spec) {
     argument_handler = argument_handler,
     response_handlers = response_handlers,
     header_handlers = header_handlers,
+    response_description = response_description,
     help = help)
 }
 
@@ -68,7 +71,10 @@ run_endpoint <- function(client, endpoint, params,
 
   status_code <- res$status_code
   if (status_code >= 300) {
-    response_to_error(res, pass_error, endpoint$name)
+    reason <-
+      endpoint$response_description[[as.character(status_code)]] %||%
+      "Unknown reason"
+     response_to_error(res, pass_error, endpoint$name, reason)
   } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {
