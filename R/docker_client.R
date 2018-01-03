@@ -754,5 +754,6 @@ validate_volumes <- function(volumes) {
                  paste(squote(volumes[!ok]), collapse = ", ")))
   }
   list(binds = binds,
-       volumes = sub(re, "\\1", volumes))
+       volumes = set_names(rep(list(NULL), length(volumes)),
+                           sub(re, "\\1", volumes)))
 }
