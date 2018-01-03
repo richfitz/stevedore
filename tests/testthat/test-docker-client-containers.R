@@ -617,3 +617,23 @@ test_that("stream", {
   expect_equal(paste0(readLines(p), "\n"),
                format(x$logs, style = "prefix"))
 })
+
+test_that("volume map", {
+  ## There's a bit of a trick here - we can't use tempfile() on osx
+  ## because the defaults for that path do not include the working
+  ## directory.  So we're going to have to use the current directory.
+  ## That's dubiously writeable with CRAN's policy though.
+  p <- tempfile()
+  dir.create(p)
+  v <- sprintf("%s:%s", getwd(), "/host")
+
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+
+  x <- d$containers$create("alpine:latest", cmd = c("ls", "/host"),
+                           name = nm, volumes = v)
+  x$start()
+  x$wait()
+  expect_equal(sort(trimws(format(x$logs(), style = "plain"))),
+               sort(dir()))
+})

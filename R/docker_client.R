@@ -65,8 +65,11 @@ docker_client_container_collection <- function(..., cl, parent) {
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
-      process = list(image = quote(image <- get_image_id(image)),
-                     cmd = quote(cmd <- check_command(cmd))),
+      process = list(
+        image = quote(image <- get_image_id(image)),
+        cmd = quote(cmd <- check_command(cmd)),
+        volumes = volumes <- volumes_for_create(
+                    quote(volumes), quote(host_config))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(
@@ -756,4 +759,16 @@ validate_volumes <- function(volumes) {
   list(binds = binds,
        volumes = set_names(rep(list(NULL), length(volumes)),
                            sub(re, "\\1", volumes)))
+}
+
+## TODO: consider a prefix for all the macro functions.
+volumes_for_create <- function(volumes, host_config) {
+  substitute(expression({
+    volumes <- validate_volumes(volumes)
+    if (!is.null(volumes)) {
+      ## TODO: consider checking that host_config$Binds is not given here
+      host_config$Binds <- volumes[["binds"]]
+      volumes <- volumes[["volumes"]]
+    }
+  }), list(volumes = volumes, host_config = host_config))[[2]]
 }
