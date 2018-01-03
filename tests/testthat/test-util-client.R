@@ -46,3 +46,26 @@ test_that("pull status: silent error", {
   res <- readLines(path)
   expect_equal(res, cmp)
 })
+
+test_that("validate volumes", {
+  expect_null(validate_volumes(NULL))
+  expect_null(validate_volumes(character()))
+
+  expect_equal(validate_volumes("foo:bar"),
+               list(binds = "foo:bar", volumes = "foo"))
+  expect_equal(validate_volumes(c("foo:bar", "/a/b:/c/d:ro")),
+               list(binds = c("foo:bar", "/a/b:/c/d:ro"),
+                    volumes = c("foo", "/a/b")))
+
+  expect_error(validate_volumes("foo"),
+               "Volume mapping 'foo' does not not match '<src>:<dest>[:ro]",
+               fixed = TRUE)
+  expect_error(
+    validate_volumes(c("foo", "bar")),
+    "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
+    fixed = TRUE)
+  expect_error(
+    validate_volumes(c("foo", "a:b", "bar")),
+    "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
+    fixed = TRUE)
+})

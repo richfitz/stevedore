@@ -247,3 +247,7 @@ has_colour <- function(dest) {
     crayon::has_color()
   }
 }
+
+squote <- function(x) {
+  sprintf("'%s'", x)
+}

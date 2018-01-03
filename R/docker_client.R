@@ -730,3 +730,29 @@ container_error <- function(container, exit_status, cmd, image, out) {
   class(ret) <- c("container_error", "docker_error", "error", "condition")
   ret
 }
+
+## TODO: For starters, let's use the string format only.  Later we'll
+## come back and allow more interesting approaches that use volume
+## mappings in a more abstract way.  This function will return the two
+## bits that we need - half for create and half for host_config.
+validate_volumes <- function(volumes) {
+  if (is.null(volumes) || length(volumes) == 0L) {
+    return(NULL)
+  }
+  assert_character(volumes)
+
+  binds <- volumes
+  re_ro <- ":ro$"
+  is_ro <- grepl(re_ro, volumes)
+  if (any(is_ro)) {
+    volumes[is_ro] <- sub(re_ro, "", volumes[is_ro])
+  }
+  re <- "^(.+):([^:]+)$"
+  ok <- grepl(re, volumes)
+  if (any(!ok)) {
+    stop(sprintf("Volume mapping %s does not not match '<src>:<dest>[:ro]",
+                 paste(squote(volumes[!ok]), collapse = ", ")))
+  }
+  list(binds = binds,
+       volumes = sub(re, "\\1", volumes))
+}
