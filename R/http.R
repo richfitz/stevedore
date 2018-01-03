@@ -90,7 +90,9 @@ response_to_error <- function(response, pass_error, endpoint, reason) {
   headers <- curl::parse_headers_list(response$headers)
   type <- headers[["content-type"]]
   if (length(response$content) > 0L) {
-    if (type == "text/plain") {
+    if (string_starts_with(type, "text/plain")) {
+      ## This is thrown when we send junk to the server -
+      ## unmarshalling errors for example.
       msg <- raw_to_char(response$content)
     } else {
       msg <- raw_to_json(response$content)$message
