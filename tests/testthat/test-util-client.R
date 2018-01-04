@@ -74,16 +74,48 @@ test_that("validate ports", {
   expect_null(validate_ports(NULL))
   expect_null(validate_ports(character()))
 
-  ## I think this might be the wrong way around?
   expect_equal(validate_ports("22:33"),
                list(port_bindings = list(
-                      "33/tcp" = list(
+                      "33/tcp" = list(list(
                         HostIp = jsonlite::unbox(""),
-                        HostPort = jsonlite::unbox("22"))),
+                        HostPort = jsonlite::unbox("22")))),
                     ports = list("33/tcp" = NULL)))
+
+  ## Check serialisation:
+  str <-
+    as.character(jsonlite::toJSON(validate_ports("11022:22")$port_bindings))
+  cmp <- '{"22/tcp":[{"HostIp":"","HostPort":"11022"}]}'
+  expect_identical(str, cmp)
 
   expect_error(validate_ports(""),
                "Port binding '' does not not match '<host>:<container>")
   expect_error(validate_ports("111"),
                "Port binding '111' does not not match '<host>:<container>")
+})
+
+test_that("validate ports: random", {
+  expect_equal(validate_ports("80"),
+               list(port_bindings = list(
+                      "80/tcp" = list(list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox("")))),
+                    ports = list("80/tcp" = NULL)))
+  expect_equal(validate_ports(c("80", "90")),
+               list(port_bindings = list(
+                      "80/tcp" = list(list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox(""))),
+                      "90/tcp" = list(list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox("")))),
+                    ports = list("80/tcp" = NULL, "90/tcp" = NULL)))
+  expect_equal(validate_ports(c("80", "100:90")),
+               list(port_bindings = list(
+                      "80/tcp" = list(list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox(""))),
+                      "90/tcp" = list(list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox("100")))),
+                    ports = list("80/tcp" = NULL, "90/tcp" = NULL)))
 })

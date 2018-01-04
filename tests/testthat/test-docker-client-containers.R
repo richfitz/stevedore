@@ -653,3 +653,40 @@ test_that("port map", {
   expect_equal(dat$status_code, 200L)
   expect_true(grepl("nginx", rawToChar(dat$content)))
 })
+
+test_that("port map - random free port", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("nginx", name = nm, ports = "80")
+  x$start()
+  on.exit(x$remove(force = TRUE))
+
+  ports <- x$ports()
+  expect_is(ports, "data.frame")
+  expect_equal(names(ports),
+               c("container_port", "protocol", "host_ip", "host_port"))
+  expect_true(all(vlapply(ports, is.character)))
+  expect_equal(ports$protocol, "tcp")
+  expect_equal(ports$host_ip, "0.0.0.0")
+  expect_equal(ports$container_port, "80")
+
+  dat <- curl::curl_fetch_memory(sprintf("http://127.0.0.1:%s/",
+                                         ports$host_port))
+  expect_equal(dat$status_code, 200L)
+  expect_true(grepl("nginx", rawToChar(dat$content)))
+})
+
+test_that("query ports of container with none", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm)
+  ports <- x$ports()
+  expect_equal(ports, data_frame(container_port = character(0),
+                                 protocol = character(0),
+                                 host_ip = character(0),
+                                 host_port = character(0)))
+
+  x$remove()
+})

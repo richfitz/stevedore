@@ -797,19 +797,34 @@ validate_ports <- function(ports) {
     return(NULL)
   }
   assert_character(ports)
+
   ## NOTE: this is _not_ enough to capture what docker can do but it's
   ## a starting point for working out to complete support.
-  re <- "^([0-9]+):([0-9]+)$"
-  ok <- grepl(re, ports)
+  re_random <- "^[0-9]+$"
+  re_explicit <- "^([0-9]+):([0-9]+)$"
+
+  i_random <- grepl(re_random, ports)
+  i_explicit <- grepl(re_explicit, ports)
+
+  ok <- i_random | i_explicit
   if (any(!ok)) {
-    stop(sprintf("Port binding %s does not not match '<host>:<container>",
+    ## TODO: This does not include all possibilities
+    stop(sprintf("Port binding %s does not not match '<host>:<container>'",
                  paste(squote(ports[!ok]), collapse = ", ")))
   }
 
-  protocol <- "tcp"
-  host_ip <- ""
-  host_port <- sub(re, "\\1", ports)
-  container_port <- sprintf("%s/%s", sub(re, "\\2", ports), protocol)
+  n <- length(ports)
+  protocol <- rep("tcp", n)
+  host_ip <- character(n)
+  host_port <- character(n)
+  container_port <- character(n)
+
+  container_port[i_random] <- ports[i_random]
+  container_port[i_explicit] <- sub(re_explicit, "\\2", ports[i_explicit])
+
+  host_port[i_explicit] <- sub(re_explicit, "\\1", ports[i_explicit])
+
+  container_port <- sprintf("%s/%s", container_port, protocol)
 
   ## TODO: this bit with the unboxing should move into HostConfig
   ## validation at the same time that the case binding is done there.
