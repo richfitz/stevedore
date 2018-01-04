@@ -128,6 +128,21 @@ docker_client_container <- function(id, client) {
     report_warnings(x$warnings, "updating container")
     invisible(self)
   }
+  ports <- function(reload = TRUE) {
+    ports <- self$inspect(reload)$network_settings$ports
+    if (length(ports) == 0L) {
+      container_port <- protocol <- host_ip <- host_port <- character(0)
+    } else {
+      container <- strsplit(names(ports), "/", fixed = TRUE)
+      stopifnot(all(lengths(container) == 2L))
+      len <- viapply(ports, nrow)
+      container_port <- rep(vcapply(container, "[[", 1L), len)
+      protocol <- rep(vcapply(container, "[[", 2L), len)
+      host_ip <- unlist(lapply(ports, "[[", "host_ip"), use.names = FALSE)
+      host_port <- unlist(lapply(ports, "[[", "host_port"), use.names = FALSE)
+    }
+    data_frame(container_port, protocol, host_ip, host_port)
+  }
   fix_id <- list(id = id)
 
   ## TODO: friendly "copy" interface needed here, but that requires a
@@ -203,6 +218,7 @@ docker_client_container <- function(id, client) {
     update = docker_endpoint("container_update", client, fix = fix_id,
                              after = after_update),
     wait = docker_endpoint("container_wait", client, fix = fix_id),
+    ports = ports,
     reload = reload)
   self
 }
