@@ -278,3 +278,15 @@ create_sample_responses <- function(target, base) {
     }
   }
 }
+
+repeat_until_error <- function(fn, times = 10L, interval = 0.1) {
+  e <- get_error(fn())
+  for (i in seq_len(times)) {
+    if (is_error(e)) {
+      return(e)
+    } else {
+      Sys.sleep(0.1)
+    }
+  }
+  stop("Did not throw error in time")
+}

@@ -579,7 +579,7 @@ test_that("auto-remove: create", {
   expect_true(x$inspect(FALSE)$host_config$auto_remove)
   x$start()
   x$wait()
-  e <- get_error(x$inspect())
+  e <- repeat_until_error(x$inspect)
   expect_equal(e$code, 404L)
 })
 
@@ -592,14 +592,7 @@ test_that("auto-remove: run", {
 
   expect_true(x$inspect(FALSE)$host_config$auto_remove)
   x$wait()
-  for (i in 1:10) {
-    e <- get_error(x$inspect())
-    if (is_error(e)) {
-      break
-    } else {
-      Sys.sleep(0.1)
-    }
-  }
+  e <- repeat_until_error(x$inspect)
   expect_equal(e$code, 404L)
 })
 
