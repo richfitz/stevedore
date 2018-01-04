@@ -89,8 +89,8 @@ test_that("validate ports", {
 
   expect_error(validate_ports(""),
                "Port binding '' does not not match '<host>:<container>")
-  expect_error(validate_ports("111"),
-               "Port binding '111' does not not match '<host>:<container>")
+  expect_error(validate_ports("111x"),
+               "Port binding '111x' does not not match '<host>:<container>")
 })
 
 test_that("validate ports: random", {
