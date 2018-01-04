@@ -69,3 +69,21 @@ test_that("validate volumes", {
     "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
     fixed = TRUE)
 })
+
+test_that("validate ports", {
+  expect_null(validate_ports(NULL))
+  expect_null(validate_ports(character()))
+
+  ## I think this might be the wrong way around?
+  expect_equal(validate_ports("22:33"),
+               list(port_bindings = list(
+                      "33/tcp" = list(
+                        HostIp = jsonlite::unbox(""),
+                        HostPort = jsonlite::unbox("22"))),
+                    ports = list("33/tcp" = NULL)))
+
+  expect_error(validate_ports(""),
+               "Port binding '' does not not match '<host>:<container>")
+  expect_error(validate_ports("111"),
+               "Port binding '111' does not not match '<host>:<container>")
+})

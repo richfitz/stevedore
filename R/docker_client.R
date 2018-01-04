@@ -772,3 +772,36 @@ volumes_for_create <- function(volumes, host_config) {
     }
   }), list(volumes = volumes, host_config = host_config))[[2]]
 }
+
+validate_ports <- function(ports) {
+  if (is.null(ports) || length(ports) == 0L) {
+    return(NULL)
+  }
+  assert_character(ports)
+  ## NOTE: this is _not_ enough to capture what docker can do but it's
+  ## a starting point for working out to complete support.
+  re <- "^([0-9]+):([0-9]+)$"
+  ok <- grepl(re, ports)
+  if (any(!ok)) {
+    stop(sprintf("Port binding %s does not not match '<host>:<container>",
+                 paste(squote(ports[!ok]), collapse = ", ")))
+  }
+
+  protocol <- "tcp"
+  host_ip <- ""
+  host_port <- sub(re, "\\1", ports)
+  container_port <- sprintf("%s/%s", sub(re, "\\2", ports), protocol)
+
+  ## TODO: this bit with the unboxing should move into HostConfig
+  ## validation at the same time that the case binding is done there.
+  ## Or, because here we're explicitly modifying the object perhaps
+  ## this is OK?
+  build_binding <- function(ip, port) {
+    list(HostIp = jsonlite::unbox(ip),
+         HostPort = jsonlite::unbox(port))
+  }
+  port_bindings <- set_names(Map(build_binding, host_ip, host_port),
+                             container_port)
+  list(port_bindings = port_bindings,
+       ports = set_names(rep(list(NULL), length(ports)), container_port))
+}
