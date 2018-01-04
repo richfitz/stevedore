@@ -637,3 +637,19 @@ test_that("volume map", {
   expect_equal(sort(trimws(format(x$logs(), style = "plain"))),
                sort(dir()))
 })
+
+test_that("port map", {
+  ## Roughly equivalent to:
+  ## docker run --rm -p 10080:80 nginx
+  port <- "10080" # port to use - hopefully clear
+  ports <- sprintf("%s:80", port)
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("nginx", name = nm, ports = ports)
+  x$start()
+  on.exit(x$remove(force = TRUE))
+
+  dat <- curl::curl_fetch_memory(sprintf("http://127.0.0.1:%s/", port))
+  expect_equal(dat$status_code, 200L)
+  expect_true(grepl("nginx", rawToChar(dat$content)))
+})

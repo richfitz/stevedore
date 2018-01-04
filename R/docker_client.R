@@ -65,11 +65,14 @@ docker_client_container_collection <- function(..., cl, parent) {
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
+      rename = c(ports = "exposed_ports"),
       process = list(
         image = quote(image <- get_image_id(image)),
         cmd = quote(cmd <- check_command(cmd)),
         volumes = volumes <- volumes_for_create(
-                    quote(volumes), quote(host_config))),
+                    quote(volumes), quote(host_config)),
+        ports = ports <- ports_for_create(
+                  quote(ports), quote(host_config))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(
@@ -797,11 +800,22 @@ validate_ports <- function(ports) {
   ## Or, because here we're explicitly modifying the object perhaps
   ## this is OK?
   build_binding <- function(ip, port) {
-    list(HostIp = jsonlite::unbox(ip),
-         HostPort = jsonlite::unbox(port))
+    list(list(HostIp = jsonlite::unbox(ip),
+              HostPort = jsonlite::unbox(port)))
   }
   port_bindings <- set_names(Map(build_binding, host_ip, host_port),
                              container_port)
   list(port_bindings = port_bindings,
        ports = set_names(rep(list(NULL), length(ports)), container_port))
+}
+
+ports_for_create <- function(ports, host_config) {
+  substitute({
+    ports <- validate_ports(ports)
+    if (!is.null(ports)) {
+      ## TODO: consider checking that host_config$PortBindings is not given here
+      host_config$PortBindings <- ports[["port_bindings"]]
+      ports <- ports[["ports"]]
+    }
+  }, list(ports = ports, host_config = host_config))
 }
