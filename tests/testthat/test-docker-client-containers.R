@@ -632,6 +632,38 @@ test_that("volume map", {
                sort(dir()))
 })
 
+test_that("volume map: docker volume", {
+  p <- tempfile()
+  dir.create(p)
+
+  d <- test_docker_client()
+  volume <- d$volumes$create()
+
+  nm <- rand_str(10, "stevedore_")
+  v <- sprintf("%s:%s", volume$name(), "/host")
+
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm, volumes = v)
+
+  on.exit({
+    x$remove(force = TRUE)
+    volume$remove()
+  })
+
+  x$start()
+  e1 <- x$exec(c("touch", "/host/foo"))
+  e1$start(detach = FALSE)
+
+  y <- d$containers$create("alpine",
+                           cmd = c("ls", "/host"),
+                           name = rand_str(10, "stevedore_"), volumes = v)
+  y$start()
+  y$wait()
+  expect_equal(trimws(format(y$logs(), style = "plain")), "foo")
+  y$remove()
+})
+
 test_that("port map", {
   ## Roughly equivalent to:
   ## docker run --rm -p 10080:80 nginx
