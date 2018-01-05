@@ -65,14 +65,13 @@ docker_client_container_collection <- function(..., cl, parent) {
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
-      rename = c(ports = "exposed_ports"),
+      rename = c(ports = "exposed_ports", network = "networking_config"),
       process = list(
         image = quote(image <- get_image_id(image)),
         cmd = quote(cmd <- check_command(cmd)),
-        volumes = volumes <- volumes_for_create(
-                    quote(volumes), quote(host_config)),
-        ports = ports <- ports_for_create(
-                  quote(ports), quote(host_config))),
+        volumes = volumes_for_create(quote(volumes), quote(host_config)),
+        ports = ports_for_create(quote(ports), quote(host_config)),
+        network = network_for_create(quote(network), quote(host_config))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(
@@ -849,4 +848,14 @@ ports_for_create <- function(ports, host_config) {
       ports <- ports[["ports"]]
     }
   }, list(ports = ports, host_config = host_config))
+}
+
+network_for_create <- function(network, host_config) {
+  substitute({
+    if (!is.null(network)) {
+      assert_scalar_character(network)
+      host_config$NetworkMode <- jsonlite::unbox(network)
+      network <- list(network = NULL)
+    }
+  }, list(network = network, host_config = host_config))
 }

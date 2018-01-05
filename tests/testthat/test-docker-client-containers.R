@@ -683,3 +683,34 @@ test_that("query ports of container with none", {
 
   x$remove()
 })
+
+test_that("network: host", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("nginx", name = nm, ports = "80")
+  x$start()
+  on.exit(x$remove(force = TRUE), add = TRUE)
+  port <- x$ports()$host_port
+
+  ## docker run --rm --network=host richfitz/curl -s http://localhost:32776
+  ## docker run --rm richfitz/curl -s http://localhost:32776
+
+  image <- "richfitz/curl"
+  args <- c("-s", sprintf("http://localhost:%s", port))
+
+  ## This will fail because we don't have host networking
+  y <- d$containers$create(image, args)
+  on.exit(y$remove(force = TRUE), add = TRUE)
+  y$start()
+  code <- y$wait()
+  expect_false(code$status_code == 0)
+  expect_equal(format(y$logs(), style = "plain"), character(0))
+
+  ## Then with host networking
+  z <- d$containers$create(image, args, network = "host")
+  on.exit(z$remove(force = TRUE), add = TRUE)
+  z$start()
+  code <- z$wait()
+  expect_true(code$status_code == 0)
+  expect_match(format(z$logs(), style = "plain"), "nginx", all = FALSE)
+})
