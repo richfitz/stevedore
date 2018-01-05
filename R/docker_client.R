@@ -361,6 +361,7 @@ docker_client_network <- function(id, client) {
 
   self <- stevedore_object(
     "docker_network",
+    id = function() id,
     name = function() attrs$name,
     inspect = function(reload = TRUE) {
       if (reload) {

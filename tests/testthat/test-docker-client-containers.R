@@ -8,6 +8,7 @@ test_that("create", {
   expect_is(x, "stevedore_object")
 
   expect_equal(x$name(), nm)
+  expect_equal(x$id(), x$inspect()$id)
   expect_equal(x$inspect()$name, paste0("/", nm))
   expect_identical(x$reload(), x)
 
