@@ -353,6 +353,10 @@ docker_client_network <- function(id, client) {
     attrs <<- network_inspect(id)
     invisible(self)
   }
+  containers <- function(reload = TRUE) {
+    containers <- self$inspect(reload)$containers
+    lapply(names(containers), docker_client_container, client)
+  }
   fix_id <- list(id = id)
 
   self <- stevedore_object(
@@ -364,7 +368,7 @@ docker_client_network <- function(id, client) {
       }
       attrs
     },
-    containers = function() lapply(attrs$containers, docker_client_container),
+    containers = containers,
     connect = docker_endpoint("network_connect", client, fix = fix_id),
     disconnect = docker_endpoint("network_disconnect", client, fix = fix_id),
     remove = docker_endpoint("network_delete", client, fix = fix_id),

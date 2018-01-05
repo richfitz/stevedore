@@ -49,7 +49,28 @@ test_that("prune", {
 })
 
 test_that("containers", {
-  skip("containers is untested")
+  d <- test_docker_client()
+  server <- rand_str(10, "stevedore_")
+  network <- rand_str(3, "stevedore_")
+
+  d <- test_docker_client()
+  nw <- d$networks$create(network)
+  on.exit(nw$remove())
+
+  expect_identical(nw$containers(), list())
+
+  x <- d$containers$create("nginx", name = server, network = network)
+  on.exit({
+    x$remove(force = TRUE)
+    nw$remove()
+  })
+  x$start()
+
+  res <- nw$containers()
+  expect_is(res, "list")
+  expect_equal(length(res), 1L)
+  expect_is(res[[1]], "docker_container")
+  expect_identical(res[[1]]$id(), x$id())
 })
 
 test_that("connect", {
