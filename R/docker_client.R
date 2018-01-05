@@ -642,6 +642,17 @@ get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
     x$id()
   } else {
+    ## TODO: error message should allow for docker_image alternative
+    assert_scalar_character(x, name)
+    x
+  }
+}
+
+get_network_id <- function(x, name = deparse(substitute(x))) {
+  if (inherits(x, "docker_network")) {
+    x$id()
+  } else {
+    ## TODO: error message should allow for docker_network alternative
     assert_scalar_character(x, name)
     x
   }
@@ -858,7 +869,7 @@ ports_for_create <- function(ports, host_config) {
 network_for_create <- function(network, host_config) {
   substitute({
     if (!is.null(network)) {
-      assert_scalar_character(network)
+      network <- get_network_id(network)
       host_config$NetworkMode <- jsonlite::unbox(network)
       network <- list(network = NULL)
     }

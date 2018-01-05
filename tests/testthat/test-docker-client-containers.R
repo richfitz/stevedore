@@ -742,7 +742,7 @@ test_that("network: custom", {
     nw$remove()
   })
 
-  x <- d$containers$create("nginx", name = server, network = network)
+  x <- d$containers$create("nginx", name = server, network = nw)
   x$start()
 
   y <- d$containers$create("richfitz/curl", c("-s", server),
