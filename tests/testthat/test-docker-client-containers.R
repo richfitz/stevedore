@@ -714,3 +714,40 @@ test_that("network: host", {
   expect_true(code$status_code == 0)
   expect_match(format(z$logs(), style = "plain"), "nginx", all = FALSE)
 })
+
+test_that("network: custom", {
+  ## Here's the scenario:
+  ##
+  ## docker network create testing
+  ## docker run --network=testing --rm -d --name server nginx
+  ## docker run --network=testing --rm richfitz/curl -s http://server
+  ## docker stop server
+  ## docker network rm testing
+
+  server <- rand_str(10, "stevedore_")
+  client <- rand_str(10, "stevedore_")
+  network <- rand_str(3, "stevedore_")
+  url <- paste0("http://", server)
+
+  d <- test_docker_client()
+  nw <- d$networks$create(network)
+  on.exit({
+    if (exists("x")) {
+      x$remove(force = TRUE)
+    }
+    if (exists("y")) {
+      y$remove(force = TRUE)
+    }
+    nw$remove()
+  })
+
+  x <- d$containers$create("nginx", name = server, network = network)
+  x$start()
+
+  y <- d$containers$create("richfitz/curl", c("-s", server),
+                           network = network, name = client)
+  y$start()
+  code <- y$wait()
+  expect_true(code$status_code == 0)
+  expect_match(format(y$logs(), style = "plain"), "nginx", all = FALSE)
+})
