@@ -832,3 +832,20 @@ test_that("stream logs with tty", {
 
   x$remove()
 })
+
+test_that("run, passing through host_config", {
+  p <- tempfile()
+  dir.create(p)
+  v <- sprintf("%s:%s", getwd(), "/host")
+
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+
+  res <- d$containers$run("alpine:latest", cmd = c("ls", "/host"),
+                          name = nm, volumes = v, rm = TRUE)
+
+  expect_equal(sort(trimws(format(res$logs, style = "plain"))),
+               sort(dir()))
+  e <- get_error(res$container$status())
+  expect_true(is_docker_error_not_found(e))
+})

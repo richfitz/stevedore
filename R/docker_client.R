@@ -721,21 +721,16 @@ make_docker_run <- function(client) {
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
   function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
-           stream = NULL) {
+           stream = NULL, host_config = NULL) {
     if (rm && detach) {
       ## This is supported in API 1.25 and up - which agrees with our
       ## API support.
-      ##
-      ## What I we *do* need to do though is intercept any host_config
-      ## argument here and modify rather than replacing it.
       ##
       ## NOTE: Must use PascalCase here because this is directly
       ## passed though - at the moment!  If I get this fixed up that
       ## might need to change (the manual unboxing would also not be
       ## needed).
-      host_config <- list(AutoRemove = jsonlite::unbox(TRUE))
-    } else {
-      host_config <- NULL
+      host_config$AutoRemove <- jsonlite::unbox(TRUE)
     }
     image <- docker_get_image(image, client)
     container <- client$containers$create(image, cmd, ...,
