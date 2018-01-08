@@ -116,6 +116,9 @@ docker_client_container <- function(id, client) {
   after_path_stat <- function(x, ...) {
     from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
   }
+  after_start <- function(x, ...) {
+    invisible(self)
+  }
   after_top <- function(x, ...) {
     m <- matrix(unlist(x$processes), byrow = TRUE, nrow = length(x$processes))
     colnames(m) <- x$titles
@@ -209,7 +212,8 @@ docker_client_container <- function(id, client) {
     rename = docker_endpoint("container_rename", client, fix = fix_id),
     resize = docker_endpoint("container_resize", client, fix = fix_id),
     restart = docker_endpoint("container_restart", client, fix = fix_id),
-    start = docker_endpoint("container_start", client, fix = fix_id),
+    start = docker_endpoint("container_start", client, fix = fix_id,
+                            after = after_start),
     ## TODO: expose stream (but with nice printing and escape instructions?)
     stats = docker_endpoint("container_stats", client,
                             fix = c(fix_id, stream = FALSE)),

@@ -80,7 +80,7 @@ test_that("list with arguments", {
   expect_true(nm %in% cl1$name)
   expect_false(nm %in% cl2$name)
 
-  x$start()
+  expect_identical(x$start(), x)
   x$wait()
 
   cl1 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
