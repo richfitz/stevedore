@@ -142,6 +142,9 @@ docker_client_container <- function(id, client) {
     }
     data_frame(container_port, protocol, host_ip, host_port)
   }
+  status <- function(reload = TRUE) {
+    self$inspect(reload)$state$status
+  }
   fix_id <- list(id = id)
 
   ## TODO: friendly "copy" interface needed here, but that requires a
@@ -155,7 +158,7 @@ docker_client_container <- function(id, client) {
         strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], client)
     },
     labels = function() attrs$config$labels,
-    status = function() attrs$state$status,
+    status = status,
     inspect = function(reload = TRUE) {
       if (reload) {
         reload()

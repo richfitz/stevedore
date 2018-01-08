@@ -204,9 +204,9 @@ test_that("kill", {
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("alpine", cmd = c("sleep", "10000"), name = nm)
   expect_null(x$start())
-  expect_equal(x$reload()$status(), "running")
+  expect_equal(x$status(), "running")
   expect_null(x$kill())
-  expect_equal(x$reload()$status(), "exited")
+  expect_equal(x$status(), "exited")
   x$remove()
 })
 
@@ -246,7 +246,7 @@ test_that("pause/unpause", {
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   expect_null(x$pause())
-  expect_equal(x$reload()$status(), "paused")
+  expect_equal(x$status(), "paused")
   e <- get_error(x$pause())
   expect_is(e, "docker_error")
 
@@ -255,7 +255,7 @@ test_that("pause/unpause", {
   ## returns 500 though so this does not seem reliable.
   ## expect_equal(e$code, 409)
   expect_null(x$unpause())
-  expect_equal(x$reload()$status(), "running")
+  expect_equal(x$status(), "running")
 
   e <- get_error(x$unpause())
   expect_is(e, "docker_error")
@@ -310,7 +310,7 @@ test_that("stop", {
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   expect_null(x$stop(0))
-  expect_equal(x$reload()$status(), "exited")
+  expect_equal(x$status(), "exited")
   x$remove()
 })
 
@@ -346,7 +346,7 @@ test_that("wait", {
   x <- d$containers$create("hello-world", name = nm)
   x$start()
   expect_equal(x$wait(), list(status_code = 0L))
-  expect_equal(x$reload()$status(), "exited")
+  expect_equal(x$status(), "exited")
 })
 
 test_that("prune", {
@@ -355,7 +355,7 @@ test_that("prune", {
   x <- d$containers$create("hello-world", name = nm)
   ans <- d$containers$prune()
   expect_true(x$id() %in% ans$containers_deleted)
-  e <- get_error(x$reload()$status())
+  e <- get_error(x$status())
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
 })
