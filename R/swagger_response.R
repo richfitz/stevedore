@@ -379,6 +379,21 @@ schema_get_type <- function(x) {
 }
 
 decode_chunked_string <- function(x, ...) {
+  ## This happens when we have logs on a container that has allocated
+  ## a tty.  In that case the output is sent directly.  The logic
+  ## behind the steps here is that if there are <8 entries then that's
+  ## not a complete docker_stream header so don't try and decode it.
+  ## And the first 4 elements are an encoded integer with possible
+  ## values 0..2 so we _must_ have a raw 0 if this is actually a
+  ## docker_stream header.
+  if (length(x) < 8L || all(x[seq_len(4)] != 0)) {
+    ## NOTE: not 100% sure about splitting the output here but I think
+    ## that matches most closely with the docker_stream version where
+    ## it is line-based output.  Also not sure if this should be
+    ## `\r\n` or `\r?\n` (with fixed = FALSE).
+    return(strsplit(raw_to_char(x), "\r\n", fixed = TRUE)[[1L]])
+  }
+
   i_size <- 5L:8L
   to_int <- function(b) {
     sum(256^(3:0) * as.integer(b))

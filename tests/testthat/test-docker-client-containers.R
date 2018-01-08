@@ -784,3 +784,34 @@ test_that("network: custom", {
   expect_true(code$status_code == 0)
   expect_match(format(y$logs(), style = "plain"), "nginx", all = FALSE)
 })
+
+test_that("logs with tty", {
+  ## > When the TTY setting is enabled in POST /containers/create, the
+  ## > stream is not multiplexed. The data exchanged over the hijacked
+  ## > connection is simply the raw data from the process PTY and
+  ## > client's stdin.
+  d <- test_docker_client()
+  nm1 <- rand_str(10, "stevedore_")
+  nm2 <- rand_str(10, "stevedore_")
+  p <- tempfile()
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("10", "0.1"),
+                           name = nm1, tty = TRUE)
+  y <- d$containers$create("richfitz/iterate",
+                           cmd = c("10", "0.1"),
+                           name = nm2, tty = FALSE)
+  x$start()
+  y$start()
+  x$wait()
+  y$wait()
+
+  res1 <- x$logs()
+  res2 <- y$logs()
+  expect_is(res1, "character")
+  expect_equal(res1[[length(res1)]], "Done!")
+
+  expect_equal(res1, trimws(format(res2, style = "plain")))
+
+  x$remove()
+  y$remove()
+})
