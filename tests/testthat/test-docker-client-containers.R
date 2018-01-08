@@ -815,3 +815,20 @@ test_that("logs with tty", {
   x$remove()
   y$remove()
 })
+
+test_that("stream logs with tty", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  p <- tempfile()
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("10", "0.1"),
+                           name = nm, tty = TRUE)
+  x$start()
+  res <- x$logs(follow = TRUE, stream = p)
+  expect_is(res, "character")
+
+  cmp <- readLines(p)
+  expect_equal(res, cmp)
+
+  x$remove()
+})

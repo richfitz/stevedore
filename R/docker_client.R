@@ -593,8 +593,12 @@ exec_output_printer <- function(stream, style = "auto") {
   }
   assert_is(stream, "connection")
   function(x) {
-    x <- format(x, style = style, dest = stream)
-    cat(x, file = stream, sep = "")
+    if (inherits(x, "docker_stream")) {
+      x <- format(x, style = style, dest = stream)
+      cat(x, file = stream, sep = "")
+    } else {
+      writeLines(x, stream)
+    }
   }
 }
 
