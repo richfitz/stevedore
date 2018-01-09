@@ -67,20 +67,20 @@ docker_client_container_collection <- function(..., cl, parent) {
       promote = c("image", "cmd"),
       rename = c(ports = "exposed_ports", network = "networking_config"),
       process = list(
-        image = quote(image <- get_image_id(image)),
-        cmd = quote(cmd <- check_command(cmd)),
-        volumes = volumes_for_create(quote(volumes), quote(host_config)),
-        ports = ports_for_create(quote(ports), quote(host_config)),
-        network = network_for_create(quote(network), quote(host_config))),
+        quote(image <- get_image_id(image)),
+        quote(cmd <- check_command(cmd)),
+        volumes_for_create(quote(volumes), quote(host_config)),
+        ports_for_create(quote(ports), quote(host_config)),
+        network_for_create(quote(network), quote(host_config))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(
       "container_list", cl,
-      process = list(filters = validate_filter("filters")),
+      process = list(validate_filter("filters")),
       after = after_list),
     remove = docker_endpoint(
       "container_delete", cl,
-      process = list(id = quote(id <- get_image_id(id)))),
+      process = list(quote(id <- get_image_id(id)))),
     prune = docker_endpoint("container_prune", cl))
 }
 
@@ -182,14 +182,14 @@ docker_client_container <- function(id, client) {
                  stdin = "attach_stdin"),
       defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
       promote = "cmd",
-      process = list(cmd = quote(cmd <- check_command(cmd))),
+      process = list(quote(cmd <- check_command(cmd))),
       after = after_exec),
     export = docker_endpoint("container_export", client, fix = fix_id),
     path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
                                 after = after_path_stat),
     get_archive = docker_endpoint(
       "container_archive", client, fix = fix_id, extra = alist(dest =),
-      process = list(dest = quote(assert_scalar_character_or_null(dest))),
+      process = list(quote(assert_scalar_character_or_null(dest))),
       after = after_get_archive),
     put_archive = docker_endpoint("container_import", client, fix = fix_id),
     kill = docker_endpoint("container_kill", client, fix = fix_id),
@@ -199,8 +199,8 @@ docker_client_container <- function(id, client) {
       "container_logs", client, fix = fix_id,
       defaults = list(stdout = TRUE, stderr = TRUE),
       process = list(
-        tail = quote(if (is.numeric(tail)) tail <- as.character(tail)),
-        stream = validate_stream_and_close(quote(stream))),
+        quote(if (is.numeric(tail)) tail <- as.character(tail)),
+        validate_stream_and_close(quote(stream))),
       extra = alist(stream = stdout()),
       hijack = quote(if (isTRUE(follow))
                        streaming_text(exec_output_printer(stream))),
@@ -263,8 +263,8 @@ docker_client_image_collection <- function(..., cl, parent) {
       "image_build", cl,
       rename = c(context = "input_stream", tag = "t"),
       extra = alist(stream = stdout()),
-      process = list(stream = validate_stream_and_close(quote(stream)),
-                     context = validate_tar_directory(quote(context))),
+      process = list(validate_stream_and_close(quote(stream)),
+                     validate_tar_directory(quote(context))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       after = after_build),
     get = get_image,
@@ -460,7 +460,7 @@ docker_client_exec <- function(id, client) {
       "exec_start", client, fix = list(id = id),
       extra = alist(stream = stdout()),
       hijack = quote(streaming_text(exec_output_printer(stream))),
-      process = list(stream = validate_stream_and_close(quote(stream))),
+      process = list(validate_stream_and_close(quote(stream))),
       after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {

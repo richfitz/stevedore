@@ -80,7 +80,16 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 
   if (!is.null(process)) {
     stopifnot(vlapply(process, is.language))
-    stopifnot(all(names(process) %in% names(args_use)))
+    assert_null(names(process))
+    ## I'm not 100% sure about how needed this is, but this slightly
+    ## odd formulation will eliminate the `{` blocks that otherwise
+    ## turn up here.  Total cost is ~26us for the worst case
+    ## (container_create).
+    i <- vlapply(process, function(x) identical(x[[1L]], quote(`{`)))
+    if (any(i)) {
+      process[i] <- lapply(process[i], function(x) as.list(x[-1L]))
+      process <- unlist(process, FALSE, FALSE)
+    }
   }
 
   if (!is.null(hijack)) {
