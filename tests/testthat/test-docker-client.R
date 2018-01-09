@@ -119,3 +119,11 @@ test_that("print endpoints", {
     "  networking_config: This container's networking configuration.",
     all = FALSE, fixed = TRUE)
 })
+
+test_that("login", {
+  skip("not yet tested")
+})
+
+test_that("events", {
+  skip("not yet tested")
+})
