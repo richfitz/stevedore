@@ -195,5 +195,12 @@ test_that("push", {
 })
 
 test_that("search", {
-  skip("not yet tested")
+  skip_if_no_internet()
+  cl <- test_docker_client()
+  ans <- cl$images$search("modeladequacy", limit = 10L)
+  expect_is(ans, "data.frame")
+  expect_match(ans$name, "richfitz/modeladequacy", all = FALSE)
+  i <- ans$name == "richfitz/modeladequacy"
+  expect_false(ans$is_official[i])
+  expect_false(ans$is_automated[i])
 })
