@@ -95,6 +95,12 @@ test_that("assert_directory", {
   unlink(path)
 })
 
+test_that("assert_null", {
+  object <- 1L
+  expect_error(assert_null(object), "'object' must be NULL")
+  expect_silent(assert_null(NULL))
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")

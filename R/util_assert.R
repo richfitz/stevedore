@@ -100,6 +100,12 @@ assert_scalar_character_or_null <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+assert_null <- function(x, name = deparse(substitute(x))) {
+  if (!is.null(x)) {
+    stop(sprintf("'%s' must be NULL", name), call. = FALSE)
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {
