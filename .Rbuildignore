@@ -2,3 +2,5 @@
 ^CONDUCT.md$
 ^TODO.md$
 ^\.travis\.yml$
+^docs$
+^update_web\.sh$
