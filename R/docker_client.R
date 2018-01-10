@@ -425,6 +425,11 @@ docker_client_volume <- function(id, client) {
       }
       attrs
     },
+    map = function(path) {
+      assert_scalar_character(path)
+      ## TODO: assert that we have an absolute path?
+      sprintf("%s:%s", name, path)
+    },
     remove = docker_endpoint("volume_delete", client, fix = list(name = name)),
     reload = reload)
   self

@@ -42,6 +42,15 @@ test_that("list", {
   expect_true(nm %in% vl$name)
 })
 
+test_that("map", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  v <- d$volumes$create(nm)
+  on.exit(v$remove())
+  expect_equal(v$map("/foo"), sprintf("%s:/foo", nm))
+  expect_error(v$map(1), "'path' must be a character")
+})
+
 test_that("prune", {
   d <- test_docker_client()
   ans <- d$volumes$prune()
