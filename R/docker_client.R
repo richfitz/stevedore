@@ -767,7 +767,7 @@ container_error <- function(container, exit_status, cmd, image, out) {
   }
   msg <- sprintf(
     "Command '%s' in image '%s' returned non-zero exit status %s%s",
-    cmd, image$name(), exit_status, err)
+    paste(cmd, collapse = " "), image$name(), exit_status, err)
   ret <- list(container = container, exit_status = exit_status,
               cmd = cmd, image = image, out = out, message = msg)
   class(ret) <- c("container_error", "docker_error", "error", "condition")
