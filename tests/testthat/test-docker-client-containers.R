@@ -633,9 +633,6 @@ test_that("volume map", {
 })
 
 test_that("volume map: docker volume", {
-  p <- tempfile()
-  dir.create(p)
-
   d <- test_docker_client()
   volume <- d$volumes$create()
 
@@ -662,6 +659,31 @@ test_that("volume map: docker volume", {
   y$wait()
   expect_equal(trimws(format(y$logs(), style = "plain")), "foo")
   y$remove()
+})
+
+test_that("volume map: readonly", {
+  d <- test_docker_client()
+  volume <- d$volumes$create()
+  nm <- rand_str(10, "stevedore_")
+  dest <- "/host"
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm,
+                           volumes = volume$map(dest, TRUE))
+
+  on.exit({
+    x$remove(force = TRUE)
+    volume$remove()
+  })
+
+  x$start()
+
+  e1 <- x$exec(c("touch", "/host/foo"))
+  ans <- e1$start(detach = FALSE)
+
+  e2 <- x$exec(c("ls", "/host"))
+  ans <- e2$start(detach = FALSE)
+  expect_equal(ans, character(0))
 })
 
 test_that("port map", {

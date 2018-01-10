@@ -48,6 +48,7 @@ test_that("map", {
   v <- d$volumes$create(nm)
   on.exit(v$remove())
   expect_equal(v$map("/foo"), sprintf("%s:/foo", nm))
+  expect_equal(v$map("/foo", TRUE), sprintf("%s:/foo:ro", nm))
   expect_error(v$map(1), "'path' must be a character")
 })
 
