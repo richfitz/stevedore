@@ -48,11 +48,17 @@ vignettes/stevedore.Rmd: vignettes/src/stevedore.Rmd
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
 
-vignettes_install: vignettes/stevedore.Rmd
+vignettes/examples.Rmd: vignettes/src/examples.Rmd
+	cd vignettes/src && ${RSCRIPT} -e 'knitr::knit("examples.Rmd")'
+	mv vignettes/src/examples.md $@
+	sed -i.bak 's/[[:space:]]*$$//' $@
+	rm -f $@.bak
+
+vignettes_install: vignettes/stevedore.Rmd vignettes/examples.Rmd
 	${RSCRIPT} -e 'library(methods); devtools::build_vignettes()'
 
 vignettes:
-	rm -f vignettes/stevedore.Rmd
+	rm -f vignettes/stevedore.Rmd vignettes/examples.Rmd
 	make vignettes_install
 
 pkgdown:

@@ -1,0 +1,381 @@
+---
+title: "Examples and use-cases"
+author: "Rich FitzJohn"
+date: "2018-01-11"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Using docker with stevedore}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+## Using a database in testing
+
+This example requires the `redux` package, which is available on
+CRAN and can be installed with
+
+```r
+install.packages("redux")
+```
+
+```r
+docker <- stevedore::docker_client()
+```
+
+```
+## The option 'stevedore.spec.path' is not set - using temporary dir
+```
+
+```r
+redis <- docker$containers$run("redis", name = "redis", ports = "6379",
+                               detach = TRUE, rm = TRUE)
+```
+
+We now have a redis server running on 32790
+
+```r
+redis$ports()
+```
+
+```
+##   container_port protocol host_ip host_port
+## 1           6379      tcp 0.0.0.0     32790
+```
+
+Make a connection to the Redis server:
+
+```r
+con <- redux::hiredis(port = redis$ports()$host_port)
+```
+
+and we can communicate with the Redis server:
+
+```r
+con$PING()
+```
+
+```
+## [Redis: PONG]
+```
+
+Because this is a brand new container we can write data without
+worrying about clobbering data that already exists:
+
+```r
+con$SET("key", "hello redis")
+```
+
+```
+## [Redis: OK]
+```
+
+```r
+con$GET("key")
+```
+
+```
+## [1] "hello redis"
+```
+
+And we can get a fresh copy of Redis by simply starting a new copy
+of redis
+
+```r
+redis$kill()
+```
+
+```
+## NULL
+```
+
+```r
+redis <- docker$containers$run("redis", name = "redis", ports = "6379",
+                               detach = TRUE, rm = TRUE)
+con <- redux::hiredis(port = redis$ports()$host_port)
+con$KEYS("*")
+```
+
+```
+## list()
+```
+
+```r
+redis$kill()
+```
+
+```
+## NULL
+```
+
+The same approach works for other database that might be large or
+awkward to install
+
+```r
+pg <- docker$containers$run("postgres", name = "pg", ports = "5432",
+                            detach = TRUE, rm = TRUE)
+```
+
+
+
+Now we have a full Postgres server running and can start writing
+data into it without worrying about clobbering anyone elses data.
+
+```r
+con <- DBI::dbConnect(RPostgres::Postgres(),
+                      host = "localhost",
+                      port = pg$ports()$host_port,
+                      user = "postgres")
+DBI::dbWriteTable(con, "mtcars", mtcars)
+```
+
+```
+## [1] TRUE
+```
+
+And if anything goes wrong, you can inspect the logs of the server
+easily if the client does not give informative error messages:
+
+```r
+DBI::dbWriteTable(con, "mtcars", iris, append = TRUE)
+```
+
+```
+## Error in connection_copy_data(conn@ptr, sql, value): Failed to initialise COPY
+```
+
+```r
+pg$logs(tail = 2)
+```
+
+```
+## E> 2018-01-11 14:14:36.327 UTC [66] ERROR:  column "Sepal.Length" of relation "mtcars" does not exist
+## E> 2018-01-11 14:14:36.327 UTC [66] STATEMENT:  COPY "mtcars" ("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species") FROM STDIN
+```
+
+```r
+pg$kill()
+```
+
+```
+## NULL
+```
+
+## Testing shiny apps
+
+(this section is not actually run because doing anything with it
+requires looking in a web browser)
+
+The rocker project has a shiny container that provides an easy to
+use version of the shiny server.  If we have a directory `app`
+that contains a shiny application we can map this with:
+
+```r
+volumes <- sprintf("%s:%s", normalizePath("app"), "/srv/shiny-server/")
+```
+
+(see the [shiny docker image
+documentation](https://hub.docker.com/r/rocker/shiny) for the
+destination path.
+
+We can start this with
+
+```r
+shiny <- docker$containers$run("rocker/shiny", name = "shiny", ports = "3838",
+                               volumes = volumes,
+                               detach = TRUE, rm = TRUE)
+```
+
+In an interactive session, you can visit the shiny server:
+
+```r
+browseURL(sprintf("http://localhost:%s", shiny$ports()$host_port))
+```
+
+## Package testing
+
+You can build an image that contains all the bits required to test
+your package and then run tests using that image.  This ensures
+that you're running in a totally clean environment (and that you
+really know what all the dependencies of your package are)
+
+
+For this we have a dockerfile, which contains
+```plain
+FROM r-base
+
+RUN apt-get update && \
+        apt-get install -yy \
+                git \
+                libcurl4-openssl-dev \
+                libssl-dev \
+                qpdf
+
+RUN install2.r --error \
+        curl \
+        knitr \
+        openssl \
+        rcmdcheck \
+        rmarkdown \
+        rcorpora \
+        testthat \
+        uuid
+
+COPY tester.sh /usr/local/bin
+RUN chmod +x /usr/local/bin/tester.sh
+
+ENTRYPOINT ["/usr/local/bin/tester.sh"]
+```
+
+And the script `tester.sh` (copied into the docker image above)
+which contains:
+
+```r
+lang_output(readLines("tester/tester.sh"), "shell")
+```
+
+```
+## ```shell
+## #!/usr/bin/env bash
+## set -e
+##
+## if [[ "$#" -ne 1 ]]; then
+##     echo "Expected one argument"
+##     exit 1
+## fi
+## SRC=$1
+##
+## if echo $SRC | grep -q "^https://"; then
+##     DEST=$(mktemp -d)
+##     git clone $SRC $DEST
+##     SRC=$DEST
+## fi
+##
+## if [ ! -f "$SRC/DESCRIPTION" ]; then
+##     echo "Did not find a DESCRIPTION" file
+##     exit 1
+## fi
+##
+## PACKAGE=$(grep '^Package:' "$SRC/DESCRIPTION" | \
+##                  sed -E 's/^Package:[[:space:]]+//')
+## R CMD build $SRC
+## PACKAGE_TGZ=$(ls -1tr ${PACKAGE}*gz | tail -n1)
+##
+## export _R_CHECK_CRAN_INCOMING_=FALSE
+## Rscript -e "rcmdcheck::rcmdcheck('$PACKAGE_TGZ', args = c('--as-cran', '--no-manual'))"
+## ```
+```
+
+```r
+img <- docker$images$build("tester", tag = "richfitz/tester")
+```
+
+```
+## Step 1/6 : FROM r-base
+##  ---> 524f705b5ed1
+## Step 2/6 : RUN apt-get update &&         apt-get install -yy                 git                 libcurl4-openssl-dev                 libssl-dev                 qpdf
+##  ---> Using cache
+##  ---> 5efb738e44dc
+## Step 3/6 : RUN install2.r --error         curl         knitr         openssl         rcmdcheck         rmarkdown         rcorpora         testthat         uuid
+##  ---> Using cache
+##  ---> 215103f9fe41
+## Step 4/6 : COPY tester.sh /usr/local/bin
+##  ---> 4e7250aae55a
+## Step 5/6 : RUN chmod +x /usr/local/bin/tester.sh
+##  ---> Running in 74cb0e9cfd70
+## Removing intermediate container 74cb0e9cfd70
+##  ---> 8a333df6a215
+## Step 6/6 : ENTRYPOINT ["/usr/local/bin/tester.sh"]
+##  ---> Running in 67887b9ad8b4
+## Removing intermediate container 67887b9ad8b4
+##  ---> 5a0876ee1dcc
+## Successfully built 5a0876ee1dcc
+## Successfully tagged richfitz/tester:latest
+```
+
+With this image we can then test packages off github:
+
+```r
+invisible(docker$containers$run(img, "https://github.com/richfitz/ids",
+                                rm = TRUE, stream = stdout()))
+```
+
+```
+## E> Cloning into '/tmp/tmp.MdzxKLqE9z'...
+## O> * checking for file ‘/tmp/tmp.MdzxKLqE9z/DESCRIPTION’ ... OK
+## O> * preparing ‘ids’:
+## O> * checking DESCRIPTION meta-information ... OK
+## O> * installing the package to build vignettes
+## O> * creating vignettes ... OK
+## O> * checking for LF line-endings in source and make files and shell scripts
+## O> * checking for empty or unneeded directories
+## O> * looking to see if a ‘data/datalist’ file should be added
+## O> * building ‘ids_1.0.1.tar.gz’
+## E>
+## O> ────────────────────────────────────────────────────────────────────────────────
+## O> ─  using log directory ‘/tmp/RtmpUTyb15/file3f31892122/ids.Rcheck’
+## O> ─  using R version 3.4.3 (2017-11-30)
+## O> ─  using platform: x86_64-pc-linux-gnu (64-bit)
+## O> ─  using session charset: UTF-8
+## O> ─  using options ‘--no-manual --as-cran’
+## O> ✔  checking for file ‘ids/DESCRIPTION’
+## O> ─  this is package ‘ids’ version ‘1.0.1’
+## O> ✔  checking package namespace information
+## O> ✔  checking package dependencies
+## O> ✔  checking if this is a source package
+## O> ✔  checking if there is a namespace
+## O> ✔  checking for .dll and .exe files
+## O> ✔  checking for hidden files and directories
+## O> ✔  checking for portable file names
+## O> ✔  checking for sufficient/correct file permissions
+## O> ✔  checking whether package ‘ids’ can be installed
+## O> ✔  checking installed package size
+## O> ✔  checking package directory
+## O> ✔  checking ‘build’ directory
+## O> ✔  checking DESCRIPTION meta-information
+## O> ✔  checking top-level files
+## O> ✔  checking for left-over files
+## O> ✔  checking index information
+## O> ✔  checking package subdirectories
+## O> ✔  checking R files for non-ASCII characters
+## O> ✔  checking R files for syntax errors
+## O> ✔  checking whether the package can be loaded
+## O> ✔  checking whether the package can be loaded with stated dependencies
+## O> ✔  checking whether the package can be unloaded cleanly
+## O> ✔  checking whether the namespace can be loaded with stated dependencies
+## O> ✔  checking whether the namespace can be unloaded cleanly
+## O> ✔  checking loading without being on the library search path
+## O> ✔  checking dependencies in R code
+## O> ✔  checking S3 generic/method consistency
+## O> ✔  checking replacement functions
+## O> ✔  checking foreign function calls
+## O> ✔  checking R code for possible problems
+## O> ✔  checking Rd files
+## O> ✔  checking Rd metadata
+## O> ✔  checking Rd line widths
+## O> ✔  checking Rd cross-references
+## O> ✔  checking for missing documentation entries
+## O> ✔  checking for code/documentation mismatches
+## O> ✔  checking Rd \usage sections
+## O> ✔  checking Rd contents
+## O> ✔  checking for unstated dependencies in examples
+## O> ✔  checking R/sysdata.rda
+## O> ✔  checking installed files from ‘inst/doc’
+## O> ✔  checking files in ‘vignettes’
+## O> ✔  checking examples
+## O> ✔  checking for unstated dependencies in ‘tests’
+## O> ✔  checking tests
+## O> ✔  checking for unstated dependencies in vignettes
+## O> ✔  checking package vignettes in ‘inst/doc’
+## O> ✔  checking re-building of vignette outputs
+## O>
+## O> ── 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+```
+
+(I have cheated here and put all of the dependencies of `ids` into
+the docker image via the Dockerfile).
+
+The same approach would work by mounting the package source
+directory into the container and passing the path (within the
+container) to `$run()`.
