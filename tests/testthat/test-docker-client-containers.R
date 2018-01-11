@@ -636,7 +636,7 @@ test_that("volume map", {
 
 test_that("volume map: docker volume", {
   d <- test_docker_client()
-  volume <- d$volumes$create()
+  volume <- d$volumes$create("myvolume")
 
   nm <- rand_str(10, "stevedore_")
   v <- sprintf("%s:%s", volume$name(), "/host")
@@ -665,7 +665,7 @@ test_that("volume map: docker volume", {
 
 test_that("volume map: readonly", {
   d <- test_docker_client()
-  volume <- d$volumes$create()
+  volume <- d$volumes$create("avolume")
   nm <- rand_str(10, "stevedore_")
   dest <- "/host"
   x <- d$containers$create("richfitz/iterate",
