@@ -8,8 +8,8 @@ Description: Work with containers over the Docker 'API'.  Rather than
     using the 'OpenAPI' (a.k.a., 'swagger') specification, and all
     return values are checked in order to make them type stable.
 License: MIT + file LICENSE
-Author: Rich FitzJohn
-Maintainer: Rich FitzJohn <rich.fitzjohn@gmail.com>
+Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
+    email = "rich.fitzjohn@gmail.com"))
 Imports:
     R6,
     crayon,
