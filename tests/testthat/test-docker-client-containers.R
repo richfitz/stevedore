@@ -635,6 +635,7 @@ test_that("volume map", {
 })
 
 test_that("volume map: docker volume", {
+  skip_on_travis() # FIXME
   d <- test_docker_client()
   volume <- d$volumes$create("myvolume")
 
@@ -664,6 +665,7 @@ test_that("volume map: docker volume", {
 })
 
 test_that("volume map: readonly", {
+  skip_on_travis() # FIXME
   d <- test_docker_client()
   volume <- d$volumes$create("avolume")
   nm <- rand_str(10, "stevedore_")
