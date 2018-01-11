@@ -295,6 +295,9 @@ docker_client_image <- function(id, client) {
     attrs <<- image_inspect(id)
     invisible(self)
   }
+  invisible_self <- function(...) {
+    invisible(self)
+  }
   fix_id_as_name = list(name = id)
   self <- stevedore_object(
     "docker_image",
@@ -312,7 +315,8 @@ docker_client_image <- function(id, client) {
     history = docker_endpoint("image_history", client, fix = fix_id_as_name),
     ## TODO: this needs to add a 'filename' option for saving
     export = docker_endpoint("image_tarball", client, fix = fix_id_as_name),
-    tag = docker_endpoint("image_tag", client, fix = fix_id_as_name),
+    tag = docker_endpoint("image_tag", client, fix = fix_id_as_name,
+                          after = invisible_self),
     ## TODO: this would best be done with a wrapper around the
     ## incoming argument for 'repo_tag' but with the core function
     ## passed through docker_endpoint so that we can pass around
