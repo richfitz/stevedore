@@ -344,7 +344,9 @@ docker_client_network_collection <- function(..., cl, parent) {
   }
   stevedore_object(
     "docker_network_collection",
-    create = docker_endpoint("network_create", cl, after = after_create),
+    create = docker_endpoint(
+      "network_create", cl, after = after_create,
+      defaults = alist(check_duplicate = TRUE)),
     get = get_network,
     list = docker_endpoint("network_list", cl),
     remove = docker_endpoint("network_delete", cl),
