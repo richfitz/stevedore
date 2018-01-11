@@ -280,8 +280,8 @@ create_sample_responses <- function(target, base) {
 }
 
 repeat_until_error <- function(fn, times = 10L, interval = 0.1) {
-  e <- get_error(fn())
   for (i in seq_len(times)) {
+    e <- get_error(fn())
     if (is_error(e)) {
       return(e)
     } else {

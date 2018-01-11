@@ -116,7 +116,7 @@ test_that("print endpoints", {
   txt <- capture.output(print(d$containers$create))
   expect_match(
     txt,
-    "  networking_config: This container's networking configuration.",
+    "  shell: Shell for when `RUN`, `CMD`, and `ENTRYPOINT` uses a shell",
     all = FALSE, fixed = TRUE)
 })
 

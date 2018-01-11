@@ -203,7 +203,8 @@ test_that("kill", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("alpine", cmd = c("sleep", "10000"), name = nm)
-  expect_null(x$start())
+  expect_identical(withVisible(x$start()),
+                   list(value = x, visible = FALSE))
   expect_equal(x$status(), "running")
   expect_null(x$kill())
   expect_equal(x$status(), "exited")
@@ -216,7 +217,8 @@ test_that("logs", {
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
-  expect_null(x$start())
+  expect_identical(withVisible(x$start()),
+                   list(value = x, visible = FALSE))
   logs <- x$logs()
   expect_is(logs, "docker_stream")
   expect_equal(logs[[1]], "Reticulating spline 1...\n")
@@ -649,7 +651,7 @@ test_that("volume map: docker volume", {
   })
 
   x$start()
-  e1 <- x$exec(c("touch", "/host/foo"))
+  e1 <- x$exec(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
   e1$start(detach = FALSE)
 
   y <- d$containers$create("alpine",
@@ -678,7 +680,7 @@ test_that("volume map: readonly", {
 
   x$start()
 
-  e1 <- x$exec(c("touch", "/host/foo"))
+  e1 <- x$exec(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
   ans <- e1$start(detach = FALSE)
 
   e2 <- x$exec(c("ls", "/host"))
