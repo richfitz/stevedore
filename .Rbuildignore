@@ -4,3 +4,4 @@
 ^\.travis\.yml$
 ^docs$
 ^update_web\.sh$
+^README\.Rmd$
