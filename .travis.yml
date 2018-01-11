@@ -8,6 +8,7 @@ r_packages:
 before_script:
   - docker pull hello-world
   - docker pull alpine
+  - docker pull alpine:3.1
   - docker pull bfirsh/reticulate-splines
   - docker pull nginx
   - (cd tests/testthat/images && ./build.sh)
