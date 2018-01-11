@@ -258,3 +258,8 @@ squote <- function(x) {
 data_frame <- function(...) {
   data.frame(..., stringsAsFactors = FALSE)
 }
+
+is_integer_like <- function(x) {
+  is.integer(x) ||
+    (is.numeric(x) && all(max(abs(as.integer(x) - x)) < 1e-8))
+}

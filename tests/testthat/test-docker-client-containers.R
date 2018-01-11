@@ -709,7 +709,7 @@ test_that("port map", {
 test_that("port map - random free port", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("nginx", name = nm, ports = "80")
+  x <- d$containers$create("nginx", name = nm, ports = 80L)
   x$start()
   on.exit(x$remove(force = TRUE))
 
@@ -726,6 +726,16 @@ test_that("port map - random free port", {
                                          ports$host_port))
   expect_equal(dat$status_code, 200L)
   expect_true(grepl("nginx", rawToChar(dat$content)))
+})
+
+test_that("port map - expose all ports", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  x <- d$containers$create("nginx", name = nm, ports = TRUE)
+  on.exit(x$remove(force = TRUE))
+  x$start()
+  ports <- x$ports()
+  expect_identical(ports$container_port, "80")
 })
 
 test_that("query ports of container with none", {

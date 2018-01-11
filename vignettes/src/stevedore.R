@@ -251,10 +251,13 @@ x$status()
 ## server/proxy that exposes port 80 from the container.  We can map
 ## that to a random port by asking docker to expose port 80 but not
 ## saying what to map it to:
-nginx <- docker$containers$run("nginx", ports = "80",
+nginx <- docker$containers$run("nginx", ports = 80,
                                detach = TRUE, rm = TRUE,
                                name = "stevedore-nginx")
 nginx$ports()
+
+## (alternatively, use `ports = TRUE` to act like `docker run`'s `-P`
+## and "publish all ports to random ports).
 
 ## This shows that the port exposed by the the container (80) is
 ## mapped to the port `r as.integer(nginx$ports()$host_port)` on the

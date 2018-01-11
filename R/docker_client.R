@@ -833,6 +833,13 @@ validate_ports <- function(ports) {
   if (is.null(ports) || length(ports) == 0L) {
     return(NULL)
   }
+  if (is.logical(ports) && length(ports) == 1L &&
+      identical(as.vector(ports), TRUE)) {
+    return(TRUE)
+  }
+  if (is_integer_like(ports)) {
+    ports <- as.character(ports)
+  }
   assert_character(ports)
 
   ## NOTE: this is _not_ enough to capture what docker can do but it's
@@ -881,9 +888,15 @@ ports_for_create <- function(ports, host_config) {
   substitute({
     ports <- validate_ports(ports)
     if (!is.null(ports)) {
-      ## TODO: consider checking that host_config$PortBindings is not given here
-      host_config$PortBindings <- ports[["port_bindings"]]
-      ports <- ports[["ports"]]
+      if (identical(ports, TRUE)) {
+        host_config$PublishAllPorts <- jsonlite::unbox(TRUE)
+        ports <- NULL
+      } else {
+        ## TODO: consider checking that host_config$PortBindings is
+        ## not given here
+        host_config$PortBindings <- ports[["port_bindings"]]
+        ports <- ports[["ports"]]
+      }
     }
   }, list(ports = ports, host_config = host_config))
 }
