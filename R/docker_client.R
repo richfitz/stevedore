@@ -636,14 +636,13 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
 }
 
 validate_stream_and_close <- function(name, mode = "wb") {
-  substitute(expression({
+  substitute(
     if (is.character(name)) {
       name <- file(name, mode)
       on.exit(close(name), add = TRUE)
     } else if (!is.null(name)) {
       assert_is(name, "connection")
-    }
-  }), list(name = name, mode = mode))[[2]][[2]]
+    }, list(name = name, mode = mode))
 }
 
 ## TODO: see comments in tar_directory about setting this up for curl
@@ -655,14 +654,13 @@ validate_stream_and_close <- function(name, mode = "wb") {
 ##   tar_directory(name)
 ## }
 validate_tar_directory <- function(name, stream = FALSE) {
-  substitute(expression({
+  substitute(
     if (is.character(name)) {
       assert_directory(name)
       name <- tar_directory(name)
     } else {
       assert_raw(name)
-    }
-  }), list(name = name))[[2]][[2]]
+    }, list(name = name))
 }
 
 ## NOTE: if this is not used anywhere else it might be better to do
@@ -821,14 +819,14 @@ validate_volumes <- function(volumes) {
 
 ## TODO: consider a prefix for all the macro functions.
 volumes_for_create <- function(volumes, host_config) {
-  substitute(expression({
+  substitute({
     volumes <- validate_volumes(volumes)
     if (!is.null(volumes)) {
       ## TODO: consider checking that host_config$Binds is not given here
       host_config$Binds <- volumes[["binds"]]
       volumes <- volumes[["volumes"]]
     }
-  }), list(volumes = volumes, host_config = host_config))[[2]]
+  }, list(volumes = volumes, host_config = host_config))
 }
 
 validate_ports <- function(ports) {
