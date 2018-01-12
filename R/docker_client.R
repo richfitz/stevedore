@@ -298,6 +298,21 @@ docker_client_image <- function(id, client) {
   invisible_self <- function(...) {
     invisible(self)
   }
+  ## TODO: repo and tag should be separate as for tag (with option
+  ## to do them together).
+  untag <- function(repo_tag) {
+    repo_tag <- image_name(repo_tag)
+    valid <- setdiff(self$inspect()$repo_tags, "<none>:<none>")
+    if (!(repo_tag %in% valid)) {
+      stop(sprintf("Invalid repo_tag '%s' for image '%s'",
+                   repo_tag, attrs$id))
+    }
+    ## NOTE: this is a little awkward - we can't use self$remove()
+    ## because that refers to the actual iage id, which is not what we
+    ## want.  So we rebuild the endpoint without the `fix` argument
+    ## and then call it with just the tag.
+    docker_endpoint("image_delete", client)(repo_tag, noprune = TRUE)
+  }
   fix_id_as_name = list(name = id)
   self <- stevedore_object(
     "docker_image",
@@ -317,23 +332,10 @@ docker_client_image <- function(id, client) {
     export = docker_endpoint("image_tarball", client, fix = fix_id_as_name),
     tag = docker_endpoint("image_tag", client, fix = fix_id_as_name,
                           after = invisible_self),
-    ## TODO: this would best be done with a wrapper around the
-    ## incoming argument for 'repo_tag' but with the core function
-    ## passed through docker_endpoint so that we can pass around
-    ## defaults.  We'll be doing that with other functions later too.
-    untag = function(repo_tag) {
-      repo_tag <- image_name(repo_tag)
-      image_delete <- docker_endpoint("image_delete", client)
-      valid <- setdiff(image_inspect(id)$repo_tags, "<none>:<none>")
-      if (!(repo_tag %in% valid)) {
-        stop(sprintf("Invalid repo_tag '%s' for image '%s'",
-                     repo_tag, attrs$id))
-      }
-      image_delete(repo_tag, noprune = TRUE)
-    },
-    ## NOTE: this removes by *id* which will not always work without a
-    ## force - the name is not preserved on the way through this
-    ## function.  Doing that might make more sense perhaps?
+    untag = untag,
+    ## NOTE: this always tries to remove the image by *id* not by
+    ## name, which is not ideal really.  When force = TRUE it's
+    ## basically the same I think.
     remove = docker_endpoint("image_delete", client, fix = fix_id_as_name),
     reload = reload)
   self
