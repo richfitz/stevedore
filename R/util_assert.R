@@ -1,82 +1,91 @@
-assert_scalar_character <- function(x, name = deparse(substitute(x))) {
-  assert_scalar(x, name)
-  assert_character(x, name)
-  assert_nonmissing(x, name)
+assert_scalar_character <- function(x, name = deparse(substitute(x)),
+                                    what = "a scalar character (non-NA)") {
+  assert_scalar(x, name, what)
+  assert_character(x, name, what)
+  assert_nonmissing(x, name, what)
   invisible(x)
 }
 
 assert_scalar_integer <- function(x, strict = FALSE,
-                                  name = deparse(substitute(x))) {
-  assert_scalar(x, name)
-  assert_nonmissing(x, name)
-  assert_integer(x, strict, name)
+                                  name = deparse(substitute(x)),
+                                  what = "a scalar integer (non-NA)") {
+  assert_scalar(x, name, what)
+  assert_nonmissing(x, name, what)
+  assert_integer(x, strict, name, what)
   invisible(x)
 }
 
-assert_scalar_logical <- function(x, name = deparse(substitute(x))) {
-  assert_scalar(x, name)
-  assert_nonmissing(x, name)
-  assert_logical(x, name)
+assert_scalar_logical <- function(x, name = deparse(substitute(x)),
+                                  what = "a scalar logical (non-NA)") {
+  assert_scalar(x, name, what)
+  assert_nonmissing(x, name, what)
+  assert_logical(x, name, what)
   invisible(x)
 }
 
-assert_scalar <- function(x, name = deparse(substitute(x))) {
+assert_scalar <- function(x, name = deparse(substitute(x)), what = "scalar") {
   if (length(x) != 1) {
-    stop(sprintf("'%s' must be a scalar", name), call. = FALSE)
+    stop(sprintf("'%s' must be a %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
-assert_nonmissing <- function(x, name = deparse(substitute(x))) {
+assert_nonmissing <- function(x, name = deparse(substitute(x)),
+                              what = "non-NA") {
   if (any(is.na(x))) {
-    stop(sprintf("'%s' must not be NA", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
 
-assert_character <- function(x, name = deparse(substitute(x))) {
+assert_character <- function(x, name = deparse(substitute(x)),
+                             what = "a character") {
   if (!is.character(x)) {
-    stop(sprintf("'%s' must be a character", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
 
-assert_raw <- function(x, name = deparse(substitute(x))) {
+assert_raw <- function(x, name = deparse(substitute(x)), what = "raw") {
   if (!is.raw(x)) {
-    stop(sprintf("'%s' must be raw", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
 
-assert_logical <- function(x, name = deparse(substitute(x))) {
+assert_logical <- function(x, name = deparse(substitute(x)), what = "logical") {
   if (!is.logical(x)) {
-    stop(sprintf("'%s' must be logical", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
 
-assert_is <- function(x, what, name = deparse(substitute(x))) {
-  if (!inherits(x, what)) {
-    stop(sprintf("'%s' must be a %s", name,
-                 paste(what, collapse = " / ")), call. = FALSE)
+assert_is <- function(x, cl, name = deparse(substitute(x)), what = NULL) {
+  if (!inherits(x, cl)) {
+    if (is.null(what)) {
+      what <- paste("a", paste(cl, collapse = " / "))
+    }
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
 
-assert_integer <- function(x, strict = FALSE, name = deparse(substitute(x))) {
+assert_integer <- function(x, strict = FALSE, name = deparse(substitute(x)),
+                           what = "integer") {
   if (!(is.integer(x))) {
     usable_as_integer <-
       !strict && is.numeric(x) && (max(abs(as.integer(x) - x)) < 1e-8)
     if (!usable_as_integer) {
-      stop(sprintf("'%s' must be integer", name), call. = FALSE)
+      stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
     }
   }
   invisible(x)
 }
 
-assert_named <- function(x, unique = FALSE, name = deparse(substitute(x))) {
+assert_named <- function(x, unique = FALSE, name = deparse(substitute(x)),
+                         what = "named") {
   nms <- names(x)
   if (is.null(nms)) {
-    stop(sprintf("'%s' must be named", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   if (!all(nzchar(nms))) {
     stop(sprintf("All elements of '%s' must be named", name), call. = FALSE)
@@ -92,17 +101,17 @@ assert_directory <- function(x, name = deparse(substitute(x))) {
   }
 }
 
-assert_scalar_character_or_null <- function(x, name = deparse(substitute(x))) {
+assert_scalar_character_or_null <- function(x, name = deparse(substitute(x)),
+                                            what = NULL) {
   if (!is.null(x)) {
-    ## TODO: this could produce better messages (there's no hint that
-    ## NULL is OK)
-    assert_scalar_character(x, name)
+    assert_scalar_character(x, name,
+                            what %||% "a scalar character (non-NA), or NULL")
   }
 }
 
-assert_null <- function(x, name = deparse(substitute(x))) {
+assert_null <- function(x, name = deparse(substitute(x)), what = "NULL") {
   if (!is.null(x)) {
-    stop(sprintf("'%s' must be NULL", name), call. = FALSE)
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
 }
 

@@ -12,10 +12,10 @@ test_that("assert_character", {
 
 test_that("assert_nonmissing", {
   object <- NA
-  expect_error(assert_nonmissing(object), "'object' must not be NA")
+  expect_error(assert_nonmissing(object), "'object' must be non-NA")
 
-  expect_error(assert_nonmissing(NA_integer_), "must not be NA")
-  expect_error(assert_nonmissing(NA_real_), "must not be NA")
+  expect_error(assert_nonmissing(NA_integer_), "must be non-NA")
+  expect_error(assert_nonmissing(NA_real_), "must be non-NA")
 
   expect_silent(assert_nonmissing(TRUE))
 })
@@ -49,7 +49,7 @@ test_that("assert_is", {
   expect_silent(assert_is(mtcars, "data.frame"))
 })
 
-test_that("assert_logical", {
+test_that("assert_raw", {
   object <- NULL
   expect_error(assert_raw(object), "'object' must be raw")
 
