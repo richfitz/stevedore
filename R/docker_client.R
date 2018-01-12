@@ -130,6 +130,9 @@ docker_client_container <- function(id, client) {
     report_warnings(x$warnings, "updating container")
     invisible(self)
   }
+  after_commit <- function(x, ...) {
+    docker_client_image(x$id, client)
+  }
   ports <- function(reload = TRUE) {
     ports <- self$inspect(reload)$network_settings$ports
     if (length(ports) == 0L) {
@@ -170,8 +173,14 @@ docker_client_container <- function(id, client) {
     },
     ## TODO: this one is hard because it might need to hijack the connection
     ## attach = docker_endpoint("container_attach", client, fix = fix_id)
-    commit = docker_endpoint("image_commit", client,
-                             fix = list(name = attrs$name)),
+    ##
+    ## NOTE: The promotion list for commit is to mimic the argument
+    ## list for the command line version of `docker commit` (minus
+    ## "id" which is fixed).
+    commit = docker_endpoint(
+      "image_commit", client,
+      promote = c("repo", "tag", "author", "changes", "comment", "pause"),
+      fix = list(container = id), after = after_commit),
     diff = docker_endpoint("container_changes", client, fix = fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
     ## detach through as well and dealing with those through the

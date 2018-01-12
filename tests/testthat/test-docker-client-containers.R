@@ -885,3 +885,19 @@ test_that("run, passing through host_config", {
   e <- get_error(res$container$status())
   expect_true(is_docker_error_not_found(e))
 })
+
+test_that("commit", {
+  d <- test_docker_client()
+  x <- d$containers$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"))
+  on.exit(x$container$remove())
+  expect_equal(x$container$diff(),
+               data_frame(path = "/etc.tar.gz", kind = 1L))
+  img <- x$container$commit("alpine-with-etc", "latest")
+  h <- img$history()
+  expect_match(h[1, "created_by"], "^tar ")
+
+  files <- d$containers$run(img, c("ls", "/"), rm = TRUE)$logs
+  expect_true("etc.tar.gz" %in% trimws(files))
+
+  img$remove()
+})
