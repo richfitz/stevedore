@@ -257,10 +257,6 @@ docker_client_image_collection <- function(..., cl, parent) {
     get_image(id)
   }
   after_pull <- function(x, params) {
-    ## TODO: check with the python version, but if called as
-    ## pull("foo", tag = NULL) then *all* tags are pulled.  I don't
-    ## think that is clever because I think this should only ever pull
-    ## one image.
     get_image(params$query$fromImage)
   }
   stevedore_object(
@@ -281,10 +277,10 @@ docker_client_image_collection <- function(..., cl, parent) {
     import = docker_endpoint("image_import", cl),
     ## TODO: need to deal with registry auth properly.  For now I'm just
     ##   eliminating it from the list.
-    ## TODO: remove tag argument and fix to inject latest in if needed
     pull = docker_endpoint(
       "image_create", cl, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
+      process = list(process_image_and_tag(quote(name), quote(tag))),
       defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stdout()))),
       after = after_pull),
@@ -918,4 +914,61 @@ network_for_create <- function(network, host_config) {
       network <- list(network = NULL)
     }
   }, list(network = network, host_config = host_config))
+}
+
+## TODO: pass names through here too I think
+validate_image_and_tag <- function(image, tag = NULL,
+                                   name_image = deparse(substitute(image)),
+                                   name_tag = deparse(substitute(tag))) {
+  dat <- parse_image_name(image)
+  if (is.null(dat$tag)) {
+    dat$tag <- tag %||% "latest"
+  } else {
+    if (!is.null(tag)) {
+      stop(sprintf("If '%s' includes a tag, then '%s' must be NULL",
+                   name_image, name_tag))
+    }
+  }
+  dat
+}
+
+## TODO: this does not handle references (repo/image@ref) but that's
+## not that hard to add in here provided we can actually pass the @ref
+## through as if it was tag to things like pull
+DOCKER_REPO_RE <- '^(.+/)?([^:]+)(:[^:]+)?$'
+parse_image_name <- function(image, name = deparse(substitute(image))) {
+  assert_scalar_character(image, name)
+  if (!grepl(DOCKER_REPO_RE, image, perl = TRUE)) {
+    stop(sprintf("'%s' does not match pattern '[<repo>/]<image>[:<tag>]'",
+                 image))
+  }
+  name <- sub(DOCKER_REPO_RE, "\\2", image, perl = TRUE)
+
+  repo <- sub(DOCKER_REPO_RE, "\\1", image)
+  if (nzchar(repo)) {
+    repo <- sub("/$", "", repo)
+  } else {
+    repo <- NULL
+  }
+
+  ## The SHA processing here might be wrong.  The RE might need to
+  ## allow a leading 'sha265:' I think!
+  tag <- sub(DOCKER_REPO_RE, "\\3", image)
+  if (nzchar(tag)) {
+    tag <- sub("^:", "", tag)
+  } else {
+    tag <- NULL
+  }
+
+  ## This is actually the name that we want to use:
+  image <- if (is.null(repo)) name else paste(repo, name, sep = "/")
+  list(repo = repo, name = name, image = image, tag = tag)
+}
+
+process_image_and_tag <- function(image, tag) {
+  substitute({
+    image_tag <- validate_image_and_tag(image, tag)
+    image <- image_tag[["image"]]
+    tag <- image_tag[["tag"]]
+  }, list(image = image, tag = tag))
 }

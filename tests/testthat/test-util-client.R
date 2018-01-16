@@ -119,3 +119,45 @@ test_that("validate ports: random", {
                         HostPort = jsonlite::unbox("100")))),
                     ports = list("80/tcp" = NULL, "90/tcp" = NULL)))
 })
+
+
+test_that("parse image", {
+  expect_equal(parse_image_name("foo"),
+               list(repo = NULL, name = "foo", image = "foo", tag = NULL))
+  expect_equal(parse_image_name("foo:latest"),
+               list(repo = NULL, name = "foo", image = "foo", tag = "latest"))
+
+  expect_equal(parse_image_name("myrepo.net/foo"),
+               list(repo = "myrepo.net", name = "foo",
+                    image = "myrepo.net/foo", tag = NULL))
+  expect_equal(parse_image_name("myrepo.net/foo:latest"),
+               list(repo = "myrepo.net", name = "foo",
+                    image = "myrepo.net/foo", tag = "latest"))
+
+  expect_equal(parse_image_name("myrepo.net:5000/foo"),
+               list(repo = "myrepo.net:5000", name = "foo",
+                    image = "myrepo.net:5000/foo", tag = NULL))
+  expect_equal(parse_image_name("myrepo.net:5000/foo:latest"),
+               list(repo = "myrepo.net:5000", name = "foo",
+                    image = "myrepo.net:5000/foo", tag = "latest"))
+
+  expect_error(
+    parse_image_name("foo:bar:baz"),
+    "'foo:bar:baz' does not match pattern '[<repo>/]<image>[:<tag>]'",
+    fixed = TRUE)
+})
+
+test_that("validate image and tag", {
+  ## Check that names propagate on error:
+  img <- "foo:latest"
+  t <- "3.1"
+  expect_error(validate_image_and_tag(img, t),
+               "If 'img' includes a tag, then 't' must be NULL")
+
+  expect_equal(validate_image_and_tag("foo:xxx", NULL),
+               list(repo = NULL, name = "foo", image = "foo", tag = "xxx"))
+  expect_equal(validate_image_and_tag("foo", NULL),
+               list(repo = NULL, name = "foo", image = "foo", tag = "latest"))
+  expect_equal(validate_image_and_tag("foo", "3.1"),
+               list(repo = NULL, name = "foo", image = "foo", tag = "3.1"))
+})
