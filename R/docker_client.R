@@ -122,7 +122,7 @@ docker_client_container <- function(id, client) {
   after_top <- function(x, ...) {
     m <- matrix(unlist(x$processes), byrow = TRUE, nrow = length(x$processes))
     colnames(m) <- x$titles
-    ## TODO: some of these can be non-text.  Not sure how to safely do
+    ## NOTE: some of these can be non-text.  Not sure how to safely do
     ## that though.  So for now it's all going to be character.
     as.data.frame(m, stringsAsFactors = FALSE)
   }
@@ -171,7 +171,9 @@ docker_client_container <- function(id, client) {
       }
       attrs
     },
-    ## TODO: this one is hard because it might need to hijack the connection
+    ## TODO: "attach" is hard because it might need to hijack the
+    ## connection and deal with stdin (follow logs is close but not
+    ## quite the same)
     ## attach = docker_endpoint("container_attach", client, fix = fix_id)
     ##
     ## NOTE: The promotion list for commit is to mimic the argument
@@ -427,8 +429,6 @@ docker_client_volume <- function(id, client) {
     invisible(self)
   }
 
-  ## TODO: friendly "copy" interface needed here, but that requires a
-  ## bit more general work really.
   self <- stevedore_object(
     "docker_volume",
     name = function() attrs$name,
@@ -441,7 +441,6 @@ docker_client_volume <- function(id, client) {
     map = function(path, readonly = FALSE) {
       assert_scalar_character(path)
       assert_scalar_logical(readonly)
-      ## TODO: assert that we have an absolute path?
       fmt <- "%s:%s"
       if (readonly) {
         fmt <- paste0(fmt, ":ro")
@@ -668,8 +667,6 @@ validate_tar_directory <- function(name, stream = FALSE) {
     }, list(name = name))
 }
 
-## NOTE: if this is not used anywhere else it might be better to do
-## this inlining?
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
     x$id()
@@ -690,6 +687,8 @@ get_network_id <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+## TODO: this should be renamed to make it clear it is adding "latest"
+## and should go via parse_image_name
 image_name <- function(x, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (!grepl(":", x, fixed = TRUE)) {

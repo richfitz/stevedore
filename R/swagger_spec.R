@@ -9,14 +9,12 @@ read_spec <- function(version, refresh = FALSE) {
   if (!refresh && version %in% names(.stevedore$spec)) {
     return(.stevedore$spec[[version]])
   }
-  ## TODO: in theory we should be ok for versions that are _greater_
+  ## NOTE: in theory we should be ok for versions that are _greater_
   ## than the biggest we have, but with a warning, so long as the file
   ## can be found on the docker website.  There's a bit of testing to
-  ## get all of that right though.
-  ##
-  ## TODO: I've removed it for now, but this can be memoised easily
-  ## (but reading takes only 1/20s so it's not really worth it and we
-  ## might do the memoisation later than this).
+  ## get all of that right though.  That should be dealt with at a
+  ## higher level than this function though, which should just read a
+  ## spec.
   path <- spec_path()
   pos <- names(.stevedore$index)
   if (!(version %in% pos)) {
