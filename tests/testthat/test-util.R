@@ -105,3 +105,33 @@ test_that("stream filtering", {
   expect_equal(format(obj, style = "plain", filter = c("stdin")), character(0))
   expect_equal(format(obj, style = "plain", filter = NULL), x)
 })
+
+test_that("integer apply", {
+  twice <- function(x) {
+    x * (if (is.integer(x)) 2L else 2.0)
+  }
+  ## Basic mode: this is all ok
+  x <- list(a = 100L, b = 200L)
+  expect_identical(viapply(x, twice), c(a = 200L, b = 400L))
+  expect_identical(viapply(x, twice, USE.NAMES = FALSE), c(200L, 400L))
+
+  ## How about integer-as-numeric?
+  x <- lapply(x, as.numeric)
+  expect_identical(viapply(x, twice), c(a = 200L, b = 400L))
+  expect_identical(viapply(x, twice, USE.NAMES = FALSE), c(200L, 400L))
+
+  ## Very large numbers:
+  large <- .Machine$integer.max + 1.0
+  x <- list(a = 100L, b = large)
+  expect_identical(viapply(x, twice), c(a = 200.0, b = large * 2))
+  expect_identical(viapply(x, twice, USE.NAMES = FALSE),
+                   c(200.0, large * 2))
+})
+
+test_that("integer apply/json serialisation", {
+  fmt <- '[{"a": %s}, {"a": %s}]'
+  s1 <- sprintf(fmt, "100", "200")
+  s2 <- sprintf(fmt, "10000000000", "20000000000")
+  expect_identical(viapply(from_json(s1), "[[", "a"), c(100L, 200L))
+  expect_identical(viapply(from_json(s2), "[[", "a"), (1:2) * 10^10)
+})

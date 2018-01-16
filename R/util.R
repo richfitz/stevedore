@@ -8,8 +8,43 @@
 vlapply <- function(X, FUN, ...) {
   vapply(X, FUN, logical(1), ...)
 }
-viapply <- function(X, FUN, ...) {
-  vapply(X, FUN, integer(1), ...)
+viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
+  ## Because we might bump into things like large image sizes that are
+  ## essentially integers but overflow what R can store as integers
+  ## (2^31 - 1) we need to be careful when requesting integers.  This
+  ## adds a fair bit of logic but should handle things somewhat
+  ## gracefully:
+  ##
+  ## * If everything is integer, return that
+  ## * If everything is _representable_ as integer, coerce to integer
+  ##   and return that (this is necessary because fromJSON may convert
+  ##   6-digit integers to numeric)
+  ## * If we would overflow, coerce to numeric because for all intents
+  ##   that's usable in R
+  dat <- lapply(X, FUN, ...)
+  if (!USE.NAMES) {
+    names(dat) <- NULL
+  }
+  is_integer <- vlapply(dat, is.integer)
+  if (all(is_integer)) {
+    vapply(dat, "[[", integer(1), 1L)
+  } else {
+    ## NOTE: super strict here, but I think this holds right up to max
+    ## double for text->numeric types
+    is_integer_like <- vnapply(dat, `%%`, 1) == 0
+    is_in_integer_range <- vnapply(dat, abs) < .Machine$integer.max
+    if (!all(is_integer_like)) {
+      stop("Result not integer-like")
+    }
+    if (all(is_in_integer_range)) {
+      vapply(dat, as.integer, integer(1))
+    } else {
+      vnapply(dat, "[[", 1L)
+    }
+  }
+}
+vnapply <- function(X, FUN, ...) {
+  vapply(X, FUN, numeric(1), ...)
 }
 vcapply <- function(X, FUN, ...) {
   vapply(X, FUN, character(1), ...)
