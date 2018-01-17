@@ -204,3 +204,17 @@ test_that("search", {
   expect_false(ans$is_official[i])
   expect_false(ans$is_automated[i])
 })
+
+## This tests that we have everything plumbed enough that we do see
+## api differences in the responses when requesting different api
+## versions.
+test_that("api versions", {
+  d1 <- test_docker_client(api_version = "1.29")
+  d2 <- test_docker_client(api_version = "1.26")
+
+  info_1 <- d1$images$get("hello-world")$inspect()
+  info_2 <- d2$images$get("hello-world")$inspect()
+
+  expect_true("os_version" %in% names(info_1))
+  expect_false("os_version" %in% names(info_2))
+})
