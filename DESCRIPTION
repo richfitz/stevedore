@@ -11,7 +11,6 @@ License: MIT + file LICENSE
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
     email = "rich.fitzjohn@gmail.com"))
 Imports:
-    R6,
     crayon,
     curl (>= 2.3.0),
     jsonlite,

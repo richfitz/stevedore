@@ -1,71 +1,66 @@
 ## All 'curl::' calls go in this file; this isolates all the low-level
 ## communication bits.  The only major overlap is that we also do a
 ## version check here before we start using the generated api.
-R6_http_client <- R6::R6Class(
-  "http_client",
-  cloneable = FALSE,
-  public = list(
-    handle = NULL,
-    api_version = NULL,
-    base_url = NULL,
+http_client <- function(base_url = NULL, api_version = NULL) {
+  ## For now hard code up as the domain socket only.  Changing
+  ## this to support working over a port is slightly more work;
+  ## we'll need to change the initialiser and the
+  ## make_handle_socket function and change the base_url
+  ## (currently it is set to http://localhost, which is not what
+  ## would be wanted if we had a proper url).
+  if (!is.null(base_url)) {
+    stop("Providing docker url is not currently supported")
+  }
+  base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
+  handle <- make_handle_socket(base_url)
+  base_url <- "http://localhost"
+  api_version <- http_client_api_version(api_version, base_url, handle,
+                                         MIN_DOCKER_API_VERSION,
+                                         MAX_DOCKER_API_VERSION)
 
-    initialize = function(base_url = NULL, api_version = NULL) {
-      ## For now hard code up as the domain socket only.  Changing
-      ## this to support working over a port is slightly more work;
-      ## we'll need to change the initialiser and the
-      ## make_handle_socket function and change the base_url
-      ## (currently it is set to http://localhost, which is not what
-      ## would be wanted if we had a proper url).
-      if (!is.null(base_url)) {
-        stop("Providing docker url is not currently supported")
-      }
-      base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
-      self$handle <- make_handle_socket(base_url)
-      self$base_url <- "http://localhost"
-      self$api_version <-
-        http_client_api_version(api_version, self,
-                                MIN_DOCKER_API_VERSION,
-                                MAX_DOCKER_API_VERSION)
-    },
-
-    request = function(verb, path, query = NULL, body = NULL, headers = NULL,
-                       hijack = NULL, mode = "rb", versioned_api = TRUE) {
-      v <- if (versioned_api) self$api_version else NULL
-      url <- build_url(self$base_url, v, path, query)
-      if (!is.null(body)) {
-        if (is.raw(body)) {
-          body_raw <- body
-          content_type <- "application/octet-stream" # or application/x-tar
-        } else {
-          body_raw <- charToRaw(body)
-          content_type <- "application/json"
-        }
-        h <- self$handle(headers = c("Content-Type" = content_type, headers))
-        curl::handle_setopt(h,
-                            post = TRUE,
-                            postfieldsize = length(body_raw),
-                            postfields = body_raw,
-                            customrequest = verb)
+  request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
+                      hijack = NULL, mode = "rb", versioned_api = TRUE) {
+    v <- if (versioned_api) api_version else NULL
+    url <- build_url(base_url, v, path, query)
+    if (!is.null(body)) {
+      if (is.raw(body)) {
+        body_raw <- body
+        content_type <- "application/octet-stream" # or application/x-tar
       } else {
-        h <- self$handle(headers = headers)
-        curl::handle_setopt(h, customrequest = verb)
+        body_raw <- charToRaw(body)
+        content_type <- "application/json"
       }
-      if (verb == "HEAD") {
-        curl::handle_setopt(h, nobody = TRUE)
-      }
-      if (!is.null(hijack)) {
-        assert_is(hijack, "function")
-        ## TODO: if I need to use a connection (e.g., to write to
-        ## stdin) then curl::handle_data is the way to get the
-        ## information out of the headers.  curl::curl is the same as
-        ## curl:::curl_collection (see the body of curl_fetch_stream.
-        ## Jeroen has certainly made this nice to work with!
-        curl::curl_fetch_stream(url, hijack, h)
-      } else {
-        curl::curl_fetch_memory(url, h)
-      }
+      h <- handle(headers = c("Content-Type" = content_type, headers))
+      curl::handle_setopt(h,
+                          post = TRUE,
+                          postfieldsize = length(body_raw),
+                          postfields = body_raw,
+                          customrequest = verb)
+    } else {
+      h <- handle(headers = headers)
+      curl::handle_setopt(h, customrequest = verb)
     }
-  ))
+    if (verb == "HEAD") {
+      curl::handle_setopt(h, nobody = TRUE)
+    }
+    if (!is.null(hijack)) {
+      assert_is(hijack, "function")
+      ## TODO: if I need to use a connection (e.g., to write to
+      ## stdin) then curl::handle_data is the way to get the
+      ## information out of the headers.  curl::curl is the same as
+      ## curl:::curl_collection (see the body of curl_fetch_stream.
+      ## Jeroen has certainly made this nice to work with!
+      curl::curl_fetch_stream(url, hijack, h)
+    } else {
+      curl::curl_fetch_memory(url, h)
+    }
+  }
+
+  list(request = request,
+       handle = handle,
+       base_url = base_url,
+       api_version = api_version)
+}
 
 ## Factory function for fresh curl handles.  In theory we could do
 ## this from a pool but for now I'm just doing this in the most
@@ -174,7 +169,7 @@ parse_headers <- function(headers) {
 ## * do we ever look? Or require a match?
 ## * do we ever look *remotely*
 ## * what is our floor version number
-http_client_api_version <- function(api_version, client,
+http_client_api_version <- function(api_version, base_url, handle,
                                     min_version, max_version) {
   version_type <- "Requested"
   if (is.null(api_version)) {
@@ -185,12 +180,14 @@ http_client_api_version <- function(api_version, client,
   } else {
     assert_scalar_character("api_version")
     if (tolower(api_version) == "detect") {
-      version_type <- "Detected"
-      ## TODO; temporarily set the version here to the default version
-      ## (i.e., whatever we ship with) to avoid hitting the deprecated
-      ## api-without-version issue.
-      res <- client$request("GET", "/version", versioned_api = FALSE)
+      url <- build_url(base_url, DEFAULT_DOCKER_API_VERSION, "/version")
+      res <- curl::curl_fetch_memory(url, handle())
+      ## Probably worth doing this:
+      ## if (res$status_code != 200L) {
+      ##   response_to_error(res, NULL, NULL, NULL)
+      ## }
       api_version <- raw_to_json(res$content)$ApiVersion
+      version_type <- "Detected"
     } else {
       numeric_version(api_version) # or throw
     }
