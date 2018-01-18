@@ -901,3 +901,28 @@ test_that("commit", {
 
   img$remove()
 })
+
+test_that("versioned responses", {
+  ## TODO: this is broken for 25..28 inclusive.  The fix is to get the
+  ## newer port definition here, but I don't know if that is because
+  ## the spec (and responses) are wrong or if it's because new clients
+  ## do not return the correct information.  This is a bit of a faff
+  ## really.
+  d1 <- test_docker_client(api_version = MIN_DOCKER_API_VERSION)
+  nm <- rand_str(10, "stevedore_")
+  ## options(error = recover)
+  x <- d1$containers$create("nginx", ports = TRUE, name = nm)
+
+  ## Error is with data: named empty list (json: {})
+  ## From 'Ports'
+
+  ## d1 <- test_docker_client(api_version = "1.29")
+  d2 <- test_docker_client(api_version = MAX_DOCKER_API_VERSION)
+  x <- d2$containers$create("nginx", ports = TRUE)
+  ## on.exit(x$remove(force = TRUE))
+  x$start()
+  x$ports()
+  y <- d1$containers$get(x$id())
+  x$remove(force = TRUE)
+
+})
