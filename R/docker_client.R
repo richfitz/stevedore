@@ -222,7 +222,7 @@ docker_client_container <- function(id, client) {
     ## NOTE: consider using parent?
     remove = docker_endpoint(
       "container_delete", client, fix = fix_id,
-      rename = c(delete_volumes = "v"))
+      rename = c(delete_volumes = "v")),
     ## This might force refresh?
     rename = docker_endpoint("container_rename", client, fix = fix_id),
     resize = docker_endpoint("container_resize", client, fix = fix_id),
