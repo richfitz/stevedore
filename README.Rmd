@@ -7,7 +7,7 @@
 
 A docker client for R
 
-**WARNING**: package is in early development. If you run the test suite it may do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f`
+**WARNING**: package is in early development. If you run the test suite it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  The examples are more polite.
 
 ```{r, prep, include = FALSE}
 knitr::opts_chunk$set(error = FALSE)

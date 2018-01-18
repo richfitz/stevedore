@@ -80,6 +80,7 @@ docker_client_container_collection <- function(..., cl, parent) {
       after = after_list),
     remove = docker_endpoint(
       "container_delete", cl,
+      rename = c(delete_volumes = "v"),
       process = list(quote(id <- get_image_id(id)))),
     prune = docker_endpoint("container_prune", cl))
 }
@@ -218,7 +219,10 @@ docker_client_container <- function(id, client) {
       after = after_logs),
     pause = docker_endpoint("container_pause", client, fix = fix_id),
     ## This should invalidate our container afterwards
-    remove = docker_endpoint("container_delete", client, fix = fix_id),
+    ## NOTE: consider using parent?
+    remove = docker_endpoint(
+      "container_delete", client, fix = fix_id,
+      rename = c(delete_volumes = "v"))
     ## This might force refresh?
     rename = docker_endpoint("container_rename", client, fix = fix_id),
     resize = docker_endpoint("container_resize", client, fix = fix_id),
@@ -268,7 +272,9 @@ docker_client_image_collection <- function(..., cl, parent) {
     ##   multiple 't' parameters - needs support in generated handlers
     build = docker_endpoint(
       "image_build", cl,
+      drop = "content_type",
       rename = c(context = "input_stream", tag = "t"),
+      defaults = alist(context =),
       extra = alist(stream = stdout()),
       process = list(validate_stream_and_close(quote(stream)),
                      validate_tar_directory(quote(context))),
@@ -319,6 +325,7 @@ docker_client_image <- function(id, client) {
     ## want.  So we rebuild the endpoint without the `fix` argument
     ## and then call it with just the tag.
     docker_endpoint("image_delete", client)(repo_tag, noprune = TRUE)
+    invisible(self)
   }
   fix_id_as_name = list(name = id)
   self <- stevedore_object(
@@ -338,7 +345,7 @@ docker_client_image <- function(id, client) {
     ## TODO: this needs to add a 'filename' option for saving
     export = docker_endpoint("image_tarball", client, fix = fix_id_as_name),
     tag = docker_endpoint("image_tag", client, fix = fix_id_as_name,
-                          after = invisible_self),
+                          after = invisible_self, defaults = alist(repo =)),
     untag = untag,
     ## NOTE: this always tries to remove the image by *id* not by
     ## name, which is not ideal really.  When force = TRUE it's
