@@ -5,6 +5,8 @@ services:
   - docker
 r_packages:
   - covr
+r_github_packages:
+  - richfitz/httppipe
 before_script:
   - docker pull hello-world
   - docker pull alpine
@@ -12,6 +14,8 @@ before_script:
   - docker pull bfirsh/reticulate-splines
   - docker pull nginx
   - (cd tests/testthat/images && ./build.sh)
+before_install:
+  - pip install numpy requests
 after_success:
   - Rscript -e 'covr::codecov()'
 addons:

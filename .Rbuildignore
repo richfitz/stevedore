@@ -5,3 +5,5 @@
 ^docs$
 ^update_web\.sh$
 ^README\.Rmd$
+\.pyc$
+__pycache__

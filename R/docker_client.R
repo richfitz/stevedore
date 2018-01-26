@@ -9,15 +9,22 @@
 ##'   1.33), or the string \code{detect} which will use the highest
 ##'   version out of the version reported by the api and 1.33
 ##'
+##' @param type HTTP client type to use.  The options are (currently)
+##'   "curl", which uses the \code{curl} package (works over unix
+##'   sockets and eventually over TCP) and \code{httppipe} which works
+##'   over unix sockets and eventually windows named pipes, using the
+##'   Docker SDK's pipe code via the \code{httppipe} package.  Not all
+##'   functionality is supported with the \code{httppipe} client.
+##'
 ##' @export
-docker_client <- function(..., api_version = NULL) {
+docker_client <- function(..., api_version = NULL, type = NULL) {
   ## The design through here mimics the Python docker library; we have
   ## a concept of a "foo collection" (e.g., a container collection)
   ## that produces instances of "foo" objects (e.g., containers).
   ## This will be replicated for networks, volumes, etc.  Unlike the
   ## Python inteface we're not doing this with any fancy inheritance
   ## etc.
-  cl <- docker_client_base(..., api_version = api_version)
+  cl <- docker_client_base(..., api_version = api_version, type = type)
 
   ret <- stevedore_object(
     "docker_client",

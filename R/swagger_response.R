@@ -396,6 +396,10 @@ decode_chunked_string <- function(x, ...) {
 
   i_size <- 5L:8L
   to_int <- function(b) {
+    ## I don't know if this will work across all platforms (yay,
+    ## Solaris) becaus of endianless drama.  But then I doubt that
+    ## docker works on Solaris.
+    ## packBits(rawToBits(b), "integer")
     sum(256^(3:0) * as.integer(b))
   }
 

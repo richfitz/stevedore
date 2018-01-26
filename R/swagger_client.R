@@ -22,10 +22,10 @@ stevedore_read_endpoints <- function() {
   unname(dat)
 }
 
-docker_client_base <- function(..., api_version = NULL) {
+docker_client_base <- function(..., api_version = NULL, type = NULL) {
   base_url <- NULL
   self <- new.env(parent = parent.env(environment()))
-  self$http_client <- http_client(base_url, api_version)
+  self$http_client <- http_client(base_url, api_version, type)
   dat <- docker_client_data(self$http_client$api_version)
   self$endpoints <- dat$endpoints
   lock_environment(self)

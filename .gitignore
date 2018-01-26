@@ -5,3 +5,5 @@ inst/spec/v*.yaml
 inst/doc
 TODO.md
 docs/
+*.pyc
+__pycache__

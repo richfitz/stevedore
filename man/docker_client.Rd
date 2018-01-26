@@ -4,7 +4,7 @@
 \alias{docker_client}
 \title{Create docker client}
 \usage{
-docker_client(..., api_version = NULL)
+docker_client(..., api_version = NULL, type = NULL)
 }
 \arguments{
 \item{...}{Reserved for future use}
@@ -15,6 +15,13 @@ default version (currently 1.29), a version as a string or
 \code{\link{numeric_version}} object (supported between 1.25 and
 1.33), or the string \code{detect} which will use the highest
 version out of the version reported by the api and 1.33}
+
+\item{type}{HTTP client type to use.  The options are (currently)
+"curl", which uses the \code{curl} package (works over unix
+sockets and eventually over TCP) and \code{httppipe} which works
+over unix sockets and eventually windows named pipes, using the
+Docker SDK's pipe code via the \code{httppipe} package.  Not all
+functionality is supported with the \code{httppipe} client.}
 }
 \description{
 Create a docker client object

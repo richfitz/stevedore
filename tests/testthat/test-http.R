@@ -27,17 +27,16 @@ test_that("version", {
     fixed = TRUE)
   expect_equal(ans, "2.01")
 
-  v <- http_client_api_version("detect", cl, "1.0", "9.99")
-  expect_equal(v, d$version()$api_version)
+  f <- function() "1.23"
+  expect_equal(http_client_api_version("detect", f, "1.0", "9.99"),
+               "1.23")
 
   expect_message(
-    ans <- http_client_api_version("detect", cl$base_url, cl$handle,
-                                   "1.01", "1.04"),
+    ans <- http_client_api_version("detect", f, "1.01", "1.04"),
     "Detected API version '.+' is above max version '1.04'; downgrading")
   expect_equal(ans, "1.04")
   expect_message(
-    ans <- http_client_api_version("detect", cl$base_url, cl$handle,
-                                   "2.01", "2.04"),
+    ans <- http_client_api_version("detect", f, "2.01", "2.04"),
     "Detected API version '.+' is below min version '2.01'; upgrading")
   expect_equal(ans, "2.01")
 })

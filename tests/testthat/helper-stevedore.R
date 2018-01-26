@@ -192,6 +192,11 @@ test_docker_client <- function(...) {
   docker_client(...)
 }
 
+test_docker_client_httppipe <- function(...) {
+  skip_if_no_httppipe_support()
+  docker_client(..., type = "httppipe")
+}
+
 has_internet <- function() {
   !is.null(suppressWarnings(utils::nsl("www.google.com")))
 }
@@ -201,6 +206,13 @@ skip_if_no_internet <- function() {
     return()
   }
   testthat::skip("no internet")
+}
+
+skip_if_no_httppipe_support <- function() {
+  testthat::skip_if_not_installed("httppipe")
+  if (!httppipe::httppipe_available()) {
+    testthat::skip("httppipe support not possible")
+  }
 }
 
 test_sample_responses <- function(v, skip = NULL) {

@@ -18,6 +18,7 @@ Imports:
     prettyunits,
     yaml
 Suggests:
+    httppipe,
     knitr,
     rmarkdown,
     testthat,
