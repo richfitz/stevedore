@@ -51,9 +51,6 @@ build_url <- function(base_url, api_version, path, params = NULL) {
   }
 }
 
-## TODO: escape parameters; consider 'curl::curl_escape' but also
-## gsub(' ', '+', x) which is what the python client used (though I
-## don't see this mentioned in the spec itself)
 build_url_query <- function(params) {
   if (length(params) > 0L) {
     stopifnot(is.list(params),
@@ -63,7 +60,7 @@ build_url_query <- function(params) {
       if (is.logical(x)) {
         if (x) "true" else "false"
       } else {
-        as.character(x)
+        curl::curl_escape(as.character(x))
       }
     }
     q <- paste(sprintf("%s=%s", names(params), vcapply(params, to_character)),
