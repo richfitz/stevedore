@@ -16,12 +16,7 @@ http_client_curl <- function(base_url = NULL, api_version = NULL) {
 
   version_detect <- function() {
     url <- build_url(base_url, DEFAULT_DOCKER_API_VERSION, "/version")
-    res <- curl::curl_fetch_memory(url, handle())
-    ## Probably worth doing this:
-    ## if (res$status_code != 200L) {
-    ##   response_to_error(res, NULL, NULL, NULL)
-    ## }
-    raw_to_json(res$content)$ApiVersion
+    version_response(curl::curl_fetch_memory(url, handle()))
   }
 
   base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
@@ -55,9 +50,9 @@ http_client_curl <- function(base_url = NULL, api_version = NULL) {
     }
     if (!is.null(hijack)) {
       assert_is(hijack, "function")
-      ## TODO: if I need to use a connection (e.g., to write to
-      ## stdin) then curl::handle_data is the way to get the
-      ## information out of the headers.  curl::curl is the same as
+      ## NOTE: if I need to use a connection (e.g., to write to stdin)
+      ## then curl::handle_data is the way to get the information out
+      ## of the headers.  curl::curl is the same as
       ## curl:::curl_collection (see the body of curl_fetch_stream.
       ## Jeroen has certainly made this nice to work with!
       curl::curl_fetch_stream(url, hijack, h)

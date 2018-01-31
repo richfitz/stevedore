@@ -10,9 +10,7 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL) {
 
   version_detect <- function() {
     url <- build_url("", DEFAULT_DOCKER_API_VERSION, "/version")
-    res <- client("GET", url, headers_agent)
-    ## TODO: check result
-    from_json(res$content)$ApiVersion
+    version_response(client("GET", url, headers_agent))
   }
   api_version <- http_client_api_version(api_version, version_detect)
 

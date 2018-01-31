@@ -15,7 +15,7 @@ response_to_error <- function(response, pass_error, endpoint, reason) {
   headers <- curl::parse_headers_list(response$headers)
   type <- headers[["content-type"]]
   if (length(response$content) > 0L) {
-    if (string_starts_with(type, "text/plain")) {
+    if (!string_starts_with(type, "application/json")) {
       ## This is thrown when we send junk to the server -
       ## unmarshalling errors for example.
       msg <- raw_to_char(response$content)
@@ -129,6 +129,13 @@ http_client_api_version <- function(api_version, detect,
   }
 
   api_version
+}
+
+version_response <- function(res) {
+  if (res$status_code != 200L) {
+    response_to_error(res, NULL, "/_ping", "Detecting version")
+  }
+  from_json(res$content)$ApiVersion
 }
 
 ## This is the lowest level of the streaming functions - others can be

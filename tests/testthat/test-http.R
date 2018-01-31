@@ -40,3 +40,17 @@ test_that("version", {
     "Detected API version '.+' is below min version '2.01'; upgrading")
   expect_equal(ans, "2.01")
 })
+
+test_that("version_response", {
+  d <- test_docker_client()
+  x <- d$containers$run("nginx", ports = TRUE, rm = TRUE,
+                        detach = TRUE)
+  on.exit(x$stop(t = 0))
+
+  url <- sprintf("http://localhost:%s/404", x$ports()$host_port)
+  res <- curl::curl_fetch_memory(url)
+
+  expect_error(version_response(res),
+               rawToChar(res$content),
+               fixed = TRUE)
+})
