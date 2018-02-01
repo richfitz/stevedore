@@ -270,7 +270,7 @@ docker_client_image_collection <- function(..., cl, parent) {
     get_image(id)
   }
   after_pull <- function(x, params) {
-    get_image(params$query$fromImage)
+    get_image(sprintf("%s:%s", params$query$fromImage, params$query$tag))
   }
   stevedore_object(
     "docker_image_collection",
