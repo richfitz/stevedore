@@ -14,11 +14,11 @@ before_script:
   - docker pull bfirsh/reticulate-splines
   - docker pull nginx
   - (cd tests/testthat/images && ./build.sh)
-before_install:
-  - pip install numpy requests
 after_success:
   - Rscript -e 'covr::codecov()'
 addons:
   apt:
     packages:
       - libcurl4-openssl-dev
+      - python-numpy
+      - python-requests
