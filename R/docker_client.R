@@ -73,6 +73,7 @@ docker_client_container_collection <- function(..., cl, parent) {
       "container_create", cl,
       promote = c("image", "cmd"),
       rename = c(ports = "exposed_ports", network = "networking_config"),
+      defaults = alist(image =),
       process = list(
         quote(image <- get_image_id(image)),
         quote(cmd <- check_command(cmd)),

@@ -13,18 +13,6 @@ endpoint_args <- function(method, path, x, spec) {
     body$schema <- resolve_schema_ref(body$schema, spec)
 
     if (body$schema$type == "object") {
-      ## TODO; we'll expand this a little if there are more - the idea
-      ## is that there is no way of determining from the yaml spec
-      ## which parameters are compulsary, so this way we can flag them
-      ## one-by-one.  So it's something that will get updated as the
-      ## underlying spec changes, but _hopefully_ not too badly with
-      ## version and not too often.  Later we can move this
-      ## information into the endpoints.yaml file perhaps.  We might
-      ## want to arbitrarily patch parameters with additional
-      ## information and then process them during argument parsing?
-      if (method == "post" && path == "/containers/create") {
-        body$schema$properties$Image$required <- TRUE
-      }
       description <- tolower1(body$description) %||% "request body"
       to_par <- function(x) {
         el <- resolve_schema_ref(body$schema$properties[[x]], spec)
