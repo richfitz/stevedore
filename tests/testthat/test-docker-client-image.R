@@ -41,15 +41,13 @@ test_that("inspect", {
 test_that("tag/reload/untag", {
   img <- test_docker_client()$images$get("hello-world")
   tag <- rand_str(10)
+  prev <- img$tags()
   expect <- paste0(tag, ":latest")
-  img$tag(tag)
-  expect_false(expect %in% img$tags())
-  tmp <- img$reload()
-  expect_identical(tmp, img)
+  res <- img$tag(tag)
+  expect_identical(res, img)
   expect_true(expect %in% img$tags())
-  expect_equal(img$untag(expect),
-               data.frame(untagged = expect, deleted = NA_character_,
-                          stringsAsFactors = FALSE))
+  res <- img$untag(expect)
+  expect_false(expect %in% img$tags())
 })
 
 test_that("untag - invalid tag", {

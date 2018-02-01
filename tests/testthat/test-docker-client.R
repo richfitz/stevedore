@@ -54,13 +54,14 @@ test_that("Prevent invalid access", {
   d <- test_docker_client()
   expect_error(d$foo, "No element 'foo' within 'docker_client' object")
   expect_error(d[["foo"]], "No element 'foo' within 'docker_client' object")
-  expect_error(d[[1]], "'i' must be a character")
+  expect_error(d[[1]], "'i' must be a scalar character (non-NA)", fixed = TRUE)
 
   expect_error(d$containers$foo,
                "No element 'foo' within 'docker_container_collection' object")
   expect_error(d[["containers"]][["foo"]],
                "No element 'foo' within 'docker_container_collection' object")
-  expect_error(d$containers[[1]], "'i' must be a character")
+  expect_error(d$containers[[1]], "'i' must be a scalar character (non-NA)",
+               fixed = TRUE)
 })
 
 test_that("print", {

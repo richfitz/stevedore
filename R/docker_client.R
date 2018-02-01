@@ -316,7 +316,7 @@ docker_client_image <- function(id, client) {
     invisible(self)
   }
   invisible_self <- function(...) {
-    invisible(self)
+    invisible(self$reload())
   }
   ## TODO: repo and tag should be separate as for tag (with option
   ## to do them together).
@@ -332,7 +332,7 @@ docker_client_image <- function(id, client) {
     ## want.  So we rebuild the endpoint without the `fix` argument
     ## and then call it with just the tag.
     docker_endpoint("image_delete", client)(repo_tag, noprune = TRUE)
-    invisible(self)
+    invisible(self$reload())
   }
   fix_id_as_name = list(name = id)
   self <- stevedore_object(
