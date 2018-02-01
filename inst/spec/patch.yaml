@@ -53,7 +53,9 @@
   value:
     produces: "application/json"
 
+# NOTE: this is *not* an error in the spec but a hint for stevedore's
+# response type generator
 - version: ["1.25", "1.33"]
   path: ["paths", "/containers/{id}/logs", "get"]
   value:
-    produces: "application/json"
+    produces: "application/chunked-string"

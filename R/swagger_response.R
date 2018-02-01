@@ -12,16 +12,8 @@
 ## It also does not handle the spec as provided by docker (it also
 ## does not have automatically generated handler functions so this
 ## might be worth pushing upstream).
-make_response_handlers <- function(responses, spec, produces, override) {
+make_response_handlers <- function(responses, spec, produces) {
   responses <- responses[as.integer(names(responses)) < 300]
-  if (!is.null(override)) {
-    ## If we need to just override a subset here we should take a list
-    ## in rather than a function.
-    ret <- rep(list(override), length(responses))
-    names(ret) <- names(responses)
-    return(ret)
-  }
-
   lapply(responses, make_response_handler, spec, produces)
 }
 
@@ -37,6 +29,8 @@ make_response_handler <- function(response, spec, produces) {
     make_response_handler_binary(response)
   } else if (produces == "text/plain") {
     make_response_handler_text(response)
+  } else if (produces == "application/chunked-string") {
+    make_response_handler_chunked_string(response)
   } else {
     stop("Unhandled response type ", produces) # nocov [stevedore bug]
   }
@@ -314,6 +308,12 @@ make_response_handler_binary <- function(...) {
 make_response_handler_text <- function(...) {
   function(data, as_is_names) {
     raw_to_char(data)
+  }
+}
+
+make_response_handler_chunked_string <- function(...) {
+  function(data, as_is_names) {
+    decode_chunked_string(data)
   }
 }
 

@@ -29,13 +29,7 @@ make_endpoint <- function(name, method, path, spec) {
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
 
-  ## TODO: these will move into the endpoints.yaml file I think
-  override <- NULL
-  if (method == "get" && path == "/containers/{id}/logs") {
-    override <- decode_chunked_string
-  }
-  response_handlers <-
-    make_response_handlers(x$responses, spec, produces, override)
+  response_handlers <- make_response_handlers(x$responses, spec, produces)
 
   header_handlers <- make_header_handlers(x$responses, spec)
 
