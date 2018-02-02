@@ -1,5 +1,5 @@
 http_client <- function(base_url = NULL, api_version = NULL, type = NULL) {
-  data <- http_client_data(base_url, api_version, is_windows())
+  data <- http_client_data(base_url, type, is_windows())
   switch(data$type,
          curl = http_client_curl(data$base_url, api_version),
          httppipe = http_client_httppipe(data$base_url, api_version),
