@@ -1,24 +1,5 @@
 context("util (tar)")
 
-test_that("tar_data", {
-  expect_equal(tar_data(NULL, numeric_version("3.0.0")),
-               list(tar = utils::tar,
-                    type = "utils",
-                    works = FALSE))
-  expect_equal(tar_data(NULL, numeric_version("3.5.0")),
-               list(tar = utils::tar,
-                    type = "utils",
-                    works = TRUE))
-  expect_equal(tar_data(identity, numeric_version("3.0.0")),
-               list(tar = identity,
-                    type = "r-lib",
-                    works = TRUE))
-  expect_equal(tar_data(identity, numeric_version("3.5.0")),
-               list(tar = identity,
-                    type = "r-lib",
-                    works = TRUE))
-})
-
 test_that("tar_directory", {
   p <- tempfile()
   dir.create(p, TRUE, FALSE)
