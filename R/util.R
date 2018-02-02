@@ -301,3 +301,7 @@ system3 <- function(command, args) {
        code = code,
        output = res)
 }
+
+is_windows <- function() {
+  Sys.info()[["sysname"]] == "Windows"
+}

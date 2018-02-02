@@ -1,9 +1,6 @@
 http_client_httppipe <- function(base_url = NULL, api_version = NULL) {
   loadNamespace("httppipe")
-  if (!is.null(base_url)) {
-    stop("Providing docker url is not currently supported")
-  }
-  client <- httppipe::httppipe(DEFAULT_DOCKER_UNIX_SOCKET)
+  client <- httppipe::httppipe(base_url)
   base_url <- "http://localhost"
 
   headers_agent <- list("User-Agent" = DEFAULT_USER_AGENT)

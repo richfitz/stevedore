@@ -1,8 +1,8 @@
 http_client <- function(base_url = NULL, api_version = NULL, type = NULL) {
-  type <- match_value(type %||% "curl", c("curl", "httppipe"))
-  switch(type,
-         curl = http_client_curl(base_url, api_version),
-         httppipe = http_client_httppipe(base_url, api_version),
+  data <- http_client_data(base_url, api_version, is_windows())
+  switch(data$type,
+         curl = http_client_curl(data$base_url, api_version),
+         httppipe = http_client_httppipe(data$base_url, api_version),
          stop("stevedore bug")) # nocov
 }
 
@@ -171,4 +171,19 @@ streaming_json <- function(callback) {
   }
   attr(ret, "content") <- function() res
   ret
+}
+
+http_client_data <- function(base_url = NULL, type = NULL,
+                             windows = is_windows()) {
+  if (is.null(type)) {
+    type <- if (windows) "httppipe" else "curl"
+  }
+  if (is.null(base_url)) {
+    base_url <-
+      if (windows) DEFAULT_DOCKER_WINDOWS_PIPE else DEFAULT_DOCKER_UNIX_SOCKET
+  } else {
+    assert_scalar_character(base_url)
+  }
+  list(type = match_value(type, c("curl", "httppipe")),
+       base_url = base_url)
 }
