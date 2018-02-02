@@ -135,3 +135,12 @@ test_that("integer apply/json serialisation", {
   expect_identical(viapply(from_json(s1), "[[", "a"), c(100L, 200L))
   expect_identical(viapply(from_json(s2), "[[", "a"), (1:2) * 10^10)
 })
+
+test_that("sys_which", {
+  expect_silent(p <- sys_which("ping"))
+  expect_is(p, "character")
+  expect_identical(p, unname(Sys.which("ping")))
+
+  expect_error(sys_which("unknown-program-never-exists"),
+               "Did not find program 'unknown-program-never-exists'")
+})
