@@ -305,3 +305,11 @@ system3 <- function(command, args) {
 is_windows <- function() {
   Sys.info()[["sysname"]] == "Windows"
 }
+
+nothing <- function(...) {
+  invisible()
+}
+
+read_binary <- function(path) {
+  readBin(path, raw(), file.size(path))
+}

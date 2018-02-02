@@ -47,6 +47,8 @@ tar_files <- function(files, root) {
 }
 
 tar_file <- function(file) {
+  assert_scalar_character(file)
+  assert_file_exists(file)
   tar_files(basename(file), dirname(file))
 }
 

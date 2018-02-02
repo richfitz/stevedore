@@ -193,6 +193,28 @@ test_that("archive import", {
   expect_identical(readLines(file.path(p, "foo")), dat)
 })
 
+test_that("archive import (file)", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  ## x <- d$containers$create("hello-world", name = nm)
+  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x$start()
+
+  path <- tempfile()
+  dir.create(path)
+  dat <- rand_str(100)
+  p <- file.path(path, "foo")
+  writeLines(dat, p)
+
+  ## Down here, we need to get the types correct for handling.
+  x$put_archive(p, "/")
+
+  tmp <- x$get_archive("foo", tempfile())
+  p2 <- untar_bin(read_binary(tmp))
+  expect_true(file.exists(file.path(p2, "foo")))
+  expect_identical(readLines(file.path(p2, "foo")), dat)
+})
+
 test_that("kill", {
   ## NOTE: This test takes a bit longer to run - the start takes ~0.3s
   ## for me.  The timings are about the same on the command line

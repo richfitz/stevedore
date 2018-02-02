@@ -115,6 +115,15 @@ assert_null <- function(x, name = deparse(substitute(x)), what = "NULL") {
   }
 }
 
+assert_file_exists <- function(x, name = deparse(substitute(x))) {
+  msg <- x[!file.exists(x)]
+  if (length(msg) > 0L) {
+    stop(ngettext(msg,
+                  "File does not exist: ",
+                  "Files do not exist: ", paste(msg, collapse = ", ")))
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {

@@ -207,11 +207,19 @@ docker_client_container <- function(id, client) {
     export = docker_endpoint("container_export", client, fix = fix_id),
     path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
                                 after = after_path_stat),
+    ##
     get_archive = docker_endpoint(
       "container_archive", client, fix = fix_id, extra = alist(dest =),
       process = list(quote(assert_scalar_character_or_null(dest))),
       after = after_get_archive),
-    put_archive = docker_endpoint("container_import", client, fix = fix_id),
+    ## TODO: option for compression, pass through to tar file (much
+    ## easier to get right if we can rely on R tar)
+    put_archive = docker_endpoint(
+      "container_import", client, fix = fix_id,
+      rename = c(src = "input_stream"),
+      process = list(validate_tar_input(quote(src))),
+      after = nothing),
+    ##
     kill = docker_endpoint("container_kill", client, fix = fix_id),
     ## Logs; quite complicated in the case of 'follow'
     ## -  stream has an effect *only* if follow is TRUE
@@ -985,4 +993,21 @@ process_image_and_tag <- function(image, tag) {
     image <- image_tag[["image"]]
     tag <- image_tag[["tag"]]
   }, list(image = image, tag = tag))
+}
+
+validate_tar_input <- function(input) {
+  ## Three options here:
+  ##
+  ## binary - assume tar
+  ## file - tar it up
+  ## (tar) - (read from disk)
+  ##
+  ## For now I ignore the last one because I don't see the use case
+  ## and I think that it's better dealt with by reading in the binary
+  ## yourself.
+  substitute(
+    if (!is.raw(input)) {
+      input <- tar_file(input)
+    },
+    list(input = input))
 }
