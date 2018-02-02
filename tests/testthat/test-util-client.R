@@ -47,6 +47,14 @@ test_that("pull status: silent error", {
   expect_equal(res, cmp)
 })
 
+test_that("pull setatus: no print", {
+  path <- tempfile()
+  p <- pull_status_printer(NULL)
+
+  txt <- readLines("sample_responses/pull/ubuntu")
+  expect_silent(for (i in txt) p(from_json(i)))
+})
+
 test_that("validate volumes", {
   expect_null(validate_volumes(NULL))
   expect_null(validate_volumes(character()))
