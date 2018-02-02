@@ -65,7 +65,7 @@ untar_bin <- function(bin, path = tempfile(), ...) {
   writeBin(bin, tmp)
   on.exit(unlink(tmp))
   dir.create(path, FALSE, TRUE)
-  untar(tmp, exdir = path, ...)
+  utils::untar(tmp, exdir = path, ...)
   invisible(path)
 }
 

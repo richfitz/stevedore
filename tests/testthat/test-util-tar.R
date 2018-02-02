@@ -19,21 +19,6 @@ test_that("tar_data", {
                     works = TRUE))
 })
 
-test_that("tar_init", {
-  skip_if_not_installed("tar")
-  expect_identical(tar_init()$tar, tar::tar)
-})
-
-test_that("avoid broken tar", {
-  tmp <- tar_init()
-  on.exit(.stevedore[[TAR_DATA]] <- tmp)
-
-  .stevedore[[TAR_DATA]] <- tar_data(NULL, numeric_version("3.0.0"))
-  expect_error(tar_safe(tempfile(), ".", complex = TRUE),
-               "This functionality requires r-lib/tar or R >=",
-               fixed = TRUE)
-})
-
 test_that("tar_directory", {
   p <- tempfile()
   dir.create(p, TRUE, FALSE)
