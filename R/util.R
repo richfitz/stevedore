@@ -196,8 +196,8 @@ string_starts_with <- function(x, sub) {
   substr(x, 1, nchar(sub)) == sub
 }
 
-reset_line <- function(stream, width) {
-  if (isatty(stream)) {
+reset_line <- function(stream, width, is_tty = isatty(stream)) {
+  if (is_tty) {
     cat(paste0(c("\r", strrep(" ", width), "\r"), collapse = ""), file = stream)
   }
 }

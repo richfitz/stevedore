@@ -148,3 +148,19 @@ test_that("sys_which", {
   expect_error(sys_which("unknown-program-never-exists"),
                "Did not find program 'unknown-program-never-exists'")
 })
+
+test_that("reset_line", {
+  tmp <- tempfile()
+  con <- file(tmp, "w+")
+  on.exit(close(con))
+
+  cat("hello", file = con)
+  reset_line(con, 10, TRUE)
+  cat("goodbye", file = con)
+  close(con)
+  on.exit()
+
+  bytes <- readBin(tmp, raw(), file.size(tmp))
+  expect_equal(rawToChar(bytes),
+               sprintf("hello\r%s\rgoodbye", strrep(" ", 10)))
+})
