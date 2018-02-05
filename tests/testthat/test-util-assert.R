@@ -101,6 +101,20 @@ test_that("assert_null", {
   expect_silent(assert_null(NULL))
 })
 
+test_that("assert_file_exists", {
+  mypath <- tempfile()
+  mypaths <- c(mypath, tempfile())
+  expect_error(assert_file_exists(mypath),
+               "File does not exist: ")
+  expect_error(assert_file_exists(mypaths),
+               "Files do not exist: ")
+
+  writeLines("", mypath)
+  writeLines("", mypaths[[2]])
+  expect_silent(assert_file_exists(mypath))
+  expect_silent(assert_file_exists(mypaths))
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")

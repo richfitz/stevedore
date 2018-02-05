@@ -115,12 +115,13 @@ assert_null <- function(x, name = deparse(substitute(x)), what = "NULL") {
   }
 }
 
-assert_file_exists <- function(x, name = deparse(substitute(x))) {
+assert_file_exists <- function(x) {
   msg <- x[!file.exists(x)]
   if (length(msg) > 0L) {
-    stop(ngettext(msg,
+    stop(ngettext(length(msg),
                   "File does not exist: ",
-                  "Files do not exist: ", paste(msg, collapse = ", ")))
+                  "Files do not exist: "),
+         paste(msg, collapse = ", "))
   }
 }
 
