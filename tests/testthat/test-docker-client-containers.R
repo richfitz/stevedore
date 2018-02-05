@@ -471,6 +471,13 @@ test_that("run: no such container", {
   expect_equal(e$endpoint, "image_create")
 })
 
+test_that("run with get/pull error handling", {
+  d <- test_docker_client()
+  err <- get_error(d$containers$run("foo bar"))
+  expect_is(err, "docker_error")
+  expect_equal(err$code, 400L) # bad request
+})
+
 test_that("run: remove", {
   d <- test_docker_client()
   ans <- d$containers$run("hello-world", rm = TRUE)
