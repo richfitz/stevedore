@@ -13,7 +13,7 @@ http_client <- function(base_url = NULL, api_version = NULL, type = NULL,
 ## This probably belongs in the swagger.R file as it's being called
 ## from there not here.  That will leave some curl logic outside of
 ## this file though.
-response_to_error <- function(response, pass_error, endpoint, reason) {
+response_to_error <- function(response, endpoint, reason) {
   headers <- curl::parse_headers_list(response$headers)
   type <- headers[["content-type"]]
   if (length(response$content) > 0L) {
@@ -33,11 +33,7 @@ response_to_error <- function(response, pass_error, endpoint, reason) {
   cond <- list(message = msg, code = status_code, endpoint = endpoint,
                reason = reason)
   class(cond) <- c("docker_error", "error", "condition")
-  if (status_code %in% pass_error) {
-    cond
-  } else {
-    stop(cond)
-  }
+  stop(cond)
 }
 
 ## Tidy away details about url construction.  This will likely get
@@ -136,7 +132,7 @@ http_client_api_version <- function(api_version, detect,
 
 version_response <- function(res) {
   if (res$status_code != 200L) {
-    response_to_error(res, NULL, "/_ping", "Detecting version")
+    response_to_error(res, "/_ping", "Detecting version")
   }
   raw_to_json(res$content)$ApiVersion
 }

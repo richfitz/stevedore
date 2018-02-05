@@ -52,8 +52,7 @@ make_endpoint <- function(name, method, path, spec) {
     help = help)
 }
 
-run_endpoint <- function(client, endpoint, params,
-                         pass_error = NULL, hijack = NULL,
+run_endpoint <- function(client, endpoint, params, hijack = NULL,
                          as_is_names = FALSE) {
   path <- sprintfn(endpoint$path_fmt, params$path)
   res <- client$request(endpoint$method, path,
@@ -68,7 +67,7 @@ run_endpoint <- function(client, endpoint, params,
     reason <-
       endpoint$response_description[[as.character(status_code)]] %||%
       "Unknown reason"
-     response_to_error(res, pass_error, endpoint$name, reason)
+     response_to_error(res, endpoint$name, reason)
   } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {
