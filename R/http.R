@@ -42,11 +42,7 @@ response_to_error <- function(response, endpoint, reason) {
 ## -> '+' at least).
 build_url <- function(base_url, api_version, path, params = NULL) {
   path <- paste0(path, build_url_query(params) %||% "")
-  if (is.null(api_version)) {
-    sprintf("%s%s", base_url, path)
-  } else {
-    sprintf("%s/v%s%s", base_url, api_version, path)
-  }
+  sprintf("%s/v%s%s", base_url, api_version, path)
 }
 
 build_url_query <- function(params) {
