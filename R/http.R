@@ -218,3 +218,14 @@ http_url_type <- function(x) {
 http_default_url <- function(windows) {
   if (windows) DEFAULT_DOCKER_WINDOWS_PIPE else DEFAULT_DOCKER_UNIX_SOCKET
 }
+
+prepare_body <- function(body) {
+  if (is.raw(body)) {
+    body_raw <- body
+    content_type <- "application/octet-stream" # or application/x-tar
+  } else {
+    body_raw <- charToRaw(body)
+    content_type <- "application/json"
+  }
+  list(raw = body_raw, content_type = content_type)
+}

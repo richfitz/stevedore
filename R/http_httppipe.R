@@ -20,14 +20,9 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL,
     url <- build_url("", api_version, path, query)
     data <- NULL
     if (!is.null(body)) {
-      if (is.raw(body)) {
-        data <- body
-        content_type <- "application/octet-stream" # or application/x-tar
-      } else {
-        data <- charToRaw(as.character(body))
-        content_type <- "application/json"
-      }
-      headers <- c(headers, list("Content-Type" = content_type))
+      body_data <- prepare_body(body)
+      data <- body_data$raw
+      headers <- c(headers, list("Content-Type" = body_data$content_type))
     }
 
     client(verb, url, data, headers, stream = hijack)

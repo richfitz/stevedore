@@ -30,18 +30,12 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
                       hijack = NULL) {
     url <- build_url(base_url, api_version, path, query)
     if (!is.null(body)) {
-      if (is.raw(body)) {
-        body_raw <- body
-        content_type <- "application/octet-stream" # or application/x-tar
-      } else {
-        body_raw <- charToRaw(body)
-        content_type <- "application/json"
-      }
-      h <- handle(headers = c("Content-Type" = content_type, headers))
+      body_data <- prepare_body(body)
+      h <- handle(headers = c("Content-Type" = body_data$content_type, headers))
       curl::handle_setopt(h,
                           post = TRUE,
-                          postfieldsize = length(body_raw),
-                          postfields = body_raw,
+                          postfieldsize = length(body_data$raw),
+                          postfields = body_data$raw,
                           customrequest = verb)
     } else {
       h <- handle(headers = headers)
