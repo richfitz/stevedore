@@ -11,7 +11,7 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
   ## make_handle_socket function and change the base_url
   ## (currently it is set to http://localhost, which is not what
   ## would be wanted if we had a proper url).
-  if (grepl("^https?://", base_url)) {
+  if (http_url_type(base_url) == "http") {
     stop("Providing docker url is not currently supported")
   }
 
