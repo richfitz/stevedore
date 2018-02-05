@@ -126,6 +126,10 @@ test_that("integer apply", {
   expect_identical(viapply(x, twice), c(a = 200.0, b = large * 2))
   expect_identical(viapply(x, twice, USE.NAMES = FALSE),
                    c(200.0, large * 2))
+
+  ## Error case:
+  expect_error(viapply(x, function(x) x + 0.1),
+               "Result not integer-like")
 })
 
 test_that("integer apply/json serialisation", {
