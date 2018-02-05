@@ -166,15 +166,6 @@ get_error <- function(expr) {
   tryCatch(expr, error = identity)
 }
 
-untar_bin <- function(bin, path = tempfile()) {
-  tmp <- tempfile()
-  writeBin(bin, tmp)
-  on.exit(file.remove(tmp))
-  dir.create(path, FALSE, TRUE)
-  untar(tmp, exdir = path)
-  invisible(path)
-}
-
 ## TODO: at some point a variant of this will move into the main
 ## constructor, with a proper error message advising on solutions.
 CURL_HAS_SOCKET_SUPPORT <-
