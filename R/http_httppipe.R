@@ -1,4 +1,5 @@
-http_client_httppipe <- function(base_url = NULL, api_version = NULL) {
+http_client_httppipe <- function(base_url = NULL, api_version = NULL,
+                                 min_version = NULL, max_version = NULL) {
   loadNamespace("httppipe")
   client <- httppipe::httppipe(base_url)
   base_url <- "http://localhost"
@@ -7,9 +8,10 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL) {
 
   version_detect <- function() {
     url <- build_url("", DEFAULT_DOCKER_API_VERSION, "/version")
-    version_response(client("GET", url, headers_agent))
+    version_response(client("GET", url, NULL, headers_agent))
   }
-  api_version <- http_client_api_version(api_version, version_detect)
+  api_version <- http_client_api_version(api_version, version_detect,
+                                         min_version, max_version)
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
                       hijack = NULL) {
