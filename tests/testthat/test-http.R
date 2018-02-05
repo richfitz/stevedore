@@ -54,3 +54,11 @@ test_that("version_response", {
                rawToChar(res$content),
                fixed = TRUE)
 })
+
+test_that("detect", {
+  cl <- http_client(api_version = "detect",
+                    min_version = "0.0.1",
+                    max_version = "9.9.9")
+  expect_equal(cl$api_version,
+               raw_to_json(cl$request("GET", "/version")$content)$ApiVersion)
+})

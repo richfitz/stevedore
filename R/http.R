@@ -1,9 +1,11 @@
-http_client <- function(base_url = NULL, api_version = NULL, type = NULL) {
+http_client <- function(base_url = NULL, api_version = NULL, type = NULL,
+                        min_version = NULL, max_version = NULL) {
   data <- http_client_data(base_url, type, is_windows())
-  switch(data$type,
-         curl = http_client_curl(data$base_url, api_version),
-         httppipe = http_client_httppipe(data$base_url, api_version),
-         stop("stevedore bug")) # nocov
+  client_fn <- switch(data$type,
+                      curl = http_client_curl,
+                      httppipe = http_client_httppipe,
+                      stop("stevedore bug")) # nocov
+  client_fn(data$base_url, api_version, min_version, max_version)
 }
 
 ## Generate (and possibly throw) S3 errors out of http errors
@@ -97,8 +99,9 @@ parse_headers <- function(headers) {
 ## * do we ever look *remotely*
 ## * what is our floor version number
 http_client_api_version <- function(api_version, detect,
-                                    min_version = MIN_DOCKER_API_VERSION,
-                                    max_version = MAX_DOCKER_API_VERSION) {
+                                    min_version = NULL, max_version = NULL) {
+  min_version <- min_version %||% MIN_DOCKER_API_VERSION
+  max_version <- max_version %||% MAX_DOCKER_API_VERSION
   version_type <- "Requested"
   if (is.null(api_version)) {
     api_version <- DEFAULT_DOCKER_API_VERSION
@@ -135,7 +138,7 @@ version_response <- function(res) {
   if (res$status_code != 200L) {
     response_to_error(res, NULL, "/_ping", "Detecting version")
   }
-  from_json(res$content)$ApiVersion
+  raw_to_json(res$content)$ApiVersion
 }
 
 ## This is the lowest level of the streaming functions - others can be

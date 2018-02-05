@@ -3,7 +3,8 @@
 
 ## The only other curl:: call is in http where we use it's header
 ## parsing.
-http_client_curl <- function(base_url = NULL, api_version = NULL) {
+http_client_curl <- function(base_url = NULL, api_version = NULL,
+                             min_version = NULL, max_version = NULL) {
   ## For now hard code up as the domain socket only.  Changing
   ## this to support working over a port is slightly more work;
   ## we'll need to change the initialiser and the
@@ -22,7 +23,8 @@ http_client_curl <- function(base_url = NULL, api_version = NULL) {
   base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
   handle <- make_handle_socket(base_url)
   base_url <- "http://localhost"
-  api_version <- http_client_api_version(api_version, version_detect)
+  api_version <- http_client_api_version(api_version, version_detect,
+                                         min_version, max_version)
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
                       hijack = NULL) {
