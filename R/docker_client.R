@@ -68,7 +68,7 @@ docker_client_container_collection <- function(..., cl, parent) {
 
   stevedore_object(
     "docker_container_collection",
-    run = make_docker_run(parent),
+    run = make_docker_run(parent, cl$http_client$can_stream),
     create = docker_endpoint(
       "container_create", cl,
       promote = c("image", "cmd"),
@@ -669,17 +669,29 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
 ## NULL: no stream
 ## connection object: stream to open connection
 validate_stream_and_close <- function(name, mode = "wb") {
-  substitute(
-    if (is.character(name)) {
-      name <- file(name, mode)
-      on.exit(close(name), add = TRUE)
-    } else if (is.null(name) || identical(name, FALSE)) {
-      name <- NULL
-    } else if (isTRUE(name)) {
-      name <- stdout()
-    } else {
-      assert_is(name, "connection")
-    }, list(name = name, mode = mode))
+  substitute({
+    stream_data <- validate_stream(name, mode)
+    stream <- stream_data$stream
+    if (stream_data$close) {
+      on.exit(close(stream), add = TRUE)
+    }
+  }, list(name = name, mode = mode))
+}
+
+validate_stream <- function(stream, mode = "wb",
+                            name = deparse(substitute(stream))) {
+  close <- FALSE
+  if (is.character(stream)) {
+    close <- TRUE
+    stream <- file(stream, mode)
+  } else if (is.null(stream) || identical(stream, FALSE)) {
+    stream <- NULL
+  } else if (isTRUE(stream)) {
+    stream <- stdout()
+  } else {
+    assert_is(stream, "connection", name = name)
+  }
+  list(stream = stream, close = close)
 }
 
 ## TODO: see comments in tar_directory about setting this up for curl
@@ -769,12 +781,17 @@ docker_get_image <- function(image, client, name = deparse(substitute(image))) {
   }
 }
 
-make_docker_run <- function(client) {
+make_docker_run <- function(client, can_stream) {
   force(client)
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
   function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
            stream = NULL, host_config = NULL) {
+    stream_data <- validate_stream(stream)
+    if (stream_data$close) {
+      on.exit(close(stream_data$stream), add = TRUE)
+    }
+
     if (rm && detach) {
       ## This is supported in API 1.25 and up - which agrees with our
       ## API support.
@@ -796,10 +813,19 @@ make_docker_run <- function(client) {
       return(container)
     }
 
-    ## TODO: here, and possibly elsewhere, some simple rules about
-    ## handling stream as an argument - TRUE/FALSE, etc.
-    out <- container$logs(stream = stream, follow = TRUE)
-    exit_status <- container$wait()$status_code
+    if (can_stream) {
+      out <- container$logs(stream = stream_data$stream, follow = TRUE)
+      exit_status <- container$wait()$status_code
+    } else {
+      ## TODO: warn here that this will block?
+      exit_status <- container$wait()$status_code
+      out <- container$logs()
+      ## NOTE: this duplicates some of the logic in print.docker_stream
+      if (!is.null(stream_data$stream)) {
+        cat(format(out, stream = stream_data$stream),
+            file = stream_data$stream, sep = "")
+      }
+    }
 
     if (rm) {
       container$inspect(TRUE)
