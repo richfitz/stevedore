@@ -232,6 +232,7 @@ docker_client_container <- function(id, client) {
       extra = alist(stream = stdout()),
       hijack = quote(if (isTRUE(follow))
                        streaming_text(exec_output_printer(stream))),
+      allow_hijack_without_stream = FALSE,
       after = after_logs),
     pause = docker_endpoint("container_pause", client, fix = fix_id),
     ## This should invalidate our container afterwards
@@ -511,8 +512,8 @@ docker_client_exec <- function(id, client) {
       "exec_start", client, fix = list(id = id),
       extra = alist(stream = stdout()),
       hijack = quote(streaming_text(exec_output_printer(stream))),
-      process = list(validate_stream_and_close(quote(stream))),
       allow_hijack_without_stream = TRUE,
+      process = list(validate_stream_and_close(quote(stream))),
       after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {
