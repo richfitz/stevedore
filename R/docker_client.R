@@ -664,12 +664,20 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
   invisible(x)
 }
 
+## character: open a file in mode wb and ensure closing on exit
+## logical: suppress stream or log to stdoud (FALSE, TRUE)
+## NULL: no stream
+## connection object: stream to open connection
 validate_stream_and_close <- function(name, mode = "wb") {
   substitute(
     if (is.character(name)) {
       name <- file(name, mode)
       on.exit(close(name), add = TRUE)
-    } else if (!is.null(name)) {
+    } else if (is.null(name) || identical(name, FALSE)) {
+      name <- NULL
+    } else if (isTRUE(name)) {
+      name <- stdout()
+    } else {
       assert_is(name, "connection")
     }, list(name = name, mode = mode))
 }
