@@ -25,10 +25,16 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL,
       headers <- c(headers, list("Content-Type" = body_data$content_type))
     }
 
-    client(verb, url, data, headers, stream = hijack)
+    res <- client(verb, url, data, headers, stream = NULL)
+
+    if (!is.null(hijack)) {
+      hijack(res$content)
+    }
+    res
   }
 
   list(type = "httppipe",
        request = request,
-       api_version = api_version)
+       api_version = api_version,
+       can_stream = FALSE)
 }

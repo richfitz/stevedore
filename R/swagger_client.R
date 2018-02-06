@@ -35,7 +35,8 @@ docker_client_base <- function(..., api_version = NULL, type = NULL) {
 docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
                             drop = NULL, defaults = NULL, extra = NULL,
                             promote = NULL, process = NULL, after = NULL,
-                            hijack = NULL) {
+                            hijack = NULL,
+                            allow_hijack_without_stream = FALSE) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
@@ -99,8 +100,10 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
   get_params <- as.call(c(list(quote(endpoint$argument_handler)),
                           lapply(names(args), as.name)))
   run_endpoint <- substitute(
-    run_endpoint(http_client, endpoint, params, hijack = hijack),
-    list(hijack = hijack))
+    run_endpoint(http_client, endpoint, params, hijack = hijack,
+                 allow_hijack_without_stream = allow_hijack_without_stream),
+    list(hijack = hijack,
+         allow_hijack_without_stream = allow_hijack_without_stream))
   if (is.null(extra)) {
     add_extra <- NULL
   } else {

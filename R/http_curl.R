@@ -59,7 +59,8 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
 
   list(type = "curl",
        request = request,
-       api_version = api_version)
+       api_version = api_version,
+       can_stream = TRUE)
 }
 
 ## Factory function for fresh curl handles.  In theory we could do

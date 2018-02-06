@@ -53,12 +53,19 @@ make_endpoint <- function(name, method, path, spec) {
 }
 
 run_endpoint <- function(client, endpoint, params, hijack = NULL,
+                         allow_hijack_without_stream = FALSE,
                          as_is_names = FALSE) {
   path <- sprintfn(endpoint$path_fmt, params$path)
+
+  http_hijack <- !is.null(hijack)
+  if (http_hijack && !client$can_stream && !allow_hijack_without_stream) {
+    stop("This endpoint cannot be implemented")
+  }
+
   res <- client$request(endpoint$method, path,
                         params$query, params$body, params$header,
                         hijack)
-  if (!is.null(hijack)) {
+  if (http_hijack) {
     res$content <- hijacked_content(hijack)
   }
 
@@ -74,7 +81,7 @@ run_endpoint <- function(client, endpoint, params, hijack = NULL,
       stop("unexpected response code ", res$status_code) # nocov [stevedore bug]
     }
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
-    if (!is.null(hijack)) {
+    if (http_hijack) {
       ## It's most common here that the any handler is incorrect, so
       ## we'll skip the handler but pass them back directly instead.
       list(response = res,
