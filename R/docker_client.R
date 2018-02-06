@@ -306,9 +306,13 @@ docker_client_image_collection <- function(..., cl, parent) {
     pull = docker_endpoint(
       "image_create", cl, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
-      process = list(process_image_and_tag(quote(name), quote(tag))),
+      process = list(
+        process_image_and_tag(quote(name), quote(tag)),
+        validate_stream_and_close(quote(stream))),
+      extra = alist(stream = stdout()),
       defaults = alist(name =),
-      hijack = quote(streaming_json(pull_status_printer(stdout()))),
+      hijack = quote(streaming_json(pull_status_printer(stream))),
+      allow_hijack_without_stream = TRUE,
       after = after_pull),
     push = docker_endpoint("image_push", cl),
     search = docker_endpoint("image_search", cl),
