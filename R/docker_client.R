@@ -508,6 +508,7 @@ docker_client_exec <- function(id, client) {
       extra = alist(stream = stdout()),
       hijack = quote(streaming_text(exec_output_printer(stream))),
       process = list(validate_stream_and_close(quote(stream))),
+      allow_hijack_without_stream = TRUE,
       after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {
