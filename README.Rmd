@@ -7,8 +7,6 @@
 
 A docker client for R
 
-**WARNING**: package is in early development. If you run the test suite it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  The examples are more polite.
-
 ```{r, prep, include = FALSE}
 knitr::opts_chunk$set(error = FALSE)
 has_internet <- function() {
@@ -75,6 +73,30 @@ This approach means that the output will be type-stable - there is no inference 
 container$inspect(reload = FALSE)
 ```
 
+## Windows support
+
+The support for windows is not as comprehensive as for other platforms (but I'm not sure how common using docker is on windows yet).  The reason for this is that [`curl`](https://cran.r-project.org/package=curl) (and the underlying `libcurl` library) do not support communicating over "named pipes" which is how docker works on windows.  There is partial support for this in the package using the package [`httppipe`](http://github.com/richfitz/httppipe).
+
+### Installation
+
+You will need a python installation (both python2 and python3 should work), along with [`reticulate`](https://cran.r-project.org/package=reticulate).  Whatever python you use needs to be able to find the python packages `requests`, `six` and `pipywin32`.  You can test if everything is working by running
+
+```
+httppipe::httppipe_available(verbose = TRUE)
+```
+
+which will return `TRUE` if everything is OK, and otherwise print some information about errors loading the package.  In the case of error consult the reticulate documentation (`vignette("versions", package = "reticulate")` will be especially useful).  Improvements to installation documentation and process are welcome!
+
+### Limitations
+
+The primary limitation of the `httppipe` interface is that streaming connections are not supported.  This affects the following methods
+
+* container logs with `follow = TRUE`: completely unsupported
+* container run - works completely with `detach = TRUE`, and with `detach = FALSE` works but prints output only at the end (not streaming output)
+* image build - works but information printed only at end of build rather than streaming
+* image pull - works but information printed only at end of pull
+* exec start - works but information printed only at end of execution
+
 ## Roadmap
 
 There is still a lot of work to do here:
@@ -87,6 +109,12 @@ There is still a lot of work to do here:
 * swarm features (`nodes`, `plugins`, `secrets`, `services` and `swarm`) are not implemented - not because they'd be any harder but just because I've never used them
 * authentication of registries for pull and push (not hard, just not done)
 * some sort of documentation - hard given that the interface is directly pulled from the spec so we need to patch up references to json
+
+## Development and testing
+
+**WARNING**: package is in early development. If you run the test suite it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  The examples are more polite.
+
+At present, the tests do leave a couple of orphan containers and volumes on exit.  If tests fail, many more containers will be left as teardown is not always automatic.  Some tests are of the `prune` endpoints, others pull images from the internet.
 
 ## Licence
 
