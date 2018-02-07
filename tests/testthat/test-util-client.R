@@ -169,3 +169,24 @@ test_that("validate image and tag", {
   expect_equal(validate_image_and_tag("foo", "3.1"),
                list(repo = NULL, name = "foo", image = "foo", tag = "3.1"))
 })
+
+test_that("validate stream", {
+  d <- validate_stream(tempfile())
+  expect_is(d$stream, "connection")
+  expect_equal(summary(d$stream)$mode, "wb")
+  expect_true(isOpen(d$stream))
+  expect_true(d$close)
+  expect_equal(validate_stream(d$stream),
+               list(stream = d$stream, close = FALSE))
+  close(d$stream)
+
+  expect_equal(validate_stream(stdout()),
+               list(stream = stdout(), close = FALSE))
+  expect_equal(validate_stream(TRUE),
+               list(stream = stdout(), close = FALSE))
+
+  expect_equal(validate_stream(NULL),
+               list(stream = NULL, close = FALSE))
+  expect_equal(validate_stream(FALSE),
+               list(stream = NULL, close = FALSE))
+})
