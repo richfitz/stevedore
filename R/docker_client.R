@@ -655,21 +655,6 @@ exec_output_printer <- function(stream, style = "auto") {
   }
 }
 
-##' @export
-print.stevedore_object <- function(x, ..., indent = 2L) {
-  nms <- sort(names(x))
-  is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
-
-  cat(sprintf("<%s>\n", class(x)[[1]]))
-  cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn],
-              vcapply(nms[!is_fn], function(el) class(x[[el]])[[1]])),
-      sep = "")
-  defns <- vcapply(nms[is_fn], function(el) capture_args(x[[el]], el, indent),
-                   USE.NAMES = FALSE)
-  cat(paste0(defns, "\n", collapse = ""))
-  invisible(x)
-}
-
 ## character: open a file in mode wb and ensure closing on exit
 ## logical: suppress stream or log to stdoud (FALSE, TRUE)
 ## NULL: no stream
@@ -839,7 +824,9 @@ make_docker_run <- function(client, can_stream) {
     if (exit_status != 0L) {
       stop(container_error(container, exit_status, cmd, image, out))
     }
-    list(container = container, logs = out)
+    ret <- list(container = container, logs = out)
+    class(ret) <- "docker_run_output"
+    ret
   }
 }
 

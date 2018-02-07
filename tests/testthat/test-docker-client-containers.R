@@ -462,10 +462,19 @@ test_that("logs (streaming)", {
 
 test_that("run", {
   d <- test_docker_client()
-  ans <- d$containers$run("hello-world")
+  txt <- capture.output(ans <- d$containers$run("hello-world"))
+  expect_is(ans, "docker_run_output")
+
   expect_equal(names(ans), c("container", "logs"))
   expect_is(ans$container, "docker_container")
   expect_is(ans$logs, "docker_stream")
+
+  expect_equal(txt, format(ans$logs, strip_newline = TRUE, style = "prefix"))
+
+  txt <- capture.output(print(ans, style = "prefix"))
+  expect_match(txt, "<docker_run_output>", fixed = TRUE, all = FALSE)
+  expect_match(txt, "  $container", fixed = TRUE, all = FALSE)
+  expect_match(txt, "  $logs", fixed = TRUE, all = FALSE)
 })
 
 test_that("run: detach", {

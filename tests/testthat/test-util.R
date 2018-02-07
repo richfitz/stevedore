@@ -106,6 +106,22 @@ test_that("stream filtering", {
   expect_equal(format(obj, style = "plain", filter = NULL), x)
 })
 
+test_that("stream truncating", {
+  s <- rep(1:2, length.out = 10)
+  x <- paste0(letters[1:10], "\n")
+  obj <- docker_stream(x, s)
+
+  expect_equal(
+    format(obj, style = "prefix", strip_newline = TRUE, max_lines = 3),
+    c("O> a", "-- [...truncated 8 lines...]", "E> j"))
+  expect_equal(
+    format(obj, style = "prefix", strip_newline = TRUE, max_lines = 4),
+    c("O> a", "-- [...truncated 7 lines...]", "O> i", "E> j"))
+  expect_equal(
+    format(obj, style = "prefix", strip_newline = TRUE, max_lines = 10),
+    format(obj, style = "prefix", strip_newline = TRUE))
+})
+
 test_that("integer apply", {
   twice <- function(x) {
     x * (if (is.integer(x)) 2L else 2.0)

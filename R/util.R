@@ -313,3 +313,7 @@ nothing <- function(...) {
 read_binary <- function(path) {
   readBin(path, raw(), file.size(path))
 }
+
+indent <- function(x, n) {
+  paste0(strrep(" ", n), x)
+}
