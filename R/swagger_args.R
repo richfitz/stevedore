@@ -211,7 +211,7 @@ arg_collect_header <- function(p, dest) {
     expr <- bquote(match_value(.(sym), .(values)))
   }
 
-  if (is_required && has_default) {
+  if (!is_required && has_default) {
     expr <- bquote(if (is.null(.(sym))) .(p$default) else .(expr))
   }
   expr <- bquote(.(dest)$header[[.(p$name)]] <- .(expr))
