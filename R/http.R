@@ -135,29 +135,25 @@ version_response <- function(res) {
 
 ## This is the lowest level of the streaming functions - others can be
 ## done in terms of this.
-streaming_raw <- function(callback = NULL) {
+## TODO: try and merge streaming_raw and streaming_text!
+streaming_raw <- function(callback) {
+  assert_function(callback)
   res <- raw()
-  if (is.null(callback)) {
-    ret <- function(x) {
-      res <<- c(res, x)
-    }
-  } else {
-    ret <- function(x) {
-      res <<- c(res, x)
-      callback(x)
-    }
+  ret <- function(x) {
+    res <<- c(res, x)
+    callback(x)
   }
   attr(ret, "content") <- function() res
   ret
 }
 
-streaming_text <- function(callback = NULL) {
-  force(callback)
+streaming_text <- function(callback) {
+  assert_function(callback)
   streaming_raw(function(x) callback(decode_chunked_string(x)))
 }
 
 streaming_json <- function(callback) {
-  force(callback)
+  assert_function(callback)
   res <- raw()
   ret <- function(x) {
     res <<- c(res, x)
