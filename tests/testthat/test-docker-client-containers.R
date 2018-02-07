@@ -140,6 +140,7 @@ test_that("path_stat", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
+  on.exit(x$remove())
 
   ## There's no spec here so not much more we can do
   dat <- x$path_stat("/")
@@ -156,6 +157,7 @@ test_that("archive export", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
+  on.exit(x$remove())
 
   bin <- x$get_archive("hello", NULL)
   p <- untar_bin(bin)
@@ -174,6 +176,7 @@ test_that("archive import", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("hello-world", name = nm)
+  on.exit(x$remove())
 
   e <- get_error(x$path_stat("foo"))
   expect_equal(e$code, 404L)
@@ -198,6 +201,7 @@ test_that("archive import (file)", {
   nm <- rand_str(10, "stevedore_")
   ## x <- d$containers$create("hello-world", name = nm)
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  on.exit(x$remove(force = TRUE))
   x$start()
 
   path <- tempfile()
@@ -355,6 +359,7 @@ test_that("update", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  on.exit(x$remove())
   info <- x$inspect(FALSE)
   n <- as.integer(10 * 1001 * 1001)
   y <- x$update(memory = n, memory_swap = -1L)
@@ -372,6 +377,7 @@ test_that("wait", {
   x$start()
   expect_equal(x$wait(), list(status_code = 0L))
   expect_equal(x$status(), "exited")
+  x$remove()
 })
 
 test_that("prune", {
@@ -421,6 +427,25 @@ test_that("exec", {
   x$remove()
 })
 
+test_that("exec, twice", {
+  skip("wip")
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  ## this sets up a container that will run forever
+  x <- d$containers$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm)
+  x$start()
+  ans <- x$exec("ls")
+
+  ans$start()
+  ## This does not throw but it should!  The issue here is that docker
+  ## is not actuall creating error codes here.  So some more care
+  ## might be needed.  Probably best not to return prepared exec
+  ## instances by default!
+  expect_error(ans$start())
+})
+
 test_that("resize", {
   skip("untested")
 })
@@ -448,6 +473,7 @@ test_that("run: detach", {
   ans <- d$containers$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
   expect_is(ans, "docker_container")
   expect_equal(ans$wait(), list("status_code" = 0L))
+  ans$remove()
 })
 
 test_that("run: no such container", {
@@ -639,7 +665,7 @@ test_that("stream", {
   x <- d$containers$run("richfitz/iterate",
                         cmd = c("10", "0.1"),
                         name = nm, detach = FALSE,
-                        stream = p)
+                        stream = p, rm = TRUE)
   expect_equal(paste0(readLines(p), "\n"),
                format(x$logs, style = "prefix"))
 })
@@ -662,6 +688,7 @@ test_that("volume map", {
   x$wait()
   expect_equal(sort(trimws(format(x$logs(), style = "plain"))),
                sort(dir()))
+  x$remove()
 })
 
 test_that("volume map: docker volume", {
