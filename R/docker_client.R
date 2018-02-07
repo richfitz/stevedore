@@ -792,7 +792,7 @@ make_docker_run <- function(client, can_stream) {
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
   function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
-           stream = NULL, host_config = NULL) {
+           stream = stdout(), host_config = NULL) {
     stream_data <- validate_stream(stream)
     if (stream_data$close) {
       on.exit(close(stream_data$stream), add = TRUE)
