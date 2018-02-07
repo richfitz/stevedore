@@ -115,6 +115,12 @@ assert_null <- function(x, name = deparse(substitute(x)), what = "NULL") {
   }
 }
 
+assert_function <- function(x, name = deparse(substitute(x))) {
+  if (!is.function(x)) {
+    stop(sprintf("'%s' must be a function", name))
+  }
+}
+
 assert_file_exists <- function(x) {
   msg <- x[!file.exists(x)]
   if (length(msg) > 0L) {

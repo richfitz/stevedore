@@ -115,6 +115,12 @@ test_that("assert_file_exists", {
   expect_silent(assert_file_exists(mypaths))
 })
 
+test_that("assert_function", {
+  object <- NULL
+  expect_error(assert_function(object), "'object' must be a function")
+  expect_silent(assert_function(sin))
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")
