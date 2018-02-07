@@ -164,3 +164,22 @@ test_that("reset_line", {
   expect_equal(rawToChar(bytes),
                sprintf("hello\r%s\rgoodbye", strrep(" ", 10)))
 })
+
+test_that("download_file", {
+  d <- test_docker_client()
+  x <- d$containers$run("nginx", detach = TRUE, ports = TRUE, rm = TRUE)
+  on.exit(x$stop(0))
+
+  url <- sprintf("http://localhost:%s/index.html", x$ports()$host_port)
+  p <- tempfile()
+
+  expect_silent(cmp <- download_file(url, p, quiet = TRUE))
+  expect_identical(cmp, p)
+
+  txt <- readLines(p)
+  expect_match(txt, "Welcome to nginx", fixed = TRUE, all = FALSE)
+  writeLines("", p)
+
+  expect_silent(cmp <- download_file(url, p, quiet = TRUE))
+  expect_equal(readLines(p), "")
+})
