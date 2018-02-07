@@ -59,7 +59,10 @@ run_endpoint <- function(client, endpoint, params, hijack = NULL,
 
   http_hijack <- !is.null(hijack)
   if (http_hijack && !client$can_stream && !allow_hijack_without_stream) {
-    stop("This endpoint cannot be implemented")
+    fmt <- paste(
+      "Endpoint '%s' cannot be implemented because the '%s' http client",
+      "does not currently support streaming connections")
+    stop(sprintf(fmt, endpoint$name, client$type))
   }
 
   res <- client$request(endpoint$method, path,

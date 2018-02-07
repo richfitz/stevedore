@@ -111,3 +111,13 @@ test_that("pull", {
   expect_silent(img3 <- dh$images$pull("alpine:latest", stream = tmp))
   expect_match(readLines(tmp), str, fixed = TRUE, all = FALSE)
 })
+
+test_that("log follow does not work", {
+  dh <- test_docker_client(type = "httppipe")
+  nm <- rand_str(10, "stevedore_")
+  x <- dh$containers$create("richfitz/iterate", c("1000", "1"), name = nm)
+  on.exit(x$remove())
+  expect_error(
+    x$logs(follow = TRUE),
+    "Endpoint 'container_logs' cannot be implemented because the 'httppipe' http client does not currently support streaming connections", fixed = TRUE)
+})
