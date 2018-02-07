@@ -103,7 +103,7 @@ test_that("pull", {
   }
 
   txt1 <- capture.output(img1 <- dh$images$pull("alpine:latest"))
-  expect_match(txt1, str, fixed = TRUE, all = TRUE)
+  expect_match(txt1, str, fixed = TRUE, all = FALSE)
 
   expect_silent(img2 <- dh$images$pull("alpine:latest", stream = NULL))
 
