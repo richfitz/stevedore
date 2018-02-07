@@ -515,7 +515,7 @@ test_that("run with get/pull error handling", {
 
 test_that("run: remove", {
   d <- test_docker_client()
-  ans <- d$containers$run("hello-world", rm = TRUE)
+  ans <- d$containers$run("hello-world", rm = TRUE, stream = FALSE)
   expect_equal(names(ans), c("container", "logs"))
   expect_is(ans$container, "docker_container")
   expect_is(ans$logs, "docker_stream")
@@ -525,7 +525,8 @@ test_that("run: remove", {
 
 test_that("run: error", {
   d <- test_docker_client()
-  e <- get_error(d$containers$run("richfitz/error", "4", rm = TRUE))
+  e <- get_error(
+    d$containers$run("richfitz/error", "4", rm = TRUE, stream = FALSE))
 
   expect_is(e, "container_error")
 
@@ -543,7 +544,8 @@ test_that("run: error", {
 
 test_that("run: error to stderr", {
   d <- test_docker_client()
-  e <- get_error(d$containers$run("richfitz/error", "14", rm = TRUE))
+  e <- get_error(
+    d$containers$run("richfitz/error", "14", rm = TRUE, stream = FALSE))
 
   expect_is(e, "container_error")
 
@@ -555,7 +557,7 @@ test_that("run: error to stderr", {
 test_that("run with image", {
   d <- test_docker_client()
   img <- d$images$get("hello-world")
-  ans <- d$containers$run(img, rm = TRUE)
+  ans <- d$containers$run(img, rm = TRUE, stream = FALSE)
   expect_is(ans$logs, "docker_stream")
 })
 
@@ -944,7 +946,7 @@ test_that("run, passing through host_config", {
   nm <- rand_str(10, "stevedore_")
 
   res <- d$containers$run("alpine:latest", cmd = c("ls", "/host"),
-                          name = nm, volumes = v, rm = TRUE)
+                          stream = FALSE, name = nm, volumes = v, rm = TRUE)
 
   expect_equal(sort(trimws(format(res$logs, style = "plain"))),
                sort(dir()))
@@ -954,7 +956,8 @@ test_that("run, passing through host_config", {
 
 test_that("commit", {
   d <- test_docker_client()
-  x <- d$containers$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"))
+  x <- d$containers$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"),
+                        stream = FALSE)
   on.exit(x$container$remove())
   expect_equal(x$container$diff(),
                data_frame(path = "/etc.tar.gz", kind = 1L))
@@ -962,7 +965,7 @@ test_that("commit", {
   h <- img$history()
   expect_match(h[1, "created_by"], "^tar ")
 
-  files <- d$containers$run(img, c("ls", "/"), rm = TRUE)$logs
+  files <- d$containers$run(img, c("ls", "/"), rm = TRUE, stream = FALSE)$logs
   expect_true("etc.tar.gz" %in% trimws(files))
 
   img$remove()
