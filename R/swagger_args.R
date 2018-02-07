@@ -201,21 +201,23 @@ arg_collect_header <- function(p, dest) {
   stopifnot(p$type == "string")
   nm <- p$name_r
   sym <- as.name(nm)
-  is_required <- !isTRUE(p$required)
+  is_required <- isTRUE(p$required)
   has_default <- !is.null(p$default)
 
   if (is.null(p$enum)) {
-    expr <- bquote(assert_scalar_character(.(nm)))
+    expr <- bquote(assert_scalar_character(.(sym)))
   } else {
     values <- as_call(quote(c), p$enum)
     expr <- bquote(match_value(.(sym), .(values)))
   }
+
   if (is_required && has_default) {
     expr <- bquote(if (is.null(.(sym))) .(p$default) else .(expr))
   }
   expr <- bquote(.(dest)$header[[.(p$name)]] <- .(expr))
+
   if (!is_required) {
-    expr <- bquote(if (!is.null(.(nm))) .(expr))
+    expr <- bquote(if (!is.null(.(sym))) .(expr))
   }
   expr
 }
