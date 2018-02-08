@@ -9,7 +9,6 @@ DEFAULT_USER_AGENT <- "stevedore/0.0.0"
 
 .stevedore <- new.env(parent = emptyenv())
 .onLoad <- function(...) {
-  .stevedore$index <- stevedore_read_index()
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
   .stevedore$names <- character()

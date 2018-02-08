@@ -150,6 +150,13 @@ snake_to_camel <- function(x) {
   x
 }
 
+
+## As above, but for header case (X-Kebab-Case) to snake_case
+x_kebab_to_snake <- function(x) {
+  sub("^x_", "", gsub("-", "_", tolower(x)))
+}
+
+
 lock_environment <- function(env) {
   for (nm in ls(env)) {
     lockBinding(as.name(nm), env)
@@ -316,4 +323,34 @@ read_binary <- function(path) {
 
 indent <- function(x, n) {
   paste0(strrep(" ", n), x)
+}
+
+
+sprintfn <- function(fmt, args) {
+  switch(as.character(length(args)),
+         "0" = fmt,
+         "1" = sprintf(fmt, args),
+         "2" = sprintf(fmt, args[[1]], args[[2]]))
+}
+
+
+version_check <- function(v, cmp) {
+  v <- numeric_version(v)
+  cmp <- numeric_version(cmp)
+  (length(cmp) == 1 && cmp == v) ||
+    (length(cmp) == 2 && v >= cmp[[1]] && v <= cmp[[2]])
+}
+
+
+atomic_types <- function() {
+  type <- list("string"  = character(1),
+               "number"  = numeric(1),
+               "integer" = integer(1),
+               "boolean" = logical(1))
+  missing <- lapply(type, as_na)
+  empty <- lapply(type, "[", 0L)
+  list(names = names(type),
+       type = type,
+       missing = missing,
+       empty = empty)
 }

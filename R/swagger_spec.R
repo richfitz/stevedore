@@ -1,11 +1,16 @@
-stevedore_read_index <- function() {
-  path <- system.file("spec/index.yaml", package = "stevedore", mustWork = TRUE)
-  dat <- yaml_load_file(path)
-  names(dat) <- sub("^v", "", names(dat))
-  dat
+swagger_spec_index <- function(refresh = FALSE) {
+  if (is.null(.stevedore$index) || refresh) {
+    path <- system.file("spec/index.yaml", package = "stevedore",
+                        mustWork = TRUE)
+    dat <- yaml_load_file(path)
+    names(dat) <- sub("^v", "", names(dat))
+    .stevedore$index <- dat
+  }
+  .stevedore$index
 }
 
-read_spec <- function(version, refresh = FALSE) {
+
+swagger_spec_read <- function(version, refresh = FALSE) {
   if (!refresh && version %in% names(.stevedore$spec)) {
     return(.stevedore$spec[[version]])
   }
@@ -15,15 +20,17 @@ read_spec <- function(version, refresh = FALSE) {
   ## get all of that right though.  That should be dealt with at a
   ## higher level than this function though, which should just read a
   ## spec.
-  path <- spec_path()
-  pos <- names(.stevedore$index)
+  path <- swagger_spec_path()
+  spec_index <- swagger_spec_index()
+
+  pos <- names(spec_index)
   if (!(version %in% pos)) {
     stop(sprintf("Invalid version %s; try one of %s",
                  version, paste(pos, collapse = ", ")))
   }
-  path_yml <- fetch_spec(version, path)
+  path_yml <- swagger_spec_fetch(version, path)
   md5_found <- unname(tools::md5sum(path_yml))
-  md5_expected <- .stevedore$index[[version]]
+  md5_expected <- spec_index[[version]]
   if (md5_found != md5_expected) {
     stop(sprintf("Spec for %s had different md5 than expected (%s, not %s)",
                  version, md5_found, md5_expected))
@@ -33,7 +40,7 @@ read_spec <- function(version, refresh = FALSE) {
   patch <- yaml_load_file(system.file(
     "spec/patch.yaml", package = "stevedore"))
 
-  ret <- spec_apply_patch(ret, patch)
+  ret <- swagger_spec_patch(ret, patch)
 
   ## This bit of patching is additional to the bits in yaml, but I
   ## can't see how to make it do-able with the yaml directly because
@@ -52,13 +59,15 @@ read_spec <- function(version, refresh = FALSE) {
   ret
 }
 
-fetch_spec <- function(version, path) {
+
+swagger_spec_fetch <- function(version, path) {
   url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
   dest <- file.path(path, sprintf("v%s.yaml", version))
   download_file(url, dest)
 }
 
-spec_path <- function() {
+
+swagger_spec_path <- function() {
   path <- getOption("stevedore.spec.path", NULL)
   if (is.null(path)) {
     message("The option 'stevedore.spec.path' is not set - using temporary dir")
@@ -72,7 +81,8 @@ spec_path <- function() {
   path
 }
 
-spec_apply_patch <- function(dat, patch) {
+
+swagger_spec_patch <- function(dat, patch) {
   v <- numeric_version(dat$info$version)
   for (el in patch) {
     assert_character(el$version)
@@ -92,24 +102,19 @@ spec_apply_patch <- function(dat, patch) {
   dat
 }
 
-spec_versions <- function() {
+
+swagger_spec_versions <- function() {
   min_version <- unclass(numeric_version(MIN_DOCKER_API_VERSION))[[c(1, 2)]]
   max_version <- unclass(numeric_version(MAX_DOCKER_API_VERSION))[[c(1, 2)]]
   sprintf("1.%d", min_version:max_version)
 }
 
+
 ## This is used only in the package Makefile
-write_spec_index <- function(path) {
-  versions <- spec_versions()
-  files <- vapply(versions, fetch_spec, character(1), path)
+swagger_spec_index_write <- function(path) {
+  versions <- swagger_spec_versions()
+  files <- vapply(versions, swagger_spec_fetch, character(1), path)
   md5 <- tools::md5sum(files)
   names(md5) <- paste0("v", names(files))
   cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
-}
-
-version_check <- function(v, cmp) {
-  v <- numeric_version(v)
-  cmp <- numeric_version(cmp)
-  (length(cmp) == 1 && cmp == v) ||
-    (length(cmp) == 2 && v >= cmp[[1]] && v <= cmp[[2]])
 }

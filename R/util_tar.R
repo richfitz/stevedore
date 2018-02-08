@@ -38,6 +38,7 @@ tar_directory <- function(root) {
   readBin(tmp, raw(), file.size(tmp))
 }
 
+
 tar_files <- function(files, root) {
   assert_directory(root)
 
@@ -50,11 +51,13 @@ tar_files <- function(files, root) {
   readBin(tmp, raw(), file.size(tmp))
 }
 
+
 tar_file <- function(file) {
   assert_scalar_character(file)
   assert_file_exists(file)
   tar_files(basename(file), dirname(file))
 }
+
 
 tar_safe <- function(tarfile, files, ..., complex = FALSE) {
   assert_file_exists(files)
@@ -66,6 +69,7 @@ tar_safe <- function(tarfile, files, ..., complex = FALSE) {
   tarfile
 }
 
+
 ## Untar a raw vector
 untar_bin <- function(bin, path = tempfile(), ...) {
   tmp <- tempfile()
@@ -75,6 +79,7 @@ untar_bin <- function(bin, path = tempfile(), ...) {
   utils::untar(tmp, exdir = path, ...)
   invisible(path)
 }
+
 
 tar_system <- function(tarfile, files) {
   ## On mac may need to set:

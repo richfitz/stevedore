@@ -1,4 +1,13 @@
-endpoint_args <- function(method, path, x, spec) {
+## Convert a specification for an endpoint into an R function that o
+swagger_args <- function(method, path, x, spec) {
+  args <- swagger_args_parse(method, path, x, spec)
+  help <- get_help(x, args)
+  list(help = help,
+       handler = swagger_args_handler(args))
+}
+
+
+swagger_args_parse <- function(method, path, x, spec) {
   args <- x$parameters
   if (is.null(args)) {
     return(NULL)
@@ -38,7 +47,7 @@ endpoint_args <- function(method, path, x, spec) {
   args_name <- vcapply(args, "[[", "name")
   args_name_r <- args_name
   args_name_r[args_in == "header"] <-
-    name_header_to_r(args_name[args_in == "header"])
+    x_kebab_to_snake(args_name[args_in == "header"])
   args_name_r <- pascal_to_snake(args_name_r)
   for (i in seq_along(args)) {
     args[[i]]$name_r <- args_name_r[[i]]
@@ -48,7 +57,8 @@ endpoint_args <- function(method, path, x, spec) {
   if (any(duplicated(args_name)) || any(duplicated(args_name_r))) {
     stop("fix duplicated names") # nocov [stevedore bug]
   }
-  stopifnot(identical(args_name[args_in == "path"], parse_path(path)$args))
+  stopifnot(identical(args_name[args_in == "path"],
+                      swagger_path_parse(path)$args))
 
   i <- match(args_in, c("path", "body", "query", "header"))
   stopifnot(all(!is.na(i)))
@@ -60,7 +70,8 @@ endpoint_args <- function(method, path, x, spec) {
   args
 }
 
-make_argument_handler <- function(args) {
+
+swagger_args_handler <- function(args) {
   ## All the stopifnot bits are assertions that have more to do with
   ## making sure that the spec confirms to what we are expecting.
   ## They'd probably be better done with debugme because I don't think
@@ -84,7 +95,7 @@ make_argument_handler <- function(args) {
       .(dollar(dest, quote(body))) <- .(fbody_body_combine))
   }
 
-  fbody_collect <- lapply(args, arg_collect, dest)
+  fbody_collect <- lapply(args, swagger_arg_collect, dest)
   fbody <- c(quote(`{`),
             bquote(.(dest) <- list()),
             fbody_collect,
@@ -100,16 +111,19 @@ make_argument_handler <- function(args) {
   as.function(c(a, as.call(fbody)), env)
 }
 
-arg_collect <- function(p, dest) {
+
+## The actual argument collectors (used only in this file)
+swagger_arg_collect <- function(p, dest) {
   switch(p[["in"]],
-         path = arg_collect_path(p, dest),
-         query = arg_collect_query(p, dest),
-         body = arg_collect_body(p, dest),
-         header = arg_collect_header(p, dest),
+         path = swagger_arg_collect_path(p, dest),
+         query = swagger_arg_collect_query(p, dest),
+         body = swagger_arg_collect_body(p, dest),
+         header = swagger_arg_collect_header(p, dest),
          stop("assertion error"))
 }
 
-arg_collect_path <- function(p, dest) {
+
+swagger_arg_collect_path <- function(p, dest) {
   if (!isTRUE(p$required)) {
     stop("all path parameters assumed required") # nocov [stevedore bug]
   }
@@ -118,11 +132,12 @@ arg_collect_path <- function(p, dest) {
   as_call(quote(`<-`), lhs, rhs)
 }
 
+
 ## some of the 'query' bits within here must change - we might need to
 ## construct different validators depending on what sort of input
 ## we're getting?  It might be better to realise that avoiding
 ## duplication here is just making this function worse, not better!
-arg_collect_query <- function(p, dest) {
+swagger_arg_collect_query <- function(p, dest) {
   type <- p$type
   stopifnot(length(type) == 1L)
   if (type == "boolean") {
@@ -152,9 +167,10 @@ arg_collect_query <- function(p, dest) {
   expr
 }
 
+
 ## This is really similar to above but not *that* similar really -
 ## when combined they're clumsy and hard to reason about.
-arg_collect_body <- function(p, dest) {
+swagger_arg_collect_body <- function(p, dest) {
   type <- p$type
   if (setequal(type, c("array", "string"))) {
     is_scalar <- FALSE
@@ -197,7 +213,8 @@ arg_collect_body <- function(p, dest) {
   expr
 }
 
-arg_collect_header <- function(p, dest) {
+
+swagger_arg_collect_header <- function(p, dest) {
   stopifnot(p$type == "string")
   nm <- p$name_r
   sym <- as.name(nm)
@@ -222,10 +239,13 @@ arg_collect_header <- function(p, dest) {
   expr
 }
 
+
+## These are up for change:
 as_query_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
   paste(x, collapse = ",")
 }
+
 
 as_body_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
@@ -235,8 +255,4 @@ as_body_array_string <- function(x, name = deparse(substitute(x))) {
   } else {
     x
   }
-}
-
-name_header_to_r <- function(x) {
-  sub("^x_", "", gsub("-", "_", tolower(x)))
 }

@@ -1,3 +1,39 @@
+## Handlers for the headers are easy because the headers are just
+## stringsmapping to fairly simple types - none of these are
+## recursive.
+swagger_header_handlers <- function(responses, spec) {
+  responses <- responses[as.integer(names(responses)) < 300]
+  lapply(responses, swagger_header_handler, spec)
+}
+
+
+swagger_header_handler <- function(response, spec) {
+  if ("headers" %in% names(response)) {
+    els <- names(response$headers)
+    els_r <- x_kebab_to_snake(els)
+    type <- vcapply(response$headers, "[[", "type")
+    atomic <- atomic_types()
+    f_atomic <- function(v, data) {
+      msg <- atomic$missing[[type[[v]]]]
+      x <- pick(data, tolower(v), msg)
+      if (!is.na(x)) {
+        storage.mode(x) <- storage.mode(msg)
+      }
+      x
+    }
+    function(headers, as_is_names) {
+      h <- parse_headers(headers)
+      names(h) <- tolower(names(h))
+      ret <- lapply(els, f_atomic, h)
+      names(ret) <- if (as_is_names) els else els_r
+      ret
+    }
+  } else {
+    NULL
+  }
+}
+
+
 ## This is significantly harder than customising the input; we read
 ## through the swagger spec and write custom handlers for the json.
 ## This seems preferable to just relying on the defaults in
@@ -12,39 +48,41 @@
 ## It also does not handle the spec as provided by docker (it also
 ## does not have automatically generated handler functions so this
 ## might be worth pushing upstream).
-make_response_handlers <- function(responses, spec, produces) {
+swagger_response_handlers <- function(responses, spec, produces) {
   responses <- responses[as.integer(names(responses)) < 300]
-  lapply(responses, make_response_handler, spec, produces)
+  lapply(responses, swagger_response_handler, spec, produces)
 }
 
-make_response_handler <- function(response, spec, produces) {
+
+swagger_response_handler <- function(response, spec, produces) {
   binary_types <- c("application/octet-stream",
                     "application/x-tar",
                     "application/vnd.docker.raw-stream")
   if (produces == "null") {
-    make_response_handler_null(response, spec)
+    swagger_response_handler_null(response, spec)
   } else if (produces == "application/json") {
-    make_response_handler_json(response, spec)
+    swagger_response_handler_json(response, spec)
   } else if (produces %in% binary_types) {
-    make_response_handler_binary(response)
+    swagger_response_handler_binary(response)
   } else if (produces == "text/plain") {
-    make_response_handler_text(response)
+    swagger_response_handler_text(response)
   } else if (produces == "application/chunked-string") {
-    make_response_handler_chunked_string(response)
+    swagger_response_handler_chunked_string(response)
   } else {
     stop("Unhandled response type ", produces) # nocov [stevedore bug]
   }
 }
 
-make_response_handler_json <- function(response, spec) {
+
+swagger_response_handler_json <- function(response, spec) {
   schema <- resolve_schema_ref(response$schema, spec)
 
   if (is.null(schema)) {
-    h <- make_response_handler_null(schema, spec)
+    h <- swagger_response_handler_null(schema, spec)
   } else if (schema$type == "object") {
-    h <- make_response_handler_object(schema, spec)
+    h <- swagger_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
-    h <- make_response_handler_array(schema, spec)
+    h <- swagger_response_handler_array(schema, spec)
   } else {
     stop("not sure how to make this response handler") # nocov [stevedore bug]
   }
@@ -53,7 +91,8 @@ make_response_handler_json <- function(response, spec) {
   }
 }
 
-make_response_handler_null <- function(response, spec) {
+
+swagger_response_handler_null <- function(response, spec) {
   function(data, as_is_names) {
     if (length(data) > 0L) {
       stop("Expected an empty response") # nocov [stevedore bug]
@@ -62,7 +101,8 @@ make_response_handler_null <- function(response, spec) {
   }
 }
 
-make_response_handler_object <- function(schema, spec) {
+
+swagger_response_handler_object <- function(schema, spec) {
   atomic <- atomic_types()
 
   additional_properties <- additional_properties_handler <- NULL
@@ -71,11 +111,12 @@ make_response_handler_object <- function(schema, spec) {
     if (ap$type == "object") {
       additional_properties <- "object"
       if (!is.null(ap$properties)) {
-        additional_properties_handler <- make_response_handler_object(ap, spec)
+        additional_properties_handler <-
+          swagger_response_handler_object(ap, spec)
       }
     } else if (ap$type == "array") {
       additional_properties <- "array"
-      additional_properties_handler <- make_response_handler_array(ap, spec)
+      additional_properties_handler <- swagger_response_handler_array(ap, spec)
     } else if (identical(ap, list(type = "string"))) {
       additional_properties <- "string"
     } else {
@@ -92,7 +133,7 @@ make_response_handler_object <- function(schema, spec) {
   }
 
   properties <- lapply(schema$properties, resolve_schema_ref, spec)
-  type <- vcapply(properties, schema_get_type)
+  type <- vcapply(properties, swagger_get_type)
 
   is_array_string <- type == "array_string"
   if (any(is_array_string)) {
@@ -115,9 +156,9 @@ make_response_handler_object <- function(schema, spec) {
   stopifnot(length(found) == length(els) && setequal(found, els))
 
   object_handlers <- lapply(properties[els_object], function(x)
-    make_response_handler_object(x, spec))
+    swagger_response_handler_object(x, spec))
   array_handlers <- lapply(properties[els_array], function(x)
-    make_response_handler_array(x, spec))
+    swagger_response_handler_array(x, spec))
 
   f_atomic <- function(v, data) {
     pick(data, v, atomic$missing[[type[[v]]]])[[1L]]
@@ -169,7 +210,8 @@ make_response_handler_object <- function(schema, spec) {
   }
 }
 
-make_response_handler_array <- function(schema, spec) {
+
+swagger_response_handler_array <- function(schema, spec) {
   items <- resolve_schema_ref(schema$items, spec)
   atomic <- atomic_types()
 
@@ -178,19 +220,20 @@ make_response_handler_array <- function(schema, spec) {
   }
   if (items$type == "object") {
     if (!is.null(items$additionalProperties)) {
-      make_response_handler_array_object_list(items, spec)
+      swagger_response_handler_array_object_list(items, spec)
     } else {
-      make_response_handler_array_object_df(items, spec)
+      swagger_response_handler_array_object_df(items, spec)
     }
   } else if (items$type == "array") {
-    make_response_handler_array_array(items, spec)
+    swagger_response_handler_array_array(items, spec)
   } else {
-    make_response_handler_array_atomic(atomic$missing[[items$type]],
-                                       atomic$empty[[items$type]])
+    swagger_response_handler_array_atomic(atomic$missing[[items$type]],
+                                          atomic$empty[[items$type]])
   }
 }
 
-make_response_handler_array_atomic <- function(missing, empty) {
+
+swagger_response_handler_array_atomic <- function(missing, empty) {
   force(missing)
   force(empty)
   function(x, as_is_names) {
@@ -198,8 +241,9 @@ make_response_handler_array_atomic <- function(missing, empty) {
   }
 }
 
-make_response_handler_array_array <- function(items, spec) {
-  handler <- make_response_handler_array(items, spec)
+
+swagger_response_handler_array_array <- function(items, spec) {
+  handler <- swagger_response_handler_array(items, spec)
   rm(spec)
   function(x, as_is_names) {
     lapply(x, handler, as_is_names)
@@ -208,11 +252,11 @@ make_response_handler_array_array <- function(items, spec) {
 
 ## This one is the nasty case; we handle an object but after
 ## collection convert it into a data frame.  There's some duplication
-## here with make_response_handler_object but it's not avoidable
+## here with swagger_response_handler_object but it's not avoidable
 ## because we need to iterate over each element in the array - we're
 ## basically transposing it but doing some type conversion at the same
 ## time!
-make_response_handler_array_object_df <- function(items, spec) {
+swagger_response_handler_array_object_df <- function(items, spec) {
   atomic <- atomic_types()
   items$properties <- lapply(items$properties, resolve_schema_ref, spec)
   properties <- lapply(items$properties, resolve_schema_ref, spec)
@@ -228,9 +272,9 @@ make_response_handler_array_object_df <- function(items, spec) {
   cols_array <- names(type)[type == "array"]
 
   object_handlers <- lapply(properties[cols_object], function(x)
-    make_response_handler_object(x, spec))
+    swagger_response_handler_object(x, spec))
   array_handlers <- lapply(properties[cols_array], function(x)
-    make_response_handler_array(x, spec))
+    swagger_response_handler_array(x, spec))
 
   f_atomic <- function(v, data) {
     vapply(data, pick, atomic$type[[type[[v]]]], v, atomic$missing[[type[[v]]]],
@@ -266,7 +310,8 @@ make_response_handler_array_object_df <- function(items, spec) {
   }
 }
 
-make_response_handler_array_object_list <- function(items, spec) {
+
+swagger_response_handler_array_object_list <- function(items, spec) {
   properties <- lapply(items$properties, resolve_schema_ref, spec)
   if (length(properties) != 0L) {
     stop("This is not supported") # nocov
@@ -299,69 +344,30 @@ make_response_handler_array_object_list <- function(items, spec) {
   }
 }
 
-make_response_handler_binary <- function(...) {
+
+swagger_response_handler_binary <- function(...) {
   function(data, as_is_names) {
     data
   }
 }
 
-make_response_handler_text <- function(...) {
+
+swagger_response_handler_text <- function(...) {
   function(data, as_is_names) {
     raw_to_char(data)
   }
 }
 
-make_response_handler_chunked_string <- function(...) {
+
+swagger_response_handler_chunked_string <- function(...) {
   function(data, as_is_names) {
     decode_chunked_string(data)
   }
 }
 
-make_header_handlers <- function(responses, spec) {
-  responses <- responses[as.integer(names(responses)) < 300]
-  lapply(responses, make_header_handler, spec)
-}
 
-make_header_handler <- function(response, spec) {
-  if ("headers" %in% names(response)) {
-    els <- names(response$headers)
-    els_r <- name_header_to_r(els)
-    type <- vcapply(response$headers, "[[", "type")
-    atomic <- atomic_types()
-    f_atomic <- function(v, data) {
-      msg <- atomic$missing[[type[[v]]]]
-      x <- pick(data, tolower(v), msg)
-      if (!is.na(x)) {
-        storage.mode(x) <- storage.mode(msg)
-      }
-      x
-    }
-    function(headers, as_is_names) {
-      h <- parse_headers(headers)
-      names(h) <- tolower(names(h))
-      ret <- lapply(els, f_atomic, h)
-      names(ret) <- if (as_is_names) els else els_r
-      ret
-    }
-  } else {
-    NULL
-  }
-}
-
-atomic_types <- function() {
-  type <- list("string"  = character(1),
-               "number"  = numeric(1),
-               "integer" = integer(1),
-               "boolean" = logical(1))
-  missing <- lapply(type, as_na)
-  empty <- lapply(type, "[", 0L)
-  list(names = names(type),
-       type = type,
-       missing = missing,
-       empty = empty)
-}
-
-schema_get_type <- function(x) {
+## Utility for dealing with swagger types
+swagger_get_type <- function(x) {
   ret <- x$type
   if (is.null(ret)) {
     if (!is.null(x$enum)) {
@@ -376,50 +382,4 @@ schema_get_type <- function(x) {
     ret <- "array_string"
   }
   ret
-}
-
-decode_chunked_string <- function(x, ...) {
-  ## This happens when we have logs on a container that has allocated
-  ## a tty.  In that case the output is sent directly.  The logic
-  ## behind the steps here is that if there are <8 entries then that's
-  ## not a complete docker_stream header so don't try and decode it.
-  ## And the first 4 elements are an encoded integer with possible
-  ## values 0..2 so we _must_ have a raw 0 if this is actually a
-  ## docker_stream header.
-  if (length(x) < 8L || all(x[seq_len(4)] != 0)) {
-    ## NOTE: not 100% sure about splitting the output here but I think
-    ## that matches most closely with the docker_stream version where
-    ## it is line-based output.  Also not sure if this should be
-    ## `\r\n` or `\r?\n` (with fixed = FALSE).
-    return(strsplit(raw_to_char(x), "\r\n", fixed = TRUE)[[1L]])
-  }
-
-  i_size <- 5L:8L
-  to_int <- function(b) {
-    ## I don't know if this will work across all platforms (yay,
-    ## Solaris) becaus of endianless drama.  But then I doubt that
-    ## docker works on Solaris.
-    ## packBits(rawToBits(b), "integer")
-    sum(256^(3:0) * as.integer(b))
-  }
-
-  stream <- integer(0)
-  value <- character(0)
-
-  while (length(x) > 0L) {
-    len <- to_int(x[i_size])
-
-    stream <- c(stream, x[[1L]])
-    value <- c(value, rawToChar(x[9:(len + 8L)]))
-
-    x <- x[-seq_len(len + 8L)]
-  }
-  docker_stream(value, stream)
-}
-
-docker_stream <- function(value, stream) {
-  attr(value, "stream") <-
-    factor(stream, 0:2, labels = c("stdin", "stdout", "stderr"))
-  class(value) <- "docker_stream"
-  value
 }

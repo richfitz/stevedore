@@ -23,27 +23,24 @@
 ## But for the simple cases this is going to save a lot of repetitive
 ## code and automatically allow for differences in the schema over
 ## time.
-
-make_endpoint <- function(name, method, path, spec) {
-  path_data <- parse_path(path)
+swagger_endpoint <- function(name, method, path, spec) {
+  path_data <- swagger_path_parse(path)
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
 
-  response_handlers <- make_response_handlers(x$responses, spec, produces)
-
-  header_handlers <- make_header_handlers(x$responses, spec)
+  response_handlers <- swagger_response_handlers(x$responses, spec, produces)
+  header_handlers <- swagger_header_handlers(x$responses, spec)
 
   response_description <- lapply(x$responses, "[[", "description")
 
-  args <- endpoint_args(method, path, x, spec)
-  argument_handler <- make_argument_handler(args)
-  help <- get_help(x, args)
+  args <- swagger_args(method, path, x, spec)
+  argument_handler <- args$handler
+  help <- args$help
 
   list(
     name = name,
     path = path,
     path_fmt = path_data$fmt,
-    path_args = path_data$args,
     method = toupper(method),
     argument_handler = argument_handler,
     response_handlers = response_handlers,
@@ -53,6 +50,7 @@ make_endpoint <- function(name, method, path, spec) {
 }
 
 
+## Basically just used above
 get_response_type <- function(method, path, data) {
   f <- function(x) x$responses[as.integer(names(x$responses)) < 300]
   if (is.null(data)) {
@@ -75,52 +73,6 @@ get_response_type <- function(method, path, data) {
   produces
 }
 
-
-resolve_schema_ref <- function(x, spec) {
-  if ("allOf" %in% names(x)) {
-    tmp <- lapply(x$allOf, resolve_schema_ref, spec)
-    type <- vcapply(tmp, "[[", "type")
-    if (!all(type == "object")) {
-      stop("should never happen") # nocov [stevedore bug]
-    }
-    description <- x$description
-    x <- list(type = "object",
-              properties = unlist(lapply(tmp, "[[", "properties"), FALSE))
-    x$description <- description
-  } else if ("$ref" %in% names(x)) {
-    ref <- strsplit(sub("^#/", "", x[["$ref"]]), "/", fixed = TRUE)[[1]]
-    x <- c(x[names(x) != "$ref"], resolve_schema_ref(spec[[ref]], spec))
-  }
-  x
-}
-
-parse_path <- function(x) {
-  re <- "\\{([^}]+)\\}"
-  args <- character(0)
-  repeat {
-    m <- regexec(re, x)[[1]]
-    if (m[[1]] < 0) {
-      break
-    }
-    args <- c(args, substr_len(x, m[[2]], attr(m, "match.length")[[2]]))
-    x <- sub(re, "%s", x)
-  }
-
-  list(fmt = x, args = args)
-}
-
-sprintfn <- function(fmt, args) {
-  switch(as.character(length(args)),
-         "0" = fmt,
-         "1" = sprintf(fmt, args),
-         "2" = sprintf(fmt, args[[1]], args[[2]]))
-}
-
-hijacked_content <- function(hijack) {
-  if (!is.null(attr(hijack, "content"))) {
-    attr(hijack, "content")()
-  }
-}
 
 get_help <- function(x, args) {
   if (length(args) == 0L) {

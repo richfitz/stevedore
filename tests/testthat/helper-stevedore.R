@@ -82,14 +82,14 @@ read_sample_response <- function(path) {
     ret$response <- charToRaw(ret$response)
   }
 
-  spec <- read_spec(ret$version)
+  spec <- swagger_spec_read(ret$version)
 
   endpoint <- spec$paths[[ret$path]][[ret$method]]
   ret$schema <- endpoint$responses[[ret$code]]
 
   ret$produces <- get_response_type(ret$method, ret$path, endpoint)
 
-  ret$handler <- make_response_handler(ret$schema, spec, ret$produces)
+  ret$handler <- swagger_response_handler(ret$schema, spec, ret$produces)
   ret$reference <- eval(parse(text = txt))
 
   ret
@@ -150,7 +150,7 @@ add_sample_response <- function(filename, method, path, code, version) {
   if (file.exists(filename)) {
     stop("filename already exists")
   }
-  spec <- read_spec(version)
+  spec <- swagger_spec_index(version)
   response <- read_sample_response_str(method, path, code, spec)
   dat <- list(version = version, method = method, path = path, code = code,
               response = response)
@@ -228,7 +228,7 @@ test_sample_responses <- function(v, skip = NULL) {
 create_sample_responses <- function(target, base) {
   path_base <- file.path("sample_responses", paste0("v", base))
   path_target <- file.path("sample_responses", paste0("v", target))
-  spec <- read_spec(target)
+  spec <- swagger_spec_index(target)
 
   files <- dir(path_base, full.names = TRUE)
 

@@ -10,12 +10,13 @@ docker_api_client <- function(..., api_version = NULL, type = NULL) {
 
 docker_api_client_data <- function(version) {
   if (!(version %in% names(.stevedore$client_data))) {
-    spec <- read_spec(version)
+    spec <- swagger_spec_read(version)
     endpoints <- docker_api_client_endpoints()
 
     dat <- lapply(endpoints, function(x)
-      make_endpoint(x$name, x$method, x$path, spec))
+      swagger_endpoint(x$name, x$method, x$path, spec))
     names(dat) <- vcapply(endpoints, "[[", "name")
+    attr(dat, "version") <- version
 
     .stevedore$client_data[[version]] <- dat
   }
@@ -37,22 +38,22 @@ docker_api_client_endpoints <- function() {
 }
 
 
-run_endpoint <- function(client, endpoint, params, hijack = NULL,
+run_endpoint <- function(http_client, endpoint, params, hijack = NULL,
                          allow_hijack_without_stream = FALSE,
                          as_is_names = FALSE) {
   path <- sprintfn(endpoint$path_fmt, params$path)
 
   http_hijack <- !is.null(hijack)
-  if (http_hijack && !client$can_stream && !allow_hijack_without_stream) {
+  if (http_hijack && !http_client$can_stream && !allow_hijack_without_stream) {
     fmt <- paste(
       "Endpoint '%s' cannot be implemented because the '%s' http client",
       "does not currently support streaming connections")
-    stop(sprintf(fmt, endpoint$name, client$type))
+    stop(sprintf(fmt, endpoint$name, http_client$type))
   }
 
-  res <- client$request(endpoint$method, path,
-                        params$query, params$body, params$header,
-                        hijack)
+  res <- http_client$request(endpoint$method, path,
+                             params$query, params$body, params$header,
+                             hijack)
   if (http_hijack) {
     res$content <- hijacked_content(hijack)
   }
@@ -88,5 +89,12 @@ run_endpoint <- function(client, endpoint, params, hijack = NULL,
       }
       ret
     }
+  }
+}
+
+
+hijacked_content <- function(hijack) {
+  if (!is.null(attr(hijack, "content"))) {
+    attr(hijack, "content")()
   }
 }
