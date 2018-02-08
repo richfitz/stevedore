@@ -77,14 +77,14 @@ docker_client_container_collection <- function(..., cl, parent) {
       process = list(
         quote(image <- get_image_id(image)),
         quote(cmd <- check_command(cmd)),
-        volumes_for_create(quote(volumes), quote(host_config)),
-        ports_for_create(quote(ports), quote(host_config)),
-        network_for_create(quote(network), quote(host_config))),
+        mcr_volumes_for_create(quote(volumes), quote(host_config)),
+        mcr_ports_for_create(quote(ports), quote(host_config)),
+        mcr_network_for_create(quote(network), quote(host_config))),
       after = after_create),
     get = get_container,
     list = docker_endpoint(
       "container_list", cl,
-      process = list(validate_filter("filters")),
+      process = list(quote(filters <- as_docker_filter(filters))),
       after = after_list),
     remove = docker_endpoint(
       "container_delete", cl,
@@ -217,7 +217,7 @@ docker_client_container <- function(id, client) {
     put_archive = docker_endpoint(
       "container_import", client, fix = fix_id,
       rename = c(src = "input_stream"),
-      process = list(validate_tar_input(quote(src))),
+      process = list(quote(src <- validate_tar_input(src))),
       after = nothing),
     ##
     kill = docker_endpoint("container_kill", client, fix = fix_id),
@@ -228,10 +228,10 @@ docker_client_container <- function(id, client) {
       defaults = list(stdout = TRUE, stderr = TRUE),
       process = list(
         quote(if (is.numeric(tail)) tail <- as.character(tail)),
-        validate_stream_and_close(quote(stream))),
+        mcr_prepare_stream_and_close(quote(stream))),
       extra = alist(stream = stdout()),
       hijack = quote(if (isTRUE(follow))
-                       streaming_text(exec_output_printer(stream))),
+                       streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = FALSE,
       after = after_logs),
     pause = docker_endpoint("container_pause", client, fix = fix_id),
@@ -294,8 +294,8 @@ docker_client_image_collection <- function(..., cl, parent) {
       defaults = alist(context =),
       extra = alist(verbose = NULL, stream = stdout()),
       process = list(
-        validate_stream_and_close(quote(stream)),
-        validate_tar_directory(quote(context))),
+        mcr_prepare_stream_and_close(quote(stream)),
+        quote(context <- validate_tar_directory(context))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
       after = after_build),
@@ -308,8 +308,8 @@ docker_client_image_collection <- function(..., cl, parent) {
       "image_create", cl, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
       process = list(
-        process_image_and_tag(quote(name), quote(tag)),
-        validate_stream_and_close(quote(stream))),
+        mcr_process_image_and_tag(quote(name), quote(tag)),
+        mcr_prepare_stream_and_close(quote(stream))),
       extra = alist(stream = stdout()),
       defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stream))),
@@ -511,9 +511,9 @@ docker_client_exec <- function(id, client) {
     start = docker_endpoint(
       "exec_start", client, fix = list(id = id),
       extra = alist(stream = stdout()),
-      hijack = quote(streaming_text(exec_output_printer(stream))),
+      hijack = quote(streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = TRUE,
-      process = list(validate_stream_and_close(quote(stream))),
+      process = list(mcr_prepare_stream_and_close(quote(stream))),
       after = after_start),
     inspect = function(reload = TRUE) {
       if (reload) {
@@ -524,519 +524,4 @@ docker_client_exec <- function(id, client) {
     resize = docker_endpoint("exec_resize", client, fix = list(id = id)),
     reload = reload)
   self
-}
-
-## TODO: The bits below here could do with some organisation
-
-stevedore_object <- function(class, ..., lock = TRUE) {
-  els <- list(...)
-  assert_named(els, TRUE, "stevedore_object elements")
-  ret <- list2env(els, parent = emptyenv())
-  class(ret) <- c(class, "stevedore_object")
-  if (lock) {
-    lock_environment(ret)
-  }
-  ret
-}
-
-short_id <- function(x) {
-  end <- if (string_starts_with(x, "sha256:")) 17L else 10L
-  substr(x, 1, end)
-}
-
-drop_leading_slash <- function(x) {
-  sub("^/", "", x)
-}
-
-report_warnings <- function(x, action) {
-  n <- length(x)
-  if (n > 0L) {
-    warning(sprintf(
-      "%d %s produced while %s:\n%s",
-      n, ngettext(n, "warning", "warnings"), action,
-      paste0("- ", x, collapse = "\n")),
-      call. = FALSE, immediate. = TRUE)
-  }
-}
-
-subset_stevedore_object <- function(x, name) {
-  .subset2(x, name) %||%
-    stop(sprintf("No element '%s' within '%s' object", name, class(x)[[1]]),
-         call. = FALSE)
-}
-
-##' @export
-`$.stevedore_object` <- function(x, name) {
-  subset_stevedore_object(x, name)
-}
-
-##' @export
-`[[.stevedore_object` <- function(x, i, ...) {
-  assert_scalar_character(i)
-  subset_stevedore_object(x, i)
-}
-
-pull_status_printer <- function(stream = stdout()) {
-  if (is.null(stream)) {
-    return(function(x) {})
-  }
-  assert_is(stream, "connection")
-  last_is_progress <- FALSE
-  width <- getOption("width")
-  endl <- if (isatty(stream)) "" else "\n"
-
-  function(x) {
-    if (last_is_progress) {
-      reset_line(stream, width)
-    }
-    status <- x$status
-    if (length(x$progressDetail > 0L)) {
-      last_is_progress <<- TRUE
-      cur <- x$progressDetail[["current"]]
-      tot <- x$progressDetail[["total"]]
-      str <- sprintf("%s: %s %s/%s %d%%%s", x[["id"]], x[["status"]],
-                     prettyunits::pretty_bytes(cur),
-                     prettyunits::pretty_bytes(tot),
-                     round(cur / tot * 100),
-                     endl)
-    } else {
-      last_is_progress <<- FALSE
-      if (!is.null(x$error)) {
-        ## TODO: there's also errorDetail$message here too
-        str <- paste0(x$error, "\n")
-      } else if (!is.null(x$status) && is.null(x$id)) {
-        str <- paste0(x$status, "\n")
-      } else if (!is.null(x$status) && !is.null(x$id)) {
-        str <- sprintf("%s %s\n", x$status, x$id)
-      } else {
-        str <- ""
-      }
-    }
-
-    cat(str, file = stream, sep = "")
-  }
-}
-
-build_error <- function(message) {
-  ret <- list(message = message, call = NULL)
-  class(ret) <- c("build_error", "error", "condition")
-  ret
-}
-
-build_status_printer <- function(stream = stdout()) {
-  print_output <- !is.null(stream)
-  if (print_output) {
-    assert_is(stream, "connection")
-  }
-  function(x) {
-    if ("error" %in% names(x)) {
-      stop(build_error(x$error))
-    }
-    if (print_output && "stream" %in% names(x)) {
-      cat(x$stream, file = stream, sep = "")
-    }
-  }
-}
-
-## TODO: this is not just exec - also logs
-## TODO: arrange for 'style' to be passed through here
-exec_output_printer <- function(stream, style = "auto") {
-  if (is.null(stream)) {
-    return(function(x) {})
-  }
-  assert_is(stream, "connection")
-  function(x) {
-    if (inherits(x, "docker_stream")) {
-      x <- format(x, style = style, dest = stream)
-      cat(x, file = stream, sep = "")
-    } else {
-      writeLines(x, stream)
-    }
-  }
-}
-
-## character: open a file in mode wb and ensure closing on exit
-## logical: suppress stream or log to stdoud (FALSE, TRUE)
-## NULL: no stream
-## connection object: stream to open connection
-validate_stream_and_close <- function(name, mode = "wb") {
-  substitute({
-    stream_data <- validate_stream(name, mode)
-    stream <- stream_data$stream
-    if (stream_data$close) {
-      on.exit(close(stream), add = TRUE)
-    }
-  }, list(name = name, mode = mode))
-}
-
-validate_stream <- function(stream, mode = "wb",
-                            name = deparse(substitute(stream))) {
-  close <- FALSE
-  if (is.character(stream)) {
-    close <- TRUE
-    stream <- file(stream, mode)
-  } else if (is.null(stream) || identical(stream, FALSE)) {
-    stream <- NULL
-  } else if (isTRUE(stream)) {
-    stream <- stdout()
-  } else {
-    assert_is(stream, "connection", name = name)
-  }
-  list(stream = stream, close = close)
-}
-
-## TODO: see comments in tar_directory about setting this up for curl
-## streaming from disk
-## if (stream) {
-##   name <- curl_stream_file(tar_directory(name)) # sets attr
-##   on.exit(file.remove(name))
-## } else {
-##   tar_directory(name)
-## }
-validate_tar_directory <- function(name, stream = FALSE) {
-  substitute(
-    if (is.character(name)) {
-      assert_directory(name)
-      name <- tar_directory(name)
-    } else {
-      assert_raw(name)
-    }, list(name = name))
-}
-
-get_image_id <- function(x, name = deparse(substitute(x))) {
-  if (inherits(x, "docker_image")) {
-    x$id()
-  } else {
-    ## TODO: error message should allow for docker_image alternative
-    assert_scalar_character(x, name)
-    x
-  }
-}
-
-get_network_id <- function(x, name = deparse(substitute(x))) {
-  if (inherits(x, "docker_network")) {
-    x$id()
-  } else {
-    ## TODO: error message should allow for docker_network alternative
-    assert_scalar_character(x, name)
-    x
-  }
-}
-
-## TODO: this should be renamed to make it clear it is adding "latest"
-## and should go via parse_image_name
-image_name <- function(x, name = deparse(substitute(x))) {
-  assert_scalar_character(x, name)
-  if (!grepl(":", x, fixed = TRUE)) {
-    x <- paste0(x, ":latest")
-  }
-  x
-}
-
-validate_filter <- function(name) {
-  substitute(name <- as_docker_filter(name),
-             list(name = as.name(name)))
-}
-
-as_docker_filter <- function(x, name = deparse(substitute(x))) {
-  if (length(x) == 0L) {
-    NULL
-  } else if (inherits(x, "json")) {
-    x
-  } else {
-    assert_named(x, TRUE, name)
-    if (!(is.character(x) || (is.list(x) && all(vlapply(x, is.character))))) {
-      stop(sprintf(
-        "'%s' must be a character vector or list of character vectors",
-        name))
-    }
-    jsonlite::toJSON(as.list(x))
-  }
-}
-
-docker_get_image <- function(image, client, name = deparse(substitute(image))) {
-  if (inherits(image, "docker_image")) {
-    image
-  } else {
-    image <- image_name(image, name)
-    tryCatch(
-      client$images$get(image),
-      docker_error = function(e) {
-        if (is_docker_error_not_found(e)) {
-          message(sprintf("Unable to find image '%s' locally", image))
-          client$images$pull(image)
-        } else {
-          stop(e)
-        }
-      })
-  }
-}
-
-make_docker_run <- function(client, can_stream) {
-  force(client)
-  ## TODO: this should pick up all the args from create rather than
-  ## using dots.
-  function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,
-           stream = stdout(), host_config = NULL) {
-    stream_data <- validate_stream(stream)
-    if (stream_data$close) {
-      on.exit(close(stream_data$stream), add = TRUE)
-    }
-
-    if (rm && detach) {
-      ## This is supported in API 1.25 and up - which agrees with our
-      ## API support.
-      ##
-      ## NOTE: Must use PascalCase here because this is directly
-      ## passed though - at the moment!  If I get this fixed up that
-      ## might need to change (the manual unboxing would also not be
-      ## needed).
-      host_config$AutoRemove <- jsonlite::unbox(TRUE)
-    }
-    image <- docker_get_image(image, client)
-    container <- client$containers$create(image, cmd, ...,
-                                          host_config = host_config)
-    if (rm && !detach) {
-      on.exit(container$remove(), add = TRUE)
-    }
-    container$start()
-    if (detach) {
-      return(container)
-    }
-
-    if (can_stream) {
-      out <- container$logs(stream = stream_data$stream, follow = TRUE)
-      exit_status <- container$wait()$status_code
-    } else {
-      ## TODO: warn here that this will block?
-      exit_status <- container$wait()$status_code
-      out <- container$logs()
-      ## NOTE: this duplicates some of the logic in print.docker_stream
-      if (!is.null(stream_data$stream)) {
-        cat(format(out, stream = stream_data$stream),
-            file = stream_data$stream, sep = "")
-      }
-    }
-
-    if (rm) {
-      container$inspect(TRUE)
-    }
-    if (exit_status != 0L) {
-      stop(container_error(container, exit_status, cmd, image, out))
-    }
-    ret <- list(container = container, logs = out)
-    class(ret) <- "docker_run_output"
-    ret
-  }
-}
-
-container_error <- function(container, exit_status, cmd, image, out) {
-  err <- out[attr(out, "stream") == "stderr"]
-  if (length(err) > 0L) {
-    err <- paste0("\n", err, collapse = "")
-  } else {
-    err <- ""
-  }
-  msg <- sprintf(
-    "Command '%s' in image '%s' returned non-zero exit status %s%s",
-    paste(cmd, collapse = " "), image$name(), exit_status, err)
-  ret <- list(container = container, exit_status = exit_status,
-              cmd = cmd, image = image, out = out, message = msg)
-  class(ret) <- c("container_error", "docker_error", "error", "condition")
-  ret
-}
-
-## TODO: For starters, let's use the string format only.  Later we'll
-## come back and allow more interesting approaches that use volume
-## mappings in a more abstract way.  This function will return the two
-## bits that we need - half for create and half for host_config.
-validate_volumes <- function(volumes) {
-  if (is.null(volumes) || length(volumes) == 0L) {
-    return(NULL)
-  }
-  assert_character(volumes)
-
-  binds <- volumes
-  re_ro <- ":ro$"
-  is_ro <- grepl(re_ro, volumes)
-  if (any(is_ro)) {
-    volumes[is_ro] <- sub(re_ro, "", volumes[is_ro])
-  }
-  re <- "^(.+):([^:]+)$"
-  ok <- grepl(re, volumes)
-  if (any(!ok)) {
-    stop(sprintf("Volume mapping %s does not not match '<src>:<dest>[:ro]",
-                 paste(squote(volumes[!ok]), collapse = ", ")))
-  }
-  list(binds = binds,
-       volumes = set_names(rep(list(NULL), length(volumes)),
-                           sub(re, "\\1", volumes)))
-}
-
-## TODO: consider a prefix for all the macro functions.
-volumes_for_create <- function(volumes, host_config) {
-  substitute({
-    volumes <- validate_volumes(volumes)
-    if (!is.null(volumes)) {
-      ## TODO: consider checking that host_config$Binds is not given here
-      host_config$Binds <- volumes[["binds"]]
-      volumes <- volumes[["volumes"]]
-    }
-  }, list(volumes = volumes, host_config = host_config))
-}
-
-validate_ports <- function(ports) {
-  if (is.null(ports) || length(ports) == 0L) {
-    return(NULL)
-  }
-  if (is.logical(ports) && length(ports) == 1L &&
-      identical(as.vector(ports), TRUE)) {
-    return(TRUE)
-  }
-  if (is_integer_like(ports)) {
-    ports <- as.character(ports)
-  }
-  assert_character(ports)
-
-  ## NOTE: this is _not_ enough to capture what docker can do but it's
-  ## a starting point for working out to complete support.
-  re_random <- "^[0-9]+$"
-  re_explicit <- "^([0-9]+):([0-9]+)$"
-
-  i_random <- grepl(re_random, ports)
-  i_explicit <- grepl(re_explicit, ports)
-
-  ok <- i_random | i_explicit
-  if (any(!ok)) {
-    ## TODO: This does not include all possibilities
-    stop(sprintf("Port binding %s does not not match '<host>:<container>'",
-                 paste(squote(ports[!ok]), collapse = ", ")))
-  }
-
-  n <- length(ports)
-  protocol <- rep("tcp", n)
-  host_ip <- character(n)
-  host_port <- character(n)
-  container_port <- character(n)
-
-  container_port[i_random] <- ports[i_random]
-  container_port[i_explicit] <- sub(re_explicit, "\\2", ports[i_explicit])
-
-  host_port[i_explicit] <- sub(re_explicit, "\\1", ports[i_explicit])
-
-  container_port <- sprintf("%s/%s", container_port, protocol)
-
-  ## TODO: this bit with the unboxing should move into HostConfig
-  ## validation at the same time that the case binding is done there.
-  ## Or, because here we're explicitly modifying the object perhaps
-  ## this is OK?
-  build_binding <- function(ip, port) {
-    list(list(HostIp = jsonlite::unbox(ip),
-              HostPort = jsonlite::unbox(port)))
-  }
-  port_bindings <- set_names(Map(build_binding, host_ip, host_port),
-                             container_port)
-  list(port_bindings = port_bindings,
-       ports = set_names(rep(list(NULL), length(ports)), container_port))
-}
-
-ports_for_create <- function(ports, host_config) {
-  substitute({
-    ports <- validate_ports(ports)
-    if (!is.null(ports)) {
-      if (identical(ports, TRUE)) {
-        host_config$PublishAllPorts <- jsonlite::unbox(TRUE)
-        ports <- NULL
-      } else {
-        ## TODO: consider checking that host_config$PortBindings is
-        ## not given here
-        host_config$PortBindings <- ports[["port_bindings"]]
-        ports <- ports[["ports"]]
-      }
-    }
-  }, list(ports = ports, host_config = host_config))
-}
-
-network_for_create <- function(network, host_config) {
-  substitute({
-    if (!is.null(network)) {
-      network <- get_network_id(network)
-      host_config$NetworkMode <- jsonlite::unbox(network)
-      network <- list(network = NULL)
-    }
-  }, list(network = network, host_config = host_config))
-}
-
-## TODO: pass names through here too I think
-validate_image_and_tag <- function(image, tag = NULL,
-                                   name_image = deparse(substitute(image)),
-                                   name_tag = deparse(substitute(tag))) {
-  dat <- parse_image_name(image)
-  if (is.null(dat$tag)) {
-    dat$tag <- tag %||% "latest"
-  } else {
-    if (!is.null(tag)) {
-      stop(sprintf("If '%s' includes a tag, then '%s' must be NULL",
-                   name_image, name_tag))
-    }
-  }
-  dat
-}
-
-## TODO: this does not handle references (repo/image@ref) but that's
-## not that hard to add in here provided we can actually pass the @ref
-## through as if it was tag to things like pull
-DOCKER_REPO_RE <- '^(.+/)?([^:]+)(:[^:]+)?$'
-parse_image_name <- function(image, name = deparse(substitute(image))) {
-  assert_scalar_character(image, name)
-  if (!grepl(DOCKER_REPO_RE, image, perl = TRUE)) {
-    stop(sprintf("'%s' does not match pattern '[<repo>/]<image>[:<tag>]'",
-                 image))
-  }
-  name <- sub(DOCKER_REPO_RE, "\\2", image, perl = TRUE)
-
-  repo <- sub(DOCKER_REPO_RE, "\\1", image)
-  if (nzchar(repo)) {
-    repo <- sub("/$", "", repo)
-  } else {
-    repo <- NULL
-  }
-
-  ## The SHA processing here might be wrong.  The RE might need to
-  ## allow a leading 'sha265:' I think!
-  tag <- sub(DOCKER_REPO_RE, "\\3", image)
-  if (nzchar(tag)) {
-    tag <- sub("^:", "", tag)
-  } else {
-    tag <- NULL
-  }
-
-  ## This is actually the name that we want to use:
-  image <- if (is.null(repo)) name else paste(repo, name, sep = "/")
-  list(repo = repo, name = name, image = image, tag = tag)
-}
-
-process_image_and_tag <- function(image, tag) {
-  substitute({
-    image_tag <- validate_image_and_tag(image, tag)
-    image <- image_tag[["image"]]
-    tag <- image_tag[["tag"]]
-  }, list(image = image, tag = tag))
-}
-
-validate_tar_input <- function(input) {
-  ## Three options here:
-  ##
-  ## binary - assume tar
-  ## file - tar it up
-  ## (tar) - (read from disk)
-  ##
-  ## For now I ignore the last one because I don't see the use case
-  ## and I think that it's better dealt with by reading in the binary
-  ## yourself.
-  substitute(
-    if (!is.raw(input)) {
-      input <- tar_file(input)
-    },
-    list(input = input))
 }
