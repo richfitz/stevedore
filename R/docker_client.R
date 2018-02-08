@@ -24,31 +24,31 @@ docker_client <- function(..., api_version = NULL, type = NULL) {
   ## This will be replicated for networks, volumes, etc.  Unlike the
   ## Python inteface we're not doing this with any fancy inheritance
   ## etc.
-  cl <- docker_client_base(..., api_version = api_version, type = type)
+  api_client <- docker_api_client(..., api_version = api_version, type = type)
 
   ret <- stevedore_object(
     "docker_client",
-    events = docker_endpoint("system_events", cl),
-    df = docker_endpoint("system_df", cl),
-    info = docker_endpoint("system_info", cl),
-    login = docker_endpoint("system_auth", cl),
-    ping = docker_endpoint("system_ping", cl),
-    version = docker_endpoint("system_version", cl),
-    api_version = function() cl$http_client$api_version,
+    events = docker_client_method("system_events", api_client),
+    df = docker_client_method("system_df", api_client),
+    info = docker_client_method("system_info", api_client),
+    login = docker_client_method("system_auth", api_client),
+    ping = docker_client_method("system_ping", api_client),
+    version = docker_client_method("system_version", api_client),
+    api_version = function() api_client$http_client$api_version,
     lock = FALSE)
 
-  ret$containers <- docker_client_container_collection(cl = cl, parent = ret)
-  ret$images <- docker_client_image_collection(cl = cl, parent = ret)
-  ret$networks <- docker_client_network_collection(cl = cl, parent = ret)
-  ret$volumes <- docker_client_volume_collection(cl = cl, parent = ret)
+  ret$containers <- docker_client_container_collection(api_client, ret)
+  ret$images <- docker_client_image_collection(api_client, ret)
+  ret$networks <- docker_client_network_collection(api_client, ret)
+  ret$volumes <- docker_client_volume_collection(api_client, ret)
 
   lock_environment(ret)
   ret
 }
 
-docker_client_container_collection <- function(..., cl, parent) {
+docker_client_container_collection <- function(api_client, parent) {
   get_container <- function(id) {
-    docker_client_container(id, cl)
+    docker_client_container(id, api_client)
   }
   after_create <- function(dat, ...) {
     report_warnings(dat$warnings)
@@ -68,9 +68,9 @@ docker_client_container_collection <- function(..., cl, parent) {
 
   stevedore_object(
     "docker_container_collection",
-    run = make_docker_run(parent, cl$http_client$can_stream),
-    create = docker_endpoint(
-      "container_create", cl,
+    run = make_docker_run(parent, api_client$http_client$can_stream),
+    create = docker_client_method(
+      "container_create", api_client,
       promote = c("image", "cmd"),
       rename = c(ports = "exposed_ports", network = "networking_config"),
       defaults = alist(image =),
@@ -82,19 +82,19 @@ docker_client_container_collection <- function(..., cl, parent) {
         mcr_network_for_create(quote(network), quote(host_config))),
       after = after_create),
     get = get_container,
-    list = docker_endpoint(
-      "container_list", cl,
+    list = docker_client_method(
+      "container_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters))),
       after = after_list),
-    remove = docker_endpoint(
-      "container_delete", cl,
+    remove = docker_client_method(
+      "container_delete", api_client,
       rename = c(delete_volumes = "v"),
       process = list(quote(id <- get_image_id(id)))),
-    prune = docker_endpoint("container_prune", cl))
+    prune = docker_client_method("container_prune", api_client))
 }
 
-docker_client_container <- function(id, client) {
-  container_inspect <- docker_endpoint("container_inspect", client)
+docker_client_container <- function(id, api_client) {
+  container_inspect <- docker_client_method("container_inspect", api_client)
   attrs <- container_inspect(id)
   id <- attrs$id
   self <- NULL
@@ -112,7 +112,7 @@ docker_client_container <- function(id, client) {
     }
   }
   after_exec <- function(x, ...) {
-    ret <- docker_client_exec(x$id, client)
+    ret <- docker_client_exec(x$id, api_client)
     ret
   }
   after_logs <- function(x, params) {
@@ -140,7 +140,7 @@ docker_client_container <- function(id, client) {
     invisible(self)
   }
   after_commit <- function(x, ...) {
-    docker_client_image(x$id, client)
+    docker_client_image(x$id, api_client)
   }
   ports <- function(reload = TRUE) {
     ports <- self$inspect(reload)$network_settings$ports
@@ -170,7 +170,7 @@ docker_client_container <- function(id, client) {
     name = function() drop_leading_slash(attrs$name),
     image = function() {
       docker_client_image(
-        strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], client)
+        strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], api_client)
     },
     labels = function() attrs$config$labels,
     status = status,
@@ -183,48 +183,53 @@ docker_client_container <- function(id, client) {
     ## TODO: "attach" is hard because it might need to hijack the
     ## connection and deal with stdin (follow logs is close but not
     ## quite the same)
-    ## attach = docker_endpoint("container_attach", client, fix = fix_id)
+    ## attach = docker_client_method("container_attach", api_client,
+    ##    fix = fix_id)
     ##
     ## NOTE: The promotion list for commit is to mimic the argument
     ## list for the command line version of `docker commit` (minus
     ## "id" which is fixed).
-    commit = docker_endpoint(
-      "image_commit", client,
+    commit = docker_client_method(
+      "image_commit", api_client,
       promote = c("repo", "tag", "author", "changes", "comment", "pause"),
       fix = list(container = id), after = after_commit),
-    diff = docker_endpoint("container_changes", client, fix = fix_id),
+    diff = docker_client_method(
+      "container_changes", api_client, fix = fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
     ## detach through as well and dealing with those through the
     ## 'after' function.
-    exec = docker_endpoint(
-      "exec_create", client, fix = fix_id,
+    exec = docker_client_method(
+      "exec_create", api_client, fix = fix_id,
       rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
                  stdin = "attach_stdin"),
       defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
       promote = "cmd",
       process = list(quote(cmd <- check_command(cmd))),
       after = after_exec),
-    export = docker_endpoint("container_export", client, fix = fix_id),
-    path_stat = docker_endpoint("container_path_stat", client, fix = fix_id,
-                                after = after_path_stat),
+    export = docker_client_method(
+      "container_export", api_client, fix = fix_id),
+    path_stat = docker_client_method(
+      "container_path_stat", api_client, fix = fix_id,
+      after = after_path_stat),
     ##
-    get_archive = docker_endpoint(
-      "container_archive", client, fix = fix_id, extra = alist(dest =),
+    get_archive = docker_client_method(
+      "container_archive", api_client, fix = fix_id, extra = alist(dest =),
       process = list(quote(assert_scalar_character_or_null(dest))),
       after = after_get_archive),
     ## TODO: option for compression, pass through to tar file (much
     ## easier to get right if we can rely on R tar)
-    put_archive = docker_endpoint(
-      "container_import", client, fix = fix_id,
+    put_archive = docker_client_method(
+      "container_import", api_client, fix = fix_id,
       rename = c(src = "input_stream"),
       process = list(quote(src <- validate_tar_input(src))),
       after = nothing),
     ##
-    kill = docker_endpoint("container_kill", client, fix = fix_id),
+    kill = docker_client_method(
+      "container_kill", api_client, fix = fix_id),
     ## Logs; quite complicated in the case of 'follow'
     ## -  stream has an effect *only* if follow is TRUE
-    logs = docker_endpoint(
-      "container_logs", client, fix = fix_id,
+    logs = docker_client_method(
+      "container_logs", api_client, fix = fix_id,
       defaults = list(stdout = TRUE, stderr = TRUE),
       process = list(
         quote(if (is.numeric(tail)) tail <- as.character(tail)),
@@ -234,36 +239,43 @@ docker_client_container <- function(id, client) {
                        streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = FALSE,
       after = after_logs),
-    pause = docker_endpoint("container_pause", client, fix = fix_id),
+    pause = docker_client_method(
+      "container_pause", api_client, fix = fix_id),
     ## This should invalidate our container afterwards
     ## NOTE: consider using parent?
-    remove = docker_endpoint(
-      "container_delete", client, fix = fix_id,
+    remove = docker_client_method(
+      "container_delete", api_client, fix = fix_id,
       rename = c(delete_volumes = "v")),
     ## This might force refresh?
-    rename = docker_endpoint("container_rename", client, fix = fix_id),
-    resize = docker_endpoint("container_resize", client, fix = fix_id),
-    restart = docker_endpoint("container_restart", client, fix = fix_id),
-    start = docker_endpoint("container_start", client, fix = fix_id,
-                            after = after_start),
+    rename = docker_client_method(
+      "container_rename", api_client, fix = fix_id),
+    resize = docker_client_method(
+      "container_resize", api_client, fix = fix_id),
+    restart = docker_client_method(
+      "container_restart", api_client, fix = fix_id),
+    start = docker_client_method(
+      "container_start", api_client, fix = fix_id, after = after_start),
     ## TODO: expose stream (but with nice printing and escape instructions?)
-    stats = docker_endpoint("container_stats", client,
-                            fix = c(fix_id, stream = FALSE)),
-    stop = docker_endpoint("container_stop", client, fix = fix_id),
-    top = docker_endpoint("container_top", client, fix = fix_id,
-                          after = after_top),
-    unpause = docker_endpoint("container_unpause", client, fix = fix_id),
-    update = docker_endpoint("container_update", client, fix = fix_id,
-                             after = after_update),
-    wait = docker_endpoint("container_wait", client, fix = fix_id),
+    stats = docker_client_method(
+      "container_stats", api_client, fix = c(fix_id, stream = FALSE)),
+    stop = docker_client_method(
+      "container_stop", api_client, fix = fix_id),
+    top = docker_client_method(
+      "container_top", api_client, fix = fix_id, after = after_top),
+    unpause = docker_client_method(
+      "container_unpause", api_client, fix = fix_id),
+    update = docker_client_method(
+      "container_update", api_client, fix = fix_id, after = after_update),
+    wait = docker_client_method(
+      "container_wait", api_client, fix = fix_id),
     ports = ports,
     reload = reload)
   self
 }
 
-docker_client_image_collection <- function(..., cl, parent) {
+docker_client_image_collection <- function(api_client, parent) {
   get_image <- function(id) {
-    docker_client_image(id, cl)
+    docker_client_image(id, api_client)
   }
   after_build <- function(x, ...) {
     lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
@@ -287,8 +299,8 @@ docker_client_image_collection <- function(..., cl, parent) {
     ## TODO: control returning output too
     ## TODO: support multiple tags (accept vector and translate into
     ##   multiple 't' parameters - needs support in generated handlers
-    build = docker_endpoint(
-      "image_build", cl,
+    build = docker_client_method(
+      "image_build", api_client,
       drop = "content_type",
       rename = c(context = "input_stream", tag = "t"),
       defaults = alist(context =),
@@ -300,12 +312,12 @@ docker_client_image_collection <- function(..., cl, parent) {
       allow_hijack_without_stream = TRUE,
       after = after_build),
     get = get_image,
-    list = docker_endpoint("image_list", cl),
-    import = docker_endpoint("image_import", cl),
+    list = docker_client_method("image_list", api_client),
+    import = docker_client_method("image_import", api_client),
     ## TODO: need to deal with registry auth properly.  For now I'm just
     ##   eliminating it from the list.
-    pull = docker_endpoint(
-      "image_create", cl, rename = c("name" = "from_image"),
+    pull = docker_client_method(
+      "image_create", api_client, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
       process = list(
         mcr_process_image_and_tag(quote(name), quote(tag)),
@@ -315,14 +327,14 @@ docker_client_image_collection <- function(..., cl, parent) {
       hijack = quote(streaming_json(pull_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
       after = after_pull),
-    push = docker_endpoint("image_push", cl),
-    search = docker_endpoint("image_search", cl),
-    remove = docker_endpoint("image_delete", cl),
-    prune = docker_endpoint("image_prune", cl))
+    push = docker_client_method("image_push", api_client),
+    search = docker_client_method("image_search", api_client),
+    remove = docker_client_method("image_delete", api_client),
+    prune = docker_client_method("image_prune", api_client))
 }
 
-docker_client_image <- function(id, client) {
-  image_inspect <- docker_endpoint("image_inspect", client)
+docker_client_image <- function(id, api_client) {
+  image_inspect <- docker_client_method("image_inspect", api_client)
   attrs <- image_inspect(id)
   name <- id
   id <- attrs$id
@@ -347,7 +359,7 @@ docker_client_image <- function(id, client) {
     ## because that refers to the actual iage id, which is not what we
     ## want.  So we rebuild the endpoint without the `fix` argument
     ## and then call it with just the tag.
-    docker_endpoint("image_delete", client)(repo_tag, noprune = TRUE)
+    docker_client_method("image_delete", api_client)(repo_tag, noprune = TRUE)
     invisible(self$reload())
   }
   fix_id_as_name = list(name = id)
@@ -364,40 +376,44 @@ docker_client_image <- function(id, client) {
       }
       attrs
     },
-    history = docker_endpoint("image_history", client, fix = fix_id_as_name),
+    history = docker_client_method(
+      "image_history", api_client, fix = fix_id_as_name),
     ## TODO: this needs to add a 'filename' option for saving
-    export = docker_endpoint("image_tarball", client, fix = fix_id_as_name),
-    tag = docker_endpoint("image_tag", client, fix = fix_id_as_name,
-                          after = invisible_self, defaults = alist(repo =)),
+    export = docker_client_method(
+      "image_tarball", api_client, fix = fix_id_as_name),
+    tag = docker_client_method(
+      "image_tag", api_client, fix = fix_id_as_name,
+      after = invisible_self, defaults = alist(repo =)),
     untag = untag,
     ## NOTE: this always tries to remove the image by *id* not by
     ## name, which is not ideal really.  When force = TRUE it's
     ## basically the same I think.
-    remove = docker_endpoint("image_delete", client, fix = fix_id_as_name),
+    remove = docker_client_method(
+      "image_delete", api_client, fix = fix_id_as_name),
     reload = reload)
   self
 }
 
-docker_client_network_collection <- function(..., cl, parent) {
+docker_client_network_collection <- function(api_client, parent) {
   get_network <- function(id) {
-    docker_client_network(id, cl)
+    docker_client_network(id, api_client)
   }
   after_create <- function(dat, ...) {
     get_network(dat$id)
   }
   stevedore_object(
     "docker_network_collection",
-    create = docker_endpoint(
-      "network_create", cl, after = after_create,
+    create = docker_client_method(
+      "network_create", api_client, after = after_create,
       defaults = alist(check_duplicate = TRUE)),
     get = get_network,
-    list = docker_endpoint("network_list", cl),
-    remove = docker_endpoint("network_delete", cl),
-    prune = docker_endpoint("network_prune", cl))
+    list = docker_client_method("network_list", api_client),
+    remove = docker_client_method("network_delete", api_client),
+    prune = docker_client_method("network_prune", api_client))
 }
 
-docker_client_network <- function(id, client) {
-  network_inspect <- docker_endpoint("network_inspect", client)
+docker_client_network <- function(id, api_client) {
+  network_inspect <- docker_client_method("network_inspect", api_client)
   attrs <- network_inspect(id)
   id <- attrs$id
   self <- NULL
@@ -407,7 +423,7 @@ docker_client_network <- function(id, client) {
   }
   containers <- function(reload = TRUE) {
     containers <- self$inspect(reload)$containers
-    lapply(names(containers), docker_client_container, client)
+    lapply(names(containers), docker_client_container, api_client)
   }
   fix_id <- list(id = id)
 
@@ -422,16 +438,19 @@ docker_client_network <- function(id, client) {
       attrs
     },
     containers = containers,
-    connect = docker_endpoint("network_connect", client, fix = fix_id),
-    disconnect = docker_endpoint("network_disconnect", client, fix = fix_id),
-    remove = docker_endpoint("network_delete", client, fix = fix_id),
+    connect = docker_client_method(
+      "network_connect", api_client, fix = fix_id),
+    disconnect = docker_client_method(
+      "network_disconnect", api_client, fix = fix_id),
+    remove = docker_client_method(
+      "network_delete", api_client, fix = fix_id),
     reload = reload)
   self
 }
 
-docker_client_volume_collection <- function(..., cl, parent) {
+docker_client_volume_collection <- function(api_client, parent) {
   get_volume <- function(id) {
-    docker_client_volume(id, cl)
+    docker_client_volume(id, api_client)
   }
   after_create <- function(dat, ...) {
     get_volume(dat$name)
@@ -442,15 +461,16 @@ docker_client_volume_collection <- function(..., cl, parent) {
   }
   stevedore_object(
     "docker_volume_collection",
-    create = docker_endpoint("volume_create", cl, after = after_create),
+    create = docker_client_method(
+      "volume_create", api_client, after = after_create),
     get = get_volume,
-    list = docker_endpoint("volume_list", cl, after = after_list),
-    remove = docker_endpoint("volume_delete", cl),
-    prune = docker_endpoint("volume_prune", cl))
+    list = docker_client_method("volume_list", api_client, after = after_list),
+    remove = docker_client_method("volume_delete", api_client),
+    prune = docker_client_method("volume_prune", api_client))
 }
 
-docker_client_volume <- function(id, client) {
-  volume_inspect <- docker_endpoint("volume_inspect", client)
+docker_client_volume <- function(id, api_client) {
+  volume_inspect <- docker_client_method("volume_inspect", api_client)
   attrs <- volume_inspect(id)
   name <- attrs$name
   self <- NULL
@@ -477,13 +497,14 @@ docker_client_volume <- function(id, client) {
       }
       sprintf(fmt, name, path)
     },
-    remove = docker_endpoint("volume_delete", client, fix = list(name = name)),
+    remove = docker_client_method(
+      "volume_delete", api_client, fix = list(name = name)),
     reload = reload)
   self
 }
 
-docker_client_exec <- function(id, client) {
-  exec_inspect <- docker_endpoint("exec_inspect", client)
+docker_client_exec <- function(id, api_client) {
+  exec_inspect <- docker_client_method("exec_inspect", api_client)
   attrs <- exec_inspect(id)
   self <- NULL
   reload <- function() {
@@ -508,8 +529,8 @@ docker_client_exec <- function(id, client) {
     ## TODO: control stream (location etc) following the same problem
     ## in build.
     ## TODO: explicitly set 'detach' argument
-    start = docker_endpoint(
-      "exec_start", client, fix = list(id = id),
+    start = docker_client_method(
+      "exec_start", api_client, fix = list(id = id),
       extra = alist(stream = stdout()),
       hijack = quote(streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = TRUE,
@@ -521,7 +542,8 @@ docker_client_exec <- function(id, client) {
       }
       attrs
     },
-    resize = docker_endpoint("exec_resize", client, fix = list(id = id)),
+    resize = docker_client_method(
+      "exec_resize", api_client, fix = list(id = id)),
     reload = reload)
   self
 }

@@ -1,42 +1,8 @@
-docker_client_data <- function(version) {
-  if (!(version %in% names(.stevedore$client_data))) {
-    spec <- read_spec(version)
-    endpoints <- lapply(.stevedore$endpoints, function(x)
-      make_endpoint(x$name, x$method, x$path, spec))
-    names(endpoints) <- vcapply(.stevedore$endpoints, "[[", "name")
-    .stevedore$client_data[[version]] <-
-      list(spec = spec,
-           version = version,
-           endpoints = endpoints)
-  }
-  .stevedore$client_data[[version]]
-}
-
-stevedore_read_endpoints <- function() {
-  path <- system.file("spec/endpoints.yaml", package = "stevedore",
-                      mustWork = TRUE)
-  dat <- yaml_load_file(path)
-  for (i in seq_along(dat)) {
-    dat[[i]]$name <- names(dat)[[i]]
-  }
-  unname(dat)
-}
-
-docker_client_base <- function(..., api_version = NULL, type = NULL) {
-  base_url <- NULL
-  self <- new.env(parent = parent.env(environment()))
-  self$http_client <- http_client(base_url, api_version, type)
-  dat <- docker_client_data(self$http_client$api_version)
-  self$endpoints <- dat$endpoints
-  lock_environment(self)
-  self
-}
-
-docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
-                            drop = NULL, defaults = NULL, extra = NULL,
-                            promote = NULL, process = NULL, after = NULL,
-                            hijack = NULL,
-                            allow_hijack_without_stream = FALSE) {
+docker_client_method <- function(name, client, fix = NULL, rename = NULL,
+                                 drop = NULL, defaults = NULL, extra = NULL,
+                                 promote = NULL, process = NULL, after = NULL,
+                                 hijack = NULL,
+                                 allow_hijack_without_stream = FALSE) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
 
@@ -127,7 +93,7 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
             finish)
 
   ret <- as.function(c(args_use, as.call(body)), fenv)
-  class(ret) <- "docker_endpoint"
+  class(ret) <- "docker_client_method"
 
   help <- endpoint$help
   if (!is.null(rename)) {
@@ -152,7 +118,8 @@ docker_endpoint <- function(name, client, fix = NULL, rename = NULL,
 }
 
 ##' @export
-print.docker_endpoint <- function(x, indent = 2, exdent = 8, args = TRUE, ...) {
+print.docker_client_method <- function(x, indent = 2, exdent = 8, args = TRUE,
+                                       ...) {
   call <- capture_args(x, "function", 0L)
   divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
   h <- attr(x, "help")

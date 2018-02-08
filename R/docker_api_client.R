@@ -1,0 +1,79 @@
+docker_api_client <- function(..., api_version = NULL, type = NULL) {
+  base_url <- NULL
+  self <- new.env(parent = parent.env(environment()))
+  self$http_client <- http_client(base_url, api_version, type)
+  dat <- docker_api_client_data(self$http_client$api_version)
+  self$endpoints <- dat$endpoints
+  lock_environment(self)
+  self
+}
+
+
+docker_api_client_data <- function(version) {
+  if (!(version %in% names(.stevedore$client_data))) {
+    spec <- read_spec(version)
+    endpoints <- lapply(.stevedore$endpoints, function(x)
+      make_endpoint(x$name, x$method, x$path, spec))
+    names(endpoints) <- vcapply(.stevedore$endpoints, "[[", "name")
+    .stevedore$client_data[[version]] <-
+      list(spec = spec,
+           version = version,
+           endpoints = endpoints)
+  }
+  .stevedore$client_data[[version]]
+}
+
+
+run_endpoint <- function(client, endpoint, params, hijack = NULL,
+                         allow_hijack_without_stream = FALSE,
+                         as_is_names = FALSE) {
+  path <- sprintfn(endpoint$path_fmt, params$path)
+
+  http_hijack <- !is.null(hijack)
+  if (http_hijack && !client$can_stream && !allow_hijack_without_stream) {
+    fmt <- paste(
+      "Endpoint '%s' cannot be implemented because the '%s' http client",
+      "does not currently support streaming connections")
+    stop(sprintf(fmt, endpoint$name, client$type))
+  }
+
+  res <- client$request(endpoint$method, path,
+                        params$query, params$body, params$header,
+                        hijack)
+  if (http_hijack) {
+    res$content <- hijacked_content(hijack)
+  }
+
+  status_code <- res$status_code
+  if (status_code >= 300) {
+    reason <-
+      endpoint$response_description[[as.character(status_code)]] %||%
+      "Unknown reason"
+     response_to_error(res, endpoint$name, reason)
+  } else {
+    r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
+    if (is.null(r_handler)) {
+      stop("unexpected response code ", res$status_code) # nocov [stevedore bug]
+    }
+    h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
+    if (http_hijack) {
+      ## It's most common here that the any handler is incorrect, so
+      ## we'll skip the handler but pass them back directly instead.
+      list(response = res,
+           content_handler = r_handler,
+           header_handler = h_handler)
+    } else {
+      ret <- r_handler(res$content, as_is_names = as_is_names)
+      if (!is.null(h_handler)) {
+        headers <- h_handler(res$headers, as_is_names = as_is_names)
+        if (endpoint$method == "HEAD") {
+          ## There cannot be a body here
+          ret <- headers
+        } else {
+          ret <- set_attributes(ret, headers)
+        }
+      }
+      ret
+    }
+  }
+}

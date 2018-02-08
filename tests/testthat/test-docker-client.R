@@ -87,7 +87,7 @@ test_that("api_version", {
 
 test_that("print endpoints", {
   d <- test_docker_client()
-  expect_is(d$ping, "docker_endpoint")
+  expect_is(d$ping, "docker_client_method")
   txt <- capture.output(print(d$ping))
   expect <- c(
     "function()",

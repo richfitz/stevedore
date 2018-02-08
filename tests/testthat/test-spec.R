@@ -15,7 +15,7 @@ test_that("build", {
   expected <- vcapply(.stevedore$endpoints, "[[", "name")
   for (v in spec_versions()) {
     message(v)
-    dat <- docker_client_data(v)
+    dat <- docker_api_client_data(v)
     expect_equal(dat$version, v)
     expect_true(all(expected %in% names(dat$endpoints)))
   }
