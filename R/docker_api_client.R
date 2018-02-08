@@ -2,8 +2,7 @@ docker_api_client <- function(..., api_version = NULL, type = NULL) {
   base_url <- NULL
   self <- new.env(parent = parent.env(environment()))
   self$http_client <- http_client(base_url, api_version, type)
-  dat <- docker_api_client_data(self$http_client$api_version)
-  self$endpoints <- dat$endpoints
+  self$endpoints <- docker_api_client_data(self$http_client$api_version)
   lock_environment(self)
   self
 }
@@ -12,15 +11,29 @@ docker_api_client <- function(..., api_version = NULL, type = NULL) {
 docker_api_client_data <- function(version) {
   if (!(version %in% names(.stevedore$client_data))) {
     spec <- read_spec(version)
-    endpoints <- lapply(.stevedore$endpoints, function(x)
+    endpoints <- docker_api_client_endpoints()
+
+    dat <- lapply(endpoints, function(x)
       make_endpoint(x$name, x$method, x$path, spec))
-    names(endpoints) <- vcapply(.stevedore$endpoints, "[[", "name")
-    .stevedore$client_data[[version]] <-
-      list(spec = spec,
-           version = version,
-           endpoints = endpoints)
+    names(dat) <- vcapply(endpoints, "[[", "name")
+
+    .stevedore$client_data[[version]] <- dat
   }
   .stevedore$client_data[[version]]
+}
+
+
+docker_api_client_endpoints <- function() {
+  if (is.null(.stevedore$endpoints)) {
+    path <- system.file("spec/endpoints.yaml", package = "stevedore",
+                        mustWork = TRUE)
+    dat <- yaml_load_file(path)
+    for (i in seq_along(dat)) {
+      dat[[i]]$name <- names(dat)[[i]]
+    }
+    .stevedore$endpoints <- unname(dat)
+  }
+  .stevedore$endpoints
 }
 
 

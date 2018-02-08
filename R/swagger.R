@@ -24,17 +24,6 @@
 ## code and automatically allow for differences in the schema over
 ## time.
 
-stevedore_read_endpoints <- function(reload = FALSE) {
-  path <- system.file("spec/endpoints.yaml", package = "stevedore",
-                      mustWork = TRUE)
-  dat <- yaml_load_file(path)
-  for (i in seq_along(dat)) {
-    dat[[i]]$name <- names(dat)[[i]]
-  }
-  unname(dat)
-}
-
-
 make_endpoint <- function(name, method, path, spec) {
   path_data <- parse_path(path)
   x <- spec$paths[[path]][[method]]
