@@ -27,6 +27,8 @@
 ## and we get cleanup for free.
 
 tar_directory <- function(root) {
+  assert_directory(root)
+
   owd <- setwd(root)
   on.exit(setwd(owd))
   tmp <- tempfile(fileext = ".tar")
@@ -37,6 +39,8 @@ tar_directory <- function(root) {
 }
 
 tar_files <- function(files, root) {
+  assert_directory(root)
+
   owd <- setwd(root)
   on.exit(setwd(owd))
   tmp <- tempfile(fileext = ".tar")
@@ -53,6 +57,7 @@ tar_file <- function(file) {
 }
 
 tar_safe <- function(tarfile, files, ..., complex = FALSE) {
+  assert_file_exists(files)
   if (complex) {
     tar_system(tarfile, files, ...)
   } else {
