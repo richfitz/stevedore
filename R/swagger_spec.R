@@ -29,7 +29,7 @@ swagger_spec_read <- function(version, refresh = FALSE) {
                  version, paste(pos, collapse = ", ")))
   }
   path_yml <- swagger_spec_fetch(version, path)
-  md5_found <- unname(tools::md5sum(path_yml))
+  md5_found <- hash_file(path_yml)
   md5_expected <- spec_index[[version]]
   if (md5_found != md5_expected) {
     stop(sprintf("Spec for %s had different md5 than expected (%s, not %s)",
@@ -114,7 +114,7 @@ swagger_spec_versions <- function() {
 swagger_spec_index_write <- function(path) {
   versions <- swagger_spec_versions()
   files <- vapply(versions, swagger_spec_fetch, character(1), path)
-  md5 <- tools::md5sum(files)
+  md5 <- hash_file(files)
   names(md5) <- paste0("v", names(files))
   cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
 }

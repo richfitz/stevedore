@@ -354,3 +354,9 @@ atomic_types <- function() {
        missing = missing,
        empty = empty)
 }
+
+
+hash_file <- function(files) {
+  assert_file_exists(files)
+  unname(tools::md5sum(normalizePath(files, mustWork = TRUE)))
+}
