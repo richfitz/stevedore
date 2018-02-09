@@ -4,7 +4,7 @@ RSCRIPT = Rscript --no-init-file
 all: install
 
 index:
-	${RSCRIPT} -e 'stevedore:::swagger_spec_write_index("inst/spec")'
+	${RSCRIPT} -e 'stevedore:::swagger_spec_index_write("inst/spec")'
 
 test:
 	${RSCRIPT} -e 'library(methods); devtools::test()'
