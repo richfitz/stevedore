@@ -18,6 +18,8 @@ if (has_internet()) {
 }
 ```
 
+![hello world example of stevedore](https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif)
+
 ## Usage
 
 The main function in the package is `docker_client`; this will construct an object with which we can talk with the docker server.

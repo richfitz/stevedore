@@ -8,6 +8,8 @@
 A docker client for R
 
 
+![hello world example of stevedore](https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif)
+
 
 ## Usage
 
