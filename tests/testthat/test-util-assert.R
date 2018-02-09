@@ -121,6 +121,28 @@ test_that("assert_function", {
   expect_silent(assert_function(sin))
 })
 
+test_that("assert_empty_dots", {
+  expect_silent(assert_empty_dots(name = "foo"))
+  expect_error(assert_empty_dots(a = 1, name = "foo"),
+               "Unknown argument passed to 'foo': a",
+               fixed = TRUE)
+  expect_error(assert_empty_dots(a = 1, b = 2, name = "foo"),
+               "Unknown arguments passed to 'foo': a, b",
+               fixed = TRUE)
+  expect_error(assert_empty_dots(1, name = "foo"),
+               "Unknown argument passed to 'foo': 1 positional argument",
+               fixed = TRUE)
+  expect_error(assert_empty_dots(1, 2, name = "foo"),
+               "Unknown arguments passed to 'foo': 2 positional arguments",
+               fixed = TRUE)
+  expect_error(assert_empty_dots(a = 1, 1, name = "foo"),
+               "Unknown arguments passed to 'foo': a, 1 positional argument",
+               fixed = TRUE)
+  expect_error(assert_empty_dots(a = 1, 1, 2, name = "foo"),
+               "Unknown arguments passed to 'foo': a, 2 positional arguments",
+               fixed = TRUE)
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")

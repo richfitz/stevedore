@@ -131,6 +131,24 @@ assert_file_exists <- function(x) {
   }
 }
 
+assert_empty_dots <- function(..., name) {
+  nextra <- length(list(...))
+  if (nextra > 0L) {
+    nms <- names(list(...)) %||% rep("", nextra)
+    pos <- !nzchar(nms)
+    if (any(pos)) {
+      npos <- sum(pos)
+      nms <-
+        c(nms[!pos],
+          paste(npos, "positional", ngettext(npos, "argument", "arguments")))
+    }
+    stop(sprintf("Unknown %s passed to '%s': %s",
+                 ngettext(nextra, "argument", "arguments"),
+                 name, paste(unique(nms), collapse = ", ")),
+         call. = FALSE)
+  }
+}
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {
