@@ -7,3 +7,4 @@
 ^README\.Rmd$
 \.pyc$
 __pycache__
+^demo$
