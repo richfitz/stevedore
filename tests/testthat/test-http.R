@@ -136,3 +136,9 @@ test_that("url type", {
   expect_error(http_url_type("ftp://noway"),
                "Can't detect url type from 'ftp://noway'")
 })
+
+test_that("can't specify http url yet", {
+  expect_error(docker_client(url = "http://localhost:1234"),
+               "Providing docker http/https url is not currently supported",
+               fixed = TRUE)
+})

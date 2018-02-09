@@ -4,11 +4,10 @@
 \alias{docker_client}
 \title{Create docker client}
 \usage{
-docker_client(..., api_version = NULL, type = NULL)
+docker_client(api_version = NULL, url = NULL, ...,
+  http_client_type = NULL)
 }
 \arguments{
-\item{...}{Reserved for future use}
-
 \item{api_version}{Version of the API request from the api.
 Options are \code{NULL} (the default) - use the package's
 default version (currently 1.29), a version as a string or
@@ -16,12 +15,27 @@ default version (currently 1.29), a version as a string or
 1.33), or the string \code{detect} which will use the highest
 version out of the version reported by the api and 1.33}
 
-\item{type}{HTTP client type to use.  The options are (currently)
-"curl", which uses the \code{curl} package (works over unix
-sockets and eventually over TCP) and \code{httppipe} which works
-over unix sockets and eventually windows named pipes, using the
-Docker SDK's pipe code via the \code{httppipe} package.  Not all
-functionality is supported with the \code{httppipe} client.}
+\item{url}{The URL for the docker daemon.  This can be an absolute
+file path (for a unix socket on macOS/Linux), a named pipe
+(e.g., \code{npipe:////./pipe/docker_engine}) on Windows, or
+(eventually) an http or https url (e.g.,
+\code{https://localhost:8888}), though this is not yet
+supported.}
+
+\item{...}{Reserved for future use.  Passing in any unrecognised
+argument will throw an error.}
+
+\item{http_client_type}{HTTP client type to use.  The options are
+(currently) "curl", which uses the \code{curl} package (works
+over unix sockets and eventually over TCP) and \code{httppipe}
+which works over unix sockets and eventually windows named
+pipes, using the Docker SDK's pipe code via the \code{httppipe}
+package.  Not all functionality is supported with the
+\code{httppipe} client.  This option may eventually be moved
+into the \code{...} argument as is not intended for end-user
+use; it is primarily intended for debugging in development
+(forcing the \code{httppipe} client where the \code{curl} client
+would ordinarily be preferred).}
 }
 \description{
 Create a docker client object

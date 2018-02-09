@@ -1,5 +1,10 @@
 context("docker client")
 
+test_that("unknown args prevented", {
+  expect_error(docker_client(foo = "bar"),
+               "Unknown argument passed to 'docker_client': foo")
+})
+
 ## The most simple nontrivial thing with the docker client
 test_that("ping", {
   d <- test_docker_client()

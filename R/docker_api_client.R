@@ -1,5 +1,5 @@
-docker_api_client <- function(..., api_version = NULL, type = NULL) {
-  base_url <- NULL
+docker_api_client <- function(base_url = NULL, api_version = NULL,
+                              type = NULL) {
   self <- new.env(parent = parent.env(environment()))
   self$http_client <- http_client(base_url, api_version, type)
   self$endpoints <- docker_api_client_data(self$http_client$api_version)

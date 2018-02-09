@@ -2,7 +2,7 @@ context("http (compatibility)")
 
 test_that("streaming raw", {
   dc <- test_docker_client()
-  dh <- test_docker_client(type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
 
   x1 <- dc$containers$create("richfitz/iterate", c("1000", "1"))
   on.exit(x1$remove(force = TRUE))
@@ -32,7 +32,7 @@ test_that("build", {
                                 tag = "richfitz/iterate:testing"))
   expect_match(readLines(p), "FROM alpine:latest", all = FALSE)
 
-  dh <- test_docker_client(type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
 
   expect_output(dh$images$build(context, nocache = TRUE, rm = TRUE,
                                 stream = stdout(),
@@ -49,7 +49,7 @@ test_that("build", {
 })
 
 test_that("docker run", {
-  dh <- test_docker_client(type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
   expect_output(
     ans <- dh$containers$run("richfitz/iterate", c("10", "0"), detach = FALSE,
                              rm = TRUE, stream = stdout()),
@@ -65,7 +65,7 @@ test_that("docker run", {
 })
 
 test_that("exec", {
-  dh <- test_docker_client(type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
   x <- dh$containers$create("richfitz/iterate",
@@ -93,8 +93,8 @@ test_that("exec", {
 
 test_that("pull", {
   skip_if_no_internet()
-  dc <- test_docker_client(type = "curl")
-  dh <- test_docker_client(type = "httppipe")
+  dc <- test_docker_client(http_client_type = "curl")
+  dh <- test_docker_client(http_client_type = "httppipe")
 
   txt0 <- capture.output(img0 <- dc$images$pull("alpine:latest"))
   str <- "Pulling from library/alpine latest"
@@ -113,7 +113,7 @@ test_that("pull", {
 })
 
 test_that("log follow does not work", {
-  dh <- test_docker_client(type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
   x <- dh$containers$create("richfitz/iterate", c("1000", "1"), name = nm)
   on.exit(x$remove())
