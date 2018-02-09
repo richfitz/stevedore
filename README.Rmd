@@ -118,6 +118,22 @@ There is still a lot of work to do here:
 
 At present, the tests do leave a couple of orphan containers and volumes on exit.  If tests fail, many more containers will be left as teardown is not always automatic.  Some tests are of the `prune` endpoints, others pull images from the internet.
 
+## Installation
+
+Currently not on CRAN, but can be installed from github with devtools
+
+```
+devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
+```
+
+On windows you will also need
+
+```
+devtools::install_github("richfitz/httppipe", upgrade_dependencies = FALSE)
+```
+
+(see [above](#windows-support)).
+
 ## Licence
 
 MIT © [Rich FitzJohn](https://github.com/richfitz).
