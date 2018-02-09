@@ -2,8 +2,11 @@
 
 S3method("$",stevedore_object)
 S3method("[[",stevedore_object)
+S3method(format,docker_container)
+S3method(format,docker_run_output)
 S3method(format,docker_stream)
 S3method(print,docker_client_method)
+S3method(print,docker_run_output)
 S3method(print,docker_stream)
 S3method(print,stevedore_object)
 export(docker_client)
