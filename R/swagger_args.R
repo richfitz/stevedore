@@ -148,6 +148,7 @@ swagger_arg_collect_query <- function(p, dest) {
     validate <- quote(assert_scalar_character)
   } else if (type == "array") {
     if (identical(p$items, list(type = "string"))) {
+      ## This is used only in ImageGetAll
       validate <- quote(as_query_array_string)
     } else {
       stop("Unknown query type") # nocov [stevedore bug]
@@ -243,6 +244,9 @@ swagger_arg_collect_header <- function(p, dest) {
 ## These are up for change:
 as_query_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
+  if (length(x) == 0L) {
+    stop(sprintf("'%s' must have at least one element", name))
+  }
   paste(x, collapse = ",")
 }
 

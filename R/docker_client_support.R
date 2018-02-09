@@ -258,6 +258,17 @@ validate_tar_input <- function(input, name = deparse(substitute(input))) {
 }
 
 
+## This is to provide an informative error message for my
+## misunderstanding of the docker spec until #8 is fixed:
+validate_export_names <- function(names) {
+  if (length(names) > 1L) {
+    stop(paste0("Exporting of multiple images currently broken\n",
+                "\tplease see https://github.com/richfitz/stevedore/issues/8"),
+         call. = FALSE)
+  }
+}
+
+
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {

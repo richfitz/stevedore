@@ -216,3 +216,12 @@ test_that("api versions", {
   expect_true("os_version" %in% names(info_1))
   expect_false("os_version" %in% names(info_2))
 })
+
+test_that("export", {
+  cl <- test_docker_client()
+  expect_error(cl$images$export(character()),
+               "'names' must have at least one element")
+  expect_error(cl$images$export(c("hello-world", "alpine")),
+               "Exporting of multiple images currently broken")
+  expect_is(cl$images$export("hello-world"), "raw")
+})
