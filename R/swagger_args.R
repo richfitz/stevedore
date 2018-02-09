@@ -249,10 +249,5 @@ as_query_array_string <- function(x, name = deparse(substitute(x))) {
 
 as_body_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
-  if (inherits(x, "AsIs")) {
-    assert_scalar(x, name)
-    jsonlite::unbox(x)
-  } else {
-    x
-  }
+  x
 }
