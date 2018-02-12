@@ -191,8 +191,25 @@ swagger_arg_collect_body <- function(p, dest) {
       is_scalar <- TRUE
     }
   } else if (type == "array") {
-    ## message("Skipping validation (array)") # TODO
-    validate <- quote(identity)
+    if (identical(p$items$type, "string")) {
+      ## Env, OnBuild  Shell, Cmd, DeviceCgroupRules
+      validate <- quote(assert_character)
+    } else {
+      ## TODO: Some of these do have specs so could be done totally
+      ## automatically.  But then doing it that way requires the user
+      ## to guess how the mapping has been done.  So a simpler way
+      ## might be to have a 'types' element in the main docker_client
+      ## object that can produce appropriate types.  Then here we just
+      ## feed things through.  Eventually it would be good to validate
+      ## all things that come through here though.
+      ##
+      ## BlkioWeightDevice, BlkioDeviceReadBps, BlkioDeviceWriteBps,
+      ## BlkioDeviceReadIOps, BlkioDeviceWriteIOps (last four are all
+      ## ThrottleDevice types)
+      ##
+      ## Devices, Ulimits
+      validate <- quote(identity)
+    }
     is_scalar <- FALSE
   } else {
     if (identical(p$additionalProperties, list(type = "string"))) {
