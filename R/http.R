@@ -9,6 +9,7 @@ http_client <- function(base_url = NULL, api_version = NULL, type = NULL,
   client_fn(data$base_url, api_version, min_version, max_version)
 }
 
+
 ## Generate (and possibly throw) S3 errors out of http errors
 ##
 ## This probably belongs in the swagger.R file as it's being called
@@ -37,6 +38,7 @@ response_to_error <- function(response, endpoint, reason) {
   stop(cond)
 }
 
+
 ## Tidy away details about url construction.  This will likely get
 ## more complicated as I find the corner cases.  Definitely some
 ## quoting/escaping etc needed here (the python client includes space
@@ -45,6 +47,7 @@ build_url <- function(base_url, api_version, path, params = NULL) {
   path <- paste0(path, build_url_query(params) %||% "")
   sprintf("%s/v%s%s", base_url, api_version, path)
 }
+
 
 build_url_query <- function(params) {
   if (length(params) > 0L) {
@@ -64,6 +67,7 @@ build_url_query <- function(params) {
   }
 }
 
+
 parse_headers <- function(headers) {
   re <- ":\\s+"
   h <- curl::parse_headers(headers)
@@ -73,6 +77,7 @@ parse_headers <- function(headers) {
   names(vals) <- nms
   vals
 }
+
 
 ## NOTE: through here (and again through the package code that calls
 ## this) we need to be able to pin down the maxmimum api version - the
@@ -127,6 +132,7 @@ http_client_api_version <- function(api_version, detect,
   api_version
 }
 
+
 version_response <- function(res) {
   if (res$status_code != 200L) {
     response_to_error(res, "/_ping", "Detecting version")
@@ -158,6 +164,7 @@ streaming_json <- function(callback) {
   attr(ret, "content") <- function() res
   ret
 }
+
 
 http_client_data <- function(base_url = NULL, type = NULL,
                              windows = is_windows()) {
@@ -192,6 +199,7 @@ http_client_data <- function(base_url = NULL, type = NULL,
   list(client_type = type, url_type = url_type, base_url = base_url)
 }
 
+
 http_url_type <- function(x) {
   assert_scalar_character(x)
   if (grepl("^npipe:/", x)) {
@@ -206,9 +214,11 @@ http_url_type <- function(x) {
   type
 }
 
+
 http_default_url <- function(windows) {
   if (windows) DEFAULT_DOCKER_WINDOWS_PIPE else DEFAULT_DOCKER_UNIX_SOCKET
 }
+
 
 prepare_body <- function(body) {
   if (is.raw(body)) {
