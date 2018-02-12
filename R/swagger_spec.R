@@ -50,6 +50,8 @@ swagger_spec_read <- function(version, refresh = FALSE) {
     ret[[p]] <- tmp
   }
 
+  ret <- swagger_spec_patch(ret, stevedore_file("spec/stevedore.yaml"))
+
   .stevedore$spec[[version]] <- ret
 
   ret

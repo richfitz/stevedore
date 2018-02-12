@@ -1,0 +1,8 @@
+# Like patch.yaml, but for things that are not inconsistencies in the
+# spec.  This is used to add hints to the swagger preparer to keep the
+# code there simple, and will be used to add docstrings for arguments
+# and methods that are modified in docker_client.R
+- version: ["1.25", "1.33"]
+  path: ["paths", "/containers/{id}/logs", "get"]
+  value:
+    produces: "application/chunked-string"
