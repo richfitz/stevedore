@@ -58,3 +58,11 @@ test_that("prune", {
   ans <- d$volumes$prune()
   expect_match(ans$volumes_deleted, "^stevedore_", all = FALSE)
 })
+
+test_that("labels", {
+  d <- test_docker_client()
+  expect_error(d$volumes$create(labels = 1),
+               "'labels' must be named character vector", fixed = TRUE)
+  vol <- d$volumes$create(labels = c(foo = "bar"))
+  expect_equal(vol$inspect()$labels, c(foo = "bar"))
+})

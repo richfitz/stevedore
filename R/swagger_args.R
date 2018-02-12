@@ -195,8 +195,20 @@ swagger_arg_collect_body <- function(p, dest) {
     validate <- quote(identity)
     is_scalar <- FALSE
   } else {
-    ## message("Skipping validation (other)") # TODO
-    validate <- quote(identity)
+    if (identical(p$additionalProperties, list(type = "string"))) {
+      ## Labels, Options, DriverOpts
+      validate <- quote(as_string_map)
+    } else {
+      ## Processed elsewhere:
+      ##
+      ## ExposedPorts, Volumes
+      ##
+      ## Not yet explicitly handled:
+      ##
+      ## Healthcheck, HostConfig, NetworkingConfig, RestartPolicy,
+      ## IPAM, EndpointConfig,
+      validate <- quote(identity)
+    }
     is_scalar <- FALSE
   }
 
@@ -254,4 +266,21 @@ as_query_array_string <- function(x, name = deparse(substitute(x))) {
 as_body_array_string <- function(x, name = deparse(substitute(x))) {
   assert_character(x, name)
   x
+}
+
+
+## For objects in the yaml that follow:
+##
+##   type: "object"
+##   additionalProperties:
+##     type: "string"
+##
+## Used in Labels, Options, DriverOpts
+as_string_map <- function(x, name = deparse(substitute(x))) {
+  if (!is.null(x)) {
+    what <- "named character vector"
+    assert_named(x, TRUE, name, what)
+    assert_character(x, name, what)
+    lapply(x, jsonlite::unbox)
+  }
 }
