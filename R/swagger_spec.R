@@ -87,18 +87,22 @@ swagger_spec_patch <- function(dat, patch_file) {
   patch <- yaml_load_file(patch_file)
   v <- numeric_version(dat$info$version)
   for (el in patch) {
-    assert_character(el$version)
-    if (version_check(v, el$version)) {
-      path <- el$path
-      value <- el$value
-      tmp <- dat[[path]]
-      if (is.null(tmp) || isTRUE(el$replace)) {
-        tmp <- value
-      } else {
-        tmp[names(value)] <- value
+    if (!is.null(el$version)) {
+      assert_character(el$version)
+      if (!version_check(v, el$version)) {
+        next
       }
-      dat[[path]] <- tmp
     }
+
+    path <- el$path
+    value <- el$value
+    tmp <- dat[[path]]
+    if (is.null(tmp) || isTRUE(el$replace)) {
+      tmp <- value
+    } else {
+      tmp[names(value)] <- value
+    }
+    dat[[path]] <- tmp
   }
 
   dat
