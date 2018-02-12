@@ -35,21 +35,7 @@ swagger_spec_read <- function(version, refresh = FALSE) {
                  version, md5_found, md5_expected))
   }
   ret <- yaml_load_file(path_yml)
-
   ret <- swagger_spec_patch(ret, stevedore_file("spec/patch.yaml"))
-
-  ## This bit of patching is additional to the bits in yaml, but I
-  ## can't see how to make it do-able with the yaml directly because
-  ## it needs to access an element within a list.  It appears
-  ## necessary for all versions I can see.
-  if (version_check(version, c("1.25", "1.33"))) {
-    p <- c("paths", "/containers/{id}/archive", "put", "parameters")
-    tmp <- ret[[p]]
-    i <- which(vcapply(tmp, "[[", "name") == "inputStream")
-    tmp[[i]]$schema$format <- "binary"
-    ret[[p]] <- tmp
-  }
-
   ret <- swagger_spec_patch(ret, stevedore_file("spec/stevedore.yaml"))
 
   .stevedore$spec[[version]] <- ret
@@ -94,7 +80,7 @@ swagger_spec_patch <- function(dat, patch_file) {
       }
     }
 
-    path <- el$path
+    path <- swagger_path_resolve(el$path, dat)
     value <- el$value
     tmp <- dat[[path]]
     if (is.null(tmp) || isTRUE(el$replace)) {
@@ -123,4 +109,33 @@ swagger_spec_index_write <- function(path) {
   md5 <- hash_file(files)
   names(md5) <- paste0("v", names(files))
   cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
+}
+
+
+swagger_path_resolve <- function(path, data) {
+  needs_resolve <- string_starts_with(path, "@")
+  if (!any(needs_resolve)) {
+    return(path)
+  }
+
+  re <- "@(.+?)\\s*=\\s*(.+)$"
+  stopifnot(grepl(re, path[needs_resolve]))
+
+  ret <- integer(length(path))
+  for (i in seq_along(path)) {
+    if (needs_resolve[[i]]) {
+      key <- sub(re, "\\1", path[[i]])
+      value <- sub(re, "\\2", path[[i]])
+      found <- vapply(data, function(x) x[[key]] == value, logical(1))
+      stopifnot(sum(found) == 1L)
+      j <- which(found)
+    } else  {
+      j <- match(path[[i]], names(data))
+      stopifnot(!is.na(j))
+    }
+    ret[[i]] <- j
+    data <- data[[j]]
+  }
+
+  ret
 }

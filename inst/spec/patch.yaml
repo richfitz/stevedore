@@ -52,3 +52,9 @@
   path: ["paths", "/containers/{id}/top", "get"]
   value:
     produces: "application/json"
+
+- version: ["1.25", "1.33"]
+  path: ["paths", "/containers/{id}/archive", "put", "parameters",
+  "@name = inputStream", "schema"]
+  value:
+    format: "binary"
