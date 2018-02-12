@@ -5,3 +5,11 @@
 - path: ["paths", "/containers/{id}/logs", "get"]
   value:
     produces: "application/chunked-string"
+
+- path: ["paths", "/containers/json", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/containers/prune", "post", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters

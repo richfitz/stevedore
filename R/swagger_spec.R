@@ -80,10 +80,15 @@ swagger_spec_patch <- function(dat, patch_file) {
       }
     }
 
-    path <- swagger_path_resolve(el$path, dat)
+    path <- swagger_spec_path_resolve(el$path, dat)
     value <- el$value
     tmp <- dat[[path]]
-    if (is.null(tmp) || isTRUE(el$replace)) {
+
+    if (!is.null(el$transform)) {
+      env <- parent.env(environment())
+      transform <- get(el$transform, env, mode = "function", inherits = FALSE)
+      tmp <- transform(tmp)
+    } else if (is.null(tmp) || isTRUE(el$replace)) {
       tmp <- value
     } else {
       tmp[names(value)] <- value
@@ -112,7 +117,7 @@ swagger_spec_index_write <- function(path) {
 }
 
 
-swagger_path_resolve <- function(path, data) {
+swagger_spec_path_resolve <- function(path, data) {
   needs_resolve <- string_starts_with(path, "@")
   if (!any(needs_resolve)) {
     return(path)
@@ -138,4 +143,17 @@ swagger_path_resolve <- function(path, data) {
   }
 
   ret
+}
+
+## Some patching drama:
+patch_doc_filters <- function(x) {
+  from <- "encoded as JSON (a `map[string][]string`)"
+  to <- "as a named character vector"
+  re <- paste('(encoded as JSON \\(a `map\\[string\\]\\[\\]string`\\))\\.',
+              'For example, `\\{"(.*?)": \\["(.*)"\\]\\}`')
+  if (grepl(re, x)) {
+    sub(re, paste0(to, '.  For example `c(\\2 = "\\3")`'), x)
+  } else {
+    sub(from, to, x, fixed = TRUE)
+  }
 }

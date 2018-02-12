@@ -114,7 +114,9 @@ docker_client_container_collection <- function(api_client, parent) {
       "container_delete", api_client,
       rename = c(delete_volumes = "v"),
       process = list(quote(id <- get_image_id(id)))),
-    prune = docker_client_method("container_prune", api_client))
+    prune = docker_client_method(
+      "container_prune", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))))
 }
 
 docker_client_container <- function(id, api_client) {
