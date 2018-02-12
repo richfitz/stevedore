@@ -147,13 +147,23 @@ swagger_spec_path_resolve <- function(path, data) {
 
 ## Some patching drama:
 patch_doc_filters <- function(x) {
-  from <- "encoded as JSON (a `map[string][]string`)"
-  to <- "as a named character vector"
+  from1 <- "encoded as JSON (a `map[string][]string`)"
+  to1 <- "as a named character vector"
+
+  from2 <- paste("(A )?JSON encoded value of( the)? filters",
+                 "\\(a `map\\[string\\]\\[\\]string`\\)")
+  to2 <- "A named character vector of filters"
+
   re <- paste('(encoded as JSON \\(a `map\\[string\\]\\[\\]string`\\))\\.',
               'For example, `\\{"(.*?)": \\["(.*)"\\]\\}`')
   if (grepl(re, x)) {
-    sub(re, paste0(to, '.  For example `c(\\2 = "\\3")`'), x)
+    x<- sub(re, paste0(to1, '.  For example `c(\\2 = "\\3")`'), x)
+  } else if (grepl(from1, x, fixed = TRUE)) {
+    x <- sub(from1, to1, x, fixed = TRUE)
+  } else if (grepl(from2, x)) {
+    x <- sub(from2, to2, x)
   } else {
-    sub(from, to, x, fixed = TRUE)
+    stop("Failure to patch filter doc [stevedore bug]") # nocov
   }
+  x
 }

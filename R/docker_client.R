@@ -50,7 +50,9 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   ret <- stevedore_object(
     "docker_client",
     api_client,
-    events = docker_client_method("system_events", api_client),
+    events = docker_client_method(
+      "system_events", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))),
     df = docker_client_method("system_df", api_client),
     info = docker_client_method("system_info", api_client),
     login = docker_client_method("system_auth", api_client),
@@ -342,7 +344,9 @@ docker_client_image_collection <- function(api_client, parent) {
       allow_hijack_without_stream = TRUE,
       after = after_build),
     get = get_image,
-    list = docker_client_method("image_list", api_client),
+    list = docker_client_method(
+      "image_list", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))),
     import = docker_client_method("image_import", api_client),
     ## TODO: add filename argument for saving (see image_tarball)
     export = docker_client_method(
@@ -362,9 +366,13 @@ docker_client_image_collection <- function(api_client, parent) {
       allow_hijack_without_stream = TRUE,
       after = after_pull),
     push = docker_client_method("image_push", api_client),
-    search = docker_client_method("image_search", api_client),
+    search = docker_client_method(
+      "image_search", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))),
     remove = docker_client_method("image_delete", api_client),
-    prune = docker_client_method("image_prune", api_client))
+    prune = docker_client_method(
+      "image_prune", api_client),
+    process = list(quote(filters <- as_docker_filter(filters))))
 }
 
 docker_client_image <- function(id, api_client) {
@@ -443,9 +451,13 @@ docker_client_network_collection <- function(api_client, parent) {
       "network_create", api_client, after = after_create,
       defaults = alist(check_duplicate = TRUE)),
     get = get_network,
-    list = docker_client_method("network_list", api_client),
+    list = docker_client_method(
+      "network_list", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))),
     remove = docker_client_method("network_delete", api_client),
-    prune = docker_client_method("network_prune", api_client))
+    prune = docker_client_method(
+      "network_prune", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))))
 }
 
 docker_client_network <- function(id, api_client) {
@@ -502,9 +514,13 @@ docker_client_volume_collection <- function(api_client, parent) {
     create = docker_client_method(
       "volume_create", api_client, after = after_create),
     get = get_volume,
-    list = docker_client_method("volume_list", api_client, after = after_list),
+    list = docker_client_method(
+      "volume_list", api_client, after = after_list,
+      process = list(quote(filters <- as_docker_filter(filters)))),
     remove = docker_client_method("volume_delete", api_client),
-    prune = docker_client_method("volume_prune", api_client))
+    prune = docker_client_method(
+      "volume_prune", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))))
 }
 
 docker_client_volume <- function(id, api_client) {

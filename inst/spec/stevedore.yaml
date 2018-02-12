@@ -6,10 +6,43 @@
   value:
     produces: "application/chunked-string"
 
+# This group is all documentation for the 'filter' parameter
 - path: ["paths", "/containers/json", "get", "parameters", "@name = filters",
   "description"]
   transform: patch_doc_filters
 
 - path: ["paths", "/containers/prune", "post", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/images/json", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/images/search", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/images/prune", "post", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/events", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/volumes", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/volumes/prune", "post", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/networks", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
+- path: ["paths", "/networks/prune", "post", "parameters", "@name = filters",
   "description"]
   transform: patch_doc_filters
