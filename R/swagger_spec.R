@@ -1,7 +1,6 @@
 swagger_spec_index <- function(refresh = FALSE) {
   if (is.null(.stevedore$index) || refresh) {
-    path <- system.file("spec/index.yaml", package = "stevedore",
-                        mustWork = TRUE)
+    path <- stevedore_file("spec/index.yaml")
     dat <- yaml_load_file(path)
     names(dat) <- sub("^v", "", names(dat))
     .stevedore$index <- dat
@@ -37,10 +36,7 @@ swagger_spec_read <- function(version, refresh = FALSE) {
   }
   ret <- yaml_load_file(path_yml)
 
-  patch <- yaml_load_file(system.file(
-    "spec/patch.yaml", package = "stevedore"))
-
-  ret <- swagger_spec_patch(ret, patch)
+  ret <- swagger_spec_patch(ret, stevedore_file("spec/patch.yaml"))
 
   ## This bit of patching is additional to the bits in yaml, but I
   ## can't see how to make it do-able with the yaml directly because
@@ -76,7 +72,7 @@ swagger_spec_path <- function() {
     }
     path <- tempfile()
     dir.create(path, TRUE)
-    path_pkg <- system.file("spec", package = "stevedore", mustWork = TRUE)
+    path_pkg <- stevedore_file("spec")
     yml <- dir(path_pkg, pattern = "v[0-9]+\\.[0-9]+.yaml$", full.names = TRUE)
     file.copy(yml, path)
     options(stevedore.spec.path = path)
@@ -85,7 +81,8 @@ swagger_spec_path <- function() {
 }
 
 
-swagger_spec_patch <- function(dat, patch) {
+swagger_spec_patch <- function(dat, patch_file) {
+  patch <- yaml_load_file(patch_file)
   v <- numeric_version(dat$info$version)
   for (el in patch) {
     assert_character(el$version)

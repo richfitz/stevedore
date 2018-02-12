@@ -353,3 +353,7 @@ hash_file <- function(files) {
   assert_file_exists(files)
   unname(tools::md5sum(normalizePath(files, mustWork = TRUE)))
 }
+
+stevedore_file <- function(path) {
+  system.file(path, package = "stevedore", mustWork = TRUE)
+}

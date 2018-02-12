@@ -27,8 +27,7 @@ docker_api_client_data <- function(version) {
 
 docker_api_client_endpoints <- function() {
   if (is.null(.stevedore$endpoints)) {
-    path <- system.file("spec/endpoints.yaml", package = "stevedore",
-                        mustWork = TRUE)
+    path <- stevedore_file("spec/endpoints.yaml")
     dat <- yaml_load_file(path)
     for (i in seq_along(dat)) {
       dat[[i]]$name <- names(dat)[[i]]
