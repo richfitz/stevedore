@@ -454,12 +454,6 @@ test_that("attach", {
   skip("attach is not yet implemented")
 })
 
-test_that("logs (streaming)", {
-  skip("log streaming is not yet implemented")
-  ## Do this after build - then we can build a small alpine image that
-  ## prints n things over m seconds perhaps
-})
-
 test_that("run", {
   d <- test_docker_client()
   txt <- capture.output(ans <- d$containers$run("hello-world"))
