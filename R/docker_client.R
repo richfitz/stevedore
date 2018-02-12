@@ -100,6 +100,7 @@ docker_client_container_collection <- function(api_client, parent) {
       process = list(
         quote(image <- get_image_id(image)),
         quote(cmd <- check_command(cmd)),
+        quote(env <- validate_env(env)),
         mcr_volumes_for_create(quote(volumes), quote(host_config)),
         mcr_ports_for_create(quote(ports), quote(host_config)),
         mcr_network_for_create(quote(network), quote(host_config))),
@@ -215,6 +216,7 @@ docker_client_container <- function(id, api_client) {
     ## "id" which is fixed).
     commit = docker_client_method(
       "image_commit", api_client,
+      process = list(quote(env <- validate_env(env))),
       promote = c("repo", "tag", "author", "changes", "comment", "pause"),
       fix = list(container = id), after = after_commit),
     diff = docker_client_method(
@@ -228,7 +230,8 @@ docker_client_container <- function(id, api_client) {
                  stdin = "attach_stdin"),
       defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
       promote = "cmd",
-      process = list(quote(cmd <- check_command(cmd))),
+      process = list(quote(cmd <- check_command(cmd)),
+                     quote(env <- validate_env(env))),
       after = after_exec),
     export = docker_client_method(
       "container_export", api_client, fix = fix_id),

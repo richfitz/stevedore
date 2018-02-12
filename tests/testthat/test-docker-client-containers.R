@@ -989,3 +989,11 @@ test_that("versioned responses", {
   y <- d1$containers$get(x$id())
   x$remove(force = TRUE)
 })
+
+test_that("environment variables on create", {
+  d <- test_docker_client()
+  res <- d$containers$run("alpine", "env", detach = FALSE, stream = NULL,
+                          env = c("X_FOO" = "1"), rm = TRUE)
+  txt <- format(res$logs, style = "plain", strip_newline = TRUE)
+  expect_true("X_FOO=1" %in% txt)
+})
