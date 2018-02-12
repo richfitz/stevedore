@@ -190,3 +190,34 @@ test_that("validate stream", {
   expect_equal(validate_stream(FALSE),
                list(stream = NULL, close = FALSE))
 })
+
+test_that("validate env", {
+  expect_null(validate_env(NULL))
+  expect_null(validate_env(character(0)))
+
+  expect_equal(validate_env(c(a = "value")), "a=value")
+  expect_equal(validate_env(c(a = "value", b = "another")),
+               c("a=value", "b=another"))
+
+  expect_equal(validate_env(list(a = "value", b = 10)),
+               c("a=value", "b=10"))
+
+  ## Unset:
+  expect_equal(validate_env(c(a = NA)), "a=")
+  expect_equal(validate_env(list(a = NULL)), "a=")
+  expect_equal(validate_env(list(a = "")), "a=")
+
+  expect_equal(validate_env(c(a = NA, b = "value")), c("a=", "b=value"))
+  expect_equal(validate_env(list(a = NULL, b = "value")), c("a=", "b=value"))
+  expect_equal(validate_env(list(a = "", b = "value")), c("a=", "b=value"))
+
+  expect_error(validate_env(c("value", "another")),
+               "must be named")
+  expect_error(validate_env(c("a=value", "b=another")),
+               "must be named")
+
+  x <- list(a = 1, b = 2:3)
+  expect_error(validate_env(x),
+               "All elements of 'x' must be scalar (or use atomic vector)",
+               fixed = TRUE)
+})

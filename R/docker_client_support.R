@@ -279,6 +279,29 @@ validate_export_names <- function(names) {
 }
 
 
+validate_env <- function(env, name = deparse(substitute(env))) {
+  if (length(env) == 0L) {
+    return(NULL)
+  }
+  if (is.recursive(env)) {
+    if (any(lengths(env) > 1)) {
+      stop(sprintf("All elements of '%s' must be scalar (or use atomic vector)",
+                   name, call. = FALSE))
+    }
+    env <- vcapply(env, function(x) if (is.null(x)) "" else as.character(x))
+  }
+
+  ## It could be possible to allow environment variables to be passed
+  ## through as named pairs ("A=B") but not done as named on the
+  ## vector, letting these through wherever names are NULL/"", but I
+  ## don't think it's worth the complication.
+  assert_named(env, TRUE, name = name)
+  value <- unname(env)
+  value[is.na(value)] <- ""
+  sprintf("%s=%s", names(env), value)
+}
+
+
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
