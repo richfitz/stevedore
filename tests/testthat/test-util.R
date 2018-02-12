@@ -80,11 +80,11 @@ test_that("split command", {
 })
 
 test_that("check command", {
-  expect_identical(check_command("hello world"), "hello world")
-  expect_identical(check_command(I("hello world")), c("hello", "world"))
-  expect_null(check_command(NULL))
-  expect_identical(check_command(letters), letters)
-  expect_identical(check_command(I(letters)), I(letters))
+  expect_identical(validate_command("hello world"), "hello world")
+  expect_identical(validate_command(I("hello world")), c("hello", "world"))
+  expect_null(validate_command(NULL))
+  expect_identical(validate_command(letters), letters)
+  expect_identical(validate_command(I(letters)), I(letters))
 })
 
 ## The new yaml package introduces integer overflow with warnings.

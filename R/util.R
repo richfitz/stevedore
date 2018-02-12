@@ -227,13 +227,6 @@ tolower1 <- function(x) {
   paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x)))
 }
 
-check_command <- function(x) {
-  if (length(x) == 1L && inherits(x, "AsIs")) {
-    x <- split_command(x)
-  }
-  x
-}
-
 ## The python command looks to split these up a bit; in
 ## types/containers.py there's a call to split_command which then goes
 ## through shlex.split(); we'll need to do something similar.

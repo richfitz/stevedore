@@ -127,6 +127,14 @@ docker_stream_printer <- function(stream, style = "auto") {
 }
 
 ## ** validators **
+validate_command <- function(x) {
+  if (length(x) == 1L && inherits(x, "AsIs")) {
+    x <- split_command(x)
+  }
+  x
+}
+
+
 ## character: open a file in mode wb and ensure closing on exit
 ## logical: suppress stream or log to stdoud (FALSE, TRUE)
 ## NULL: no stream
