@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
 
-## https://docs.docker.com/engine/security/https/#other-modes
+## This setup follows the instructions here:
+## https://docs.docker.com/engine/security/https
+
+## with a couple of tweaks to set it working with ubuntu systemd and
+## without any user intervention (passwords for the key in the first
+## step)
 
 ## Keys:
 rm -rf /vagrant/ssl
