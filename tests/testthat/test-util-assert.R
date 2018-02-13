@@ -143,6 +143,25 @@ test_that("assert_empty_dots", {
                fixed = TRUE)
 })
 
+
+test_that("assert_nonempty_character", {
+  value <- character()
+  expect_error(assert_nonempty_character(value),
+               "'value' must be a character vector (non zero length, non-NA)",
+               fixed = TRUE)
+  value <- c("a", NA)
+  expect_error(assert_nonempty_character(value),
+               "'value' must be character vector (non zero length, non-NA)",
+               fixed = TRUE)
+  value <- 1L
+  expect_error(assert_nonempty_character(value),
+               "'value' must be character vector (non zero length, non-NA)",
+               fixed = TRUE)
+  expect_silent(assert_nonempty_character("a"))
+  expect_silent(assert_nonempty_character(letters))
+})
+
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")

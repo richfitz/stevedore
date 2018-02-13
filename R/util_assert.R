@@ -149,6 +149,26 @@ assert_empty_dots <- function(..., name) {
   }
 }
 
+
+assert_nonempty <- function(x, name = deparse(substitute(x)),
+                            what = "nonempty vector") {
+  if (length(x) == 0) {
+    stop(sprintf("'%s' must be a %s", name, what), call. = FALSE)
+  }
+  invisible(x)
+}
+
+
+assert_nonempty_character <- function(x, name = deparse(substitute(x)),
+                                      what = NULL) {
+  what <- what %||% "character vector (non zero length, non-NA)"
+  assert_nonempty(x, name, what)
+  assert_character(x, name, what)
+  assert_nonmissing(x, name, what)
+  invisible(x)
+}
+
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {
