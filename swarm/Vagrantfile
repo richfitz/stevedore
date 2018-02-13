@@ -1,0 +1,46 @@
+# -*- mode: ruby -*-
+Vagrant.require_version ">= 1.8.2"
+
+domain = 'localdomain'
+box = "ubuntu/xenial64"
+manager = { :hostname => 'manager', :ip => '192.168.99.100' }
+workers = [
+  { :hostname => 'worker1', :ip => '192.168.99.101' },
+  { :hostname => 'worker2', :ip => '192.168.99.102' }
+]
+
+Vagrant.configure(2) do |config|
+  config.vm.box = box
+  config.vm.synced_folder 'shared', '/vagrant'
+  config.vm.provision :shell do |shell|
+    shell.path = 'provision-docker.sh'
+  end
+
+  config.vm.define manager[:hostname] do |manager_config|
+    manager_config.vm.provider :virtualbox do | vbox |
+      vbox.gui = false
+    end
+
+    manager_config.vm.hostname = manager[:hostname] + '.' + domain
+    manager_config.vm.network :private_network, ip: manager[:ip]
+    manager_config.vm.network "forwarded_port", guest: 2376, host: 2376
+
+    manager_config.vm.provision :shell do |shell|
+      shell.path = 'provision-manager.sh'
+    end
+  end
+
+  workers.each do |worker|
+    config.vm.define worker[:hostname] do |worker_config|
+      worker_config.vm.provider :virtualbox do | vbox |
+        vbox.gui = false
+      end
+
+      worker_config.vm.hostname = worker[:hostname] + '.' + domain
+      worker_config.vm.network :private_network, ip: worker[:ip]
+      worker_config.vm.provision :shell do |shell|
+        shell.path = 'provision-worker.sh'
+      end
+    end
+  end
+end
