@@ -6,6 +6,21 @@
   value:
     produces: "application/chunked-string"
 
+- path: ["paths", "/build", "post", "parameters", "@name = t"]
+  value:
+    multiple: true
+    # Based on the wording from 1.29, modified to be reflect how the
+    # tag parameter is handled by stevedore:
+    description: A name and optional tag to apply to the image in the `name:tag` format. If you omit the tag the default `latest` value is assumed. You can provide a vector of mutiple tags here.
+
+# See issue #8 - I think that the spec is incorrect here - the docker
+# client itself does not follow what the spec requires
+- path: ["paths", "/images/get", "get", "parameters", "@name = names"]
+  value:
+    multiple: true
+    type: "string"
+    items: ~
+
 # This group is all documentation for the 'filter' parameter
 - path: ["paths", "/containers/json", "get", "parameters", "@name = filters",
   "description"]

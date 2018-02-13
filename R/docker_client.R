@@ -350,8 +350,7 @@ docker_client_image_collection <- function(api_client, parent) {
     import = docker_client_method("image_import", api_client),
     ## TODO: add filename argument for saving (see image_tarball)
     export = docker_client_method(
-      "image_export", api_client,
-      process = list(quote(validate_export_names(names)))),
+      "image_export", api_client),
     ## TODO: need to deal with registry auth properly.  For now I'm just
     ##   eliminating it from the list.
     pull = docker_client_method(

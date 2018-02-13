@@ -118,6 +118,20 @@ test_that("build: success", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+
+test_that("build: multitag", {
+  cl <- test_docker_client()
+  context <- tar_directory("images/iterate")
+
+  nm <- rand_str(8, "stevedore_")
+  tag <- sprintf("%s:%s", nm, c("foo", "bar"))
+
+  ans <- cl$images$build(context, nocache = TRUE, rm = TRUE,
+                         tag = tag, stream = FALSE)
+  expect_true(setequal(ans$tags(), tag))
+})
+
+
 test_that("build: stream output", {
   path <- tempfile()
   con <- file(path, "wb")
@@ -220,8 +234,16 @@ test_that("api versions", {
 test_that("export", {
   cl <- test_docker_client()
   expect_error(cl$images$export(character()),
-               "'names' must have at least one element")
-  expect_error(cl$images$export(c("hello-world", "alpine")),
-               "Exporting of multiple images currently broken")
-  expect_is(cl$images$export("hello-world"), "raw")
+               "'names' must be a character vector (non zero length, non-NA)",
+               fixed = TRUE)
+  b1 <- cl$images$export("hello-world")
+  b2 <- cl$images$export("alpine")
+  b3 <- cl$images$export(c("hello-world", "alpine"))
+
+  expect_is(b1, "raw")
+  expect_is(b2, "raw")
+  expect_is(b3, "raw")
+
+  expect_true(length(b3) > length(b1))
+  expect_true(length(b3) > length(b2))
 })

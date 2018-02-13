@@ -61,7 +61,17 @@ build_url_query <- function(params) {
         curl::curl_escape(as.character(x))
       }
     }
-    q <- paste(sprintf("%s=%s", names(params), vcapply(params, to_character)),
+
+    name <- names(params)
+    value <- unname(params)
+
+    n <- lengths(value)
+    if (any(n != 1L)) {
+      name <- rep(name, n)
+      value <- unlist(unname(params), FALSE)
+    }
+
+    q <- paste(sprintf("%s=%s", name, vcapply(value, to_character)),
                collapse = "&")
     paste0("?", q)
   }

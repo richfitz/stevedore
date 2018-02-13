@@ -145,7 +145,11 @@ swagger_arg_collect_query <- function(p, dest) {
   } else if (type == "integer") {
     validate <- quote(assert_scalar_integer)
   } else if (type == "string") {
-    validate <- quote(assert_scalar_character)
+    if (isTRUE(p$multiple)) {
+      validate <- quote(assert_nonempty_character)
+    } else {
+      validate <- quote(assert_scalar_character)
+    }
   } else if (type == "array") {
     if (identical(p$items, list(type = "string"))) {
       ## This is used only in ImageGetAll
