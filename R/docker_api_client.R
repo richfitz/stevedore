@@ -12,10 +12,11 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
 docker_api_client_data <- function(version) {
   if (!(version %in% names(.stevedore$client_data))) {
     spec <- swagger_spec_read(version)
-    endpoints <- docker_api_client_endpoints()
+    endpoints <- docker_api_client_endpoints(version)
+    docker_api_client_data_check(spec, endpoints)
 
     dat <- lapply(endpoints, function(x)
-      swagger_endpoint(x$name, x$method, x$path, spec))
+      swagger_endpoint(x$name, x$method, x$path, x$from, spec))
     names(dat) <- vcapply(endpoints, "[[", "name")
     attr(dat, "version") <- version
 
@@ -25,7 +26,28 @@ docker_api_client_data <- function(version) {
 }
 
 
-docker_api_client_endpoints <- function() {
+docker_api_client_data_check <- function(spec, endpoints) {
+  done <- vcapply(endpoints, function(x) paste(x$method, x$path))
+
+  pos <- lapply(spec$paths, names)
+  pos <- paste(unlist(pos, FALSE, FALSE), rep(names(spec$paths), lengths(pos)))
+
+  ## Ignore missing "POST /session" because it is experimental
+  unk <- setdiff(done, pos)
+  msg <- setdiff(pos, c(done, "post /session"))
+
+  if (length(unk) > 0L) {
+    stop("Unknown endpoints (stevedore bug):\n",
+            paste("  -", unk, collapse = "\n"))
+  }
+  if (length(msg) > 0L) {
+    message("Unimplemented endpoints (stevedore bug):\n",
+            paste("  -", msg, collapse = "\n"))
+  }
+}
+
+
+docker_api_client_endpoints <- function(version) {
   if (is.null(.stevedore$endpoints)) {
     path <- stevedore_file("spec/endpoints.yaml")
     dat <- yaml_load_file(path)
@@ -34,7 +56,11 @@ docker_api_client_endpoints <- function() {
     }
     .stevedore$endpoints <- unname(dat)
   }
-  .stevedore$endpoints
+
+  ret <- .stevedore$endpoints
+  version <- numeric_version(version)
+  ret <- ret[vlapply(ret, function(x) version_at_least(version, x$from))]
+  ret
 }
 
 

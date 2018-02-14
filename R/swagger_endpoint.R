@@ -23,7 +23,11 @@
 ## But for the simple cases this is going to save a lot of repetitive
 ## code and automatically allow for differences in the schema over
 ## time.
-swagger_endpoint <- function(name, method, path, spec) {
+swagger_endpoint <- function(name, method, path, v_from, spec) {
+  if (!is.null(v_from) && !version_at_least(spec$info$version, v_from)) {
+    return(swagger_endpoint_unsupported(name, method, path, v_from,
+                                        spec$info$version))
+  }
   path_data <- swagger_path_parse(path)
   x <- spec$paths[[path]][[method]]
   produces <- get_response_type(method, path, x)
@@ -82,4 +86,14 @@ get_help <- function(x, args) {
                       vcapply(args, "[[", "name_r"))
   }
   list(summary = x$summary, description = x$description, args = args)
+}
+
+swagger_endpoint_unsupported <- function(name, method, path,
+                                         version_required, version_used) {
+  list(name = name,
+       path = path,
+       method = toupper(method),
+       version_required = version_required,
+       version_used = version_used,
+       unsupported = TRUE)
 }

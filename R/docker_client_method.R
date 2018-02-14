@@ -5,6 +5,9 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
                                  allow_hijack_without_stream = FALSE) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
   endpoint <- client$endpoints[[name]]
+  if (isTRUE(endpoint$unsupported)) {
+    return(docker_client_method_unsupported(endpoint))
+  }
 
   fenv <- new.env(parent = client, hash = FALSE)
   fenv$endpoint <- endpoint
@@ -115,6 +118,16 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
   attr(ret, "help") <- help
 
   ret
+}
+
+docker_client_method_unsupported <- function(endpoint) {
+  force(endpoint)
+  function(...) {
+    stop(sprintf(
+      "'%s' (%s %s) requires docker API version at least %s (version %s used)",
+      endpoint$name, endpoint$method, endpoint$path,
+      endpoint$version_required, endpoint$version_used))
+  }
 }
 
 ##' @export

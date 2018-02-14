@@ -348,6 +348,11 @@ version_check <- function(v, cmp) {
 }
 
 
+version_at_least <- function(v, cmp) {
+  is.null(cmp) || numeric_version(v) >= numeric_version(cmp)
+}
+
+
 atomic_types <- function() {
   type <- list("string"  = character(1),
                "number"  = numeric(1),
