@@ -90,18 +90,11 @@ RE_PASCAL_START <- local({
   sprintf("^([A-Z]|%s)", paste(special, collapse = "|"))
 })
 
+
+## TODO: this is actually a major timesink (up to 40% of total time
+## building the docker client - 0.5s), so we cache result of this in
+## the pascal_to_snake_cached and use that wherever possible.
 pascal_to_snake <- function(x) {
-  ## Uncomment this to record all names for testing
-  ##
-  ##   .stevedore$names <- union(.stevedore$names, x)
-  ##
-  ## Then after running through the test suite run
-  ##
-  ##   nms <- sort(unique(.stevedore$names))
-  ##   write.csv(cbind(from = nms, to = pascal_to_snake(nms)),
-  ##             "names.csv", row.names = FALSE)
-  ##
-  ## This will be used (after checking) in the test suite.
   len <- attr(regexpr(RE_PASCAL_START, x), "match.length")
   i <- len > 0L
   if (any(i)) {
@@ -110,6 +103,26 @@ pascal_to_snake <- function(x) {
   }
   camel_to_snake(x)
 }
+
+
+pascal_to_snake_cached <- function(x) {
+  nms <- .stevedore$names
+  ret <- nms[, "to"][match(x, nms[, "from"])]
+  i <- is.na(ret)
+  if (any(i)) {
+    from <- x[i]
+    ret[i] <- to <- pascal_to_snake(from)
+    .stevedore$names <- rbind(nms, cbind(from, to, deparse.level = 0))
+  }
+  ret
+}
+
+
+pascal_to_snake_cache_reset <- function() {
+  .stevedore$names <- as.matrix(
+    read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE))
+}
+
 
 snake_to_pascal <- function(x) {
   x <- snake_to_camel(x)

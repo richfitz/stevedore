@@ -19,8 +19,22 @@ test_that("case convert with consecutive capitals", {
 })
 
 test_that("case convert: reference check", {
-  nms <- read.csv("names.csv", stringsAsFactors = FALSE)
+  nms <- read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE)
   expect_equal(nms$to, pascal_to_snake(nms$from))
+})
+
+test_that("case convert: caching", {
+  pascal_to_snake_cache_reset()
+  expect_equal(pascal_to_snake("CACert"),
+               pascal_to_snake_cached("CACert"))
+
+  from <- "AbraCadabra"
+  to <- pascal_to_snake(from)
+  expect_false(from %in% .stevedore$names[, "from"])
+  expect_false(to %in% .stevedore$names[, "to"])
+  expect_equal(pascal_to_snake_cached(from), to)
+  expect_true(from %in% .stevedore$names[, "from"])
+  expect_true(to %in% .stevedore$names[, "to"])
 })
 
 test_that("case convert: special cases", {

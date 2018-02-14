@@ -48,7 +48,7 @@ swagger_args_parse <- function(method, path, x, spec) {
   args_name_r <- args_name
   args_name_r[args_in == "header"] <-
     x_kebab_to_snake(args_name[args_in == "header"])
-  args_name_r <- pascal_to_snake(args_name_r)
+  args_name_r <- pascal_to_snake_cached(args_name_r)
   for (i in seq_along(args)) {
     args[[i]]$name_r <- args_name_r[[i]]
     args[[i]] <- resolve_schema_ref(args[[i]], spec)

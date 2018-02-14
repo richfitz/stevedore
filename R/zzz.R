@@ -11,7 +11,7 @@ HELP <- "\r\b\n"
 
 .stevedore <- new.env(parent = emptyenv())
 .onLoad <- function(...) {
+  pascal_to_snake_cache_reset()
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
-  .stevedore$names <- character()
 }

@@ -125,7 +125,7 @@ swagger_response_handler_object <- function(schema, spec) {
   }
 
   els <- names(schema$properties)
-  els_r <- pascal_to_snake(els)
+  els_r <- pascal_to_snake_cached(els)
 
   if (length(els) == 0 && is.null(additional_properties)) {
     ## This is required for container_stats at least
@@ -200,7 +200,7 @@ swagger_response_handler_object <- function(schema, spec) {
           extra <- lapply(extra, additional_properties_handler, as_is_names)
         }
         if (!as_is_names && length(extra) > 0L) {
-          names(extra) <- pascal_to_snake(names(extra))
+          names(extra) <- pascal_to_snake_cached(names(extra))
         }
         ret <- c(ret, extra)
       }
@@ -262,7 +262,7 @@ swagger_response_handler_array_object_df <- function(items, spec) {
   properties <- lapply(items$properties, resolve_schema_ref, spec)
 
   cols <- names(properties)
-  cols_r <- pascal_to_snake(cols)
+  cols_r <- pascal_to_snake_cached(cols)
 
   type <- vcapply(properties, "[[", "type")
   stopifnot(all(type %in% c(atomic$names, "object", "array")))
@@ -334,7 +334,7 @@ swagger_response_handler_array_object_list <- function(items, spec) {
     if (!as_is_names) {
       rename <- function(x) {
         if (!is.null(names(x))) {
-          names(x) <- pascal_to_snake(names(x))
+          names(x) <- pascal_to_snake_cached(names(x))
         }
         x
       }
