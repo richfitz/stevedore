@@ -1,5 +1,5 @@
 ## ** stevedore_object support **
-stevedore_object <- function(api_client, class, ..., lock = TRUE) {
+stevedore_object <- function(class, api_client, ..., lock = TRUE) {
   els <- list(...)
   assert_named(els, TRUE, "stevedore_object elements")
   ret <- list2env(els, parent = emptyenv())
