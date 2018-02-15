@@ -125,8 +125,22 @@ read_sample_response_str <- function(method, path, code, spec, error = TRUE) {
   if (!is.null(ex)) {
     return(to_str(ex[[1]]))
   }
+  ex <- r[["schema"]][["example"]]
+  if (!is.null(ex)) {
+    return(to_str(ex))
+  }
+  if (identical(r$schema$type, "array")) {
+    r$schema$items <- resolve_schema_ref(r$schema$items, spec)
+    ex1 <- r$schema$items$example
+    if (!is.null(ex1)) {
+      return(to_str(list(ex1)))
+    }
+  }
+  msg <- sprintf("did not find example for %s %s", method, path)
   if (error) {
-    stop("did not find example")
+    stop(msg)
+  } else {
+    message(msg)
   }
   NULL
 }
@@ -146,12 +160,18 @@ dput_cvec <- function(x) {
   sprintf("c(\n%s\n  )", els)
 }
 
-add_sample_response <- function(filename, method, path, code, version) {
+add_sample_response <- function(filename, method, path, code, version,
+                                error = FALSE) {
   if (file.exists(filename)) {
-    stop("filename already exists")
+    if (error) {
+      stop("filename already exists")
+    }
   }
-  spec <- swagger_spec_index(version)
-  response <- read_sample_response_str(method, path, code, spec)
+  spec <- swagger_spec_read(version)
+  response <- read_sample_response_str(method, path, code, spec, error)
+  if (is.null(response)) {
+    return(invisible())
+  }
   dat <- list(version = version, method = method, path = path, code = code,
               response = response)
   txt <- c(sprintf("## %s: %s", names(dat), unname(dat)), "NULL")
