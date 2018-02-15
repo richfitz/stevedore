@@ -12,5 +12,5 @@ Methods for working with docker volumes.  This object is
 }
 \seealso{
 \code{\link{docker_volume}} for information on
-  network objects.
+  volume objects.
 }

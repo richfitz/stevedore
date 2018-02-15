@@ -96,7 +96,7 @@ NULL
 ##' @title Management commands for working with docker volumes
 ##'
 ##' @seealso \code{\link{docker_volume}} for information on
-##'   network objects.
+##'   volume objects.
 NULL
 
 
@@ -182,7 +182,9 @@ markdown_to_rd <- function(str) {
     str <- paste0(tmp, "\n", collapse = "")
   }
 
-  gsub("`([^`]+)`", "\\\\code{\\1}", str)
+  str <- gsub("```([^`]+)```", "\\\\preformatted{\\1}", str)
+  str <- gsub("`([^`]+)`", "\\\\code{\\1}", str)
+  str
 }
 
 
@@ -200,7 +202,7 @@ generate_docker_client_method_rd <- function(name, obj) {
   }
   summary <- markdown_to_rd(summary)
 
-  if (is.null(h$args)) {
+  if (length(h$args) == 0L) {
     args <- NULL
   } else {
     f <- function(nm, txt) {
