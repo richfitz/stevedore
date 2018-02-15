@@ -157,7 +157,19 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
               "")
   }
 
-  c(mgmt,
+  preamble <- c(
+    "Below is reference documentation for all methods for version",
+    squote(x$api_version()),
+    "of the docker API - other versions are available.  This documentation",
+    "is automatically generated from docker's API schema, and so",
+    "inaccuracies may exist between it and stevedore's interface",
+    "(especially references to JSON objects).  Please report any",
+    "documentation that might be improved at",
+    "https://github.com/richfitz/stevedore/issues")
+
+  c(preamble,
+    "",
+    mgmt,
     "\\subsection{Methods}{",
     "\\describe{",
     fns,

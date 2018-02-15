@@ -48,6 +48,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
                                   type = http_client_type, ...)
 
   ret <- stevedore_object(
+    api_client,
     "docker_client",
     events = docker_client_method("system_events", api_client),
     df = docker_client_method("system_df", api_client),
@@ -88,6 +89,7 @@ docker_client_container_collection <- function(api_client, parent) {
   }
 
   stevedore_object(
+    api_client,
     "docker_container_collection",
     run = make_docker_run(parent, api_client$http_client$can_stream),
     create = docker_client_method(
@@ -186,6 +188,7 @@ docker_client_container <- function(id, api_client) {
   ## TODO: friendly "copy" interface needed here, but that requires a
   ## bit more general work really.
   self <- stevedore_object(
+    api_client,
     "docker_container",
     id = function() id,
     name = function() drop_leading_slash(attrs$name),
@@ -316,6 +319,7 @@ docker_client_image_collection <- function(api_client, parent) {
     get_image(sprintf("%s:%s", params$query$fromImage, params$query$tag))
   }
   stevedore_object(
+    api_client,
     "docker_image_collection",
     ## TODO: control returning output too
     ## TODO: support multiple tags (accept vector and translate into
@@ -389,6 +393,7 @@ docker_client_image <- function(id, api_client) {
   }
   fix_id_as_name = list(name = id)
   self <- stevedore_object(
+    api_client,
     "docker_image",
     id = function() attrs$id,
     name = function() name,
@@ -427,6 +432,7 @@ docker_client_network_collection <- function(api_client, parent) {
     get_network(dat$id)
   }
   stevedore_object(
+    api_client,
     "docker_network_collection",
     create = docker_client_method(
       "network_create", api_client, after = after_create,
@@ -453,6 +459,7 @@ docker_client_network <- function(id, api_client) {
   fix_id <- list(id = id)
 
   self <- stevedore_object(
+    api_client,
     "docker_network",
     id = function() id,
     name = function() attrs$name,
@@ -485,6 +492,7 @@ docker_client_volume_collection <- function(api_client, parent) {
     dat$volumes
   }
   stevedore_object(
+    api_client,
     "docker_volume_collection",
     create = docker_client_method(
       "volume_create", api_client, after = after_create),
@@ -505,6 +513,7 @@ docker_client_volume <- function(id, api_client) {
   }
 
   self <- stevedore_object(
+    api_client,
     "docker_volume",
     name = function() attrs$name,
     inspect = function(reload = TRUE) {
@@ -549,6 +558,7 @@ docker_client_exec <- function(id, api_client) {
   ## way to get back to a detached exec instance.
   ## https://github.com/moby/moby/issues/9527
   self <- stevedore_object(
+    api_client,
     "docker_exec",
     id = function() id,
     ## TODO: control stream (location etc) following the same problem

@@ -1,13 +1,23 @@
 ## ** stevedore_object support **
-stevedore_object <- function(class, ..., lock = TRUE) {
+stevedore_object <- function(api_client, class, ..., lock = TRUE) {
   els <- list(...)
   assert_named(els, TRUE, "stevedore_object elements")
   ret <- list2env(els, parent = emptyenv())
+  ret$help <- function(help_type = getOption("help_type")) {
+    stevedore_help(class, api_client$api_version, help_type)
+  }
   class(ret) <- c(class, "stevedore_object")
   if (lock) {
     lock_environment(ret)
   }
   ret
+}
+
+
+stevedore_help <- function(name, api_version, help_type) {
+  oo <- options(stevedore.help.api_version = api_version)
+  on.exit(options(oo))
+  utils::help(name, package = "stevedore", help_type = help_type)
 }
 
 
