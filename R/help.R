@@ -115,6 +115,19 @@ NULL
 NULL
 
 
+##' Methods for working with docker "exec" instances, which are
+##' returned by running \code{exec} on a running container
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_exec")}
+##'
+##' @name docker_exec
+##'
+##' @title Commands for working with a docker exec instance
+##'
+##' @seealso \code{\link{docker_container}}
+NULL
+
+
 generate_help <- function(sub = NULL, api_version = NULL) {
   oo <- options(stevedore.silent = TRUE)
   on.exit(options(oo))
@@ -125,14 +138,22 @@ generate_help <- function(sub = NULL, api_version = NULL) {
 
 generate_help_string <- function(sub = NULL, api_version = NULL) {
   ## We should store the last used version in a cache I think?
-  x <- docker_client(api_version)
+  x <- docker_client(api_version, http_client_type = "null")
+  api_version <- x$api_version()
   if (!is.null(sub)) {
     if (sub %in% names(x)) {
       x <- x[[sub]]
     } else {
-      x <- switch(sub,
-                  docker_container = x$containers$get(HELP),
+      api_client <- docker_api_client(api_version = x$api_version(),
+                                      type = "null")
+      f <- switch(sub,
+                  docker_container = docker_client_container,
+                  docker_image = docker_client_image,
+                  docker_network = docker_client_network,
+                  docker_volume = docker_client_volume,
+                  docker_exec = docker_client_exec,
                   stop("impossible!"))
+      x <- f(HELP, api_client)
     }
   }
 
@@ -159,7 +180,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 
   preamble <- c(
     "Below is reference documentation for all methods for version",
-    squote(x$api_version()),
+    squote(api_version),
     "of the docker API - other versions are available.  This documentation",
     "is automatically generated from docker's API schema, and so",
     "inaccuracies may exist between it and stevedore's interface",

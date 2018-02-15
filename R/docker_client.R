@@ -539,7 +539,7 @@ docker_client_volume <- function(id, api_client) {
 
 docker_client_exec <- function(id, api_client) {
   exec_inspect <- docker_client_method("exec_inspect", api_client)
-  attrs <- exec_inspect(id)
+  attrs <- if (identical(id, HELP)) NULL else exec_inspect(id)
   self <- NULL
   reload <- function() {
     attrs <<- exec_inspect(id)
