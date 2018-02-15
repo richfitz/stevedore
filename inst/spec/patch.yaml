@@ -68,3 +68,76 @@
   path: ["definitions", "TaskSpec", "properties", "Resources", "properties", "Reservation"]
   value:
     type: object
+
+- path: ["paths", "/swarm", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/swarm/init", "post"]
+  value:
+    produces: "text/plain"
+
+- path: ["paths", "/swarm/unlockkey", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/nodes", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/nodes/{id}", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/services", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/services/{id}", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/tasks", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/secrets/{id}", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/plugins/privileges", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/plugins/{name}/json", "get"]
+  value:
+    produces: "application/json"
+
+- path: ["paths", "/plugins/{name}", "delete"]
+  value:
+    produces: "application/json"
+
+- path: ["definitions", "ServiceSpec"]
+  value:
+    type: "object"
+
+- path: ["definitions", "TaskSpec", "properties", "Resources", "properties", "Reservation"]
+  value:
+    type: "object"
+
+# Feature added in 1.30, type annotation added in 1.32
+- version: ["1.30", "1.31"]
+  path: ["definitions", "SwarmSpec", "properties", "CAConfig", "properties", "ForceRotate"]
+  value:
+    type: "integer"
+
+# NOTE: debateably belongs in stevedore.yaml, but the spec appears
+# wrong so we'll just do this all at once.
+- path: ["paths", "/services/{id}/logs", "get"]
+  value:
+    produces: "application/chunked-string"
+
+- version: ["1.29", "1.35"]
+  path: ["paths", "/tasks/{id}/logs", "get"]
+  value:
+    produces: "application/chunked-string"

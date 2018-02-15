@@ -31,6 +31,12 @@ system_df:
   path: "/system/df"
   cli: "system df"
 
+## This is included as a "system" method but I think it might go
+## better as an image method?
+system_distribution:
+  method: get
+  path: "/distribution/{name}/json"
+  from: "1.30"
 
 container_list:
   method: get
@@ -121,6 +127,11 @@ container_unpause:
 container_attach:
   method: post
   path: "/containers/{id}/attach"
+  cli: ["attach", "container attach"]
+
+container_attach_ws:
+  method: get
+  path: "/containers/{id}/attach/ws"
   cli: ["attach", "container attach"]
 
 container_wait:
@@ -303,3 +314,184 @@ exec_resize:
 exec_inspect:
   method: get
   path: "/exec/{id}/json"
+
+## These are all "swarm mode" endpoints
+swarm_inspect:
+  method: get
+  path: "/swarm"
+
+swarm_init:
+  method: post
+  path: "/swarm/init"
+
+swarm_join:
+  method: post
+  path: "/swarm/join"
+
+swarm_leave:
+  method: post
+  path: "/swarm/leave"
+
+swarm_update:
+  method: post
+  path: "/swarm/update"
+
+swarm_unlockkey:
+  method: get
+  path: "/swarm/unlockkey"
+
+swarm_unlock:
+  method: post
+  path: "/swarm/unlock"
+
+
+node_list:
+  method: get
+  path: "/nodes"
+
+node_inspect:
+  method: get
+  path: "/nodes/{id}"
+
+node_delete:
+  method: delete
+  path: "/nodes/{id}"
+
+node_update:
+  method: post
+  path: "/nodes/{id}/update"
+
+
+service_list:
+  method: get
+  path: "/services"
+
+service_create:
+  method: post
+  path: "/services/create"
+
+service_inspect:
+  method: get
+  path: "/services/{id}"
+
+service_delete:
+  method: delete
+  path: "/services/{id}"
+
+service_update:
+  method: post
+  path: "/services/{id}/update"
+
+service_logs:
+  method: get
+  path: "/services/{id}/logs"
+
+
+task_list:
+  method: get
+  path: "/tasks"
+
+task_inspect:
+  method: get
+  path: "/tasks/{id}"
+
+task_logs:
+  method: get
+  path: "/tasks/{id}/logs"
+  from: "1.29"
+
+
+secret_list:
+  method: get
+  path: "/secrets"
+
+secret_create:
+  method: post
+  path: "/secrets/create"
+
+secret_inspect:
+  method: get
+  path: "/secrets/{id}"
+
+secret_delete:
+  method: delete
+  path: "/secrets/{id}"
+
+secret_update:
+  method: post
+  path: "/secrets/{id}/update"
+  from: "1.26"
+
+
+## Only available >= 1.30
+config_list:
+  method: get
+  path: "/configs"
+  from: "1.30"
+
+config_create:
+  method: post
+  path: "/configs/create"
+  from: "1.30"
+
+config_inspect:
+  method: get
+  path: "/configs/{id}"
+  from: "1.30"
+
+config_delete:
+  method: delete
+  path: "/configs/{id}"
+  from: "1.30"
+
+config_update:
+  method: post
+  path: "/configs/{id}/update"
+  from: "1.30"
+
+
+## Not swarm related:
+plugin_list:
+  method: get
+  path: "/plugins"
+
+plugin_privileges:
+  method: get
+  path: "/plugins/privileges"
+
+plugin_install:
+  method: post
+  path: "/plugins/pull"
+
+plugin_inspect:
+  method: get
+  path: "/plugins/{name}/json"
+
+plugin_remove:
+  method: delete
+  path: "/plugins/{name}"
+
+plugin_enable:
+  method: post
+  path: "/plugins/{name}/enable"
+
+plugin_disable:
+  method: post
+  path: "/plugins/{name}/disable"
+
+plugin_create:
+  method: post
+  path: "/plugins/create"
+
+plugin_push:
+  method: post
+  path: "/plugins/{name}/push"
+
+plugin_configure:
+  method: post
+  path: "/plugins/{name}/set"
+
+plugin_upgrade:
+  method: post
+  path: "/plugins/{name}/upgrade"
+  from: "1.26"
