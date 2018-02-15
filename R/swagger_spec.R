@@ -63,14 +63,17 @@ swagger_spec_read <- function(version, refresh = FALSE) {
 swagger_spec_fetch <- function(version, path) {
   url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
   dest <- file.path(path, sprintf("v%s.yaml", version))
-  download_file(url, dest)
+  quiet <- getOption("stevedore.silent", FALSE)
+  download_file(url, dest, quiet)
 }
 
 
 swagger_spec_path <- function() {
   path <- getOption("stevedore.spec.path", NULL)
   if (is.null(path)) {
-    message("The option 'stevedore.spec.path' is not set - using temporary dir")
+    if (!getOption("stevedore.silent", FALSE)) {
+      message("The option 'stevedore.spec.path' not set - using temporary dir")
+    }
     path <- tempfile()
     dir.create(path, TRUE)
     path_pkg <- system.file("spec", package = "stevedore", mustWork = TRUE)

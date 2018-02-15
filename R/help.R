@@ -116,6 +116,8 @@ NULL
 
 
 generate_help <- function(sub = NULL, api_version = NULL) {
+  oo <- options(stevedore.silent = TRUE)
+  on.exit(options(oo))
   tryCatch(generate_help_string(sub, api_version),
            error = function(e) "(automatic help generation has failed)")
 }
