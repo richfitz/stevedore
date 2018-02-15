@@ -1,4 +1,7 @@
 ##' Create a docker client object
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help()}
+##'
 ##' @title Create docker client
 ##'
 ##' @param api_version Version of the API request from the api.
@@ -113,7 +116,7 @@ docker_client_container_collection <- function(api_client, parent) {
 
 docker_client_container <- function(id, api_client) {
   container_inspect <- docker_client_method("container_inspect", api_client)
-  attrs <- container_inspect(id)
+  attrs <- if (identical(id, HELP)) NULL else container_inspect(id)
   id <- attrs$id
   self <- NULL
 
@@ -357,7 +360,7 @@ docker_client_image_collection <- function(api_client, parent) {
 
 docker_client_image <- function(id, api_client) {
   image_inspect <- docker_client_method("image_inspect", api_client)
-  attrs <- image_inspect(id)
+  attrs <- if (identical(id, HELP)) NULL else image_inspect(id)
   name <- id
   id <- attrs$id
   self <- NULL
@@ -436,7 +439,7 @@ docker_client_network_collection <- function(api_client, parent) {
 
 docker_client_network <- function(id, api_client) {
   network_inspect <- docker_client_method("network_inspect", api_client)
-  attrs <- network_inspect(id)
+  attrs <- if (identical(id, HELP)) NULL else network_inspect(id)
   id <- attrs$id
   self <- NULL
   reload <- function() {
@@ -493,7 +496,7 @@ docker_client_volume_collection <- function(api_client, parent) {
 
 docker_client_volume <- function(id, api_client) {
   volume_inspect <- docker_client_method("volume_inspect", api_client)
-  attrs <- volume_inspect(id)
+  attrs <- if (identical(id, HELP)) NULL else volume_inspect(id)
   name <- attrs$name
   self <- NULL
   reload <- function() {

@@ -40,3 +40,6 @@ would ordinarily be preferred).}
 \description{
 Create a docker client object
 }
+\details{
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help()}
+}
