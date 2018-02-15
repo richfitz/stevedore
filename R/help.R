@@ -202,18 +202,26 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 markdown_to_rd <- function(str) {
   if (grepl("\n+(\\s*-\\s+)", str)) {
     ## Simplest thing that might work - keep going until the next
-    ## blank line or the end.
+    ## blank line or the end.  Otherwise assume only one group of
+    ## items
     tmp <- strsplit(str, "\n", fixed = TRUE)[[1]]
 
     blank <- grep("^\\s*$", tmp)
     item_start <- grep("^\\s*-\\s+", tmp)
-    ## simplest case:
-    stopifnot(length(blank) == 1L, all(item_start > blank))
-    ## which implies:
-    item_end <- c(item_start[-1L] - 1L, length(tmp))
+    end <- length(tmp) + 1L
+
+    if (length(blank) > 1L) {
+      stopifnot(!any(blank > item_start[[1]] & blank < max(item_start)))
+      blank2 <- blank[blank > max(item_start)]
+      if (length(blank2) > 0L) {
+        end <- blank2[[1]]
+      }
+      blank <- max(blank[blank < item_start[[1]]])
+    }
+
     tmp[item_start] <- sub("^\\s*-\\s+", "\\\\item ", tmp[item_start])
     tmp[blank] <- "\\itemize{"
-    tmp <- c(tmp, "}")
+    tmp[end] <- "}"
     str <- paste0(tmp, "\n", collapse = "")
   }
 
