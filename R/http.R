@@ -4,6 +4,7 @@ http_client <- function(base_url = NULL, api_version = NULL, type = NULL,
   client_fn <- switch(data$client_type,
                       curl = http_client_curl,
                       httppipe = http_client_httppipe,
+                      null = http_client_null,
                       stop("stevedore bug")) # nocov
   client_fn(data$base_url, api_version, min_version, max_version)
 }
@@ -176,7 +177,7 @@ http_client_data <- function(base_url = NULL, type = NULL,
   if (is.null(type)) {
     type <- if (url_type == "npipe") "httppipe" else "curl"
   } else {
-    type <- match_value(type, c("curl", "httppipe"))
+    type <- match_value(type, c("curl", "httppipe", "null"))
   }
 
   if (url_type == "npipe") {
