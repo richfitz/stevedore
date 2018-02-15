@@ -75,7 +75,7 @@
 
 - path: ["paths", "/swarm/init", "post"]
   value:
-    produces: "text/plain"
+    produces: "application/json"
 
 - path: ["paths", "/swarm/unlockkey", "get"]
   value:

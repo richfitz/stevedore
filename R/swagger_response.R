@@ -83,6 +83,8 @@ swagger_response_handler_json <- function(response, spec) {
     h <- swagger_response_handler_object(schema, spec)
   } else if (schema$type == "array") {
     h <- swagger_response_handler_array(schema, spec)
+  } else if (schema$type == "string") {
+    h <- swagger_response_handler_json_string(schema, spec)
   } else {
     stop("not sure how to make this response handler") # nocov [stevedore bug]
   }
@@ -98,6 +100,16 @@ swagger_response_handler_null <- function(response, spec) {
       stop("Expected an empty response") # nocov [stevedore bug]
     }
     invisible(NULL)
+  }
+}
+
+
+## This is the slightly odd outcome of /swarm/init, which returns a
+## json encoded string
+swagger_response_handler_json_string <- function(response, spec) {
+  function(data, as_is_names) {
+    assert_scalar_character(data)
+    data
   }
 }
 
