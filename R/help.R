@@ -237,7 +237,8 @@ generate_docker_client_method_rd <- function(name, obj) {
   call <- capture_args(x, name, 0L)
   h <- attr(x, "help")
   if (is.null(h)) {
-    summary <- "(documentation not yet available)"
+    ## This should never trigger:
+    summary <- "(documentation not yet available)" # nocov
   } else if (is.null(h$description)) {
     summary <- h$summary
   } else {
