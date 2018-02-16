@@ -313,3 +313,14 @@ repeat_until_error <- function(fn, times = 10L, interval = 0.1) {
   }
   stop("Did not throw error in time")
 }
+
+
+fake_pager <- function(dest) {
+  force(dest)
+  function(files, header, title, delete.file) {
+    file.copy(files, dest)
+    if (delete.file) {
+      unlink(files)
+    }
+  }
+}

@@ -14,10 +14,15 @@ stevedore_object <- function(class, api_client, ..., lock = TRUE) {
 }
 
 
+## NOTE: - this is not utils::help (though it should be) because I
+## need to make sure that we can go via devtool's help in testing.  So
+## I am trying a bit of a hack here, using the unqualified 'help'
+## (rather than utils::help or doing importFrom(utils, help)).
 stevedore_help <- function(name, api_version, help_type) {
+  help <- NULL # avoid note
   oo <- options(stevedore.help.api_version = api_version)
   on.exit(options(oo))
-  utils::help(name, package = "stevedore", help_type = help_type)
+  help(name, package = "stevedore", help_type = help_type)
 }
 
 

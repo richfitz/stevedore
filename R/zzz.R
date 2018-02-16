@@ -10,8 +10,14 @@ DEFAULT_USER_AGENT <- "stevedore/0.0.0"
 HELP <- "\r\b\n"
 
 .stevedore <- new.env(parent = emptyenv())
-.onLoad <- function(...) {
+
+stevedore_reset <- function() {
+  rm(list = ls(.stevedore, all.names = TRUE), envir = .stevedore)
   pascal_to_snake_cache_reset()
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
+}
+
+.onLoad <- function(...) {
+  stevedore_reset()
 }
