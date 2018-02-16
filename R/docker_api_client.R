@@ -26,23 +26,65 @@ docker_api_client_data <- function(version) {
 }
 
 
+STEVEDORE_UNIMPLEMENTED <-
+  c("get /containers/{id}/attach/ws",
+    "get /plugins",
+    "get /plugins/privileges",
+    "post /plugins/pull",
+    "get /plugins/{name}/json",
+    "delete /plugins/{name}",
+    "post /plugins/{name}/enable",
+    "post /plugins/{name}/disable",
+    "post /plugins/{name}/upgrade",
+    "post /plugins/create",
+    "post /plugins/{name}/push",
+    "post /plugins/{name}/set",
+    "get /nodes",
+    "get /nodes/{id}",
+    "delete /nodes/{id}",
+    "post /nodes/{id}/update",
+    "get /swarm",
+    "post /swarm/init",
+    "post /swarm/join",
+    "post /swarm/leave",
+    "post /swarm/update",
+    "get /swarm/unlockkey",
+    "post /swarm/unlock",
+    "get /services",
+    "post /services/create",
+    "get /services/{id}",
+    "delete /services/{id}",
+    "post /services/{id}/update",
+    "get /services/{id}/logs",
+    "get /tasks",
+    "get /tasks/{id}",
+    "get /tasks/{id}/logs",
+    "get /secrets",
+    "post /secrets/create",
+    "get /secrets/{id}",
+    "delete /secrets/{id}",
+    "post /secrets/{id}/update",
+    "post /session",
+    "get /configs",
+    "post /configs/create",
+    "get /configs/{id}",
+    "delete /configs/{id}",
+    "post /configs/{id}/update",
+    "get /distribution/{name}/json")
+
+
 docker_api_client_data_check <- function(spec, endpoints) {
   done <- vcapply(endpoints, function(x) paste(x$method, x$path))
 
   pos <- lapply(spec$paths, names)
   pos <- paste(unlist(pos, FALSE, FALSE), rep(names(spec$paths), lengths(pos)))
+  pos_check <- setdiff(pos, STEVEDORE_UNIMPLEMENTED)
 
-  ## Ignore missing "POST /session" because it is experimental
-  unk <- setdiff(done, pos)
-  msg <- setdiff(pos, c(done, "post /session"))
+  msg <- setdiff(pos_check, done)
 
-  if (length(unk) > 0L) {
-    stop("Unknown endpoints (stevedore bug):\n",
-            paste("  -", unk, collapse = "\n"))
-  }
   if (length(msg) > 0L) {
-    message("Unimplemented endpoints (stevedore bug):\n",
-            paste("  -", msg, collapse = "\n"))
+    stop("Unimplemented endpoints (stevedore bug):\n",
+         paste("  -", msg, collapse = "\n"))
   }
 }
 
@@ -57,10 +99,8 @@ docker_api_client_endpoints <- function(version) {
     .stevedore$endpoints <- unname(dat)
   }
 
-  ret <- .stevedore$endpoints
-  version <- numeric_version(version)
-  ret <- ret[vlapply(ret, function(x) version_at_least(version, x$from))]
-  ret
+  endpoints <- .stevedore$endpoints
+  endpoints
 }
 
 

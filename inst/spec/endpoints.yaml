@@ -48,6 +48,8 @@ image_commit:       {method: post,   path: "/commit"}
 image_tarball:      {method: get,    path: "/images/{name}/get"}
 image_export:       {method: get,    path: "/images/get"}
 image_import:       {method: post,   path: "/images/load"}
+image_build_clean:
+  {method: post, path: "/build/prune", from: "1.31"}
 
 network_list:       {method: get,    path: "/networks"}
 network_inspect:    {method: get,    path: "/networks/{id}"}

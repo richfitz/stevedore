@@ -22,19 +22,23 @@ test_that("build", {
 })
 
 
-## This just checks that spec upgrades should be easy:
 test_that("spec check", {
-  spec_25 <- swagger_spec_read("1.25")
-  spec_33 <- swagger_spec_read("1.33")
+  spec <- swagger_spec_read("1.29")
+  endpoints <- docker_api_client_endpoints("1.29")
 
-  endpoints_25 <- docker_api_client_endpoints("1.25")
-  endpoints_33 <- docker_api_client_endpoints("1.33")
+  expect_silent(docker_api_client_data_check(spec, endpoints))
 
-  expect_silent(docker_api_client_data_check(spec_25, endpoints_25))
-  expect_silent(docker_api_client_data_check(spec_33, endpoints_33))
+  expect_error(
+    docker_api_client_data_check(spec, endpoints[-1]),
+    "Unimplemented endpoints (stevedore bug)",
+    fixed = TRUE)
+})
 
-  expect_message(docker_api_client_data_check(spec_33, endpoints_25),
-                 "Unimplemented endpoints")
-  expect_error(docker_api_client_data_check(spec_25, endpoints_33),
-               "Unknown endpoints")
+
+test_that("image build clean in old versions", {
+  cl <- test_docker_client(api_version = "1.29")
+  expect_error(
+    cl$images$build_clean(),
+    "'image_build_clean' (POST /build/prune) requires docker API version at least 1.31 (version 1.29 used)",
+    fixed = TRUE)
 })
