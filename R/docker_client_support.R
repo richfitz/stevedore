@@ -39,10 +39,10 @@ docker_client_method_nonapi <- function(fun, class, name) {
 }
 
 
-## NOTE: - this is not utils::help (though it should be) because I
-## need to make sure that we can go via devtool's help in testing.
-## So I am trying a bit of a hack here, using the unqualified 'help'
-## (rather than utils::help or doing importFrom(utils, help)).
+## NOTE: - this is not always utils::help here because I need to make
+## sure that we can go via devtool's help in testing.  So I am trying
+## a bit of a hack here, using a conditional in the NAMESPACE - this
+## is similar to the approach taken in backports
 ##
 ## NOTE: help_type is passed through by option because the devtools
 ## shim does not pass help_type through, but the option manages to
@@ -53,7 +53,7 @@ docker_client_method_nonapi <- function(fun, class, name) {
 ## and returns no file at all!  And then testing with mockr goes very
 ## badly with the devtools help shim.  So this looks untestable at
 ## present.
-help <- NULL # QA hack
+##' @rawNamespace if("devtools_shims" %in% search()) importFrom("utils", "help")
 stevedore_object_help <- function(name, api_version, help_type) {
   ## nocov start
   oo <- options(stevedore.help.api_version = api_version,
