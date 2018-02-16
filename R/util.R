@@ -120,7 +120,7 @@ pascal_to_snake_cached <- function(x) {
 
 pascal_to_snake_cache_reset <- function() {
   .stevedore$names <- as.matrix(
-    read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE))
+    utils::read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE))
 }
 
 
