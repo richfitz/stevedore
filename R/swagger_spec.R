@@ -88,7 +88,8 @@ swagger_spec_patch <- function(dat, patch_file) {
       env <- parent.env(environment())
       transform <- get(el$transform, env, mode = "function", inherits = FALSE)
       tmp <- transform(tmp)
-    } else if (is.null(tmp) || isTRUE(el$replace)) {
+    } else if (is.null(tmp) || isTRUE(el$replace) ||
+               (is.atomic(tmp) && is.atomic(value) && length(value) == 1)) {
       tmp <- value
     } else {
       tmp[names(value)] <- value

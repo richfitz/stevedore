@@ -26,6 +26,8 @@ make_docker_run <- function(client, can_stream) {
     container <- client$containers$create(image, cmd, ...,
                                           host_config = host_config)
     if (rm && !detach) {
+      ## TODO: this should be configurable - do we want to background
+      ## on interrupt?
       on.exit(container$remove(), add = TRUE)
     }
     container$start()

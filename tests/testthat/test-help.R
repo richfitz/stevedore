@@ -53,3 +53,21 @@ test_that("generate help via utils::help", {
   expect_match(txt, "Below is reference documentation for all methods",
                fixed = TRUE, all = FALSE)
 })
+
+
+## Help does not break object load
+test_that("construct all api versions", {
+  for (v in swagger_spec_versions()) {
+    ## This does the core object and collections:
+    d <- docker_client(api_version = v, http_client_type = "null")
+    expect_equal(d$api_version(), v)
+
+    ## then the special objects:
+    api_client <- docker_api_client(type = "null")
+    expect_silent(docker_client_container(HELP, api_client))
+    expect_silent(docker_client_image(HELP, api_client))
+    expect_silent(docker_client_network(HELP, api_client))
+    expect_silent(docker_client_volume(HELP, api_client))
+    expect_silent(docker_client_exec(HELP, api_client))
+  }
+})

@@ -61,3 +61,39 @@
 - path: ["paths", "/networks/prune", "post", "parameters", "@name = filters",
   "description"]
   transform: patch_doc_filters
+
+# totally different!
+
+# TODO: I like the idea of putting links in here but they play poorly
+# when printing to the screen.  So we should do some autoreplace
+- version: ["1.29", "1.29"]
+  path: ["definitions", "Config", "properties", "ExposedPorts", "description"]
+  value: &container-ports >-
+    A character vector of port mappings between the container and
+    host, in (1) the form `<host>:<container>` (e.g., `10080:80` to
+    map the container's port 80 to the host's port 10080), (2) the
+    form `<port>` as shorthand for `<port>:<port>`, or (3) a single
+    logical value `TRUE` indicating to map all container ports to
+    random available ports on the host.  You can use the `$ports()`
+    method in the `docker_container` object to query the port mapping
+    of a running container.
+
+- version: ["1.25", "1.29"]
+  path: ["definitions", "Config", "properties", "Volumes", "description"]
+  value: &container-volumes >-
+    A character vector of mappings of mount points on the host (or in
+    volumes) to paths on the container.  Each element must be of the
+    form `<path_host>:<path_container>`, possibly followed by `:ro`
+    for read-only mappings (i.e., the same syntax as the docker
+    command line client).
+
+    `docker_volume` objects have a `$map` method to help with
+    generating these paths for volume mappings.
+
+- version: ["1.30", "1.33"]
+  path: ["definitions", "ContainerConfig", "properties", "ExposedPorts", "description"]
+  value: *ports
+
+- version: ["1.30", "1.33"]
+  path: ["definitions", "ContainerConfig", "properties", "Volumes", "description"]
+  value: *container-volumes

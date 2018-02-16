@@ -1,0 +1,277 @@
+docker_client:
+  api_version:
+    summary: >-
+      Return the version of the API that the docker client is using to
+      communicate with the server, as a string (e.g., "1.29")
+  help: &help
+    summary: >-
+      Display help for this object
+    args:
+      help_type: >-
+        Passed to `utils::help`, can be one of "text", "html" or
+        "pdf" (or an abbreviation).  By default it uses the value
+        `getOption("help_type")` and should follow the same
+        behaviour as other R help (e.g., using "?")
+
+docker_container_collection:
+  get:
+    summary: >-
+      Get a container by name or id
+    args:
+      id: >-
+        A scalar character with the container's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+  help: *help
+  run:
+    summary: >-
+      Run a command in a new container
+    description: >-
+      This method does rather a lot, and wraps several other
+      methods.  It aims to mimic the behaviour of `docker run`
+      in the command line tool.  It will
+
+      - Try to pull a container if it does not yet exist (see
+        `$images$pull`; `docker_image_collection`)
+      - Create the container (see `$containers$create`;
+        `docker_container_collection`)
+      - Start the container (see `$start`; `docker_container`)
+      - Optionally stream the logs, if not detached (see
+        `$logs`, `docker_container`
+      - Wait for the container to finish (see `$wait`;
+        `docker_container`)
+
+      It returns a list with a container object as
+      `"container"` and a `"docker_stream"` object
+      containing logs as `"logs"`).  If `rm = TRUE` and
+      `detach = TRUE` the container object will be of limited
+      utility and you will need to use `reload = FALSE` on many
+      methods (and some will not work) as the container will have
+      been removed on exit.
+
+      Unlike the command line version, interrupting the streaming
+      logs will not necessarily kill the container but may leave it
+      running in the background.
+
+      Unlike the command line version, the `attach = TRUE`
+      simply attaches the output of the container and blocks
+      the R session until it is complete.  There is currently no way
+      of sending input into the docker container.
+    args:
+      image: >-
+        Image to run.  Can be a name, id, or a
+        `docker_image` object.
+      cmd: >-
+        Command to run in the container.  Must be a character
+        vector.  If not specified then the default `ENTRYPOINT`
+        and `CMD` will be used (see the docker documentation
+        for details)
+      "...": >-
+        Additional arguments passed through to `$create` (see
+        `docker_container_collection`.  There are many
+        possible arguments here.
+      detach: >-
+        Detach the container as soon as it has started and return
+        control to R.  The container will run in the background.
+        The returned object can be used to interrogate the container
+        afterwards (see `docker_container`).
+      rm: >-
+        Remove the container on exit.
+      stream: >-
+        The stream to use to send output to, if `detach =
+        FALSE`.  The default uses the standard output stream (i.e.,
+        where `cat` would send output).  Other valid
+        values are an R connection object, a string (interpreted as
+        a filename) or `FALSE` to prevent any output.
+      host_config: >-
+        Passed through to `$create`, as with `...`.
+
+docker_image_collection:
+  get:
+    summary: >-
+      Get an image by name or id
+    args:
+      id: >-
+        A scalar character with the image's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+  help: *help
+
+docker_network_collection:
+  get:
+    summary: >-
+      Get an network by name or id
+    args:
+      id: >-
+        A scalar character with the network's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+  help: *help
+
+docker_volume_collection:
+  get:
+    summary: >-
+      Get an volume by name or id
+    args:
+      name: >-
+        A scalar character with the volume's name.
+  help: *help
+
+docker_container:
+  help: *help
+  id:
+    summary: >-
+      Return the container's id
+  image:
+    summary: >-
+      Return the image for this container, as a
+      `docker_image` object.
+  inspect:
+    summary: >-
+      Return detailed information about this container
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an image has been removed.
+  name:
+    summary: >-
+      Return name for this container
+  labels:
+    summary: >-
+      Return labels for this container
+  ports:
+    summary: >-
+      Return a `data.frame` of information about ports
+      opened by this container.  This is particularly useful in a
+      container started with `ports = TRUE`, where container
+      ports are mapped to random ports on the host.
+    args:
+      reload: Refresh container data?
+  reload:
+    summary: >-
+      Refresh infomation on the container from the server, returning
+      `$inspect()` invisibly.
+  status:
+    summary: >-
+      Short status of the container ("running", "exited", etc).
+    args:
+      reload: Refresh container data?
+
+docker_image:
+  help: *help
+  id:
+    summary: >-
+      Return the image's id
+  inspect:
+    summary: >-
+      Return detailed information about this image
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an image has been removed.
+  name:
+    summary: >-
+      Return name for this image
+  labels:
+    summary: >-
+      Return labels for this image
+  reload:
+    summary: >-
+      Refresh infomation on the image from the server, returning
+      `$inspect()` invisibly.
+  short_id:
+    summary: >-
+      Abbreviated identifier, truncated to 10 characters (perhaps plus
+      the leading `sha256:`
+  tags:
+    summary: >-
+      Return tags for this image
+  untag:
+    summary: >-
+      Remove tags from the image.  This is a lot like
+      `images$remove` (see `docker_image_collection`)
+      but with `noprune = TRUE`.
+    args:
+      repo_tag: >
+        Tags to remove
+
+docker_network:
+  containers:
+    help: >-
+      Return containers connected to this network
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon (usually what you want).
+  help: *help
+  id:
+    summary: >-
+      Return the network's id
+  inspect:
+    summary: >-
+      Return detailed information about this network
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an network has been removed.
+  name:
+    summary: >-
+      Return name for this network
+  reload:
+    summary: >-
+      Refresh infomation on the network from the server, returning
+      `$inspect()` invisibly.
+
+docker_volume:
+  help: *help
+  id:
+    summary: >-
+      Return the volume's id
+  inspect:
+    summary: >-
+      Return detailed information about this volume
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an volume has been removed.
+  map:
+    summary: >-
+      Generate a path suitable to be passed in to
+      `docker$containers$run` or `docker$containers$create`
+    args:
+      path: >-
+        Path in the container to map the volume to
+      readonly: >-
+        Logical, indicating if this should be a readonly mount
+  name:
+    summary: >-
+      Return name for this volume
+  reload:
+    summary: >-
+      Refresh infomation on the volume from the server, returning
+      `$inspect()` invisibly.
+
+docker_exec:
+  help: *help
+  id:
+    summary: >-
+      Return the exec instance's id
+  inspect:
+    summary: >-
+      Return detailed information about this exec instance
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.
+  reload:
+    summary: >-
+      Refresh infomation on the exec instance from the server, returning
+      `$inspect()` invisibly.
+
+unsupported:
+  image_build_clean:
+    summary: Delete builder cache

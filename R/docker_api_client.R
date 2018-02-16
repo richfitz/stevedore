@@ -26,6 +26,14 @@ docker_api_client_data <- function(version) {
 }
 
 
+docker_api_client_help <- function(class, name) {
+  if (is.null(.stevedore$help)) {
+    .stevedore$help <- yaml_load_file(stevedore_file("spec/help.yaml"))
+  }
+  .stevedore$help[[class]][[name]]
+}
+
+
 STEVEDORE_UNIMPLEMENTED <-
   c("get /containers/{id}/attach/ws",
     "get /plugins",

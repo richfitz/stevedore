@@ -85,9 +85,6 @@ test_that("print", {
 test_that("api_version", {
   d <- test_docker_client()
   expect_equal(d$api_version(), DEFAULT_DOCKER_API_VERSION)
-
-  d <- test_docker_client(api_version = "1.30")
-  expect_equal(d$api_version(), "1.30")
 })
 
 test_that("print endpoints", {

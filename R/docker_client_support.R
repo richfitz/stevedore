@@ -2,17 +2,40 @@
 stevedore_object <- function(class, api_client, ..., lock = TRUE) {
   els <- list(...)
   assert_named(els, TRUE, "stevedore_object elements")
-  ret <- list2env(els, parent = emptyenv())
 
-  ret$help <- function(help_type = getOption("help_type")) {
+  els$help <- function(help_type = getOption("help_type")) {
     stevedore_object_help(class, api_client$api_version, help_type) # nocov
   }
 
+  add_help_nonapi <- function(nm) {
+    x <- els[[nm]]
+    if (is.function(x) && !inherits(x, "docker_client_method")) {
+      x <- docker_client_method_nonapi(x, class, nm)
+    }
+    x
+  }
+  els[] <- lapply(names(els), add_help_nonapi)
+
+  ret <- list2env(els, parent = emptyenv())
   class(ret) <- c(class, "stevedore_object")
   if (lock) {
     lock_environment(ret)
   }
   ret
+}
+
+
+docker_client_method_nonapi <- function(fun, class, name) {
+  help <- docker_api_client_help(class, name)
+  if (is.null(help)) {
+    stop(sprintf("missing help for %s$%s", class, name))
+  } else if (!setequal(names(help$args), names(formals(fun)))) {
+    stop(sprintf("incorrect help for %s$%s", class, name))
+  }
+
+  attr(fun, "help") <- help
+  class(fun) <- "docker_client_method"
+  fun
 }
 
 

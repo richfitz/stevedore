@@ -221,3 +221,12 @@ test_that("validate env", {
                "All elements of 'x' must be scalar (or use atomic vector)",
                fixed = TRUE)
 })
+
+
+test_that("nonapi methods", {
+  fn <- function() ""
+  expect_error(docker_client_method_nonapi(fn, "no", "method"),
+               "missing help for no$method", fixed = TRUE)
+  expect_error(docker_client_method_nonapi(fn, "docker_image", "help"),
+               "incorrect help for docker_image$help", fixed = TRUE)
+})
