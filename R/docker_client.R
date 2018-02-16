@@ -370,8 +370,8 @@ docker_client_image_collection <- function(api_client, parent) {
       process = list(quote(filters <- as_docker_filter(filters)))),
     remove = docker_client_method("image_delete", api_client),
     prune = docker_client_method(
-      "image_prune", api_client),
-    process = list(quote(filters <- as_docker_filter(filters))))
+      "image_prune", api_client,
+      process = list(quote(filters <- as_docker_filter(filters)))))
 }
 
 docker_client_image <- function(id, api_client) {
