@@ -3,9 +3,11 @@ stevedore_object <- function(class, api_client, ..., lock = TRUE) {
   els <- list(...)
   assert_named(els, TRUE, "stevedore_object elements")
   ret <- list2env(els, parent = emptyenv())
+
   ret$help <- function(help_type = getOption("help_type")) {
-    stevedore_help(class, api_client$api_version, help_type)
+    stevedore_object_help(class, api_client$api_version, help_type) # nocov
   }
+
   class(ret) <- c(class, "stevedore_object")
   if (lock) {
     lock_environment(ret)
@@ -15,14 +17,27 @@ stevedore_object <- function(class, api_client, ..., lock = TRUE) {
 
 
 ## NOTE: - this is not utils::help (though it should be) because I
-## need to make sure that we can go via devtool's help in testing.  So
-## I am trying a bit of a hack here, using the unqualified 'help'
+## need to make sure that we can go via devtool's help in testing.
+## So I am trying a bit of a hack here, using the unqualified 'help'
 ## (rather than utils::help or doing importFrom(utils, help)).
-stevedore_help <- function(name, api_version, help_type) {
-  help <- NULL # avoid note
-  oo <- options(stevedore.help.api_version = api_version)
+##
+## NOTE: help_type is passed through by option because the devtools
+## shim does not pass help_type through, but the option manages to
+## make it.
+##
+## NOTE: This is not testable because while one can turn off the pager
+## (see test-help.R for the approach) it all goes pear shaped in covr
+## and returns no file at all!  And then testing with mockr goes very
+## badly with the devtools help shim.  So this looks untestable at
+## present.
+help <- NULL # QA hack
+stevedore_object_help <- function(name, api_version, help_type) {
+  ## nocov start
+  oo <- options(stevedore.help.api_version = api_version,
+                help_type = help_type)
   on.exit(options(oo))
-  help(name, package = "stevedore", help_type = help_type)
+  help(name, package = "stevedore")
+  ## nocov end
 }
 
 
