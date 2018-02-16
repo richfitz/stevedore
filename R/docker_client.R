@@ -499,8 +499,8 @@ docker_client_network <- function(id, api_client) {
 }
 
 docker_client_volume_collection <- function(api_client, parent) {
-  get_volume <- function(id) {
-    docker_client_volume(id, api_client)
+  get_volume <- function(name) {
+    docker_client_volume(name, api_client)
   }
   after_create <- function(dat, ...) {
     get_volume(dat$name)
@@ -524,9 +524,9 @@ docker_client_volume_collection <- function(api_client, parent) {
       process = list(quote(filters <- as_docker_filter(filters)))))
 }
 
-docker_client_volume <- function(id, api_client) {
+docker_client_volume <- function(name, api_client) {
   volume_inspect <- docker_client_method("volume_inspect", api_client)
-  attrs <- if (identical(id, HELP)) NULL else volume_inspect(id)
+  attrs <- if (identical(name, HELP)) NULL else volume_inspect(name)
   name <- attrs$name
   self <- NULL
   reload <- function() {
