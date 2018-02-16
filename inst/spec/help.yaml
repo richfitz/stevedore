@@ -26,10 +26,10 @@ docker_container_collection:
   run:
     summary: >-
       Run a command in a new container
-    description: >-
-      This method does rather a lot, and wraps several other
-      methods.  It aims to mimic the behaviour of `docker run`
-      in the command line tool.  It will
+    description: |
+      This method does rather a lot, and wraps several other methods.
+      It aims to mimic the behaviour of `docker run` in the command
+      line tool.  It will:
 
       - Try to pull a container if it does not yet exist (see
         `$images$pull`; `docker_image_collection`)
