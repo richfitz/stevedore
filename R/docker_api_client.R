@@ -16,7 +16,7 @@ docker_api_client_data <- function(version) {
     docker_api_client_data_check(spec, endpoints)
 
     dat <- lapply(endpoints, function(x)
-      swagger_endpoint(x$name, x$method, x$path, x$from, spec))
+      swagger_endpoint(x$name, x$method, x$path, x$cli, x$from, spec))
     names(dat) <- vcapply(endpoints, "[[", "name")
     attr(dat, "version") <- version
 

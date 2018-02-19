@@ -23,7 +23,7 @@
 ## But for the simple cases this is going to save a lot of repetitive
 ## code and automatically allow for differences in the schema over
 ## time.
-swagger_endpoint <- function(name, method, path, v_from, spec) {
+swagger_endpoint <- function(name, method, path, cli, v_from, spec) {
   if (!is.null(v_from) && !version_at_least(spec$info$version, v_from)) {
     return(swagger_endpoint_unsupported(name, method, path, v_from,
                                         spec$info$version))
@@ -40,6 +40,7 @@ swagger_endpoint <- function(name, method, path, v_from, spec) {
   args <- swagger_args(method, path, x, spec)
   argument_handler <- args$handler
   help <- args$help
+  help$cli <- cli
 
   list(
     name = name,

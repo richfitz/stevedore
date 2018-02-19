@@ -24,6 +24,7 @@ docker_container_collection:
         the docker daemon).
   help: *help
   run:
+    cli: "docker run"
     summary: >-
       Run a command in a new container
     description: |
@@ -134,6 +135,7 @@ docker_container:
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
         `FALSE` after an image has been removed.
+    cli: "container inspect"
   name:
     summary: >-
       Return name for this container
@@ -148,6 +150,7 @@ docker_container:
       ports are mapped to random ports on the host.
     args:
       reload: Refresh container data?
+    cli: "docker container port"
   reload:
     summary: >-
       Refresh infomation on the container from the server, returning
@@ -171,6 +174,7 @@ docker_image:
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
         `FALSE` after an image has been removed.
+    cli: "image inspect"
   name:
     summary: >-
       Return name for this image
@@ -217,6 +221,7 @@ docker_network:
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
         `FALSE` after an network has been removed.
+    cli: "network inspect"
   name:
     summary: >-
       Return name for this network
@@ -238,6 +243,7 @@ docker_volume:
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
         `FALSE` after an volume has been removed.
+    cli: "volume inspect"
   map:
     summary: >-
       Generate a path suitable to be passed in to

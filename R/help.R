@@ -248,11 +248,8 @@ format_docker_client_method_text <- function(x, indent = 2, exdent = 8,
   call <- capture_args(x, "function", 0L)
   divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
   h <- attr(x, "help")
-  if (is.null(h$description)) {
-    summary <- h$summary
-  } else {
-    summary <- sprintf("%s: %s", h$summary, h$description)
-  }
+
+  summary <- help_summary(h)
   summary <- strwrap(summary, indent = 0, exdent = indent)
 
   if (!args || is.null(h$args)) {
@@ -279,14 +276,8 @@ format_docker_client_method_rd <- function(name, obj) {
   x <- obj[[name]]
   call <- capture_args(x, name, 0L)
   h <- attr(x, "help")
-  if (is.null(h)) {
-    ## This should never trigger:
-    summary <- "(documentation not yet available)" # nocov
-  } else if (is.null(h$description)) {
-    summary <- h$summary
-  } else {
-    summary <- sprintf("%s.  %s", h$summary, h$description)
-  }
+
+  summary <- help_summary(h)
   summary <- markdown_to_rd(summary)
 
   if (length(h$args) == 0L) {
@@ -309,4 +300,18 @@ format_docker_client_method_rd <- function(name, obj) {
           sprintf("\\code{%s}", call),
           args,
           "}"), sep = "\n", collapse = "\n")
+}
+
+
+help_summary <- function(h) {
+  summary <- h$summary
+  if (!is.null(h$description)) {
+    summary <- sprintf("%s.  %s", summary, h$description)
+  }
+  if (!is.null(h$cli)) {
+    cli <- paste(sprintf("`docker %s`", h$cli), collapse = " or ")
+    summary <- sprintf("%s  Similar to the cli command %s.",
+                       summary, cli)
+  }
+  summary
 }
