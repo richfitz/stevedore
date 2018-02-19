@@ -53,7 +53,6 @@ docker_client_method_nonapi <- function(fun, class, name) {
 ## and returns no file at all!  And then testing with mockr goes very
 ## badly with the devtools help shim.  So this looks untestable at
 ## present.
-##' @rawNamespace if("devtools_shims" %in% search()) importFrom("utils", "help")
 stevedore_object_help <- function(name, api_version, help_type) {
   ## nocov start
   oo <- options(stevedore.help.api_version = api_version,
