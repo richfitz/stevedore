@@ -116,6 +116,7 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
   }
 
   attr(ret, "help") <- help
+  attr(ret, "name") <- name
 
   ret
 }
@@ -140,34 +141,24 @@ docker_client_method_unsupported <- function(endpoint, name) {
   ret
 }
 
-##' @export
+
+#' @export
 print.docker_client_method <- function(x, indent = 2, exdent = 8, args = TRUE,
                                        ...) {
-  call <- capture_args(x, "function", 0L)
-  divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
-  h <- attr(x, "help")
-  if (is.null(h$description)) {
-    summary <- h$summary
-  } else {
-    summary <- sprintf("%s: %s", h$summary, h$description)
-  }
-  summary <- strwrap(summary, indent = 0, exdent = indent)
-  if (!args || is.null(h$args)) {
-    args <- NULL
-  } else {
-    indent <- 2
-    exdent <- 8
-    f <- function(nm, txt) {
-      txt <- strsplit(txt, "\n", fixed = TRUE)[[1]]
-      txt1 <- strwrap(sprintf("%s: %s", nm, txt[[1]]),
-                         indent = indent, exdent = exdent)
-      txt2 <- strwrap(txt[-1], indent = exdent, exdent = exdent)
-      c(txt1, txt2)
-    }
-    args <- mapply(f, names(h$args), unname(h$args), SIMPLIFY = FALSE)
-    args <- c(divider, unlist(unname(args)))
-  }
-  str <- c(call, divider, summary, args)
+  str <- format.docker_client_method(x, "text",
+                                     indent = indent, exdent = exdent,
+                                     args = args, ...)
   cat(paste0(str, "\n", collapse = ""))
   invisible(x)
+}
+
+
+##' @export
+format.docker_client_method <- function(x, type = "text", ...) {
+  type <- match_value(type, c("text", "rd"))
+  if (type == "text") {
+    format_docker_client_method_text(x, ...)
+  } else {
+    format_docker_client_method_rd(x, ...)
+  }
 }

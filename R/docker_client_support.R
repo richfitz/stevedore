@@ -34,6 +34,7 @@ docker_client_method_nonapi <- function(fun, class, name) {
   }
 
   attr(fun, "help") <- help
+  attr(fun, "name") <- name
   class(fun) <- "docker_client_method"
   fun
 }

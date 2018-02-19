@@ -159,7 +159,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 
   nms <- sort(names(x))
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
-  fns <- vcapply(nms[is_fn], generate_docker_client_method_rd, x,
+  fns <- vcapply(nms[is_fn], format_docker_client_method_rd, x,
                  USE.NAMES = FALSE)
 
   if (all(is_fn)) {
@@ -231,8 +231,51 @@ markdown_to_rd <- function(str) {
 }
 
 
-## Fold in with format.docker_client_method?
-generate_docker_client_method_rd <- function(name, obj) {
+markdown_to_text <- function(str) {
+  if (crayon::has_color()) {
+    open <- "\033[1m"
+    close <- "\033[22m"
+    repl <- sprintf("%s\\1%s", open, close)
+    str <- gsub("```([^`]+)```", repl, paste(str, collapse = "\n"))
+    str <- gsub("`([^`]+)`", repl, str)
+  }
+  str
+}
+
+
+format_docker_client_method_text <- function(x, indent = 2, exdent = 8,
+                                             args = TRUE, ...) {
+  call <- capture_args(x, "function", 0L)
+  divider <- strrep("-", max(nchar(strsplit(call, "\n", fixed = TRUE)[[1]])))
+  h <- attr(x, "help")
+  if (is.null(h$description)) {
+    summary <- h$summary
+  } else {
+    summary <- sprintf("%s: %s", h$summary, h$description)
+  }
+  summary <- strwrap(summary, indent = 0, exdent = indent)
+
+  if (!args || is.null(h$args)) {
+    args <- NULL
+  } else {
+    indent <- 2
+    exdent <- 8
+    f <- function(nm, txt) {
+      txt <- strsplit(txt, "\n", fixed = TRUE)[[1]]
+      txt1 <- strwrap(sprintf("%s: %s", crayon::bold(nm), txt[[1]]),
+                         indent = indent, exdent = exdent)
+      txt2 <- strwrap(txt[-1], indent = exdent, exdent = exdent)
+      c(txt1, txt2)
+    }
+    args <- mapply(f, names(h$args), unname(h$args), SIMPLIFY = FALSE)
+    args <- c(divider, unlist(unname(args)))
+  }
+
+  c(call, divider, markdown_to_text(summary), markdown_to_text(args))
+}
+
+
+format_docker_client_method_rd <- function(name, obj) {
   x <- obj[[name]]
   call <- capture_args(x, name, 0L)
   h <- attr(x, "help")
