@@ -72,6 +72,7 @@ test_that("exec", {
                             cmd = c("100", "100"),
                             name = nm)
   x$start()
+  on.exit(x$remove(force = TRUE))
 
   e1 <- x$exec("ls")
   txt1 <- capture.output(res1 <- e1$start(detach = FALSE))
