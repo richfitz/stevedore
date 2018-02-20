@@ -297,7 +297,7 @@ format_docker_client_method_rd <- function(name, obj) {
           summary,
           "",
           "\\emph{Usage:}",
-          sprintf("\\code{%s}", call),
+          sprintf("\\preformatted{%s}", call),
           args,
           "}"), sep = "\n", collapse = "\n")
 }
