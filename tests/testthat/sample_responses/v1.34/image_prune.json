@@ -1,0 +1,9 @@
+{
+    "ImagesDeleted": [
+        {
+            "Untagged": "string",
+            "Deleted": "string"
+        }
+    ],
+    "SpaceReclaimed": 0
+}
