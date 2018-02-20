@@ -1,0 +1,21 @@
+{
+    "Volumes": [
+        {
+            "CreatedAt": "2017-07-19T12:00:26Z",
+            "Name": "tardis",
+            "Driver": "local",
+            "Mountpoint": "/var/lib/docker/volumes/tardis",
+            "Labels": {
+                "com.example.some-label": "some-value",
+                "com.example.some-other-label": "some-other-value"
+            },
+            "Scope": "local",
+            "Options": {
+                "device": "tmpfs",
+                "o": "size=100m,uid=1000",
+                "type": "tmpfs"
+            }
+        }
+    ],
+    "Warnings": []
+}

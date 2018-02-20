@@ -65,7 +65,7 @@ V_NEW=1.35
 rm -rf "v$V_NEW"
 cp -r "v$V_OLD" "v$V_NEW"
 ls -1 "v${V_NEW}"/*.json | sed 's;.*/;- [ ] ;' > "v${V_NEW}/rewrite.md"
-(cd v${V_NEW} && ../rewrite.sh "'version: v$V_OLD'" "'version: v${V_NEW}'")
+(cd v${V_NEW} && ../rewrite.sh "'version: $V_OLD'" "'version: ${V_NEW}'")
 rm "v${V_NEW}"/*.json "v${V_NEW}"/*.bak
 cp "../test-spec-responses-${V_OLD}.R" "../test-spec-responses-${V_NEW}.R"
 ```

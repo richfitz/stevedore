@@ -1,0 +1,14 @@
+[
+    {
+        "Path": "/dev",
+        "Kind": 0
+    },
+    {
+        "Path": "/dev/kmsg",
+        "Kind": 1
+    },
+    {
+        "Path": "/test",
+        "Kind": 1
+    }
+]
