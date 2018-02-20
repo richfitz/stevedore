@@ -94,7 +94,7 @@ test_that("print endpoints", {
   expect <- c(
     "function()",
     "----------",
-    "Ping: This is a dummy endpoint you can use to test if the server is",
+    "Ping.  This is a dummy endpoint you can use to test if the server is",
     "  accessible.")
   expect_equal(txt, expect)
 
@@ -113,7 +113,7 @@ test_that("print endpoints", {
   txt <- capture.output(print(d$login))
   expect_match(
     txt,
-    "Check auth configuration: Validate credentials for a registry and, if",
+    "Check auth configuration.  Validate credentials for a registry and, if",
     all = FALSE, fixed = TRUE)
 
   txt <- capture.output(print(d$containers$create))

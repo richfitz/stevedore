@@ -763,7 +763,17 @@ test_that("port map", {
   x$start()
   on.exit(x$remove(force = TRUE))
 
-  dat <- curl::curl_fetch_memory(sprintf("http://127.0.0.1:%s/", port))
+  url <- sprintf("http://127.0.0.1:%s/", port)
+  ## This test is a little flakey to start - so retry up to 5 times
+  ## (with a 1/2s delay between each)
+  for (i in 1:5) {
+    dat <- tryCatch(curl::curl_fetch_memory(url),
+                    error = function(e) NULL)
+    if (!is.null(dat)) {
+      break
+    }
+    Sys.sleep(0.5)
+  }
   expect_equal(dat$status_code, 200L)
   expect_true(grepl("nginx", rawToChar(dat$content)))
 })
