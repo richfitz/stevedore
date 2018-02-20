@@ -74,7 +74,14 @@ describe_api <- function(x) {
 
 read_sample_response <- function(path) {
   txt <- readLines(path)
-  ret <- parse_sample_response(txt)
+
+  response_json <- sub("\\.R$", ".json", path)
+  if (file.exists(response_json)) {
+    response <- readChar(response_json, file.size(response_json))
+  } else {
+    response <- NULL
+  }
+  ret <- parse_sample_response(txt, response)
 
   if (ret$response == "~") {
     ret$response <- raw()
@@ -95,13 +102,17 @@ read_sample_response <- function(path) {
   ret
 }
 
-parse_sample_response <- function(txt) {
+parse_sample_response <- function(txt, response) {
   i <- grep("^[^#]", txt)[[1]]
   head <- sub("^#+\\s*", "", txt[seq_len(i - 1L)])
   re <- "(^[^ ]+): +(.*)\\s*$"
   stopifnot(all(grepl(re, head)))
   value <- sub(re, "\\2", head)
   ret <- set_names(as.list(value), sub(re, "\\1", head))
+
+  if (!is.null(response)) {
+    ret$response <- response
+  }
 
   msg <- setdiff(c("version", "method", "path", "code", "response"), names(ret))
   if (length(msg) > 0L) {
@@ -267,7 +278,7 @@ create_sample_responses <- function(target, base) {
     stopifnot(length(i) == 1L)
     prev <- sub(re_response, "\\2", x[[i]])
 
-    d <- parse_sample_response(x)
+    d <- parse_sample_response(x, NULL)
     response <- read_sample_response_str(d$method, d$path, d$code, spec, FALSE)
     if (is.null(response)) {
       if (d$response == "~") {
