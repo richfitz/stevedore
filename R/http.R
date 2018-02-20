@@ -106,7 +106,7 @@ parse_headers <- function(headers) {
 ## * do we ever look? Or require a match?
 ## * do we ever look *remotely*
 ## * what is our floor version number
-http_client_api_version <- function(api_version, detect,
+http_client_api_version <- function(api_version, ping,
                                     min_version = NULL, max_version = NULL) {
   min_version <- min_version %||% MIN_DOCKER_API_VERSION
   max_version <- max_version %||% MAX_DOCKER_API_VERSION
@@ -119,7 +119,7 @@ http_client_api_version <- function(api_version, detect,
   } else {
     assert_scalar_character("api_version")
     if (tolower(api_version) == "detect") {
-      api_version <- detect()
+      api_version <- ping_version(ping())
       version_type <- "Detected"
     } else {
       numeric_version(api_version) # or throw
@@ -143,11 +143,11 @@ http_client_api_version <- function(api_version, detect,
 }
 
 
-version_response <- function(res) {
+ping_version <- function(res) {
   if (res$status_code != 200L) {
     response_to_error(res, "/_ping", "Detecting version")
   }
-  raw_to_json(res$content)$ApiVersion
+  parse_headers(res$headers)[["Api-Version"]]
 }
 
 

@@ -6,11 +6,11 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL,
 
   headers_agent <- list("User-Agent" = DEFAULT_USER_AGENT)
 
-  version_detect <- function() {
-    url <- build_url("", DEFAULT_DOCKER_API_VERSION, "/version")
-    version_response(client("GET", url, NULL, headers_agent))
+  ping <- function() {
+    url <- build_url("", MIN_DOCKER_API_VERSION, "/_ping")
+    client("GET", url, NULL, headers_agent)
   }
-  api_version <- http_client_api_version(api_version, version_detect,
+  api_version <- http_client_api_version(api_version, ping,
                                          min_version, max_version)
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
@@ -36,5 +36,6 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL,
   list(type = "httppipe",
        request = request,
        api_version = api_version,
-       can_stream = FALSE)
+       can_stream = FALSE,
+       ping = ping)
 }

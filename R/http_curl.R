@@ -15,15 +15,15 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
     stop("Providing docker http/https url is not currently supported")
   }
 
-  version_detect <- function() {
-    url <- build_url(base_url, DEFAULT_DOCKER_API_VERSION, "/version")
-    version_response(curl::curl_fetch_memory(url, handle()))
+  ping <- function() {
+    url <- build_url(base_url, MIN_DOCKER_API_VERSION, "/_ping")
+    curl::curl_fetch_memory(url, handle())
   }
 
   base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
   handle <- make_handle_socket(base_url)
   base_url <- "http://localhost"
-  api_version <- http_client_api_version(api_version, version_detect,
+  api_version <- http_client_api_version(api_version, ping,
                                          min_version, max_version)
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
@@ -60,7 +60,8 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
   list(type = "curl",
        request = request,
        api_version = api_version,
-       can_stream = TRUE)
+       can_stream = TRUE,
+       ping = ping)
 }
 
 ## Factory function for fresh curl handles.  In theory we could do

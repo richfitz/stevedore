@@ -122,17 +122,23 @@ At present, the tests do leave a couple of orphan containers and volumes on exit
 
 Currently not on CRAN, but can be installed from github with devtools
 
-```
+```r
 devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
 ```
 
 On windows you will also need
 
-```
+```r
 devtools::install_github("richfitz/httppipe", upgrade_dependencies = FALSE)
 ```
 
 (see [above](#windows-support)).
+
+Once installed, find out if everything is set up to use docker by running
+
+```{r, available}
+stevedore::docker_available()
+```
 
 ## Licence
 

@@ -1,8 +1,10 @@
 http_client_null <- function(base_url, api_version, min_version, max_version) {
-  version_detect <- function() {
-    DEFAULT_DOCKER_API_VERSION
+  ping <- function() {
+    list(status_code = 200,
+         headers = charToRaw(paste("Api-Version:", DEFAULT_DOCKER_API_VERSION)),
+         content = charToRaw("OK"))
   }
-  api_version <- http_client_api_version(api_version, version_detect,
+  api_version <- http_client_api_version(api_version, ping,
                                          min_version, max_version)
   request <- function(...) {
     stop("Can't make requests with the null client")
@@ -10,5 +12,6 @@ http_client_null <- function(base_url, api_version, min_version, max_version) {
   list(type = "null",
        request = request,
        api_version = api_version,
-       can_stream = FALSE)
+       can_stream = FALSE,
+       ping = request)
 }
