@@ -54,3 +54,32 @@ dat <- read_sample_response("sample_responses/v1.31/foo_bar.R")
 ans1 <- dat$handler(dat$response, FALSE)
 all.equal(ans1, dat$reference)
 ```
+
+## Adding a new set
+
+The easy bit:
+
+```
+V_OLD=1.34
+V_NEW=1.35
+rm -rf "v$V_NEW"
+cp -r "v$V_OLD" "v$V_NEW"
+ls -1 "v${V_NEW}"/*.json | sed 's;.*/;- [ ] ;' > "v${V_NEW}/rewrite.md"
+(cd v${V_NEW} && ../rewrite.sh "'version: v$V_OLD'" "'version: v${V_NEW}'")
+rm "v${V_NEW}"/*.json "v${V_NEW}"/*.bak
+cp "../test-spec-responses-${V_OLD}.R" "../test-spec-responses-${V_NEW}.R"
+```
+
+Then, go to the spec page, e.g. https://docs.docker.com/engine/api/v1.35/
+
+Open rewrite.md
+
+For each endpoint in rewrite.md, identify the docker endpoint and copy the response sample into a json file
+
+Run the tests:
+
+```
+test_file("test-spec-responses-1.35.R")
+```
+
+Inspect any failures, fix, repeat
