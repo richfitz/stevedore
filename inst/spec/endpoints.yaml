@@ -315,6 +315,7 @@ exec_inspect:
   method: get
   path: "/exec/{id}/json"
 
+
 ## These are all "swarm mode" endpoints
 swarm_inspect:
   method: get
@@ -323,43 +324,53 @@ swarm_inspect:
 swarm_init:
   method: post
   path: "/swarm/init"
+  cli: "swarm init"
 
 swarm_join:
   method: post
   path: "/swarm/join"
+  cli: "swarm join"
 
 swarm_leave:
   method: post
   path: "/swarm/leave"
+  cli: "swarm leave"
 
 swarm_update:
   method: post
   path: "/swarm/update"
+  cli: "swarm update"
 
 swarm_unlockkey:
   method: get
   path: "/swarm/unlockkey"
+  cli: "swarm unlock-key"
 
 swarm_unlock:
   method: post
   path: "/swarm/unlock"
+  cli: "swarm unlock"
 
 
 node_list:
   method: get
   path: "/nodes"
+  cli: "node list"
 
 node_inspect:
   method: get
   path: "/nodes/{id}"
+  cli: "node inspect"
 
 node_delete:
   method: delete
   path: "/nodes/{id}"
+  cli: "node rm"
 
 node_update:
   method: post
   path: "/nodes/{id}/update"
+  cli: "node update"
 
 
 service_list:
