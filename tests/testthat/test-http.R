@@ -44,7 +44,7 @@ test_that("version", {
   expect_equal(ans, "2.01")
 })
 
-test_that("version_response", {
+test_that("ping_version", {
   d <- test_docker_client()
   x <- d$containers$run("nginx", ports = TRUE, rm = TRUE,
                         detach = TRUE)
@@ -56,7 +56,15 @@ test_that("version_response", {
   expect_error(ping_version(res),
                rawToChar(res$content),
                fixed = TRUE)
+
+
+  res <- list(status_code = 200, headers = charToRaw("A: B"))
+  expect_error(ping_version(res),
+               "Failed to detect version.  Headers returned were: 'a'",
+               fixed = TRUE)
 })
+
+
 
 test_that("detect", {
   cl <- http_client(api_version = "detect",

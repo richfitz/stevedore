@@ -150,7 +150,8 @@ ping_version <- function(res) {
   headers <- parse_headers(res$headers)
   names(headers) <- tolower(names(headers))
   if (!("api-version" %in% names(headers))) {
-    stop("Failed to detect version ", paste(names(headers), collapse = ""))
+    stop("Failed to detect version.  Headers returned were: ",
+         paste(squote(names(headers)), collapse = ""))
   }
   headers[["api-version"]]
 }
