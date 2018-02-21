@@ -1007,3 +1007,26 @@ test_that("environment variables on create", {
   txt <- format(res$logs, style = "plain", strip_newline = TRUE)
   expect_true("X_FOO=1" %in% txt)
 })
+
+test_that("set user", {
+  skip_on_windows()
+  d <- test_docker_client()
+  uid <- user(group = TRUE)
+  res1 <- d$containers$run("alpine:3.1", "id",
+                           detach = FALSE, stream = NULL, rm = TRUE)
+  res2 <- d$containers$run("alpine:3.1", "id", user = uid,
+                           detach = FALSE, stream = NULL, rm = TRUE)
+
+  parse_id <- function(x) {
+    x <- strsplit(x, "\\s+")[[1]]
+    xx <- strsplit(x, "=", fixed = TRUE)
+    label <- vcapply(xx, "[[", 1L)
+    value <- vcapply(xx, "[[", 2L)
+    paste(sub("[^0-9].*", "", value[label == "uid"]),
+          sub("[^0-9].*", "", value[label == "gid"]),
+          sep = ":")
+  }
+
+  expect_equal(parse_id(res1$logs), "0:0")
+  expect_equal(parse_id(res2$logs), uid)
+})
