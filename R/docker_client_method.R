@@ -114,6 +114,7 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
     stopifnot(all(names(args_use) %in% names(help$args)))
     help$args <- help$args[names(args_use)]
   }
+  help$name <- name
 
   attr(ret, "help") <- help
   attr(ret, "name") <- name

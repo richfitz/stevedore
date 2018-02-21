@@ -203,7 +203,7 @@ docker_image:
 
 docker_network:
   containers:
-    help: >-
+    summary: >-
       Return containers connected to this network
     args:
       reload: >-

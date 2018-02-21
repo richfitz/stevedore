@@ -159,8 +159,9 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 
   nms <- sort(names(x))
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
-  fns <- vcapply(nms[is_fn], format_docker_client_method_rd, x,
-                 USE.NAMES = FALSE)
+  fns <- vcapply(nms[is_fn], function(nm)
+    format_docker_client_method_rd(x[[nm]]),
+    USE.NAMES = FALSE)
 
   if (all(is_fn)) {
     mgmt <- NULL
@@ -231,8 +232,8 @@ markdown_to_rd <- function(str) {
 }
 
 
-markdown_to_text <- function(str) {
-  if (crayon::has_color()) {
+markdown_to_text <- function(str, colour = crayon::has_color()) {
+  if (colour) {
     open <- "\033[1m"
     close <- "\033[22m"
     repl <- sprintf("%s\\1%s", open, close)
@@ -272,11 +273,11 @@ format_docker_client_method_text <- function(x, indent = 2, exdent = 8,
 }
 
 
-format_docker_client_method_rd <- function(name, obj) {
-  x <- obj[[name]]
-  call <- capture_args(x, name, 0L)
+format_docker_client_method_rd <- function(x, ...) {
   h <- attr(x, "help")
-
+  ## stopifnot(!is.null(h$name))
+  name <- h$name
+  call <- capture_args(x, name, 0L)
   summary <- help_summary(h)
   summary <- markdown_to_rd(summary)
 

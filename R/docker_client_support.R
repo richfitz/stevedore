@@ -27,7 +27,7 @@ stevedore_object <- function(class, api_client, ..., lock = TRUE) {
 
 docker_client_method_nonapi <- function(fun, class, name) {
   help <- docker_api_client_help(class, name)
-  if (is.null(help)) {
+  if (is.null(help$summary)) {
     stop(sprintf("missing help for %s$%s", class, name))
   } else if (!setequal(names(help$args), names(formals(fun)))) {
     stop(sprintf("incorrect help for %s$%s", class, name))

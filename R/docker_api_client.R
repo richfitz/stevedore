@@ -30,7 +30,9 @@ docker_api_client_help <- function(class, name) {
   if (is.null(.stevedore$help)) {
     .stevedore$help <- yaml_load_file(stevedore_file("spec/help.yaml"))
   }
-  .stevedore$help[[class]][[name]]
+  ret <- .stevedore$help[[class]][[name]]
+  ret$name <- name
+  ret
 }
 
 

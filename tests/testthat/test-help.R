@@ -16,6 +16,7 @@ test_that("all help generates", {
   for (v in swagger_spec_versions()) {
     for (t in topics) {
       expect_silent(generate_help(t, v))
+      expect_silent(generate_help_string(t, v))
     }
   }
 })
@@ -70,4 +71,31 @@ test_that("construct all api versions", {
     expect_silent(docker_client_volume(HELP, api_client))
     expect_silent(docker_client_exec(HELP, api_client))
   }
+})
+
+test_that("format one method", {
+  d <- docker_client(http_client_type = "null")
+  s1 <- format(d$ping)
+  s2 <- format(d$ping, type = "text")
+  s3 <- format(d$ping, type = "rd")
+  expect_identical(s1, s2)
+  expect_false(identical(s3, s1))
+
+  d <- docker_client(http_client_type = "null")
+  s1 <- format(d$api_version)
+  s2 <- format(d$api_version, type = "text")
+  s3 <- format(d$api_version, type = "rd")
+  expect_identical(s1, s2)
+  expect_false(identical(s3, s1))
+})
+
+test_that("markdown_to_text", {
+  expect_equal(markdown_to_text("hello `code` world", FALSE),
+               "hello `code` world")
+  expect_equal(markdown_to_text("hello ```code``` world", FALSE),
+               "hello ```code``` world")
+  expect_equal(markdown_to_text("hello `code` world", TRUE),
+               "hello \033[1mcode\033[22m world")
+  expect_equal(markdown_to_text("hello ```code``` world", TRUE),
+               "hello \033[1mcode\033[22m world")
 })
