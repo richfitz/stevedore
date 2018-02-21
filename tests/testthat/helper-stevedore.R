@@ -335,3 +335,7 @@ fake_pager <- function(dest) {
     }
   }
 }
+
+skip_on_windows <- function() {
+  testthat::skip_on_os("windows")
+}
