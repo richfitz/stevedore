@@ -147,7 +147,9 @@ ping_version <- function(res) {
   if (res$status_code != 200L) {
     response_to_error(res, "/_ping", "Detecting version")
   }
-  parse_headers(res$headers)[["Api-Version"]]
+  headers <- parse_headers(res$headers)
+  names(headers) <- tolower(headers)
+  headers[["api-version"]]
 }
 
 
