@@ -40,3 +40,16 @@ test_that("tar failure", {
   expect_error(tar_system(tempfile(), tempfile()),
                "tar failed with status")
 })
+
+
+test_that("external list", {
+  p <- tempfile()
+  dir.create(p, TRUE, FALSE)
+  for (i in letters) {
+    writeLines(i, file.path(p, i))
+  }
+
+  bin <- tar_files(letters[1:6], p, external_list = TRUE)
+  tmp <- untar_bin(bin)
+  expect_true(setequal(dir(tmp), letters[1:6]))
+})

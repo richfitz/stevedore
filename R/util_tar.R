@@ -39,7 +39,7 @@ tar_directory <- function(root) {
 }
 
 
-tar_files <- function(files, root) {
+tar_files <- function(files, root, external_list = length(files) > 20) {
   assert_directory(root)
 
   owd <- setwd(root)
@@ -47,7 +47,7 @@ tar_files <- function(files, root) {
   tmp <- tempfile(fileext = ".tar")
   on.exit(unlink(tmp), add = TRUE)
 
-  tar_safe(tmp, files, complex = TRUE)
+  tar_safe(tmp, files, complex = TRUE, external_list = external_list)
   readBin(tmp, raw(), file.size(tmp))
 }
 
@@ -59,8 +59,15 @@ tar_file <- function(file) {
 }
 
 
-tar_safe <- function(tarfile, files, ..., complex = FALSE) {
+tar_safe <- function(tarfile, files, ..., complex = FALSE,
+                     external_list = FALSE) {
   assert_file_exists(files)
+  if (external_list) {
+    list <- tempfile()
+    on.exit(unlink(list))
+    writeLines(files, list)
+    files <- c("-T", list)
+  }
   if (complex) {
     tar_system(tarfile, files, ...)
   } else {
