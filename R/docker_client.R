@@ -343,7 +343,7 @@ docker_client_image_collection <- function(api_client, parent) {
       extra = alist(verbose = NULL, stream = stdout()),
       process = list(
         mcr_prepare_stream_and_close(quote(stream)),
-        quote(context <- validate_tar_directory(context))),
+        quote(context <- validate_tar_directory(context, dockerfile))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
       after = after_build),

@@ -122,6 +122,8 @@ pull_status_printer <- function(stream = stdout()) {
       last_is_progress <<- FALSE
       if (!is.null(x$error)) {
         ## TODO: there's also errorDetail$message here too
+        ##
+        ## (See definitions/BuildInfo in the spec yaml)
         str <- paste0(x$error, "\n")
       } else if (!is.null(x$status) && is.null(x$id)) {
         str <- paste0(x$status, "\n")
@@ -198,10 +200,11 @@ validate_stream <- function(stream, mode = "wb",
 }
 
 
-validate_tar_directory <- function(path, name = deparse(substitute(path))) {
+validate_tar_directory <- function(path, dockerfile,
+                                   name = deparse(substitute(path))) {
   if (is.character(path)) {
     assert_directory(path, name = name)
-    path <- tar_directory(path)
+    path <- build_tar(path, dockerfile)
   } else {
     assert_raw(path, name = name)
   }

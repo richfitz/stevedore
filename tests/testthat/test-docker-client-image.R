@@ -191,6 +191,43 @@ test_that("build: failure", {
   expect_is(ans, "build_error")
 })
 
+
+test_that("build: dockerignore", {
+  cl <- test_docker_client()
+
+  path <- tempfile()
+  dir.create(path)
+  file.copy("images/iterate", path, recursive = TRUE)
+
+  paths <- c(paste0("dir1/", c("a.txt", "b.md", "c.c")),
+             paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
+             paste0("dir3/", c("bar.md", "bar.c")),
+             "README.md")
+  root <- make_fake_files(paths)
+  dockerfile <- c("FROM alpine:latest",
+                  "COPY . /contents",
+                  "WORKDIR /contents")
+  writeLines(dockerfile, file.path(root, "Dockerfile"))
+
+  list_files <- function(container) {
+    logs <- cl$containers$run(container, c("find", "."),
+                              rm = TRUE, stream = FALSE)$logs
+    setdiff(sub("^\\./", "", trimws(as.vector(logs))), ".")
+  }
+
+  res1 <- cl$images$build(root)
+  files1 <- list_files(res1)
+
+  writeLines("**/*.md", file.path(root, ".dockerignore"))
+
+  res2 <- cl$images$build(root)
+  files2 <- list_files(res2)
+
+  expect_equal(sort(files2),
+               sort(setdiff(c(".dockerignore", files1),
+                            grep("\\.md$", files1, value = TRUE))))
+})
+
 test_that("pull", {
   skip_if_no_internet()
 
