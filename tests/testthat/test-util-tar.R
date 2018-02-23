@@ -34,3 +34,9 @@ test_that("tar_file", {
   expect_equal(unname(tools::md5sum(file.path(tmp, "README.md"))),
                unname(tools::md5sum("sample_responses/README.md")))
 })
+
+
+test_that("tar failure", {
+  expect_error(tar_system(tempfile(), tempfile()),
+               "tar failed with status")
+})

@@ -89,6 +89,9 @@ tar_system <- function(tarfile, files) {
   ## (see ?tar, and check Sys.info()[["sysname"]] == "Darwin")
   flags <- c("-c", "-f", tarfile)
   res <- system3(sys_which("tar"), c(flags, files))
-  ## TODO: nicer error here
-  stopifnot(res$success)
+  if (!res$success) {
+    stop(sprintf("tar failed with status %d:\n%s",
+                 res$code, paste(res$output, collapse = "\n")),
+         call. = FALSE)
+  }
 }
