@@ -382,3 +382,12 @@ pretty_bytes <- function(bytes) {
   exponent <- min(floor(log(bytes, 1000)), length(unit) - 1)
   sprintf("%s %sB", round(bytes /1000^exponent, 2), unit[exponent + 1])
 }
+
+
+file_path <- function(a, b) {
+  if (a != ".") {
+    file.path(a, b)
+  } else {
+    b
+  }
+}

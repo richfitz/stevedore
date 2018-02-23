@@ -26,6 +26,12 @@
 ## that's easy to send without worrying about streaming to httppipe
 ## and we get cleanup for free.
 
+## TODO: if we're going to use the system tar it might be better to
+## offer to stream from disk?
+
+## TODO: what about compression?  Probably quite hard to do portably,
+## but 'z' is pretty widely supported.
+
 tar_directory <- function(root) {
   assert_directory(root)
 

@@ -339,3 +339,15 @@ fake_pager <- function(dest) {
 skip_on_windows <- function() {
   testthat::skip_on_os("windows")
 }
+
+make_fake_files <- function(paths) {
+  root <- tempfile()
+  paths <- file.path(root, paths)
+  for (d in unique(dirname(paths))) {
+    dir.create(d, FALSE, TRUE)
+  }
+  for (p in grep("/$", paths, invert = TRUE, value = TRUE)) {
+    file.create(p)
+  }
+  root
+}
