@@ -1,11 +1,11 @@
 build_tar <- function(root, dockerfile) {
-  ignore <- read_dockerignore(root)
-  files <- build_file_list(root, ignore, dockerfile %||% "Dockerfile")
+  ignore <- include_dockerfile(read_dockerignore(root), dockerfile)
+  files <- build_file_list(root, ignore)
   tar_files(files, root)
 }
 
 
-build_file_list <- function(root, ignore, dockerfile) {
+build_file_list <- function(root, ignore) {
   if (is.null(ignore)) {
     return(".")
   }
@@ -29,21 +29,26 @@ build_file_list <- function(root, ignore, dockerfile) {
     check <- c(check[-1L], tmp$check)
   }
 
-  if (file.exists(dockerfile) && !dockerfile %in% incl) {
-    incl <- c(incl, dockerfile)
-  }
-
   sort(incl)
 }
 
 
-read_dockerignore <- function(root) {
+read_dockerignore <- function(root, dockerfile) {
   p <- file.path(root, ".dockerignore")
   if (file.exists(p)) {
-    parse_dockerignore(readLines(p))
+    include_dockerfile(parse_dockerignore(readLines(p)), root, dockerfile)
   } else {
     NULL
   }
+}
+
+
+include_dockerfile <- function(ignore, root, dockerfile) {
+  if (!is.null(ignore) && file.exists(file.path(root, dockerfile))) {
+    ignore$patterns <- c(ignore$patterns, dockerfile)
+    ignore$is_exception <- c(ignore$is_exception, TRUE)
+  }
+  ignore
 }
 
 

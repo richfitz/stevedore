@@ -88,7 +88,17 @@ test_that("build file list with excluded dockerignore", {
   root <- make_fake_files(paths)
   dockerfile <- "dir1/Dockerfile"
 
-  dockerignore <- parse_dockerignore("dir1")
-  expect_equal(build_file_list(root, dockerignore, dockerfile),
-               sort(c("dir1/Dockerfile", "dir2", "README.md")))
+  writeLines("dir1", file.path(root, ".dockerignore"))
+
+  ignore1 <- parse_dockerignore("dir1")
+  ignore2 <- include_dockerfile(ignore, root, dockerfile)
+  ignore3 <- read_dockerignore(root, dockerfile)
+  expect_equal(ignore2, ignore3)
+
+  expect_equal(build_file_list(root, ignore1),
+               sort(c(".dockerignore", "dir2", "README.md")))
+  expect_equal(build_file_list(root, ignore2),
+               sort(c(".dockerignore", "dir1/Dockerfile", "dir2", "README.md")))
+  expect_equal(build_file_list(root, ignore3),
+               sort(c(".dockerignore", "dir1/Dockerfile", "dir2", "README.md")))
 })
