@@ -215,12 +215,12 @@ test_that("build: dockerignore", {
     setdiff(sub("^\\./", "", trimws(as.vector(logs))), ".")
   }
 
-  res1 <- cl$images$build(root)
+  res1 <- cl$images$build(root, stream = FALSE)
   files1 <- list_files(res1)
 
   writeLines("**/*.md", file.path(root, ".dockerignore"))
 
-  res2 <- cl$images$build(root)
+  res2 <- cl$images$build(root, stream = FALSE)
   files2 <- list_files(res2)
 
   expect_equal(sort(files2),
