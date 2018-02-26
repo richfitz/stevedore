@@ -131,23 +131,29 @@ test_that("validate ports: random", {
 
 test_that("parse image", {
   expect_equal(parse_image_name("foo"),
-               list(repo = NULL, name = "foo", image = "foo", tag = NULL))
+               list(repo = NULL, name = "foo", image = "foo", tag = NULL,
+                    registry = "docker.io"))
   expect_equal(parse_image_name("foo:latest"),
-               list(repo = NULL, name = "foo", image = "foo", tag = "latest"))
+               list(repo = NULL, name = "foo", image = "foo", tag = "latest",
+                    registry = "docker.io"))
 
   expect_equal(parse_image_name("myrepo.net/foo"),
                list(repo = "myrepo.net", name = "foo",
-                    image = "myrepo.net/foo", tag = NULL))
+                    image = "myrepo.net/foo", tag = NULL,
+                    registry = "myrepo.net"))
   expect_equal(parse_image_name("myrepo.net/foo:latest"),
                list(repo = "myrepo.net", name = "foo",
-                    image = "myrepo.net/foo", tag = "latest"))
+                    image = "myrepo.net/foo", tag = "latest",
+                    registry = "myrepo.net"))
 
   expect_equal(parse_image_name("myrepo.net:5000/foo"),
                list(repo = "myrepo.net:5000", name = "foo",
-                    image = "myrepo.net:5000/foo", tag = NULL))
+                    image = "myrepo.net:5000/foo", tag = NULL,
+                    registry = "myrepo.net:5000"))
   expect_equal(parse_image_name("myrepo.net:5000/foo:latest"),
                list(repo = "myrepo.net:5000", name = "foo",
-                    image = "myrepo.net:5000/foo", tag = "latest"))
+                    image = "myrepo.net:5000/foo", tag = "latest",
+                    registry = "myrepo.net:5000"))
 
   expect_error(
     parse_image_name("foo:bar:baz"),
@@ -163,11 +169,14 @@ test_that("validate image and tag", {
                "If 'img' includes a tag, then 't' must be NULL")
 
   expect_equal(validate_image_and_tag("foo:xxx", NULL),
-               list(repo = NULL, name = "foo", image = "foo", tag = "xxx"))
+               list(repo = NULL, name = "foo", image = "foo", tag = "xxx",
+                    registry = "docker.io"))
   expect_equal(validate_image_and_tag("foo", NULL),
-               list(repo = NULL, name = "foo", image = "foo", tag = "latest"))
+               list(repo = NULL, name = "foo", image = "foo", tag = "latest",
+                    registry = "docker.io"))
   expect_equal(validate_image_and_tag("foo", "3.1"),
-               list(repo = NULL, name = "foo", image = "foo", tag = "3.1"))
+               list(repo = NULL, name = "foo", image = "foo", tag = "3.1",
+                    registry = "docker.io"))
 })
 
 test_that("validate stream", {
