@@ -383,7 +383,8 @@ docker_client_image_collection <- function(api_client, parent) {
       "image_push", api_client,
       drop = "registry_auth",
       data = list(auth = api_client$auth),
-      mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
+      process = list(
+        mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth)))),
     search = docker_client_method(
       "image_search", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),
