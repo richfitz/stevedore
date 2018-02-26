@@ -443,3 +443,10 @@ mcr_process_image_and_tag <- function(image, tag) {
     tag <- image_tag[["tag"]]
   }, list(image = image, tag = tag))
 }
+
+
+mrc_prepare_auth <- function(auth, image, registry_auth) {
+  substitute(
+    registry_auth <- auth$get(parse_image_name(image)$registry),
+    list(auth = auth, image = image, registry_auth = registry_auth))
+}

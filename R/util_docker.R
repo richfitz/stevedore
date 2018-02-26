@@ -51,9 +51,19 @@ parse_image_name <- function(image, name = deparse(substitute(image))) {
     tag <- NULL
   }
 
+  if (is.null(repo)) {
+    registry <- "docker.io"
+  } else if (grepl(".", repo, fixed = TRUE) ||
+             grepl(":", repo, fixed = TRUE) ||
+             repo == "localhost") {
+    registry <- repo
+  } else {
+    registry <- "docker.io"
+  }
+
   ## This is actually the name that we want to use:
   image <- if (is.null(repo)) name else paste(repo, name, sep = "/")
-  list(repo = repo, name = name, image = image, tag = tag)
+  list(repo = repo, name = name, image = image, tag = tag, registry = registry)
 }
 
 

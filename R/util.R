@@ -391,3 +391,8 @@ file_path <- function(a, b) {
     b
   }
 }
+
+
+base64enc <- function(x) {
+  openssl::base64_encode(x)
+}

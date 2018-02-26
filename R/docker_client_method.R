@@ -1,6 +1,7 @@
 docker_client_method <- function(name, client, fix = NULL, rename = NULL,
                                  drop = NULL, defaults = NULL, extra = NULL,
-                                 promote = NULL, process = NULL, after = NULL,
+                                 promote = NULL, process = NULL,
+                                 data = NULL, after = NULL,
                                  hijack = NULL,
                                  allow_hijack_without_stream = FALSE) {
   stopifnot(c("endpoints", "http_client") %in% names(client))
@@ -13,6 +14,10 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
   fenv$endpoint <- endpoint
   if (!is.null(fix)) {
     list2env(fix, fenv)
+  }
+
+  if (!is.null(data)) {
+    list2env(data, fenv)
   }
 
   args <- formals(endpoint$argument_handler)

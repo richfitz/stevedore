@@ -4,6 +4,7 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
   self$http_client <- http_client(base_url, api_version, type)
   self$endpoints <- docker_api_client_data(self$http_client$api_version)
   self$api_version <- self$http_client$api_version
+  self$auth <- docker_api_client_auth()
   lock_environment(self)
   self
 }
@@ -33,6 +34,23 @@ docker_api_client_help <- function(class, name) {
   ret <- .stevedore$help[[class]][[name]]
   ret$name <- name
   ret
+}
+
+
+## endpoints that need this:
+##   POST /images/create
+##   POST /images/{name}/push
+##   POST /build
+##   some plugin ones not yet handled
+docker_api_client_auth <- function() {
+  data <- new.env()
+  list(
+    set = function(serveraddress, value) {
+      data[[serveraddress]] <- openssl::base64_encode(as.character(value))
+    },
+    get = function(serveraddress) {
+      data[[serveraddress]]
+    })
 }
 
 

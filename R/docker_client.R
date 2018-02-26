@@ -51,6 +51,14 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   api_client <- docker_api_client(base_url = url, api_version = api_version,
                                   type = http_client_type, ...)
 
+  after_login <- function(response, params) {
+    ## TOOD: somewhat surprised this has come back this useless (as
+    ## json not an R list)
+    serveraddress <- from_json(params$body)$serveraddress
+    api_client$auth$set(serveraddress, params$body)
+    invisible(TRUE)
+  }
+
   ret <- stevedore_object(
     "docker_client",
     api_client,
@@ -59,7 +67,8 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
       process = list(quote(filters <- as_docker_filter(filters)))),
     df = docker_client_method("system_df", api_client),
     info = docker_client_method("system_info", api_client),
-    login = docker_client_method("system_auth", api_client),
+    login = docker_client_method(
+      "system_auth", api_client, after = after_login),
     ping = docker_client_method("system_ping", api_client),
     version = docker_client_method("system_version", api_client),
     api_version = function() api_client$http_client$api_version,
@@ -360,15 +369,21 @@ docker_client_image_collection <- function(api_client, parent) {
     pull = docker_client_method(
       "image_create", api_client, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
+      data = list(auth = api_client$auth),
       process = list(
         mcr_process_image_and_tag(quote(name), quote(tag)),
-        mcr_prepare_stream_and_close(quote(stream))),
+        mcr_prepare_stream_and_close(quote(stream)),
+        mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
       extra = alist(stream = stdout()),
       defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
       after = after_pull),
-    push = docker_client_method("image_push", api_client),
+    push = docker_client_method(
+      "image_push", api_client,
+      drop = "registry_auth",
+      data = list(auth = api_client$auth),
+      mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
     search = docker_client_method(
       "image_search", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),
