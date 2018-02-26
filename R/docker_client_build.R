@@ -61,7 +61,7 @@ parse_dockerignore <- function(x) {
   ## Normalise separators
   x <- gsub("[/\\\\]+", "/", x)
   ## Root and working directory are considered the same:
-  x <- sub("^/+[^/]", "", x)
+  x <- sub("^/+(?=[^/])", "", x, perl = TRUE)
 
   list(patterns = x, is_exception = is_exception)
 }

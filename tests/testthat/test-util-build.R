@@ -1,5 +1,49 @@
 context("dockerignore")
 
+test_that("parse_dockerignore: empty", {
+  expect_null(parse_dockerignore(character()))
+  expect_null(parse_dockerignore(NULL))
+  expect_null(parse_dockerignore("# foo"))
+  expect_null(parse_dockerignore("  "))
+  expect_null(parse_dockerignore(c("#foo", "  ", "# bar")))
+})
+
+
+test_that("parse_dockerignore: empty", {
+  expect_null(parse_dockerignore(character()))
+  expect_null(parse_dockerignore(NULL))
+  expect_null(parse_dockerignore("# foo"))
+  expect_null(parse_dockerignore("  "))
+  expect_null(parse_dockerignore(c("#foo", "  ", "# bar")))
+})
+
+
+test_that("parse_dockerignore: simple", {
+  expect_equal(parse_dockerignore("hello"),
+               list(patterns = "hello", is_exception = FALSE))
+})
+
+
+test_that("parse_dockerignore: exceptions", {
+  expect_equal(parse_dockerignore(c("*.md", "!README.md")),
+               list(patterns = c("*.md", "README.md"),
+                    is_exception = c(FALSE, TRUE)))
+})
+
+
+test_that("parse_dockerignore: cleanup", {
+  parse_dockerignore("//a///b\\c")$patterns
+
+  expect_equal(parse_dockerignore("a/b/c")$patterns, "a/b/c")
+  expect_equal(parse_dockerignore("a//b/c")$patterns, "a/b/c")
+  expect_equal(parse_dockerignore("a//b\\c")$patterns, "a/b/c")
+  expect_equal(parse_dockerignore("/a//b\\c")$patterns, "a/b/c")
+
+  ## Lots of rubbish
+  expect_equal(parse_dockerignore("////a/////b///c\\\\\\d")$patterns, "a/b/c/d")
+})
+
+
 test_that("simple cases", {
   paths <- c(paste0("dir1/", c("a.txt", "b.md", "c.c")),
              paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
