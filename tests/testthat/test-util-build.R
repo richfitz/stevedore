@@ -79,3 +79,16 @@ test_that("simple cases", {
     sort(c("Dockerfile", "dir1/a.txt", "dir1/c.c",
            "dir2/foo.md", "dir3/bar.c")))
 })
+
+
+test_that("build file list with excluded dockerignore", {
+  paths <- c(paste0("dir1/", c("a.txt", "Dockerfile")),
+             paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
+             "README.md")
+  root <- make_fake_files(paths)
+  dockerfile <- "dir1/Dockerfile"
+
+  dockerignore <- parse_dockerignore("dir1")
+  expect_equal(build_file_list(root, dockerignore, dockerfile),
+               sort(c("dir1/Dockerfile", "dir2", "README.md")))
+})
