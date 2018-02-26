@@ -1,11 +1,7 @@
 build_tar <- function(root, dockerfile) {
   ignore <- read_dockerignore(root)
   files <- build_file_list(root, ignore, dockerfile %||% "Dockerfile")
-  if (identical(list, ".")) {
-    tar_directory(root)
-  } else {
-    tar_files(files, root)
-  }
+  tar_files(files, root)
 }
 
 
