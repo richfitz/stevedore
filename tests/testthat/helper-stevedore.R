@@ -208,8 +208,24 @@ skip_if_no_curl_socket <- function() {
   }
 }
 
+
+HAS_DOCKER <- NULL
+
 test_docker_client <- function(...) {
   skip_if_no_curl_socket()
+
+  if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
+    testthat::skip("docker-using tests are not enabled")
+  }
+
+  if (is.null(HAS_DOCKER)) {
+    HAS_DOCKER <<-
+      !is.null(tryCatch(docker_client()$ping(), error = function(e) NULL))
+  }
+  if (!HAS_DOCKER) {
+    testthat::skip("docker not available?")
+  }
+
   ## TODO: stop here if connection fails too
   docker_client(...)
 }

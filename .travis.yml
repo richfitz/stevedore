@@ -16,6 +16,9 @@ before_script:
   - (cd tests/testthat/images && ./build.sh)
 after_success:
   - Rscript -e 'covr::codecov()'
+env:
+  globals:
+    - STEVEDORE_TEST_USE_DOCKER=true
 addons:
   apt:
     packages:
