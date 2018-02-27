@@ -100,14 +100,22 @@ container$inspect(reload = FALSE)
 
 ## Windows support
 
-The support for windows is not as comprehensive as for other platforms (but I'm not sure how common using docker is on windows yet).  The reason for this is that [`curl`](https://cran.r-project.org/package=curl) (and the underlying `libcurl` library) do not support communicating over "named pipes" which is how docker works on windows.  There is partial support for this in the package using the package [`httppipe`](http://github.com/richfitz/httppipe).
+### Current situation
 
-### Installation
+The support for windows is not as comprehensive as for other platforms (but I'm not sure how common using docker is on windows yet).  The reason for this is that [`curl`](https://cran.r-project.org/package=curl) (and the underlying `libcurl` library) do not support communicating over "named pipes" which is how docker works on windows.
 
-You will need a python installation (both python2 and python3 should work), along with [`reticulate`](https://cran.r-project.org/package=reticulate).  Whatever python you use needs to be able to find the python packages `requests`, `six` and `pipywin32`.  You can test if everything is working by running
+The package includes a small wrapper around the python sdk's docker support.  On the R side this requires the `reticulate` package.  It also requires that you have a python installation that includes both the `docker` package and `pypiwin32` - once python is installed you can add these packages to python with
 
 ```
-httppipe::httppipe_available(verbose = TRUE)
+pip install docker pypiwin32
+```
+
+(or `pip3` instead of `pip` to use python3).
+
+You can check that everything is configured by running
+
+```r
+stevedore:::httppipe_available(verbose = TRUE)
 ```
 
 which will return `TRUE` if everything is OK, and otherwise print some information about errors loading the package.  In the case of error consult the reticulate documentation (`vignette("versions", package = "reticulate")` will be especially useful).  Improvements to installation documentation and process are welcome!
@@ -122,6 +130,9 @@ The primary limitation of the `httppipe` interface is that streaming connections
 * image pull - works but information printed only at end of pull
 * exec start - works but information printed only at end of execution
 
+### Going forward
+
+The support in this package is a duplicate of the micropackage [`httppipe`](http://github.com/richfitz/httppipe).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
 
 ## Roadmap
 
@@ -144,13 +155,13 @@ Currently, `stevedore` is not on CRAN, but can be installed directly from GitHub
 devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
 ```
 
-On windows you will also need
+On windows you will also need `reticulate`
 
 ```r
-devtools::install_github("richfitz/httppipe", upgrade_dependencies = FALSE)
+install.packages("reticulate")
 ```
 
-(see [above](#windows-support)).
+You will also need a python installation and the `docker` and `pypiwin32` packages, which can be installed with pip (see [above](#windows-support)).
 
 Once installed, find out if everything is set up to use docker by running
 
