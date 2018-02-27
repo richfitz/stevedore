@@ -65,14 +65,16 @@ test_that("ping_version", {
 })
 
 
-
 test_that("detect", {
+  ## This requires the server
+  invisible(test_docker_client())
   cl <- http_client(api_version = "detect",
                     min_version = "0.0.1",
                     max_version = "9.9.9")
   expect_equal(cl$api_version,
                raw_to_json(cl$request("GET", "/version")$content)$ApiVersion)
 })
+
 
 ## There's more to test here - should also test if we can build the
 ## type of connection requested with the requested platform/url
@@ -149,7 +151,7 @@ test_that("url type", {
 })
 
 test_that("can't specify http url yet", {
-  expect_error(docker_client(url = "http://localhost:1234"),
+  expect_error(test_docker_client(url = "http://localhost:1234"),
                "Providing docker http/https url is not currently supported",
                fixed = TRUE)
 })

@@ -2,8 +2,8 @@ context("http with httppipe")
 
 test_that("basic connection works", {
   skip_if_no_httppipe_support()
-  dc <- docker_client()
-  dh <- docker_client(http_client_type = "httppipe")
+  dc <- test_docker_client()
+  dh <- test_docker_client(http_client_type = "httppipe")
   dh$ping()
 
   expect_identical(dc$version(), dh$version())
@@ -11,7 +11,7 @@ test_that("basic connection works", {
 
 test_that("binary output", {
   skip_if_no_httppipe_support()
-  dh <- docker_client(http_client_type = "httppipe")
+  dh <- test_docker_client(http_client_type = "httppipe")
 
   nm <- rand_str(10, "stevedore_")
   x <- dh$containers$create("bfirsh/reticulate-splines", name = nm)
@@ -25,6 +25,7 @@ test_that("binary output", {
 })
 
 test_that("detect", {
+  invisible(test_docker_client()) # skips if not present
   cl <- http_client(api_version = "detect",
                     type = "httppipe",
                     min_version = "0.0.1",
