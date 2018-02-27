@@ -20,6 +20,20 @@ if (has_internet()) {
 
 ![hello world example of stevedore](https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif)
 
+
+## Background
+
+**What is docker?** Docker is a platform for "containerising" applications - running them in isolation from one another, removing differences of how they are built, what they are built from, and what resources they need (disk, ports, users, etc).  It's similar conceptually to virtualisation, but much more light weight.
+
+**Why would one want to use docker from R?** Whenever you need to control external processes from an R script or package, it might be useful to interact with this process from in containers using docker
+
+- *package authors* might want a clean environment to test their code (similar to travis)
+- *a developer using an external database* in a package or in an analysis script might use docker to create disposable copies of the database, or to create a copy isolated from their production database
+- *a researcher* might use docker to do a reproducible analysis, or preserve the artefacts that were created along with a copy of the environment that created them
+
+These are discussed further in the [applications vignette](https://richfitz.github.io/stevedore/articles/examples.html)
+
+
 ## Usage
 
 The main function in the package is `docker_client`; this will construct an object with which we can talk with the docker server.
@@ -65,6 +79,7 @@ And manage images
 head(docker$images$list())
 ```
 
+
 ## Approach
 
 Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions `r stevedore:::MIN_DOCKER_API_VERSION` to `r stevedore:::MAX_DOCKER_API_VERSION` (defaulting to `r stevedore:::DEFAULT_DOCKER_API_VERSION`).
@@ -74,6 +89,7 @@ This approach means that the output will be type-stable - there is no inference 
 ```{r, inspect}
 container$inspect(reload = FALSE)
 ```
+
 
 ## Windows support
 
@@ -99,6 +115,7 @@ The primary limitation of the `httppipe` interface is that streaming connections
 * image pull - works but information printed only at end of pull
 * exec start - works but information printed only at end of execution
 
+
 ## Roadmap
 
 There is still a lot of work to do here:
@@ -109,17 +126,16 @@ There is still a lot of work to do here:
 * endpoints that require tar input and output (equivalents of `docker cp` especially) need major work
 * lots of work on parameter wrangling for the more complicated endpoints (basically things that take anything more complicated than a string array are prone to failure because I've not tested them yet)
 * swarm features (`nodes`, `plugins`, `secrets`, `services` and `swarm`) are not implemented - not because they'd be any harder but just because I've never used them
-* authentication of registries for pull and push (not hard, just not done)
+
 
 ## Development and testing
 
-**WARNING**: package is in early development. If you run the test suite it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  The examples are more polite.
+See the [development guide](development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
 
-At present, the tests do leave a couple of orphan containers and volumes on exit.  If tests fail, many more containers will be left as teardown is not always automatic.  Some tests are of the `prune` endpoints, others pull images from the internet.
 
 ## Installation
 
-Currently not on CRAN, but can be installed from github with devtools
+Currently, `stevedore` is not on CRAN, but can be installed directly from GitHub using devtools
 
 ```r
 devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
@@ -138,6 +154,7 @@ Once installed, find out if everything is set up to use docker by running
 ```{r, available}
 stevedore::docker_available()
 ```
+
 
 ## Licence
 
