@@ -17,8 +17,7 @@ before_script:
 after_success:
   - Rscript -e 'covr::codecov()'
 env:
-  globals:
-    - STEVEDORE_TEST_USE_DOCKER=true
+  - STEVEDORE_TEST_USE_DOCKER=true
 addons:
   apt:
     packages:
