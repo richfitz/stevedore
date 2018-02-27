@@ -46,7 +46,7 @@ docker_api_client_auth <- function() {
   data <- new.env()
   list(
     set = function(serveraddress, value) {
-      data[[serveraddress]] <- openssl::base64_encode(as.character(value))
+      data[[serveraddress]] <- base64encode(as.character(value))
     },
     get = function(serveraddress) {
       data[[serveraddress]]

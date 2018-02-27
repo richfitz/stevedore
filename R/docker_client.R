@@ -164,7 +164,7 @@ docker_client_container <- function(id, api_client) {
     }
   }
   after_path_stat <- function(x, ...) {
-    from_json(rawToChar(openssl::base64_decode(x$docker_container_path_stat)))
+    from_json(rawToChar(base64decode(x$docker_container_path_stat)))
   }
   after_start <- function(x, ...) {
     invisible(self)

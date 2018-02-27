@@ -456,7 +456,7 @@ mcr_prepare_push <- function(name, tag, registry_auth) {
   substitute({
     name <- parse_image_name(name)
     tag <- name$tag %||% "latest"
-    registry_auth <- auth$get(name$registry) %||% base64enc("{}")
+    registry_auth <- auth$get(name$registry) %||% base64encode("{}")
     name <- sprintf("%s/%s", name$registry, name$image)
   }, list(name = name, tag = tag, registry_auth = registry_auth))
 }
