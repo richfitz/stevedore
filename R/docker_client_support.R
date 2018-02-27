@@ -445,8 +445,18 @@ mcr_process_image_and_tag <- function(image, tag) {
 }
 
 
-mrc_prepare_auth <- function(auth, image, registry_auth) {
+mcr_prepare_auth <- function(auth, image, registry_auth) {
   substitute(
     registry_auth <- auth$get(parse_image_name(image)$registry),
     list(auth = auth, image = image, registry_auth = registry_auth))
+}
+
+
+mcr_prepare_push <- function(name, tag, registry_auth) {
+  substitute({
+    name <- parse_image_name(name)
+    tag <- name$tag %||% "latest"
+    registry_auth <- auth$get(name$registry) %||% base64enc("{}")
+    name <- sprintf("%s/%s", name$registry, name$image)
+  }, list(name = name, tag = tag, registry_auth = registry_auth))
 }

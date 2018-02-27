@@ -336,9 +336,11 @@ fake_pager <- function(dest) {
   }
 }
 
+
 skip_on_windows <- function() {
   testthat::skip_on_os("windows")
 }
+
 
 make_fake_files <- function(paths) {
   root <- tempfile()
@@ -350,4 +352,13 @@ make_fake_files <- function(paths) {
     file.create(p)
   }
   root
+}
+
+
+get_stevedorebot_pass <- function() {
+  pw <- Sys.getenv("STEVEDORE_STEVEDOREBOT_PASS", "")
+  if (!nzchar(pw)) {
+    testthat::skip("'STEVEDORE_STEVEDOREBOT_PASS' is not defined")
+  }
+  pw
 }

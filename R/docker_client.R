@@ -338,6 +338,16 @@ docker_client_image_collection <- function(api_client, parent) {
   after_pull <- function(x, params) {
     get_image(sprintf("%s:%s", params$query$fromImage, params$query$tag))
   }
+  after_push <- function(x, params) {
+    lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
+    last <- from_json(lines[[length(lines)]])
+    ## Oddly, for 1.29 at least, I don't see an error from the API,
+    ## just in here:
+    if ("error" %in% names(last)) {
+      stop(push_error(last$error))
+    }
+    invisible(TRUE)
+  }
   stevedore_object(
     "docker_image_collection",
     api_client,
@@ -364,16 +374,14 @@ docker_client_image_collection <- function(api_client, parent) {
     ## TODO: add filename argument for saving (see image_tarball)
     export = docker_client_method(
       "image_export", api_client),
-    ## TODO: need to deal with registry auth properly.  For now I'm just
-    ##   eliminating it from the list.
     pull = docker_client_method(
       "image_create", api_client, rename = c("name" = "from_image"),
       drop = c("input_image", "from_src", "repo", "registry_auth"),
       data = list(auth = api_client$auth),
       process = list(
-        mcr_process_image_and_tag(quote(name), quote(tag)),
         mcr_prepare_stream_and_close(quote(stream)),
-        mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
+        mcr_process_image_and_tag(quote(name), quote(tag)),
+        mcr_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
       extra = alist(stream = stdout()),
       defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stream))),
@@ -381,10 +389,14 @@ docker_client_image_collection <- function(api_client, parent) {
       after = after_pull),
     push = docker_client_method(
       "image_push", api_client,
-      drop = "registry_auth",
+      drop = c("registry_auth", "tag"),
       data = list(auth = api_client$auth),
+      extra = alist(stream = stdout()),
+      hijack = quote(streaming_json(pull_status_printer(stream))),
       process = list(
-        mrc_prepare_auth(quote(auth), quote(name), quote(registry_auth)))),
+        mcr_prepare_stream_and_close(quote(stream)),
+        mcr_prepare_push(quote(name), quote(tag), quote(registry_auth))),
+      after = after_push),
     search = docker_client_method(
       "image_search", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),

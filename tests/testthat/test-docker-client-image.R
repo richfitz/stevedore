@@ -284,3 +284,33 @@ test_that("export", {
   expect_true(length(b3) > length(b1))
   expect_true(length(b3) > length(b2))
 })
+
+test_that("push/pull with auth", {
+  skip_if_no_internet()
+
+  cl <- test_docker_client()
+
+  img <- cl$images$get("richfitz/iterate:latest")
+  tag <- "stevedorebot/secret:latest"
+  img$tag(tag)
+  img$reload()
+  on.exit(img$untag(tag))
+
+  cl <- test_docker_client()
+
+  err <- get_error(cl$images$pull(tag, stream = FALSE))
+  expect_is(err, "docker_error")
+  expect_equal(err$code, 404L)
+
+  err <- get_error(cl$images$push(tag, stream = FALSE))
+  expect_is(err, "push_error")
+  expect_null(err$code)
+
+  pw <- get_stevedorebot_pass()
+  cl$login("stevedorebot", pw, serveraddress = "docker.io")
+
+  expect_true(cl$images$push(tag, stream = FALSE))
+  img2 <- cl$images$pull(tag, stream = FALSE)
+  expect_is(img2, "docker_image")
+  expect_equal(img2$id(), img$id())
+})

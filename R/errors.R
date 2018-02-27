@@ -15,6 +15,13 @@ build_error <- function(message) {
 }
 
 
+push_error <- function(message) {
+  ret <- list(message = message, call = NULL)
+  class(ret) <- c("push_error", "error", "condition")
+  ret
+}
+
+
 container_error <- function(container, exit_status, cmd, image, out) {
   err <- out[attr(out, "stream") == "stderr"]
   if (length(err) > 0L) {
