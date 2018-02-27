@@ -229,3 +229,54 @@ test_that("pretty_bytes", {
   expect_equal(pretty_bytes(12345678901), "12.35 GB")
   expect_equal(pretty_bytes(123456789012), "123.46 GB")
 })
+
+
+test_that("set_attributes", {
+  expect_identical(set_attributes(1L, NULL), 1L)
+  expect_identical(set_attributes(1L, list(a = 2L)),
+                   structure(1L, a = 2L))
+})
+
+
+test_that("has_colour", {
+  expect_equal(has_colour(NULL), crayon::has_color())
+  con <- file(tempfile(), "w")
+  on.exit(close(con))
+  expect_false(has_colour(con))
+})
+
+
+test_that("data_frame", {
+  a <- 1:10
+  b <- sample(letters, 10)
+  expect_equal(data_frame(a, b), data.frame(a, b, stringsAsFactors = FALSE))
+})
+
+
+test_that("nothing", {
+  expect_equal(withVisible(nothing()),
+               list(value = NULL, visible = FALSE))
+})
+
+
+test_that("read_binary", {
+  p <- tempfile()
+  on.exit(unlink(p))
+  bytes <- as.raw(sample(0:255, 10000, replace = TRUE))
+  writeBin(bytes, p)
+  expect_identical(read_binary(p), bytes)
+})
+
+
+test_that("indent", {
+  expect_equal(indent("a", 4), "    a")
+  expect_equal(indent(letters, 2), paste0("  ", letters))
+})
+
+
+test_that("base64encode", {
+  str <- "hello world"
+  res <- "aGVsbG8gd29ybGQ="
+  expect_identical(base64encode(str), res)
+  expect_identical(base64decode(res), str)
+})

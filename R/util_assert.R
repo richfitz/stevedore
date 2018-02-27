@@ -16,7 +16,7 @@ assert_scalar_integer <- function(x, strict = FALSE,
 }
 
 assert_scalar_logical <- function(x, name = deparse(substitute(x)),
-                                  what = "a scalar logical (non-NA)") {
+                                  what = "scalar logical (non-NA)") {
   assert_scalar(x, name, what)
   assert_nonmissing(x, name, what)
   assert_logical(x, name, what)

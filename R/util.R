@@ -399,5 +399,5 @@ base64encode <- function(x) {
 
 
 base64decode <- function(x) {
-  openssl::base64_decode(x)
+  rawToChar(openssl::base64_decode(x))
 }

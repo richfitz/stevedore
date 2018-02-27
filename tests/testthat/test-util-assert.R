@@ -162,6 +162,33 @@ test_that("assert_nonempty_character", {
 })
 
 
+test_that("assert_scalar_logical", {
+  value <- character()
+  expect_error(assert_scalar_logical(value),
+               "'value' must be a scalar logical (non-NA)",
+               fixed = TRUE)
+  value <- c("a", NA)
+  expect_error(assert_scalar_logical(value),
+               "'value' must be a scalar logical (non-NA)",
+               fixed = TRUE)
+  value <- 1L
+  expect_error(assert_scalar_logical(value),
+               "'value' must be scalar logical (non-NA)",
+               fixed = TRUE)
+  expect_silent(assert_scalar_logical(TRUE))
+  expect_silent(assert_scalar_logical(FALSE))
+})
+
+
+test_that("assert_scalar_character_or_null", {
+  value <- 1
+  expect_error(assert_scalar_character_or_null(value),
+               "'value' must be a scalar character (non-NA), or NULL",
+               fixed = TRUE)
+  expect_silent(assert_scalar_character_or_null(NULL))
+  expect_silent(assert_scalar_character_or_null("a"))
+})
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")
