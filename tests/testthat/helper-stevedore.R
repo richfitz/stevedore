@@ -214,9 +214,9 @@ HAS_DOCKER <- NULL
 test_docker_client <- function(...) {
   skip_if_no_curl_socket()
 
-  if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
-    testthat::skip("docker-using tests are not enabled")
-  }
+  ## if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
+  ##   testthat::skip("docker-using tests are not enabled")
+  ## }
 
   if (is.null(HAS_DOCKER)) {
     HAS_DOCKER <<-
