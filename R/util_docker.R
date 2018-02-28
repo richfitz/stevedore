@@ -10,13 +10,10 @@ drop_leading_slash <- function(x) {
 }
 
 
-## TODO: this should be renamed to make it clear it is adding "latest"
-## and should go via parse_image_name
-image_name <- function(x, name = deparse(substitute(x))) {
+image_name_with_tag <- function(x, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
-  ## TODO: run this through parse_image_name?  This will fail on repos
-  ## with a port, for example.
-  if (!grepl(":", x, fixed = TRUE)) {
+  dat <- parse_image_name(x, name)
+  if (is.null(dat$tag)) {
     x <- paste0(x, ":latest")
   }
   x

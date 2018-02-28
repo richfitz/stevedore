@@ -137,6 +137,13 @@ test_that("parse image", {
                list(repo = NULL, name = "foo", image = "foo", tag = "latest",
                     registry = "docker.io"))
 
+  expect_equal(parse_image_name("repo/foo"),
+               list(repo = "repo", name = "foo", image = "repo/foo",
+                    tag = NULL, registry = "docker.io"))
+  expect_equal(parse_image_name("repo/foo:latest"),
+               list(repo = "repo", name = "foo", image = "repo/foo",
+                    tag = "latest", registry = "docker.io"))
+
   expect_equal(parse_image_name("myrepo.net/foo"),
                list(repo = "myrepo.net", name = "foo",
                     image = "myrepo.net/foo", tag = NULL,
@@ -238,4 +245,35 @@ test_that("nonapi methods", {
                "missing help for no$method", fixed = TRUE)
   expect_error(docker_client_method_nonapi(fn, "docker_image", "help"),
                "incorrect help for docker_image$help", fixed = TRUE)
+})
+
+
+test_that("drop_leading_slash", {
+  expect_equal(drop_leading_slash("/a/b"), "a/b")
+  expect_equal(drop_leading_slash("a/b"), "a/b")
+})
+
+
+test_that("short_id", {
+  expect_equal(short_id("abcdefghijklmnopqrstuvwxyz"),
+               "abcdefghij")
+  expect_equal(short_id("sha256:abcdefghijklmnopqrstuvwxyz"),
+               "sha256:abcdefghij")
+})
+
+
+test_that("image_name_with_tag", {
+  expect_equal(image_name_with_tag("foo"), "foo:latest")
+  expect_equal(image_name_with_tag("foo:bar"), "foo:bar")
+
+  expect_equal(image_name_with_tag("myrepo.net:5000/foo"),
+               "myrepo.net:5000/foo:latest")
+  expect_equal(image_name_with_tag("myrepo.net:5000/foo:bar"),
+               "myrepo.net:5000/foo:bar")
+})
+
+
+test_that("decode_chunked_string", {
+  ## TODO: harvest some real values here?
+  expect_equal(decode_chunked_string(raw()), character())
 })

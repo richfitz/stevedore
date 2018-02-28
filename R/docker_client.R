@@ -424,7 +424,7 @@ docker_client_image <- function(id, api_client) {
   ## TODO: repo and tag should be separate as for tag (with option
   ## to do them together).
   untag <- function(repo_tag) {
-    repo_tag <- image_name(repo_tag)
+    repo_tag <- image_name_with_tag(repo_tag)
     valid <- setdiff(self$inspect()$repo_tags, "<none>:<none>")
     if (!(repo_tag %in% valid)) {
       stop(sprintf("Invalid repo_tag '%s' for image '%s'",

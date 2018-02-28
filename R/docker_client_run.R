@@ -68,7 +68,7 @@ docker_get_image <- function(image, client, name = deparse(substitute(image))) {
   if (inherits(image, "docker_image")) {
     image
   } else {
-    image <- image_name(image, name)
+    image <- image_name_with_tag(image, name)
     tryCatch(
       client$images$get(image),
       docker_error = function(e) {

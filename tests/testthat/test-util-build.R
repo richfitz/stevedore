@@ -102,3 +102,31 @@ test_that("build file list with excluded dockerignore", {
   expect_equal(build_file_list(root, ignore3),
                sort(c(".dockerignore", "dir1/Dockerfile", "dir2", "README.md")))
 })
+
+
+test_that("build_tar", {
+  paths <- c(paste0("dir1/", c("a.txt", "Dockerfile")),
+             paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
+             "README.md")
+  root <- make_fake_files(paths)
+  dockerfile <- "dir1/Dockerfile"
+
+  x <- build_tar(root, dockerfile)
+  expect_is(x, "raw")
+
+  tmp <- untar_bin(x)
+  on.exit(unlink(tmp, recursive = TRUE))
+
+  expect_equal(dir(tmp, all.files = TRUE, recursive = TRUE),
+               dir(root, all.files = TRUE, recursive = TRUE))
+  unlink(tmp, recursive = TRUE)
+
+  writeLines("dir2", file.path(root, ".dockerignore"))
+  x <- build_tar(root, dockerfile)
+
+  tmp <- untar_bin(x)
+  f1 <- dir(tmp, all.files = TRUE, recursive = TRUE)
+  f2 <- dir(root, all.files = TRUE, recursive = TRUE)
+
+  expect_equal(sort(f1), sort(grep("^dir2", f2, invert = TRUE, value = TRUE)))
+})
