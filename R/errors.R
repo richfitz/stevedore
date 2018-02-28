@@ -23,11 +23,15 @@ push_error <- function(message) {
 
 
 container_error <- function(container, exit_status, cmd, image, out) {
-  err <- out[attr(out, "stream") == "stderr"]
-  if (length(err) > 0L) {
-    err <- paste0("\n", err, collapse = "")
+  if (inherits(out, "docker_stream")) {
+    err <- out[attr(out, "stream") == "stderr"]
+    if (length(err) > 0L) {
+      err <- paste0("\n", err, collapse = "")
+    } else {
+      err <- ""
+    }
   } else {
-    err <- ""
+    err <- paste0("\n", out)
   }
   msg <- sprintf(
     "Command '%s' in image '%s' returned non-zero exit status %s%s",
