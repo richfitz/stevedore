@@ -1,0 +1,18 @@
+Step 1/5 : FROM alpine:latest
+ ---> 3fd9065eaf02
+Step 2/5 : COPY iterate /usr/local/bin/iterate
+ ---> 1b28f32382e1
+Step 3/5 : CMD chmod +x /usr/local/bin/iterate
+ ---> Running in b2cc617fd070
+Removing intermediate container b2cc617fd070
+ ---> ac63f0539cb8
+Step 4/5 : LABEL stevedore_version 0.0.1
+ ---> Running in f11d01ae57b2
+Removing intermediate container f11d01ae57b2
+ ---> dea0367f8ad1
+Step 5/5 : ENTRYPOINT ["/usr/local/bin/iterate"]
+ ---> Running in 2e0116dacc91
+Removing intermediate container 2e0116dacc91
+ ---> 8d9538fe3885
+Successfully built 8d9538fe3885
+Successfully tagged richfitz/iterate:testing

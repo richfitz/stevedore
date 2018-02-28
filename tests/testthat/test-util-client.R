@@ -30,6 +30,63 @@ test_that("pull status", {
   expect_equal(res, cmp)
 })
 
+
+test_that("build status: success", {
+  ## To generate these, pop a browser call into after_build
+  ##   dir.create("sample_responses/build", FALSE, TRUE)
+  ##   writeBin(x$response$content, "sample_responses/build/success")
+  ##   writeBin(x$response$content, "sample_responses/build/failure")
+
+  path <- tempfile()
+  con <- file(path, "w+")
+  on.exit(close(con))
+  p <- build_status_printer(con)
+
+  txt <- readLines("sample_responses/build/success")
+  cmp <- readLines("sample_responses/build/success.out")
+
+  for (i in txt) {
+    p(from_json(i))
+  }
+  close(con)
+  on.exit()
+
+  res <- readLines(path)
+  ## writeLines(res, "sample_responses/build/success.out")
+
+  expect_equal(res, cmp)
+
+  bin <- read_binary("sample_responses/build/success")
+  expect_identical(build_status_id(bin), "8d9538fe3885")
+})
+
+
+test_that("build status: failure", {
+  path <- tempfile()
+  con <- file(path, "w+")
+  on.exit(close(con))
+  p <- build_status_printer(con)
+
+  txt <- readLines("sample_responses/build/failure")
+  cmp <- readLines("sample_responses/build/failure.out")
+
+  for (i in txt) {
+    p(from_json(i))
+  }
+  close(con)
+  on.exit()
+
+  res <- readLines(path)
+  ## writeLines(res, "sample_responses/build/failure.out")
+
+  expect_equal(res, cmp)
+
+  bin <- read_binary("sample_responses/build/failure")
+  err <- get_error(build_status_id(bin))
+  expect_is(err, "build_error")
+})
+
+
 test_that("pull status: silent error", {
   path <- tempfile()
   con <- file(path, "w+")
@@ -48,7 +105,7 @@ test_that("pull status: silent error", {
   expect_equal(res, cmp)
 })
 
-test_that("pull setatus: no print", {
+test_that("pull status: no print", {
   path <- tempfile()
   p <- pull_status_printer(NULL)
 

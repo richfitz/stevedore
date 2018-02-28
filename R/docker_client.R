@@ -322,18 +322,7 @@ docker_client_image_collection <- function(api_client, parent) {
     docker_client_image(id, api_client)
   }
   after_build <- function(x, ...) {
-    lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
-    ## This is the regular expression used in the python package (but
-    ## with a newline following, which I have made optional here).
-    re <- "(^Successfully built |sha256:)([0-9a-f]+)\n?$"
-    dat <- lapply(lines, from_json)
-    is_id <- vlapply(dat, function(el)
-      "stream" %in% names(el) && grepl(re, el$stream))
-    if (!any(is_id)) {
-      stop("Could not determine created image id") # nocov [stevedore bug]
-    }
-    id <- sub(re, "\\2", dat[[max(which(is_id))]]$stream)
-    get_image(id)
+    get_image(build_status_id(x$response$content))
   }
   after_pull <- function(x, params) {
     get_image(sprintf("%s:%s", params$query$fromImage, params$query$tag))

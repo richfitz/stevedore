@@ -1,0 +1,23 @@
+{"stream":"Step 1/5 : FROM alpine:latest"}
+{"stream":"\n"}
+{"stream":" ---\u003e 3fd9065eaf02\n"}
+{"stream":"Step 2/5 : COPY iterate /usr/local/bin/iterate"}
+{"stream":"\n"}
+{"stream":" ---\u003e 1b28f32382e1\n"}
+{"stream":"Step 3/5 : CMD chmod +x /usr/local/bin/iterate"}
+{"stream":"\n"}
+{"stream":" ---\u003e Running in b2cc617fd070\n"}
+{"stream":"Removing intermediate container b2cc617fd070\n"}
+{"stream":" ---\u003e ac63f0539cb8\n"}
+{"stream":"Step 4/5 : LABEL stevedore_version 0.0.1"}
+{"stream":"\n"}
+{"stream":" ---\u003e Running in f11d01ae57b2\n"}
+{"stream":"Removing intermediate container f11d01ae57b2\n"}
+{"stream":" ---\u003e dea0367f8ad1\n"}
+{"stream":"Step 5/5 : ENTRYPOINT [\"/usr/local/bin/iterate\"]"}
+{"stream":"\n"}
+{"stream":" ---\u003e Running in 2e0116dacc91\n"}
+{"stream":"Removing intermediate container 2e0116dacc91\n"}
+{"stream":" ---\u003e 8d9538fe3885\n"}
+{"stream":"Successfully built 8d9538fe3885\n"}
+{"stream":"Successfully tagged richfitz/iterate:testing\n"}

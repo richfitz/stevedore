@@ -1,0 +1,6 @@
+{"stream":"Step 1/5 : FROM alpine:latest"}
+{"stream":"\n"}
+{"stream":" ---\u003e 3fd9065eaf02\n"}
+{"stream":"Step 2/5 : COPY iterate /usr/local/bin/iterate"}
+{"stream":"\n"}
+{"errorDetail":{"message":"COPY failed: stat /var/lib/docker/tmp/docker-builder712978910/iterate: no such file or directory"},"error":"COPY failed: stat /var/lib/docker/tmp/docker-builder712978910/iterate: no such file or directory"}

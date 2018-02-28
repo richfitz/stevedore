@@ -145,13 +145,31 @@ build_status_printer <- function(stream = stdout()) {
     assert_is(stream, "connection")
   }
   function(x) {
-    if ("error" %in% names(x)) {
-      stop(build_error(x$error))
-    }
     if (print_output && "stream" %in% names(x)) {
       cat(x$stream, file = stream, sep = "")
     }
   }
+}
+
+
+build_status_id <- function(content) {
+  lines <- strsplit(raw_to_char(content), "\r\n")[[1]]
+  dat <- lapply(lines, from_json)
+  err <- vlapply(dat, function(x) "error" %in% names(x))
+  if (any(err)) {
+    stop(build_error(dat[[which(err)[[1]]]]$error))
+  }
+
+  ## This is the regular expression used in the python package (but
+  ## with a newline following, which I have made optional here).
+  re <- "(^Successfully built |sha256:)([0-9a-f]+)\n?$"
+  dat <- lapply(lines, from_json)
+  is_id <- vlapply(dat, function(el)
+    "stream" %in% names(el) && grepl(re, el$stream))
+  if (!any(is_id)) {
+    stop("Could not determine created image id") # nocov [stevedore bug]
+  }
+  sub(re, "\\2", dat[[max(which(is_id))]]$stream)
 }
 
 
