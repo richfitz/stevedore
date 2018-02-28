@@ -87,6 +87,61 @@ test_that("build status: failure", {
 })
 
 
+test_that("decode_chunked_string", {
+  x <- read_binary("sample_responses/logs/simple")
+  res <- decode_chunked_string(x)
+  expect_is(res, "docker_stream")
+  expect_equal(length(res), 5)
+  expect_true(all(as.character(attr(res, "stream")) == "stdout"))
+})
+
+
+test_that("docker_stream_printer: null", {
+  p <- docker_stream_printer(NULL)
+  expect_silent(p("anything"))
+})
+
+
+test_that("docker_stream_printer: text", {
+  path <- tempfile()
+  con <- file(path, "w+")
+  on.exit(close(con))
+  p <- docker_stream_printer(con)
+
+  txt <- c("these", "are some lines", "of text")
+  expect_silent({
+    for (i in txt) {
+      p(i)
+    }
+  })
+  close(con)
+  on.exit()
+
+  res <- readLines(path)
+  unlink(path)
+  expect_identical(res, txt)
+})
+
+
+test_that("docker_stream_printer: docker_stream", {
+  path <- tempfile()
+  con <- file(path, "w+")
+  on.exit(close(con))
+  p <- docker_stream_printer(con, "prefix")
+
+  txt <- paste0(c("these", "are some lines", "of text"), "\n")
+  obj <- docker_stream(txt, c(1, 2, 1))
+
+  expect_silent(p(obj))
+  close(con)
+  on.exit()
+
+  res <- readLines(path)
+  unlink(path)
+  expect_identical(res, format(obj, style = "prefix", strip_newline = TRUE))
+})
+
+
 test_that("pull status: silent error", {
   path <- tempfile()
   con <- file(path, "w+")
