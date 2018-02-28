@@ -79,6 +79,13 @@ And manage images
 head(docker$images$list())
 ```
 
+Some of these functions have many arguments, but `stevedore` includes help inline:
+
+```{r, help}
+docker$containers$create
+```
+
+as well as via an `help()` method on each object (e.g., `docker$help()`, `docker$containers$help()`) which will display help for the API version that you are using.
 
 ## Approach
 
