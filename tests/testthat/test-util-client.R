@@ -394,3 +394,20 @@ test_that("decode_chunked_string", {
   ## TODO: harvest some real values here?
   expect_equal(decode_chunked_string(raw()), character())
 })
+
+
+test_that("get_image_id", {
+  expect_equal(get_image_id("aa"), "aa")
+  expect_equal(
+    get_image_id(structure(list(id = function() "bb"), class = "docker_image")),
+    "bb")
+})
+
+
+test_that("get_network_id", {
+  expect_equal(get_network_id("aa"), "aa")
+  expect_equal(
+    get_network_id(structure(list(id = function() "bb"),
+                             class = "docker_network")),
+    "bb")
+})

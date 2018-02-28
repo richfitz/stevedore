@@ -130,3 +130,17 @@ test_that("build_tar", {
 
   expect_equal(sort(f1), sort(grep("^dir2", f2, invert = TRUE, value = TRUE)))
 })
+
+
+test_that("validate_tar_directory", {
+  paths <- c(paste0("dir1/", c("a.txt", "Dockerfile")),
+             paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
+             "README.md")
+  root <- make_fake_files(paths)
+  dockerfile <- "dir1/Dockerfile"
+
+  bin <- validate_tar_directory(root, dockerfile)
+  expect_is(bin, "binary")
+
+  expect_identical(validate_tar_directory(bin), bin)
+})
