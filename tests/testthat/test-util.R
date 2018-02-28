@@ -136,6 +136,51 @@ test_that("stream truncating", {
     format(obj, style = "prefix", strip_newline = TRUE))
 })
 
+
+test_that("stream printing", {
+  x <- sprintf("Reticulating spline %d...\n", 1:10)
+  s <- rep(1, length.out = length(x))
+  logs <- docker_stream(x, s)
+
+  expect_match(format(logs, style = "plain"),
+               "^Reticulating spline \\d+...\n$")
+  expect_match(format(logs, style = "prefix"),
+               "^O> Reticulating spline \\d+...\n")
+  expect_equal(all(crayon::has_style(format(logs, style = "colour"))),
+               crayon::has_color())
+  expect_match(capture.output(print(logs, style = "plain")),
+               "^Reticulating spline \\d+...$")
+  expect_match(capture.output(print(logs, style = "prefix")),
+               "^O> Reticulating spline \\d+...$")
+  expect_match(capture.output(print(logs)), "Reticulating spline \\d+...")
+})
+
+
+test_that("container output", {
+  x <- list(id = function() "aaa", name = function() "bbb")
+  class(x) <- "docker_container"
+  expect_equal(format(x),
+               c("<docker_container>",
+                 "  id: aaa",
+                 "  name: bbb"))
+})
+
+
+test_that("container output print", {
+  x <- list(container = "a", logs = "b")
+  class(x) <- "docker_run_output"
+  str <- c("<docker_run_output>",
+           "  $container:",
+           "    a",
+           "",
+           "  $logs:",
+           "    b")
+  expect_equal(format(x), str)
+  expect_equal(capture.output(res <- withVisible(print(x))), str)
+  expect_identical(res, list(value = x, visible = FALSE))
+})
+
+
 test_that("integer apply", {
   twice <- function(x) {
     x * (if (is.integer(x)) 2L else 2.0)

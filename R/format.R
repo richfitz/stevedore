@@ -93,7 +93,7 @@ format.docker_run_output <- function(x, ..., max_lines = 12) {
 
 ##' @export
 print.docker_run_output <- function(x, ...) {
-  cat(paste0(format(x, ...), "\n"))
+  cat(paste0(format(x, ...), "\n"), sep = "")
   invisible(x)
 }
 

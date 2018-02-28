@@ -11,6 +11,7 @@ test_that("report warnings", {
                         "- another warning"))
 })
 
+
 test_that("pull status", {
   path <- tempfile()
   con <- file(path, "w+")
@@ -126,6 +127,10 @@ test_that("validate ports: random", {
                         HostIp = jsonlite::unbox(""),
                         HostPort = jsonlite::unbox("100")))),
                     ports = list("80/tcp" = NULL, "90/tcp" = NULL)))
+
+  expect_true(validate_ports(TRUE))
+  expect_equal(validate_ports(c("111", "222")),
+               validate_ports(c(111, 222)))
 })
 
 
