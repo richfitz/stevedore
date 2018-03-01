@@ -1,36 +1,33 @@
 context("http")
 
 test_that("version", {
-  cl <- http_client()
-  d <- test_docker_client()
+  ping <- function() {
+    list(headers = charToRaw("Api-Version: 1.23"),
+         status_code = 200)
+  }
 
   min <- MIN_DOCKER_API_VERSION
   max <- MAX_DOCKER_API_VERSION
   def <- DEFAULT_DOCKER_API_VERSION
 
-  expect_identical(http_client_api_version(NULL, cl, min, max),
+  expect_identical(http_client_api_version(NULL, ping, min, max),
                    DEFAULT_DOCKER_API_VERSION)
   expect_identical(
-    http_client_api_version(numeric_version("1.28"), cl, min, max),
+    http_client_api_version(numeric_version("1.28"), ping, min, max),
     "1.28")
-  expect_identical(http_client_api_version("1.28", cl, min, max), "1.28")
-
+  expect_identical(http_client_api_version("1.28", ping, min, max), "1.28")
 
   expect_message(
-    ans <- http_client_api_version("1.28", cl, "1.01", "1.04"),
+    ans <- http_client_api_version("1.28", ping, "1.01", "1.04"),
     "Requested API version '1.28' is above max version '1.04'; downgrading",
     fixed = TRUE)
   expect_equal(ans, "1.04")
   expect_message(
-    ans <- http_client_api_version("1.28", cl, "2.01", "2.04"),
+    ans <- http_client_api_version("1.28", ping, "2.01", "2.04"),
     "Requested API version '1.28' is below min version '2.01'; upgrading",
     fixed = TRUE)
   expect_equal(ans, "2.01")
 
-  ping <- function() {
-    list(headers = charToRaw("Api-Version: 1.23"),
-         status_code = 200)
-  }
   expect_equal(http_client_api_version("detect", ping, "1.0", "9.99"),
                "1.23")
 
@@ -44,7 +41,24 @@ test_that("version", {
   expect_equal(ans, "2.01")
 })
 
+
 test_that("ping_version", {
+  res <- list(status_code = 200L, headers = charToRaw("Api-Version: 1.23"))
+  expect_equal(ping_version(res), "1.23")
+
+  res <- list(status_code = 404L,
+              headers = charToRaw("Api-Version: 1.23"),
+              content = charToRaw("nope"))
+  expect_error(ping_version(res), "nope")
+
+  res <- list(status_code = 200, headers = charToRaw("A: B"))
+  expect_error(ping_version(res),
+               "Failed to detect version.  Headers returned were: 'a'",
+               fixed = TRUE)
+})
+
+
+test_that("ping_version: bad query", {
   d <- test_docker_client()
   x <- d$containers$run("nginx", ports = TRUE, rm = TRUE,
                         detach = TRUE)
@@ -55,12 +69,6 @@ test_that("ping_version", {
 
   expect_error(ping_version(res),
                rawToChar(res$content),
-               fixed = TRUE)
-
-
-  res <- list(status_code = 200, headers = charToRaw("A: B"))
-  expect_error(ping_version(res),
-               "Failed to detect version.  Headers returned were: 'a'",
                fixed = TRUE)
 })
 
@@ -154,4 +162,78 @@ test_that("can't specify http url yet", {
   expect_error(test_docker_client(url = "http://localhost:1234"),
                "Providing docker http/https url is not currently supported",
                fixed = TRUE)
+})
+
+
+test_that("response_to_error", {
+  make_response <- function(status_code, headers, content) {
+    headers <- paste(sprintf("%s: %s\n", names(headers), unname(headers)),
+                     collapse = "")
+    if (!is.raw(content)) {
+      content <- charToRaw(as.character(jsonlite::toJSON(content)))
+    }
+    list(status_code = status_code,
+         headers = charToRaw(headers),
+         content = content)
+  }
+
+  ## The simplest case:
+  r <- make_response(404, c("Content-Type" = "application/json"),
+                     list(message = jsonlite::unbox("my error")))
+  e <- get_error(response_to_error(r, "myendpoint", "myreason"))
+  expect_is(e, "error")
+  expect_is(e, "condition")
+  expect_is(e, "docker_error")
+
+  expect_equal(e$message, "my error")
+  expect_equal(e$code, 404)
+  expect_equal(e$endpoint, "myendpoint")
+  expect_equal(e$reason, "myreason")
+
+  r$content <- raw()
+  expect_error(response_to_error(r, "myendpoint", "myreason"),
+               "An error occured but HEAD is obscuring it")
+
+  r <- make_response(404, c("Content-Type" = "text/plain"),
+                     charToRaw("plain text error"))
+  e <- get_error(response_to_error(r, "myendpoint", "myreason"))
+  expect_equal(e$message, "plain text error")
+})
+
+
+test_that("build_url_query: empty", {
+  expect_null(build_url_query(NULL))
+  expect_null(build_url_query(character()))
+})
+
+
+test_that("build_url_query: logical", {
+  expect_equal(build_url_query(list(a = TRUE)),
+               "?a=true")
+  expect_equal(build_url_query(list(a = TRUE, b = FALSE)),
+               "?a=true&b=false")
+})
+
+
+test_that("build_url_query: character", {
+  expect_equal(build_url_query(list(a = "foo")),
+               "?a=foo")
+  expect_equal(build_url_query(list(a = "foo bar")),
+               "?a=foo%20bar")
+  expect_equal(build_url_query(list(a = "foo", b = FALSE)),
+               "?a=foo&b=false")
+})
+
+
+test_that("build_url_query: repeat", {
+  expect_equal(build_url_query(list(a = "foo", a = "bar")),
+               "?a=foo&a=bar")
+})
+
+
+test_that("build_url", {
+  expect_equal(build_url("http://localhost", "1.29", "/dest"),
+               "http://localhost/v1.29/dest")
+  expect_equal(build_url("http://localhost", "1.29", "/dest", list(a = TRUE)),
+               "http://localhost/v1.29/dest?a=true")
 })

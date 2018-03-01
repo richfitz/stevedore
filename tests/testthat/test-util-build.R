@@ -140,7 +140,7 @@ test_that("validate_tar_directory", {
   dockerfile <- "dir1/Dockerfile"
 
   bin <- validate_tar_directory(root, dockerfile)
-  expect_is(bin, "binary")
+  expect_is(bin, "raw")
 
   expect_identical(validate_tar_directory(bin), bin)
 })

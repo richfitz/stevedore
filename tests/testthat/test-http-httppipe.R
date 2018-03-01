@@ -1,5 +1,17 @@
 context("http with httppipe")
 
+test_that("construction", {
+  skip_if_not_installed("httppipe")
+  x <- http_client_httppipe(http_default_url(is_windows()))
+
+  expect_is(x, "list")
+  expect_equal(x$type, "httppipe")
+  expect_is(x$request, "function")
+  expect_equal(x$api_version, DEFAULT_DOCKER_API_VERSION)
+  expect_false(x$can_stream)
+  expect_is(x$ping, "function")
+})
+
 test_that("basic connection works", {
   skip_if_no_httppipe_support()
   dc <- test_docker_client()
