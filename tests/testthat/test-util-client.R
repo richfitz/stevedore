@@ -87,6 +87,44 @@ test_that("build status: failure", {
 })
 
 
+test_that("streaming_text", {
+  text <- character()
+  callback <- function(x) {
+    text <<- c(text, x)
+  }
+
+  p <- streaming_text(callback)
+  expect_equal(hijacked_content(p), raw())
+
+  p(charToRaw("hello"))
+  expect_equal(text, "hello")
+  expect_equal(hijacked_content(p), charToRaw("hello"))
+
+  p(charToRaw("goodbye"))
+  expect_equal(text, c("hello", "goodbye"))
+  expect_equal(hijacked_content(p), charToRaw("hellogoodbye"))
+})
+
+
+test_that("streaming_json", {
+  data <- list()
+  callback <- function(x) {
+    data <<- c(data, list(x))
+  }
+
+  p <- streaming_json(callback)
+  expect_equal(hijacked_content(p), raw())
+
+  p(charToRaw("[1,2,3]\r\n"))
+  expect_equal(data, list(list(1, 2, 3)))
+  expect_equal(hijacked_content(p), charToRaw("[1,2,3]\r\n"))
+
+  p(charToRaw('"a"\r\n{"x":1}\r\n'))
+  expect_equal(data, list(list(1, 2, 3), "a", list(x = 1)))
+  expect_equal(hijacked_content(p), charToRaw('[1,2,3]\r\n"a"\r\n{"x":1}\r\n'))
+})
+
+
 test_that("decode_chunked_string", {
   x <- read_binary("sample_responses/logs/simple")
   res <- decode_chunked_string(x)

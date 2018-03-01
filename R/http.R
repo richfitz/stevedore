@@ -157,31 +157,6 @@ ping_version <- function(res) {
 }
 
 
-streaming_text <- function(callback) {
-  assert_function(callback)
-  res <- raw()
-  ret <- function(x) {
-    res <<- c(res, x)
-    callback(decode_chunked_string(x))
-  }
-  attr(ret, "content") <- function() res
-  ret
-}
-
-
-streaming_json <- function(callback) {
-  assert_function(callback)
-  res <- raw()
-  ret <- function(x) {
-    res <<- c(res, x)
-    lapply(strsplit(raw_to_char(x), "\r\n")[[1]],
-           function(line) callback(from_json(line)))
-  }
-  attr(ret, "content") <- function() res
-  ret
-}
-
-
 http_client_data <- function(base_url = NULL, type = NULL,
                              windows = is_windows()) {
   if (is.null(base_url)) {
