@@ -336,7 +336,8 @@ sprintfn <- function(fmt, args) {
   switch(as.character(length(args)),
          "0" = fmt,
          "1" = sprintf(fmt, args),
-         "2" = sprintf(fmt, args[[1]], args[[2]]))
+         "2" = sprintf(fmt, args[[1]], args[[2]]),
+         stop("Not implemented [stevedore bug]"))
 }
 
 

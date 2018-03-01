@@ -228,6 +228,8 @@ test_that("build_url_query: character", {
 test_that("build_url_query: repeat", {
   expect_equal(build_url_query(list(a = "foo", a = "bar")),
                "?a=foo&a=bar")
+  expect_equal(build_url_query(list(a = c("foo", "bar"))),
+               "?a=foo&a=bar")
 })
 
 
@@ -236,4 +238,14 @@ test_that("build_url", {
                "http://localhost/v1.29/dest")
   expect_equal(build_url("http://localhost", "1.29", "/dest", list(a = TRUE)),
                "http://localhost/v1.29/dest?a=true")
+})
+
+
+test_that("prepare_body", {
+  expect_equal(prepare_body(as.raw(0:9)),
+               list(raw = as.raw(0:9),
+                    content_type = "application/octet-stream"))
+  expect_equal(prepare_body("hello"),
+               list(raw = charToRaw("hello"),
+                    content_type = "application/json"))
 })

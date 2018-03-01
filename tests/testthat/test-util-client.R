@@ -449,3 +449,19 @@ test_that("get_network_id", {
                              class = "docker_network")),
     "bb")
 })
+
+
+test_that("validate_tar", {
+  path <- tempfile()
+  writeLines("hello", path)
+  res <- validate_tar_input(path)
+  expect_is(res, "raw")
+  expect_identical(validate_tar_input(res), res)
+
+  tmp <- untar_bin(res)
+  expect_identical(dir(tmp), basename(path))
+  expect_equal(readLines(path), readLines(file.path(tmp, basename(path))))
+
+  unlink(path)
+  unlink(tmp, recursive = TRUE)
+})

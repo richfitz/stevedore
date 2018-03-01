@@ -325,3 +325,23 @@ test_that("base64encode", {
   expect_identical(base64encode(str), res)
   expect_identical(base64decode(res), str)
 })
+
+
+test_that("sprintfn", {
+  expect_equal(sprintfn("mystring", character(0)), "mystring")
+  expect_equal(sprintfn("xx %s yy", "aa"), "xx aa yy")
+  expect_equal(sprintfn("xx %s %s yy", c("aa", "bb")), "xx aa bb yy")
+  expect_error(sprintfn("xx %s %s %s yy", c("aa", "bb", "cc")),
+               "Not implemented [stevedore bug]", fixed = TRUE)
+})
+
+
+test_that("download_file", {
+  skip_if_no_internet()
+  dest <- download_file("https://google.com", tempfile(), TRUE)
+  expect_true(file.exists(dest))
+  writeLines("testing", dest)
+  expect_identical(download_file("https://google.com", dest, TRUE), dest)
+  expect_silent(download_file("https://google.com", dest, FALSE))
+  expect_equal(readLines(dest), "testing")
+})
