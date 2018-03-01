@@ -393,3 +393,34 @@ test_that("system_df is a problem for unpacking of lists", {
   ans <- dat$handler(dat$response, FALSE)
   expect_equal(ans, dat$reference)
 })
+
+
+test_that("header handler", {
+  spec <- swagger_spec_read(DEFAULT_DOCKER_API_VERSION)
+  response <- spec$paths[["/_ping"]][["get"]]$responses[["200"]]
+  handler <- swagger_header_handler(response, spec)
+
+  expect_equal(handler("Api-Version: 1.29\nDocker-Experimental: true", FALSE),
+               list("api_version" = "1.29",
+                    "docker_experimental" = TRUE))
+  expect_equal(handler("other: 1", FALSE),
+               list("api_version" = NA_character_,
+                    "docker_experimental" = NA))
+})
+
+
+test_that("binary response handler", {
+  h <- swagger_response_handler_binary()
+  expect_identical(h(NULL), NULL)
+  expect_identical(h(raw(100)), raw(100))
+})
+
+
+test_that("chunked string handler", {
+  h <- swagger_response_handler_chunked_string()
+  x <- read_binary("sample_responses/logs/simple")
+
+  expect_identical(h(x), decode_chunked_string(x))
+  expect_identical(h(charToRaw(paste(letters, collapse = ""))),
+                   paste(letters, collapse = ""))
+})
