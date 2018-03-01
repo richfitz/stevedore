@@ -173,6 +173,26 @@ build_status_id <- function(content) {
 }
 
 
+support_set_login <- function(dict, auth) {
+  serveraddress <- from_json(dict)$serveraddress
+  auth$set(serveraddress, dict)
+  invisible(TRUE)
+}
+
+
+support_list_clean <- function(response, ...) {
+  ## TODO: I'm not really sure of the situation where we get more
+  ## than one name here; there might be a better way of dealing with
+  ## this.  One option would be to refuse to treat this as a list
+  ## column unless explicitly asked for, returning generally the
+  ## first element.  But I don't know how reasonable that is.
+  response$names[] <- lapply(response$names, drop_leading_slash)
+  response$name <- vcapply(response$names, function(x)
+    if (length(x) > 0) x[[1]] else NA_character_)
+  response
+}
+
+
 docker_stream_printer <- function(stream, style = "auto") {
   if (is.null(stream)) {
     return(function(x) {})

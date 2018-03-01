@@ -52,11 +52,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
                                   type = http_client_type, ...)
 
   after_login <- function(response, params) {
-    ## TOOD: somewhat surprised this has come back this useless (as
-    ## json not an R list)
-    serveraddress <- from_json(params$body)$serveraddress
-    api_client$auth$set(serveraddress, params$body)
-    invisible(TRUE)
+    support_set_login(params$body, api_client$auth)
   }
 
   ret <- stevedore_object(
@@ -87,20 +83,9 @@ docker_client_container_collection <- function(api_client, parent) {
   get_container <- function(id) {
     docker_client_container(id, api_client)
   }
-  after_create <- function(dat, ...) {
-    report_warnings(dat$warnings)
-    get_container(dat$id)
-  }
-  after_list <- function(dat, ...) {
-    ## TODO: I'm not really sure of the situation where we get more
-    ## than one name here; there might be a better way of dealing with
-    ## this.  One option would be to refuse to treat this as a list
-    ## column unless explicitly asked for, returning generally the
-    ## first element.  But I don't know how reasonable that is.
-    dat$names[] <- lapply(dat$names, drop_leading_slash)
-    dat$name <- vcapply(dat$names, function(x)
-      if (length(x) > 0) x[[1]] else NA_character_)
-    dat
+  after_create <- function(response, ...) {
+    report_warnings(response$warnings)
+    get_container(response$id)
   }
 
   stevedore_object(
@@ -124,7 +109,7 @@ docker_client_container_collection <- function(api_client, parent) {
     list = docker_client_method(
       "container_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters))),
-      after = after_list),
+      after = support_list_clean),
     remove = docker_client_method(
       "container_delete", api_client,
       rename = c(delete_volumes = "v"),

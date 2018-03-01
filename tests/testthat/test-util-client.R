@@ -465,3 +465,25 @@ test_that("validate_tar", {
   unlink(path)
   unlink(tmp, recursive = TRUE)
 })
+
+
+test_that("support_set_login", {
+  auth <- docker_api_client_auth()
+  expect_null(auth$get("server.io"))
+  data <- jsonlite::toJSON(list(serveraddress = "server.io",
+                                username = "foo",
+                                password = "bar"),
+                           auto_unbox = TRUE)
+  support_set_login(data, auth)
+  expect_equal(auth$get("server.io"),
+               base64encode(data))
+})
+
+
+test_that("support_list_clean", {
+  data <- data_frame(names = I(list("/foo", "/bar")),
+                     other = c("a", "b"))
+  res <- support_list_clean(data)
+  expect_equal(res$name, vcapply(res$names, identity))
+  expect_equal(res$name, sub("^/", "", vcapply(data$names, identity)))
+})
