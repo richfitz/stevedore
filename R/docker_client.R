@@ -51,10 +51,6 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   api_client <- docker_api_client(base_url = url, api_version = api_version,
                                   type = http_client_type, ...)
 
-  after_login <- function(response, params) {
-    support_set_login(params$body, api_client$auth)
-  }
-
   ret <- stevedore_object(
     "docker_client",
     api_client,
@@ -64,7 +60,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
     df = docker_client_method("system_df", api_client),
     info = docker_client_method("system_info", api_client),
     login = docker_client_method(
-      "system_auth", api_client, after = after_login),
+      "system_auth", api_client, after = after_system_login),
     ping = docker_client_method("system_ping", api_client),
     version = docker_client_method("system_version", api_client),
     api_version = function() api_client$http_client$api_version,
@@ -83,10 +79,6 @@ docker_client_container_collection <- function(api_client, parent) {
   get_container <- function(id) {
     docker_client_container(id, api_client)
   }
-  after_create <- function(response, ...) {
-    report_warnings(response$warnings)
-    get_container(response$id)
-  }
 
   stevedore_object(
     "docker_container_collection",
@@ -104,12 +96,12 @@ docker_client_container_collection <- function(api_client, parent) {
         mcr_volumes_for_create(quote(volumes), quote(host_config)),
         mcr_ports_for_create(quote(ports), quote(host_config)),
         mcr_network_for_create(quote(network), quote(host_config))),
-      after = after_create),
+      after = after_container_create),
     get = get_container,
     list = docker_client_method(
       "container_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters))),
-      after = support_list_clean),
+      after = after_container_list),
     remove = docker_client_method(
       "container_delete", api_client,
       rename = c(delete_volumes = "v"),
@@ -121,7 +113,7 @@ docker_client_container_collection <- function(api_client, parent) {
 
 docker_client_container <- function(id, api_client) {
   container_inspect <- docker_client_method("container_inspect", api_client)
-  attrs <- if (identical(id, HELP)) NULL else container_inspect(id)
+  attrs <- if (is_dummy_id(id)) NULL else container_inspect(id)
   id <- attrs$id
   self <- NULL
 
@@ -129,44 +121,12 @@ docker_client_container <- function(id, api_client) {
     attrs <<- container_inspect(id)
     invisible(self)
   }
-  after_get_archive <- function(x, params) {
-    if (is.null(params$dest)) {
-      x
-    } else {
-      writeBin(x, params$dest)
-      invisible(params$dest)
-    }
-  }
-  after_exec <- function(x, ...) {
-    ret <- docker_client_exec(x$id, api_client)
-    ret
-  }
-  after_logs <- function(x, params) {
-    if (isTRUE(params$query$follow)) {
-      invisible(x$content_handler(x$response$content))
-    } else {
-      x
-    }
-  }
-  after_path_stat <- function(x, ...) {
-    from_json(base64decode(x$docker_container_path_stat))
-  }
   after_start <- function(x, ...) {
     invisible(self)
-  }
-  after_top <- function(x, ...) {
-    m <- matrix(unlist(x$processes), byrow = TRUE, nrow = length(x$processes))
-    colnames(m) <- x$titles
-    ## NOTE: some of these can be non-text.  Not sure how to safely do
-    ## that though.  So for now it's all going to be character.
-    as.data.frame(m, stringsAsFactors = FALSE)
   }
   after_update <- function(x, ...) {
     report_warnings(x$warnings, "updating container")
     invisible(self)
-  }
-  after_commit <- function(x, ...) {
-    docker_client_image(x$id, api_client)
   }
   ports <- function(reload = TRUE) {
     ports <- self$inspect(reload)$network_settings$ports
@@ -220,7 +180,7 @@ docker_client_container <- function(id, api_client) {
       "image_commit", api_client,
       process = list(quote(env <- validate_env(env))),
       promote = c("repo", "tag", "author", "changes", "comment", "pause"),
-      fix = list(container = id), after = after_commit),
+      fix = list(container = id), after = after_image_commit),
     diff = docker_client_method(
       "container_changes", api_client, fix = fix_id),
     ## TODO: inject 'start' into here too, which then requires passing
@@ -234,17 +194,17 @@ docker_client_container <- function(id, api_client) {
       promote = "cmd",
       process = list(quote(cmd <- validate_command(cmd)),
                      quote(env <- validate_env(env))),
-      after = after_exec),
+      after = after_exec_create),
     export = docker_client_method(
       "container_export", api_client, fix = fix_id),
     path_stat = docker_client_method(
       "container_path_stat", api_client, fix = fix_id,
-      after = after_path_stat),
+      after = after_container_path_stat),
     ##
     get_archive = docker_client_method(
       "container_archive", api_client, fix = fix_id, extra = alist(dest =),
       process = list(quote(assert_scalar_character_or_null(dest))),
-      after = after_get_archive),
+      after = after_container_archive),
     ## TODO: option for compression, pass through to tar file (much
     ## easier to get right if we can rely on R tar)
     put_archive = docker_client_method(
@@ -267,7 +227,7 @@ docker_client_container <- function(id, api_client) {
       hijack = quote(if (isTRUE(follow))
                        streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = FALSE,
-      after = after_logs),
+      after = after_container_logs),
     pause = docker_client_method(
       "container_pause", api_client, fix = fix_id),
     ## This should invalidate our container afterwards
@@ -290,7 +250,7 @@ docker_client_container <- function(id, api_client) {
     stop = docker_client_method(
       "container_stop", api_client, fix = fix_id),
     top = docker_client_method(
-      "container_top", api_client, fix = fix_id, after = after_top),
+      "container_top", api_client, fix = fix_id, after = after_container_top),
     unpause = docker_client_method(
       "container_unpause", api_client, fix = fix_id),
     update = docker_client_method(
@@ -306,28 +266,11 @@ docker_client_image_collection <- function(api_client, parent) {
   get_image <- function(id) {
     docker_client_image(id, api_client)
   }
-  after_build <- function(x, ...) {
-    get_image(build_status_id(x$response$content))
-  }
-  after_pull <- function(x, params) {
-    get_image(sprintf("%s:%s", params$query$fromImage, params$query$tag))
-  }
-  after_push <- function(x, params) {
-    lines <- strsplit(raw_to_char(x$response$content), "\r\n")[[1]]
-    last <- from_json(lines[[length(lines)]])
-    ## Oddly, for 1.29 at least, I don't see an error from the API,
-    ## just in here:
-    if ("error" %in% names(last)) {
-      stop(push_error(last$error))
-    }
-    invisible(TRUE)
-  }
+
   stevedore_object(
     "docker_image_collection",
     api_client,
     ## TODO: control returning output too
-    ## TODO: support multiple tags (accept vector and translate into
-    ##   multiple 't' parameters - needs support in generated handlers
     build = docker_client_method(
       "image_build", api_client,
       drop = "content_type",
@@ -339,7 +282,7 @@ docker_client_image_collection <- function(api_client, parent) {
         quote(context <- validate_tar_directory(context, dockerfile))),
       hijack = quote(streaming_json(build_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
-      after = after_build),
+      after = after_image_build),
     get = get_image,
     list = docker_client_method(
       "image_list", api_client,
@@ -360,7 +303,7 @@ docker_client_image_collection <- function(api_client, parent) {
       defaults = alist(name =),
       hijack = quote(streaming_json(pull_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
-      after = after_pull),
+      after = after_image_pull),
     push = docker_client_method(
       "image_push", api_client,
       drop = c("registry_auth", "tag"),
@@ -370,7 +313,7 @@ docker_client_image_collection <- function(api_client, parent) {
       process = list(
         mcr_prepare_stream_and_close(quote(stream)),
         mcr_prepare_push(quote(name), quote(tag), quote(registry_auth))),
-      after = after_push),
+      after = after_image_push),
     search = docker_client_method(
       "image_search", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),
@@ -384,7 +327,7 @@ docker_client_image_collection <- function(api_client, parent) {
 
 docker_client_image <- function(id, api_client) {
   image_inspect <- docker_client_method("image_inspect", api_client)
-  attrs <- if (identical(id, HELP)) NULL else image_inspect(id)
+  attrs <- if (is_dummy_id(id)) NULL else image_inspect(id)
   name <- id
   id <- attrs$id
   self <- NULL
@@ -448,14 +391,11 @@ docker_client_network_collection <- function(api_client, parent) {
   get_network <- function(id) {
     docker_client_network(id, api_client)
   }
-  after_create <- function(dat, ...) {
-    get_network(dat$id)
-  }
   stevedore_object(
     "docker_network_collection",
     api_client,
     create = docker_client_method(
-      "network_create", api_client, after = after_create,
+      "network_create", api_client, after = after_network_create,
       defaults = alist(check_duplicate = TRUE)),
     get = get_network,
     list = docker_client_method(
@@ -469,7 +409,7 @@ docker_client_network_collection <- function(api_client, parent) {
 
 docker_client_network <- function(id, api_client) {
   network_inspect <- docker_client_method("network_inspect", api_client)
-  attrs <- if (identical(id, HELP)) NULL else network_inspect(id)
+  attrs <- if (is_dummy_id(id)) NULL else network_inspect(id)
   id <- attrs$id
   self <- NULL
   reload <- function() {
@@ -508,21 +448,14 @@ docker_client_volume_collection <- function(api_client, parent) {
   get_volume <- function(name) {
     docker_client_volume(name, api_client)
   }
-  after_create <- function(dat, ...) {
-    get_volume(dat$name)
-  }
-  after_list <- function(dat, ...) {
-    report_warnings(dat$warnings, "reading volume list")
-    dat$volumes
-  }
   stevedore_object(
     "docker_volume_collection",
     api_client,
     create = docker_client_method(
-      "volume_create", api_client, after = after_create),
+      "volume_create", api_client, after = after_volume_create),
     get = get_volume,
     list = docker_client_method(
-      "volume_list", api_client, after = after_list,
+      "volume_list", api_client, after = after_volume_list,
       process = list(quote(filters <- as_docker_filter(filters)))),
     remove = docker_client_method("volume_delete", api_client),
     prune = docker_client_method(
@@ -532,7 +465,7 @@ docker_client_volume_collection <- function(api_client, parent) {
 
 docker_client_volume <- function(name, api_client) {
   volume_inspect <- docker_client_method("volume_inspect", api_client)
-  attrs <- if (identical(name, HELP)) NULL else volume_inspect(name)
+  attrs <- if (is_dummy_id(name)) NULL else volume_inspect(name)
   name <- attrs$name
   self <- NULL
   reload <- function() {
@@ -567,20 +500,11 @@ docker_client_volume <- function(name, api_client) {
 
 docker_client_exec <- function(id, api_client) {
   exec_inspect <- docker_client_method("exec_inspect", api_client)
-  attrs <- if (identical(id, HELP)) NULL else exec_inspect(id)
+  attrs <- if (is_dummy_id(id)) NULL else exec_inspect(id)
   self <- NULL
   reload <- function() {
     attrs <<- exec_inspect(id)
     invisible(self)
-  }
-  after_start <- function(x, params) {
-    ## TODO: this also wants to catch an input argument (which does
-    ## not yet exist) that controls if output is to be returned.  The
-    ## argument will be 'collect' or something.  Alternatively we
-    ## might return 'self' and implement some sort of async on top of
-    ## this (I think Jeroen has written all the required bits into
-    ## curl).
-    invisible(decode_chunked_string(x$response$content))
   }
   ## Even though it feels like there *should* be a way, there is no
   ## way to get back to a detached exec instance.
@@ -598,7 +522,7 @@ docker_client_exec <- function(id, api_client) {
       hijack = quote(streaming_text(docker_stream_printer(stream))),
       allow_hijack_without_stream = TRUE,
       process = list(mcr_prepare_stream_and_close(quote(stream))),
-      after = after_start),
+      after = after_exec_start),
     inspect = function(reload = TRUE) {
       if (reload) {
         reload()

@@ -153,7 +153,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
                   docker_volume = docker_client_volume,
                   docker_exec = docker_client_exec,
                   stop("impossible!"))
-      x <- f(HELP, api_client)
+      x <- f(dummy_id(), api_client)
     }
   }
 

@@ -378,3 +378,10 @@ get_stevedorebot_pass <- function() {
   }
   pw
 }
+
+
+set_dummy_id <- function(value) {
+  prev <- .stevedore$dummy_id
+  .stevedore$dummy_id <- value
+  invisible(prev)
+}

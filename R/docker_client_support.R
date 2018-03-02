@@ -173,14 +173,14 @@ build_status_id <- function(content) {
 }
 
 
-support_set_login <- function(dict, auth) {
-  serveraddress <- from_json(dict)$serveraddress
-  auth$set(serveraddress, dict)
+after_system_login <- function(response, params, api_client) {
+  serveraddress <- from_json(params$body)$serveraddress
+  api_client$auth$set(serveraddress, params$body)
   invisible(TRUE)
 }
 
 
-support_list_clean <- function(response, ...) {
+after_container_list <- function(response, ...) {
   ## TODO: I'm not really sure of the situation where we get more
   ## than one name here; there might be a better way of dealing with
   ## this.  One option would be to refuse to treat this as a list
@@ -190,6 +190,107 @@ support_list_clean <- function(response, ...) {
   response$name <- vcapply(response$names, function(x)
     if (length(x) > 0) x[[1]] else NA_character_)
   response
+}
+
+
+after_container_create <- function(response, params, api_client) {
+  report_warnings(response$warnings, "creating container")
+  docker_client_container(response$id, api_client)
+}
+
+
+after_container_archive <- function(response, params, api_client) {
+  if (is.null(params$dest)) {
+    response
+  } else {
+    writeBin(response, params$dest)
+    invisible(params$dest)
+  }
+}
+
+
+after_exec_create <- function(response, params, api_client) {
+  docker_client_exec(response$id, api_client)
+}
+
+
+after_container_logs <- function(response, params, ...) {
+  if (isTRUE(params$query$follow)) {
+    invisible(response$content_handler(response$response$content))
+  } else {
+    response
+  }
+}
+
+
+after_container_path_stat <- function(response, ...) {
+  from_json(base64decode(response$docker_container_path_stat))
+}
+
+
+after_container_top <- function(response, ...) {
+  m <- matrix(unlist(response$processes),
+              byrow = TRUE, nrow = length(response$processes))
+  colnames(m) <- response$titles
+  ## NOTE: some of these can be non-text.  Not sure how to safely do
+  ## that though.  So for now it's all going to be character.
+  as.data.frame(m, stringsAsFactors = FALSE)
+}
+
+
+after_image_commit <- function(response, params, api_client) {
+  docker_client_image(response$id, api_client)
+}
+
+
+after_image_build <- function(response, params, api_client) {
+  id <- build_status_id(response$response$content)
+  docker_client_image(id, api_client)
+}
+
+
+after_image_pull <- function(response, params, api_client) {
+  id <- sprintf("%s:%s", params$query$fromImage, params$query$tag)
+  docker_client_image(id, api_client)
+}
+
+
+after_image_push <- function(response, ...) {
+  lines <- strsplit(raw_to_char(response$response$content), "\r\n")[[1]]
+  last <- from_json(lines[[length(lines)]])
+  ## Oddly, for 1.29 at least, I don't see an error from the API,
+  ## just in here:
+  if ("error" %in% names(last)) {
+    stop(push_error(last$error))
+  }
+  invisible(TRUE)
+}
+
+
+after_network_create <- function(response, params, api_client) {
+  docker_client_network(response$id, api_client)
+}
+
+
+after_volume_create <- function(response, params, api_client) {
+  docker_client_volume(response$name, api_client)
+}
+
+
+after_volume_list <- function(response, ...) {
+  report_warnings(response$warnings, "reading volume list")
+  response$volumes
+}
+
+
+after_exec_start <- function(response, ...) {
+  ## TODO: this also wants to catch an input argument (which does
+  ## not yet exist) that controls if output is to be returned.  The
+  ## argument will be 'collect' or something.  Alternatively we
+  ## might return 'self' and implement some sort of async on top of
+  ## this (I think Jeroen has written all the required bits into
+  ## curl).
+  invisible(decode_chunked_string(response$response$content))
 }
 
 
@@ -524,4 +625,15 @@ mcr_prepare_push <- function(name, tag, registry_auth) {
     registry_auth <- auth$get(name$registry) %||% base64encode("{}")
     name <- sprintf("%s/%s", name$registry, name$image)
   }, list(name = name, tag = tag, registry_auth = registry_auth))
+}
+
+
+## Testing help
+dummy_id <- function() {
+  .stevedore$dummy_id %||% HELP
+}
+
+
+is_dummy_id <- function(id) {
+  identical(id, dummy_id())
 }

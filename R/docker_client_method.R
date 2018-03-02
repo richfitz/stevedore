@@ -1,17 +1,18 @@
-docker_client_method <- function(name, client, fix = NULL, rename = NULL,
+docker_client_method <- function(name, api_client, fix = NULL, rename = NULL,
                                  drop = NULL, defaults = NULL, extra = NULL,
                                  promote = NULL, process = NULL,
                                  data = NULL, after = NULL,
                                  hijack = NULL,
                                  allow_hijack_without_stream = FALSE) {
-  stopifnot(c("endpoints", "http_client") %in% names(client))
-  endpoint <- client$endpoints[[name]]
+  stopifnot(c("endpoints", "http_client") %in% names(api_client))
+  endpoint <- api_client$endpoints[[name]]
   if (isTRUE(endpoint$unsupported)) {
     return(docker_client_method_unsupported(endpoint, name))
   }
 
-  fenv <- new.env(parent = client, hash = FALSE)
+  fenv <- new.env(parent = api_client, hash = FALSE)
   fenv$endpoint <- endpoint
+  fenv$api_client <- api_client
   if (!is.null(fix)) {
     list2env(fix, fenv)
   }
@@ -90,7 +91,7 @@ docker_client_method <- function(name, client, fix = NULL, rename = NULL,
     fenv$after <- after
     finish <- c(call("<-", quote(response), run_endpoint),
                 add_extra,
-                quote(after(response, params)))
+                quote(after(response, params, api_client)))
   } else {
     finish <- run_endpoint
   }

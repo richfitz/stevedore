@@ -468,22 +468,183 @@ test_that("validate_tar", {
 
 
 test_that("support_set_login", {
-  auth <- docker_api_client_auth()
-  expect_null(auth$get("server.io"))
-  data <- jsonlite::toJSON(list(serveraddress = "server.io",
-                                username = "foo",
-                                password = "bar"),
-                           auto_unbox = TRUE)
-  support_set_login(data, auth)
-  expect_equal(auth$get("server.io"),
-               base64encode(data))
+  cl <- docker_api_client(type = "null")
+  expect_null(cl$auth$get("server.io"))
+  params <- list(body = jsonlite::toJSON(list(serveraddress = "server.io",
+                                              username = "foo",
+                                              password = "bar"),
+                                         auto_unbox = TRUE))
+  after_system_login(NULL, params, cl)
+  expect_equal(cl$auth$get("server.io"),
+               base64encode(params$body))
 })
 
 
-test_that("support_list_clean", {
+test_that("after_container_list", {
   data <- data_frame(names = I(list("/foo", "/bar")),
                      other = c("a", "b"))
-  res <- support_list_clean(data)
+  res <- after_container_list(data)
   expect_equal(res$name, vcapply(res$names, identity))
   expect_equal(res$name, sub("^/", "", vcapply(data$names, identity)))
+})
+
+
+test_that("after_container_create", {
+  response <- list(id = dummy_id())
+  cl <- docker_api_client(type = "null")
+
+  res <- after_container_create(response, NULL, cl)
+  expect_is(res, "docker_container")
+})
+
+
+test_that("after_container_create: warnings", {
+  response <- list(id = dummy_id(), warnings = "here is a warning")
+  cl <- docker_api_client(type = "null")
+  expect_warning(res <- after_container_create(response, NULL, cl),
+                 "here is a warning")
+  expect_is(res, "docker_container")
+})
+
+
+test_that("after_container_archive", {
+  bytes <- as.raw(sample(0:255))
+  expect_identical(after_container_archive(bytes, list()), bytes)
+
+  path <- tempfile()
+  on.exit(unlink(path))
+
+  expect_identical(after_container_archive(bytes, list(dest = path)), path)
+  expect_identical(read_binary(path), bytes)
+})
+
+
+test_that("after_exec_create", {
+  cl <- docker_api_client(type = "null")
+  res <- after_exec_create(list(id = dummy_id()), NULL, cl)
+  expect_is(res, "docker_exec")
+  expect_identical(res$id(), dummy_id())
+})
+
+
+test_that("after_container_logs", {
+  bin <- as.raw(0:10)
+  expect_identical(after_container_logs("hello", NULL), "hello")
+  expect_identical(after_container_logs(bin, NULL), bin)
+
+  response <- list(content_handler = rawToChar,
+                   response = list(content = charToRaw("hello")))
+  params <- list(query = list(follow = TRUE))
+
+  expect_identical(after_container_logs(response, params), "hello")
+})
+
+
+test_that("after_container_path_stat", {
+  data <- list(a = 1, b = "hello")
+  str <- jsonlite::toJSON(data, auto_unbox = TRUE)
+  response <- list(docker_container_path_stat = base64encode(str))
+  expect_equal(after_container_path_stat(response), data)
+})
+
+
+test_that("after_container_top", {
+  d <- read_sample_response("sample_responses/v1.29/container_top.R")
+  cmp <- data_frame(
+    UID = "root",
+    PID = c("13642", "13735"),
+    PPID = c("882", "13642"),
+    C = "0",
+    STIME = c("17:03", "17:06"),
+    TTY = "pts/0",
+    TIME = "00:00:00",
+    CMD = c("/bin/bash", "sleep 10"))
+
+  expect_equal(after_container_top(d$reference), cmp)
+})
+
+
+test_that("after_image_commit", {
+  cl <- docker_api_client(type = "null")
+  img <- after_image_commit(list(id = dummy_id()), NULL, cl)
+  expect_is(img, "docker_image")
+})
+
+
+test_that("after_image_build", {
+  cl <- docker_api_client(type = "null")
+
+  bin <- read_binary("sample_responses/build/success")
+  id <- "8d9538fe3885"
+
+  prev <- set_dummy_id(id)
+  on.exit(set_dummy_id(prev))
+
+  response <- list(response = list(content = bin))
+
+  img <- after_image_build(response, NULL, cl)
+  expect_is(img, "docker_image")
+})
+
+
+test_that("after_image_pull", {
+  cl <- docker_api_client(type = "null")
+
+  params <- list(query = list(fromImage = "ubuntu", tag = "latest"))
+  id <- sprintf("%s:%s", params$query$fromImage, params$query$tag)
+
+  prev <- set_dummy_id(id)
+  on.exit(set_dummy_id(prev))
+
+  img <- after_image_pull(NULL, params, cl)
+  expect_is(img, "docker_image")
+})
+
+
+test_that("after_image_push", {
+  f <- function(x) {
+    list(response =
+           list(content = charToRaw(jsonlite::toJSON(x, auto_unbox = TRUE))))
+  }
+
+  expect_equal(withVisible(after_image_push(f(list(status = TRUE)))),
+               list(value = TRUE, visible = FALSE))
+  e <- get_error(after_image_push(f(list(error = "my error"))))
+  expect_is(e, "push_error")
+  expect_is(e, "error")
+  expect_is(e, "condition")
+  expect_equal(e$message, "my error")
+})
+
+
+test_that("after_network_create", {
+  cl <- docker_api_client(type = "null")
+  res <- after_network_create(list(id = dummy_id()), NULL, cl)
+  expect_is(res, "docker_network")
+})
+
+
+test_that("after_volume_create", {
+  cl <- docker_api_client(type = "null")
+  res <- after_volume_create(list(name = dummy_id()), NULL, cl)
+  expect_is(res, "docker_volume")
+})
+
+
+test_that("after_volume_list", {
+  response <- list(volumes = mtcars)
+  expect_identical(after_volume_list(response), response$volumes)
+
+  response$warnings <- "something happened"
+  expect_warning(res <- after_volume_list(response),
+                  response$warnings)
+  expect_equal(res, response$volumes)
+})
+
+
+test_that("after_exec_start", {
+  str <- "this is a string"
+  response <- list(response = list(content = charToRaw(str)))
+  res <- withVisible(after_exec_start(response))
+  expect_identical(res, list(value = str, visible = FALSE))
 })

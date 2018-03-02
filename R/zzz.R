@@ -7,7 +7,7 @@ DEFAULT_DOCKER_UNIX_SOCKET <- "/var/run/docker.sock"
 DEFAULT_DOCKER_WINDOWS_PIPE <- "npipe:////./pipe/docker_engine"
 DEFAULT_USER_AGENT <- "stevedore/0.0.0"
 
-HELP <- "\r\b\n"
+HELP <- "\r\b:\n"
 
 .stevedore <- new.env(parent = emptyenv())
 
