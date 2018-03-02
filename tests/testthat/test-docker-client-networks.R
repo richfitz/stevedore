@@ -80,3 +80,11 @@ test_that("connect", {
 test_that("disconnect", {
   skip("disconnect is untested")
 })
+
+
+test_that("get (offline)", {
+  cl <- docker_client(http_client_type = "null")
+  x <- cl$networks$get(dummy_id())
+  expect_is(x, "docker_network")
+  expect_equal(x$id(), dummy_id())
+})

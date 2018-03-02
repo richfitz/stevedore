@@ -76,10 +76,6 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
 }
 
 docker_client_container_collection <- function(api_client, parent) {
-  get_container <- function(id) {
-    docker_client_container(id, api_client)
-  }
-
   stevedore_object(
     "docker_container_collection",
     api_client,
@@ -97,7 +93,7 @@ docker_client_container_collection <- function(api_client, parent) {
         mcr_ports_for_create(quote(ports), quote(host_config)),
         mcr_network_for_create(quote(network), quote(host_config))),
       after = after_container_create),
-    get = get_container,
+    get = docker_client_getter(docker_client_container, api_client),
     list = docker_client_method(
       "container_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters))),
@@ -113,7 +109,7 @@ docker_client_container_collection <- function(api_client, parent) {
 
 docker_client_container <- function(id, api_client) {
   container_inspect <- docker_client_method("container_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) NULL else container_inspect(id)
+  attrs <- if (is_dummy_id(id)) list(id = id) else container_inspect(id)
   id <- attrs$id
   self <- NULL
 
@@ -262,11 +258,8 @@ docker_client_container <- function(id, api_client) {
   self
 }
 
-docker_client_image_collection <- function(api_client, parent) {
-  get_image <- function(id) {
-    docker_client_image(id, api_client)
-  }
 
+docker_client_image_collection <- function(api_client, parent) {
   stevedore_object(
     "docker_image_collection",
     api_client,
@@ -283,7 +276,7 @@ docker_client_image_collection <- function(api_client, parent) {
       hijack = quote(streaming_json(build_status_printer(stream))),
       allow_hijack_without_stream = TRUE,
       after = after_image_build),
-    get = get_image,
+    get = docker_client_getter(docker_client_image, api_client),
     list = docker_client_method(
       "image_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),
@@ -327,7 +320,7 @@ docker_client_image_collection <- function(api_client, parent) {
 
 docker_client_image <- function(id, api_client) {
   image_inspect <- docker_client_method("image_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) NULL else image_inspect(id)
+  attrs <- if (is_dummy_id(id)) list(id = id) else image_inspect(id)
   name <- id
   id <- attrs$id
   self <- NULL
@@ -388,16 +381,13 @@ docker_client_image <- function(id, api_client) {
 }
 
 docker_client_network_collection <- function(api_client, parent) {
-  get_network <- function(id) {
-    docker_client_network(id, api_client)
-  }
   stevedore_object(
     "docker_network_collection",
     api_client,
     create = docker_client_method(
       "network_create", api_client, after = after_network_create,
       defaults = alist(check_duplicate = TRUE)),
-    get = get_network,
+    get = docker_client_getter(docker_client_network, api_client),
     list = docker_client_method(
       "network_list", api_client,
       process = list(quote(filters <- as_docker_filter(filters)))),
@@ -409,7 +399,7 @@ docker_client_network_collection <- function(api_client, parent) {
 
 docker_client_network <- function(id, api_client) {
   network_inspect <- docker_client_method("network_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) NULL else network_inspect(id)
+  attrs <- if (is_dummy_id(id)) list(id = id) else network_inspect(id)
   id <- attrs$id
   self <- NULL
   reload <- function() {
@@ -445,15 +435,12 @@ docker_client_network <- function(id, api_client) {
 }
 
 docker_client_volume_collection <- function(api_client, parent) {
-  get_volume <- function(name) {
-    docker_client_volume(name, api_client)
-  }
   stevedore_object(
     "docker_volume_collection",
     api_client,
     create = docker_client_method(
       "volume_create", api_client, after = after_volume_create),
-    get = get_volume,
+    get = docker_client_getter(docker_client_volume, api_client, "name"),
     list = docker_client_method(
       "volume_list", api_client, after = after_volume_list,
       process = list(quote(filters <- as_docker_filter(filters)))),
@@ -465,7 +452,7 @@ docker_client_volume_collection <- function(api_client, parent) {
 
 docker_client_volume <- function(name, api_client) {
   volume_inspect <- docker_client_method("volume_inspect", api_client)
-  attrs <- if (is_dummy_id(name)) NULL else volume_inspect(name)
+  attrs <- if (is_dummy_id(name)) list(name = name) else volume_inspect(name)
   name <- attrs$name
   self <- NULL
   reload <- function() {

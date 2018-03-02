@@ -1030,3 +1030,11 @@ test_that("set user", {
   expect_equal(parse_id(res1$logs), "0:0")
   expect_equal(parse_id(res2$logs), uid)
 })
+
+
+test_that("get (offline)", {
+  cl <- docker_client(http_client_type = "null")
+  x <- cl$containers$get(dummy_id())
+  expect_is(x, "docker_container")
+  expect_equal(x$id(), dummy_id())
+})

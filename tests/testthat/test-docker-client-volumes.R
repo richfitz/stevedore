@@ -66,3 +66,11 @@ test_that("labels", {
   vol <- d$volumes$create(labels = c(foo = "bar"))
   expect_equal(vol$inspect()$labels, c(foo = "bar"))
 })
+
+
+test_that("get (offline)", {
+  cl <- docker_client(http_client_type = "null")
+  x <- cl$volumes$get(dummy_id())
+  expect_is(x, "docker_volume")
+  expect_equal(x$name(), dummy_id())
+})

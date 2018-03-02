@@ -637,3 +637,14 @@ dummy_id <- function() {
 is_dummy_id <- function(id) {
   identical(id, dummy_id())
 }
+
+
+docker_client_getter <- function(getter, api_client, name = "id") {
+  env <- new.env(parent = baseenv())
+  env$api_client <- api_client
+  env$getter <- getter
+  args <- alist(id =)
+  names(args) <- name
+  body <- substitute(getter(id, api_client), list(id = as.name(name)))
+  as.function(c(args, body), env)
+}
