@@ -235,9 +235,10 @@ docker_network:
     summary: >-
       Return name for this network
     args:
-      Logical scalar, indicating if the information should be
-      refreshed from the daemon.  This is useful to set to
-      `FALSE` after a network has been removed.
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after a network has been removed.
   reload:
     summary: >-
       Refresh infomation on the network from the server, returning
