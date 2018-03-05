@@ -281,7 +281,7 @@ yaml_load <- function(str) {
 
 
 ## Until https://github.com/viking/r-yaml/issues/52 is updated
-yaml_check_version <- function(yaml_version = packageVersion("yaml")) {
+yaml_check_version <- function(yaml_version = utils::packageVersion("yaml")) {
   if (!isTRUE(.stevedore$yaml_version_ok)) {
     if (yaml_version == numeric_version("2.1.17")) {
       stop(
