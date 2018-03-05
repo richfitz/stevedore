@@ -134,7 +134,7 @@ docker_container:
       reload: &reload-container >-
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
-        `FALSE` after an image has been removed.
+        `FALSE` after a container has been removed.
     cli: "container inspect"
   name:
     summary: >-
@@ -184,7 +184,10 @@ docker_image:
     summary: >-
       Return labels for this image
     args:
-      reload: *reload
+      reload: &reload-image >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an image has been removed.
   reload:
     summary: >-
       Refresh infomation on the image from the server, returning
@@ -197,7 +200,7 @@ docker_image:
     summary: >-
       Return tags for this image
     args:
-      reload: *reload
+      reload: *reload-image
   untag:
     summary: >-
       Remove tags from the image.  This is a lot like
@@ -232,7 +235,9 @@ docker_network:
     summary: >-
       Return name for this network
     args:
-      reload: *reload
+      Logical scalar, indicating if the information should be
+      refreshed from the daemon.  This is useful to set to
+      `FALSE` after a network has been removed.
   reload:
     summary: >-
       Refresh infomation on the network from the server, returning
