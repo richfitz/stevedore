@@ -424,3 +424,13 @@ base64decode <- function(x) {
 new_empty_env <- function() {
   new.env(parent = emptyenv())
 }
+
+
+## Version of vapply that will cope with integer overflow
+vapply2 <- function(X, FUN, FUN.VALUE, ...) {
+  if (is.integer(FUN.VALUE) && length(FUN.VALUE) == 1L) {
+    viapply(X, FUN, ...)
+  } else {
+    vapply(X, FUN, FUN.VALUE, ...)
+  }
+}

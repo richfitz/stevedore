@@ -182,6 +182,7 @@ test_that("container output print", {
 
 
 test_that("integer apply", {
+  int <- integer(1)
   twice <- function(x) {
     x * (if (is.integer(x)) 2L else 2.0)
   }
@@ -190,10 +191,16 @@ test_that("integer apply", {
   expect_identical(viapply(x, twice), c(a = 200L, b = 400L))
   expect_identical(viapply(x, twice, USE.NAMES = FALSE), c(200L, 400L))
 
+  expect_identical(vapply2(x, twice, int), c(a = 200L, b = 400L))
+  expect_identical(vapply2(x, twice, int, USE.NAMES = FALSE), c(200L, 400L))
+
+
   ## How about integer-as-numeric?
   x <- lapply(x, as.numeric)
   expect_identical(viapply(x, twice), c(a = 200L, b = 400L))
   expect_identical(viapply(x, twice, USE.NAMES = FALSE), c(200L, 400L))
+  expect_identical(vapply2(x, twice, int), c(a = 200L, b = 400L))
+  expect_identical(vapply2(x, twice, int, USE.NAMES = FALSE), c(200L, 400L))
 
   ## Very large numbers:
   large <- .Machine$integer.max + 1.0
@@ -201,11 +208,20 @@ test_that("integer apply", {
   expect_identical(viapply(x, twice), c(a = 200.0, b = large * 2))
   expect_identical(viapply(x, twice, USE.NAMES = FALSE),
                    c(200.0, large * 2))
+  expect_identical(vapply2(x, twice, int), c(a = 200.0, b = large * 2))
+  expect_identical(vapply2(x, twice, int, USE.NAMES = FALSE),
+                   c(200.0, large * 2))
 
   ## Error case:
   expect_error(viapply(x, function(x) x + 0.1),
                "Result not integer-like")
+
+  ## non-integer
+  expect_identical(
+    vapply2(letters, strrep, character(1), 2, USE.NAMES = FALSE),
+    strrep(letters, 2))
 })
+
 
 test_that("integer apply/json serialisation", {
   fmt <- '[{"a": %s}, {"a": %s}]'
