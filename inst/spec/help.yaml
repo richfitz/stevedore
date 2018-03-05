@@ -131,7 +131,7 @@ docker_container:
     summary: >-
       Return detailed information about this container
     args:
-      reload: >-
+      reload: &reload-container >-
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
         `FALSE` after an image has been removed.
@@ -142,6 +142,8 @@ docker_container:
   labels:
     summary: >-
       Return labels for this container
+    args:
+      reload: *reload-container
   ports:
     summary: >-
       Return a `data.frame` of information about ports
@@ -149,7 +151,7 @@ docker_container:
       container started with `ports = TRUE`, where container
       ports are mapped to random ports on the host.
     args:
-      reload: Refresh container data?
+      reload: *reload-container
     cli: "docker container port"
   reload:
     summary: >-

@@ -100,6 +100,7 @@ print.docker_run_output <- function(x, ...) {
 ##' @export
 print.stevedore_object <- function(x, ..., indent = 2L) {
   nms <- sort(names(x))
+  nms <- nms[!string_starts_with(nms, ".")]
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
 
   cat(sprintf("<%s>\n", class(x)[[1]]))

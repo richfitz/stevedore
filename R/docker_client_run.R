@@ -1,8 +1,9 @@
 ## This is complicated enough that it gets its own file.  The 'run'
 ## function is a bit of a beast.  This duplicates much of the `docker
 ## run` functionality.
-make_docker_run <- function(client, can_stream) {
-  force(client)
+make_docker_run <- function(client) {
+  can_stream <- client$.api_client$http_client$can_stream
+
   ## TODO: this should pick up all the args from create rather than
   ## using dots.
   function(image, cmd = NULL, ..., detach = FALSE, rm = FALSE,

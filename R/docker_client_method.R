@@ -1,24 +1,27 @@
-docker_client_method <- function(name, api_client, fix = NULL, rename = NULL,
+docker_client_method <- function(name, object,
+                                 fix = NULL, rename = NULL,
                                  drop = NULL, defaults = NULL, extra = NULL,
                                  promote = NULL, process = NULL,
-                                 data = NULL, after = NULL,
+                                 after = NULL,
                                  hijack = NULL,
                                  allow_hijack_without_stream = FALSE) {
+  api_client <- object$.parent$.api_client
+
   stopifnot(c("endpoints", "http_client") %in% names(api_client))
   endpoint <- api_client$endpoints[[name]]
   if (isTRUE(endpoint$unsupported)) {
     return(docker_client_method_unsupported(endpoint, name))
   }
 
+  ## TODO: does this mean that contents of fenv collide with the names
+  ## of parameters?  If so this should be the *parent* env possibly?
+  ## Or just dot name these.
   fenv <- new.env(parent = api_client, hash = FALSE)
   fenv$endpoint <- endpoint
-  fenv$api_client <- api_client
+  fenv$api_client <- api_client # neeed?
+  fenv$object <- object
   if (!is.null(fix)) {
     list2env(fix, fenv)
-  }
-
-  if (!is.null(data)) {
-    list2env(data, fenv)
   }
 
   args <- formals(endpoint$argument_handler)
@@ -91,7 +94,7 @@ docker_client_method <- function(name, api_client, fix = NULL, rename = NULL,
     fenv$after <- after
     finish <- c(call("<-", quote(response), run_endpoint),
                 add_extra,
-                quote(after(response, params, api_client)))
+                quote(after(response, params, object)))
   } else {
     finish <- run_endpoint
   }

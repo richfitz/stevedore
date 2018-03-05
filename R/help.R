@@ -144,8 +144,6 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
     if (sub %in% names(x)) {
       x <- x[[sub]]
     } else {
-      api_client <- docker_api_client(api_version = x$api_version(),
-                                      type = "null")
       f <- switch(sub,
                   docker_container = docker_client_container,
                   docker_image = docker_client_image,
@@ -153,11 +151,11 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
                   docker_volume = docker_client_volume,
                   docker_exec = docker_client_exec,
                   stop("impossible!"))
-      x <- f(dummy_id(), api_client)
+      x <- f(dummy_id(), x)
     }
   }
 
-  nms <- sort(names(x))
+  nms <- ls(x)
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
   fns <- vcapply(nms[is_fn], function(nm)
     format_docker_client_method_rd(x[[nm]]),

@@ -1,26 +1,27 @@
 ## ** stevedore_object support **
-stevedore_object <- function(class, api_client, ..., lock = TRUE) {
-  els <- list(...)
-  assert_named(els, TRUE, "stevedore_object elements")
-
-  els$help <- function(help_type = getOption("help_type")) {
-    stevedore_object_help(class, api_client$api_version, help_type) # nocov
+stevedore_object <- function(env, class) {
+  api_version <- env$.parent$.api_client$api_version
+  env$help <- function(help_type = getOption("help_type")) {
+    stevedore_object_help(class, api_version, help_type) # nocov
   }
 
-  add_help_nonapi <- function(nm) {
-    x <- els[[nm]]
+
+  for (nm in names(env)) {
+    x <- env[[nm]]
     if (is.function(x) && !inherits(x, "docker_client_method")) {
-      x <- docker_client_method_nonapi(x, class, nm)
+      env[[nm]] <- docker_client_method_nonapi(x, class, nm)
     }
-    x
   }
-  els[] <- lapply(names(els), add_help_nonapi)
 
-  ret <- list2env(els, parent = emptyenv())
-  class(ret) <- c(class, "stevedore_object")
-  if (lock) {
-    lock_environment(ret)
-  }
+  class(env) <- c(class, "stevedore_object")
+  lock_environment(env)
+  env
+}
+
+
+new_stevedore_object <- function(parent) {
+  ret <- new_empty_env()
+  ret$.parent <- parent %||% ret
   ret
 }
 
@@ -173,9 +174,9 @@ build_status_id <- function(content) {
 }
 
 
-after_system_login <- function(response, params, api_client) {
+after_system_login <- function(response, params, self) {
   serveraddress <- from_json(params$body)$serveraddress
-  api_client$auth$set(serveraddress, params$body)
+  self$.parent$.api_client$auth$set(serveraddress, params$body)
   invisible(TRUE)
 }
 
@@ -193,13 +194,13 @@ after_container_list <- function(response, ...) {
 }
 
 
-after_container_create <- function(response, params, api_client) {
+after_container_create <- function(response, params, self) {
   report_warnings(response$warnings, "creating container")
-  docker_client_container(response$id, api_client)
+  docker_client_container(response$id, self$.parent)
 }
 
 
-after_container_archive <- function(response, params, api_client) {
+after_container_archive <- function(response, params, self) {
   if (is.null(params$dest)) {
     response
   } else {
@@ -209,8 +210,8 @@ after_container_archive <- function(response, params, api_client) {
 }
 
 
-after_exec_create <- function(response, params, api_client) {
-  docker_client_exec(response$id, api_client)
+after_exec_create <- function(response, params, self) {
+  docker_client_exec(response$id, self$.parent)
 }
 
 
@@ -238,20 +239,20 @@ after_container_top <- function(response, ...) {
 }
 
 
-after_image_commit <- function(response, params, api_client) {
-  docker_client_image(response$id, api_client)
+after_image_commit <- function(response, params, self) {
+  docker_client_image(response$id, self$.parent)
 }
 
 
-after_image_build <- function(response, params, api_client) {
+after_image_build <- function(response, params, self) {
   id <- build_status_id(response$response$content)
-  docker_client_image(id, api_client)
+  docker_client_image(id, self$.parent)
 }
 
 
-after_image_pull <- function(response, params, api_client) {
+after_image_pull <- function(response, params, self) {
   id <- sprintf("%s:%s", params$query$fromImage, params$query$tag)
-  docker_client_image(id, api_client)
+  docker_client_image(id, self$.parent)
 }
 
 
@@ -267,13 +268,13 @@ after_image_push <- function(response, ...) {
 }
 
 
-after_network_create <- function(response, params, api_client) {
-  docker_client_network(response$id, api_client)
+after_network_create <- function(response, params, self) {
+  docker_client_network(response$id, self$.parent)
 }
 
 
-after_volume_create <- function(response, params, api_client) {
-  docker_client_volume(response$name, api_client)
+after_volume_create <- function(response, params, self) {
+  docker_client_volume(response$name, self$.parent)
 }
 
 
@@ -291,6 +292,17 @@ after_exec_start <- function(response, ...) {
   ## this (I think Jeroen has written all the required bits into
   ## curl).
   invisible(decode_chunked_string(response$response$content))
+}
+
+
+after_container_update <- function(response, params, self) {
+  report_warnings(response$warnings, "updating container")
+  invisible(self)
+}
+
+
+invisible_self <- function(response, params, self) {
+  invisible(self)
 }
 
 
@@ -611,10 +623,10 @@ mcr_process_image_and_tag <- function(image, tag) {
 }
 
 
-mcr_prepare_auth <- function(auth, image, registry_auth) {
+mcr_prepare_auth <- function(image, registry_auth) {
   substitute(
-    registry_auth <- auth$get(parse_image_name(image)$registry),
-    list(auth = auth, image = image, registry_auth = registry_auth))
+    registry_auth <- api_client$auth$get(parse_image_name(image)$registry),
+    list(image = image, registry_auth = registry_auth))
 }
 
 
@@ -622,7 +634,7 @@ mcr_prepare_push <- function(name, tag, registry_auth) {
   substitute({
     name <- parse_image_name(name)
     tag <- name$tag %||% "latest"
-    registry_auth <- auth$get(name$registry) %||% base64encode("{}")
+    registry_auth <- api_client$auth$get(name$registry) %||% base64encode("{}")
     name <- sprintf("%s/%s", name$registry, name$image)
   }, list(name = name, tag = tag, registry_auth = registry_auth))
 }
@@ -639,12 +651,68 @@ is_dummy_id <- function(id) {
 }
 
 
-docker_client_getter <- function(getter, api_client, name = "id") {
+## TODO: make this more like add_inspect?
+docker_client_getter <- function(getter, parent, name = "id") {
   env <- new.env(parent = baseenv())
-  env$api_client <- api_client
   env$getter <- getter
+  env$parent <- parent
+
   args <- alist(id =)
   names(args) <- name
-  body <- substitute(getter(id, api_client), list(id = as.name(name)))
+  body <- substitute(getter(id, parent), list(id = as.name(name)))
+
   as.function(c(args, body), env)
+}
+
+
+docker_client_add_inspect <- function(id, key_name, inspect_name, self) {
+  if (is_dummy_id(id)) {
+    inspect <- function(id) set_names(list(id), key_name)
+  } else {
+    inspect <- docker_client_method(inspect_name, self)
+  }
+
+  self$.attrs <- inspect(id)
+
+  self$reload <- function() {
+    self$.attrs <- inspect(self$.attrs$id)
+    invisible(self)
+  }
+
+  self$inspect <- function(reload = TRUE) {
+    if (reload) {
+      self$reload()
+    }
+    self$.attrs
+  }
+
+  self[[key_name]] <- function() self$.attrs[[key_name]]
+
+  ## Used to fix ids, and may move into the self object?
+  self$.attrs[key_name]
+}
+
+
+docker_client_container_ports <- function(attrs) {
+  ports <- attrs$network_settings$ports
+
+  if (length(ports) == 0L) {
+    container_port <- protocol <- host_ip <- host_port <- character(0)
+  } else {
+    container <- strsplit(names(ports), "/", fixed = TRUE)
+    stopifnot(all(lengths(container) == 2L))
+    len <- viapply(ports, nrow)
+    container_port <- rep(vcapply(container, "[[", 1L), len)
+    protocol <- rep(vcapply(container, "[[", 2L), len)
+    host_ip <- unlist(lapply(ports, "[[", "host_ip"), use.names = FALSE)
+    host_port <- unlist(lapply(ports, "[[", "host_port"), use.names = FALSE)
+  }
+  data_frame(container_port, protocol, host_ip, host_port)
+}
+
+
+docker_client_container_image <- function(self) {
+  attrs <- self$inspect(FALSE)
+  image_id <- strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]]
+  docker_client_image(image_id, self$.parent)
 }

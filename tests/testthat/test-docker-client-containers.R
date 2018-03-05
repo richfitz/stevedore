@@ -1038,3 +1038,29 @@ test_that("get (offline)", {
   expect_is(x, "docker_container")
   expect_equal(x$id(), dummy_id())
 })
+
+
+test_that("process ports", {
+  expect_equal(docker_client_container_ports(NULL),
+               data_frame(container_port = character(0),
+                          protocol = character(0),
+                          host_ip = character(0),
+                          host_port = character(0)))
+
+  d <- list("80/tcp" = data_frame(host_ip = "0.0.0.0", host_port = "32789"))
+  attrs <- list(network_settings = list(ports = d))
+
+  expect_equal(docker_client_container_ports(attrs),
+               data_frame(container_port = "80",
+                          protocol = "tcp",
+                          host_ip = "0.0.0.0",
+                          host_port = "32789"))
+
+  cl <- docker_client(http_client_type = "null")
+  x <- cl$containers$get(dummy_id())
+  expect_equal(x$ports(),
+               data_frame(container_port = character(0),
+                          protocol = character(0),
+                          host_ip = character(0),
+                          host_port = character(0)))
+})

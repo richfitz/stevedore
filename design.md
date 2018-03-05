@@ -4,7 +4,7 @@ Notes on developing `stevedore` - read this before trying to get started changin
 
 By default, `stevedore` will not run any test that interacts with the docker daemon, and only test "safe" code.  You must opt-in to the full test suite by setting the environment variable `STEVEDORE_TEST_USE_DOCKER` to `true`.
 
-**WARNING**: If you do opt in to the full test suite, it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  It will not warn before deleting anything and **will** call all `prune` commands during running.
+**WARNING**: If you do opt in to the full test suite, it will do all sorts of things to your containers/images/volumes/networks.  Do not run it unless you'd be happy running `docker system prune -f --volumes`.  It will not warn before deleting anything and **will** call all `prune` commands during running.  The docker-using tests are also much slower to run than the offline tests (~100s vs 16s).
 
 There are some tests that authenticate to dockerhub to use a private repository.  These tests will just skip if the `STEVEDORE_STEVEDOREBOT_PASS` environment variable is not set to the password.  If this poses a problem, this can be generalised out to use any account.
 

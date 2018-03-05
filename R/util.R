@@ -402,3 +402,8 @@ base64encode <- function(x) {
 base64decode <- function(x) {
   rawToChar(openssl::base64_decode(x))
 }
+
+
+new_empty_env <- function() {
+  new.env(parent = emptyenv())
+}

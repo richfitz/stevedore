@@ -64,12 +64,11 @@ test_that("construct all api versions", {
     expect_equal(d$api_version(), v)
 
     ## then the special objects:
-    api_client <- docker_api_client(type = "null")
-    expect_silent(docker_client_container(dummy_id(), api_client))
-    expect_silent(docker_client_image(dummy_id(), api_client))
-    expect_silent(docker_client_network(dummy_id(), api_client))
-    expect_silent(docker_client_volume(dummy_id(), api_client))
-    expect_silent(docker_client_exec(dummy_id(), api_client))
+    expect_silent(docker_client_container(dummy_id(), d))
+    expect_silent(docker_client_image(dummy_id(), d))
+    expect_silent(docker_client_network(dummy_id(), d))
+    expect_silent(docker_client_volume(dummy_id(), d))
+    expect_silent(docker_client_exec(dummy_id(), d))
   }
 })
 

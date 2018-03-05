@@ -42,290 +42,288 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
                           http_client_type = NULL) {
   assert_empty_dots(..., name = "docker_client")
 
-  ## The design through here mimics the Python docker library; we have
-  ## a concept of a "foo collection" (e.g., a container collection)
-  ## that produces instances of "foo" objects (e.g., containers).
-  ## This will be replicated for networks, volumes, etc.  Unlike the
-  ## Python inteface we're not doing this with any fancy inheritance
-  ## etc.
-  api_client <- docker_api_client(base_url = url, api_version = api_version,
-                                  type = http_client_type, ...)
+  self <- new_stevedore_object(NULL)
+  self$.api_client <-
+    docker_api_client(base_url = url, api_version = api_version,
+                      type = http_client_type, ...)
 
-  ret <- stevedore_object(
-    "docker_client",
-    api_client,
-    events = docker_client_method(
-      "system_events", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    df = docker_client_method("system_df", api_client),
-    info = docker_client_method("system_info", api_client),
-    login = docker_client_method(
-      "system_auth", api_client, after = after_system_login),
-    ping = docker_client_method("system_ping", api_client),
-    version = docker_client_method("system_version", api_client),
-    api_version = function() api_client$http_client$api_version,
-    lock = FALSE)
+  self$events <- docker_client_method(
+    "system_events", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
 
-  ret$containers <- docker_client_container_collection(api_client, ret)
-  ret$images <- docker_client_image_collection(api_client, ret)
-  ret$networks <- docker_client_network_collection(api_client, ret)
-  ret$volumes <- docker_client_volume_collection(api_client, ret)
+  self$df <- docker_client_method("system_df", self)
 
-  lock_environment(ret)
-  ret
+  self$info <- docker_client_method("system_info", self)
+
+  self$login <- docker_client_method(
+    "system_auth", self, after = after_system_login)
+
+  self$ping <- docker_client_method("system_ping", self)
+
+  self$version <- docker_client_method("system_version", self)
+  self$api_version <- function() self$.api_client$http_client$api_version
+
+  self$containers <- docker_client_container_collection(self)
+  self$images <- docker_client_image_collection(self)
+  self$networks <- docker_client_network_collection(self)
+  self$volumes <- docker_client_volume_collection(self)
+
+  stevedore_object(self, "docker_client")
 }
 
-docker_client_container_collection <- function(api_client, parent) {
-  stevedore_object(
-    "docker_container_collection",
-    api_client,
-    run = make_docker_run(parent, api_client$http_client$can_stream),
-    create = docker_client_method(
-      "container_create", api_client,
-      promote = c("image", "cmd"),
-      rename = c(ports = "exposed_ports", network = "networking_config"),
-      defaults = alist(image =),
-      process = list(
-        quote(image <- get_image_id(image)),
-        quote(cmd <- validate_command(cmd)),
-        quote(env <- validate_env(env)),
-        mcr_volumes_for_create(quote(volumes), quote(host_config)),
-        mcr_ports_for_create(quote(ports), quote(host_config)),
-        mcr_network_for_create(quote(network), quote(host_config))),
-      after = after_container_create),
-    get = docker_client_getter(docker_client_container, api_client),
-    list = docker_client_method(
-      "container_list", api_client,
-      process = list(quote(filters <- as_docker_filter(filters))),
-      after = after_container_list),
-    remove = docker_client_method(
-      "container_delete", api_client,
-      rename = c(delete_volumes = "v"),
-      process = list(quote(id <- get_image_id(id)))),
-    prune = docker_client_method(
-      "container_prune", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))))
+docker_client_container_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$run <- make_docker_run(parent)
+
+  self$create <- docker_client_method(
+    "container_create", self,
+    promote = c("image", "cmd"),
+    rename = c(ports = "exposed_ports", network = "networking_config"),
+    defaults = alist(image =),
+    process = list(
+      quote(image <- get_image_id(image)),
+      quote(cmd <- validate_command(cmd)),
+      quote(env <- validate_env(env)),
+      mcr_volumes_for_create(quote(volumes), quote(host_config)),
+      mcr_ports_for_create(quote(ports), quote(host_config)),
+      mcr_network_for_create(quote(network), quote(host_config))),
+    after = after_container_create)
+
+  self$get <- docker_client_getter(docker_client_container, parent)
+
+  self$list <- docker_client_method(
+    "container_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))),
+    after = after_container_list)
+
+  self$remove <- docker_client_method(
+    "container_delete", self,
+    rename = c(delete_volumes = "v"),
+    process = list(quote(id <- get_image_id(id))))
+
+  self$prune <- docker_client_method(
+    "container_prune", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  stevedore_object(self, "docker_container_collection")
 }
 
-docker_client_container <- function(id, api_client) {
-  container_inspect <- docker_client_method("container_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) list(id = id) else container_inspect(id)
-  id <- attrs$id
-  self <- NULL
+docker_client_container <- function(id, parent) {
+  self <- new_stevedore_object(parent)
 
-  reload <- function() {
-    attrs <<- container_inspect(id)
-    invisible(self)
-  }
-  after_start <- function(x, ...) {
-    invisible(self)
-  }
-  after_update <- function(x, ...) {
-    report_warnings(x$warnings, "updating container")
-    invisible(self)
-  }
-  ports <- function(reload = TRUE) {
-    ports <- self$inspect(reload)$network_settings$ports
-    if (length(ports) == 0L) {
-      container_port <- protocol <- host_ip <- host_port <- character(0)
-    } else {
-      container <- strsplit(names(ports), "/", fixed = TRUE)
-      stopifnot(all(lengths(container) == 2L))
-      len <- viapply(ports, nrow)
-      container_port <- rep(vcapply(container, "[[", 1L), len)
-      protocol <- rep(vcapply(container, "[[", 2L), len)
-      host_ip <- unlist(lapply(ports, "[[", "host_ip"), use.names = FALSE)
-      host_port <- unlist(lapply(ports, "[[", "host_port"), use.names = FALSE)
-    }
-    data_frame(container_port, protocol, host_ip, host_port)
-  }
-  status <- function(reload = TRUE) {
-    self$inspect(reload)$state$status
-  }
-  fix_id <- list(id = id)
+  ## Will add an .attrs field, and reload, inspect and id methods
+  fix_id <-
+    docker_client_add_inspect(id, "id", "container_inspect", self)
 
-  ## TODO: friendly "copy" interface needed here, but that requires a
-  ## bit more general work really.
-  self <- stevedore_object(
-    "docker_container",
-    api_client,
-    id = function() id,
-    name = function() drop_leading_slash(attrs$name),
-    image = function() {
-      docker_client_image(
-        strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]], api_client)
-    },
-    labels = function() attrs$config$labels,
-    status = status,
-    inspect = function(reload = TRUE) {
-      if (reload) {
-        reload()
-      }
-      attrs
-    },
-    ## TODO: "attach" is hard because it might need to hijack the
-    ## connection and deal with stdin (follow logs is close but not
-    ## quite the same)
-    ## attach = docker_client_method("container_attach", api_client,
-    ##    fix = fix_id)
-    ##
-    ## NOTE: The promotion list for commit is to mimic the argument
-    ## list for the command line version of `docker commit` (minus
-    ## "id" which is fixed).
-    commit = docker_client_method(
-      "image_commit", api_client,
-      process = list(quote(env <- validate_env(env))),
-      promote = c("repo", "tag", "author", "changes", "comment", "pause"),
-      fix = list(container = id), after = after_image_commit),
-    diff = docker_client_method(
-      "container_changes", api_client, fix = fix_id),
-    ## TODO: inject 'start' into here too, which then requires passing
-    ## detach through as well and dealing with those through the
-    ## 'after' function.
-    exec = docker_client_method(
-      "exec_create", api_client, fix = fix_id,
-      rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
-                 stdin = "attach_stdin"),
-      defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
-      promote = "cmd",
-      process = list(quote(cmd <- validate_command(cmd)),
-                     quote(env <- validate_env(env))),
-      after = after_exec_create),
-    export = docker_client_method(
-      "container_export", api_client, fix = fix_id),
-    path_stat = docker_client_method(
-      "container_path_stat", api_client, fix = fix_id,
-      after = after_container_path_stat),
-    ##
-    get_archive = docker_client_method(
-      "container_archive", api_client, fix = fix_id, extra = alist(dest =),
-      process = list(quote(assert_scalar_character_or_null(dest))),
-      after = after_container_archive),
-    ## TODO: option for compression, pass through to tar file (much
-    ## easier to get right if we can rely on R tar)
-    put_archive = docker_client_method(
-      "container_import", api_client, fix = fix_id,
-      rename = c(src = "input_stream"),
-      process = list(quote(src <- validate_tar_input(src))),
-      after = nothing),
-    ##
-    kill = docker_client_method(
-      "container_kill", api_client, fix = fix_id),
-    ## Logs; quite complicated in the case of 'follow'
-    ## -  stream has an effect *only* if follow is TRUE
-    logs = docker_client_method(
-      "container_logs", api_client, fix = fix_id,
-      defaults = list(stdout = TRUE, stderr = TRUE),
-      process = list(
-        quote(if (is.numeric(tail)) tail <- as.character(tail)),
-        mcr_prepare_stream_and_close(quote(stream))),
-      extra = alist(stream = stdout()),
-      hijack = quote(if (isTRUE(follow))
-                       streaming_text(docker_stream_printer(stream))),
-      allow_hijack_without_stream = FALSE,
-      after = after_container_logs),
-    pause = docker_client_method(
-      "container_pause", api_client, fix = fix_id),
-    ## This should invalidate our container afterwards
-    ## NOTE: consider using parent?
-    remove = docker_client_method(
-      "container_delete", api_client, fix = fix_id,
-      rename = c(delete_volumes = "v")),
-    ## This might force refresh?
-    rename = docker_client_method(
-      "container_rename", api_client, fix = fix_id),
-    resize = docker_client_method(
-      "container_resize", api_client, fix = fix_id),
-    restart = docker_client_method(
-      "container_restart", api_client, fix = fix_id),
-    start = docker_client_method(
-      "container_start", api_client, fix = fix_id, after = after_start),
-    ## TODO: expose stream (but with nice printing and escape instructions?)
-    stats = docker_client_method(
-      "container_stats", api_client, fix = c(fix_id, stream = FALSE)),
-    stop = docker_client_method(
-      "container_stop", api_client, fix = fix_id),
-    top = docker_client_method(
-      "container_top", api_client, fix = fix_id, after = after_container_top),
-    unpause = docker_client_method(
-      "container_unpause", api_client, fix = fix_id),
-    update = docker_client_method(
-      "container_update", api_client, fix = fix_id, after = after_update),
-    wait = docker_client_method(
-      "container_wait", api_client, fix = fix_id),
-    ports = ports,
-    reload = reload)
-  self
+  ## These will probably get rationalised soon as there is a pattern here
+  self$name <- function() drop_leading_slash(self$inspect(FALSE)$name)
+  self$labels <- function(reload = TRUE) self$inspect(reload)$config$labels
+  self$status <- function(reload = TRUE) self$inspect(reload)$state$status
+  self$image <- function() {
+    docker_client_container_image(self)
+  }
+  self$ports <- function(reload = TRUE) {
+    docker_client_container_ports(self$inspect(reload))
+  }
+
+  ## TODO: "attach" is hard because it might need to hijack the
+  ## connection and deal with stdin (follow logs is close but not
+  ## quite the same)
+  ## attach = docker_client_method("container_attach", self,
+  ##    fix = fix_id)
+  ##
+  ## NOTE: The promotion list for commit is to mimic the argument
+  ## list for the command line version of `docker commit` (minus
+  ## "id" which is fixed).
+  self$commit <- docker_client_method(
+    "image_commit", self,
+    process = list(quote(env <- validate_env(env))),
+    promote = c("repo", "tag", "author", "changes", "comment", "pause"),
+    fix = list(container = id), after = after_image_commit)
+
+  self$diff <- docker_client_method(
+    "container_changes", self, fix = fix_id)
+
+  ## TODO: inject 'start' into here too, which then requires passing
+  ## detach through as well and dealing with those through the
+  ## 'after' function.
+  self$exec <- docker_client_method(
+    "exec_create", self, fix = fix_id,
+    rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
+               stdin = "attach_stdin"),
+    defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
+    promote = "cmd",
+    process = list(quote(cmd <- validate_command(cmd)),
+                   quote(env <- validate_env(env))),
+    after = after_exec_create)
+
+  self$export <- docker_client_method(
+    "container_export", self, fix = fix_id)
+
+  self$path_stat <- docker_client_method(
+    "container_path_stat", self, fix = fix_id,
+    after = after_container_path_stat)
+
+  self$get_archive <- docker_client_method(
+    "container_archive", self, fix = fix_id,
+    extra = alist(dest =),
+    process = list(quote(assert_scalar_character_or_null(dest))),
+    after = after_container_archive)
+
+  ## TODO: option for compression, pass through to tar file (much
+  ## easier to get right if we can rely on R tar)
+  self$put_archive <- docker_client_method(
+    "container_import", self, fix = fix_id,
+    rename = c(src = "input_stream"),
+    process = list(quote(src <- validate_tar_input(src))),
+    after = nothing)
+
+  self$kill <- docker_client_method(
+    "container_kill", self, fix = fix_id)
+
+  ## Logs; quite complicated in the case of 'follow'
+  ## -  stream has an effect *only* if follow is TRUE
+  self$logs <- docker_client_method(
+    "container_logs", self, fix = fix_id,
+    defaults = list(stdout = TRUE, stderr = TRUE),
+    process = list(
+      quote(if (is.numeric(tail)) tail <- as.character(tail)),
+      mcr_prepare_stream_and_close(quote(stream))),
+    extra = alist(stream = stdout()),
+    hijack = quote(if (isTRUE(follow))
+                     streaming_text(docker_stream_printer(stream))),
+    allow_hijack_without_stream = FALSE,
+    after = after_container_logs)
+
+  self$pause <- docker_client_method(
+    "container_pause", self, fix = fix_id)
+
+  self$remove <- docker_client_method(
+    "container_delete", self, fix = fix_id,
+    rename = c(delete_volumes = "v"))
+
+  ## This might force refresh?
+  self$rename <- docker_client_method(
+      "container_rename", self, fix = fix_id)
+
+  self$resize <- docker_client_method(
+    "container_resize", self, fix = fix_id)
+
+  self$restart <- docker_client_method(
+      "container_restart", self, fix = fix_id)
+
+  self$start <- docker_client_method(
+    "container_start", self, fix = fix_id, after = invisible_self)
+
+  ## TODO: expose stream (but with nice printing and escape instructions?)
+  self$stats <- docker_client_method(
+    "container_stats", self, fix = c(fix_id, stream = FALSE))
+
+  self$stop <- docker_client_method(
+    "container_stop", self, fix = fix_id)
+
+  self$top <- docker_client_method(
+    "container_top", self, fix = fix_id,
+    after = after_container_top)
+
+  self$unpause <- docker_client_method(
+    "container_unpause", self, fix = fix_id)
+
+  self$update <- docker_client_method(
+    "container_update", self, fix = fix_id,
+    after = after_container_update)
+
+  self$wait <- docker_client_method(
+    "container_wait", self, fix = fix_id)
+
+  stevedore_object(self, "docker_container")
 }
 
 
-docker_client_image_collection <- function(api_client, parent) {
-  stevedore_object(
-    "docker_image_collection",
-    api_client,
-    ## TODO: control returning output too
-    build = docker_client_method(
-      "image_build", api_client,
-      drop = "content_type",
-      rename = c(context = "input_stream", tag = "t"),
-      defaults = alist(context =),
-      extra = alist(verbose = NULL, stream = stdout()),
-      process = list(
-        mcr_prepare_stream_and_close(quote(stream)),
-        quote(context <- validate_tar_directory(context, dockerfile))),
-      hijack = quote(streaming_json(build_status_printer(stream))),
-      allow_hijack_without_stream = TRUE,
-      after = after_image_build),
-    get = docker_client_getter(docker_client_image, api_client),
-    list = docker_client_method(
-      "image_list", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    import = docker_client_method("image_import", api_client),
-    ## TODO: add filename argument for saving (see image_tarball)
-    export = docker_client_method(
-      "image_export", api_client),
-    pull = docker_client_method(
-      "image_create", api_client, rename = c("name" = "from_image"),
-      drop = c("input_image", "from_src", "repo", "registry_auth"),
-      data = list(auth = api_client$auth),
-      process = list(
-        mcr_prepare_stream_and_close(quote(stream)),
-        mcr_process_image_and_tag(quote(name), quote(tag)),
-        mcr_prepare_auth(quote(auth), quote(name), quote(registry_auth))),
-      extra = alist(stream = stdout()),
-      defaults = alist(name =),
-      hijack = quote(streaming_json(pull_status_printer(stream))),
-      allow_hijack_without_stream = TRUE,
-      after = after_image_pull),
-    push = docker_client_method(
-      "image_push", api_client,
-      drop = c("registry_auth", "tag"),
-      data = list(auth = api_client$auth),
-      extra = alist(stream = stdout()),
-      hijack = quote(streaming_json(pull_status_printer(stream))),
-      process = list(
-        mcr_prepare_stream_and_close(quote(stream)),
-        mcr_prepare_push(quote(name), quote(tag), quote(registry_auth))),
-      after = after_image_push),
-    search = docker_client_method(
-      "image_search", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    remove = docker_client_method("image_delete", api_client),
-    prune = docker_client_method(
-      "image_prune", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    build_clean = docker_client_method(
-      "image_build_clean", api_client))
+docker_client_image_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$get <- docker_client_getter(docker_client_image, parent)
+
+  ## TODO: control returning output too
+  self$build <- docker_client_method(
+    "image_build", self,
+    drop = "content_type",
+    rename = c(context = "input_stream", tag = "t"),
+    defaults = alist(context =),
+    extra = alist(verbose = NULL, stream = stdout()),
+    process = list(
+      mcr_prepare_stream_and_close(quote(stream)),
+      quote(context <- validate_tar_directory(context, dockerfile))),
+    hijack = quote(streaming_json(build_status_printer(stream))),
+    allow_hijack_without_stream = TRUE,
+    after = after_image_build)
+
+  self$list <- docker_client_method(
+    "image_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$import <- docker_client_method("image_import", self)
+
+  ## TODO: add filename argument for saving (see image_tarball)
+  self$export <- docker_client_method("image_export", self)
+
+  self$pull <- docker_client_method(
+    "image_create", self, rename = c("name" = "from_image"),
+    drop = c("input_image", "from_src", "repo", "registry_auth"),
+    process = list(
+      mcr_prepare_stream_and_close(quote(stream)),
+      mcr_process_image_and_tag(quote(name), quote(tag)),
+      mcr_prepare_auth(quote(name), quote(registry_auth))),
+    extra = alist(stream = stdout()),
+    defaults = alist(name =),
+    hijack = quote(streaming_json(pull_status_printer(stream))),
+    allow_hijack_without_stream = TRUE,
+    after = after_image_pull)
+
+  self$push <- docker_client_method(
+    "image_push", self,
+    drop = c("registry_auth", "tag"),
+    extra = alist(stream = stdout()),
+    hijack = quote(streaming_json(pull_status_printer(stream))),
+    process = list(
+      mcr_prepare_stream_and_close(quote(stream)),
+      mcr_prepare_push(quote(name), quote(tag), quote(registry_auth))),
+    after = after_image_push)
+
+  self$search <- docker_client_method(
+    "image_search", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$remove <- docker_client_method("image_delete", self)
+
+  self$prune <- docker_client_method(
+    "image_prune", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$build_clean <- docker_client_method(
+    "image_build_clean", self)
+
+  stevedore_object(self, "docker_image_collection")
 }
 
-docker_client_image <- function(id, api_client) {
-  image_inspect <- docker_client_method("image_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) list(id = id) else image_inspect(id)
+docker_client_image <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+
+  ## TODO: do this by using the parent.  That requires a bit of wor
+  ## because all sorts of things can be the parent here so we'll need
+  ## to go back up until we hit the main object and then come back
+  ## down to the image collection I think?  But then that does not
+  ## include the free version of inspect so that's not much use.
+  image_inspect <- docker_client_method(
+    "image_inspect", self)
+
+  self$.attrs <- if (is_dummy_id(id)) list(id = id) else image_inspect(id)
   name <- id
-  id <- attrs$id
-  self <- NULL
+  id <- self$.attrs$id
   reload <- function() {
-    attrs <<- image_inspect(id)
+    self$.attrs <- image_inspect(id)
     invisible(self)
   }
   invisible_self <- function(...) {
@@ -338,186 +336,213 @@ docker_client_image <- function(id, api_client) {
     valid <- setdiff(self$inspect()$repo_tags, "<none>:<none>")
     if (!(repo_tag %in% valid)) {
       stop(sprintf("Invalid repo_tag '%s' for image '%s'",
-                   repo_tag, attrs$id))
+                   repo_tag, self$.attrs$id))
     }
     ## NOTE: this is a little awkward - we can't use self$remove()
     ## because that refers to the actual iage id, which is not what we
     ## want.  So we rebuild the endpoint without the `fix` argument
     ## and then call it with just the tag.
-    docker_client_method("image_delete", api_client)(repo_tag, noprune = TRUE)
+    docker_client_method(
+      "image_delete", self)(repo_tag, noprune = TRUE)
     invisible(self$reload())
   }
   fix_id_as_name = list(name = id)
-  self <- stevedore_object(
-    "docker_image",
-    api_client,
-    id = function() attrs$id,
-    name = function() name,
-    labels = function() attrs$config$labels,
-    short_id = function() short_id(attrs$id),
-    tags = function() setdiff(attrs$repo_tags, "<none>:<none>"),
-    inspect = function(reload = TRUE) {
-      if (reload) {
-        reload()
-      }
-      attrs
-    },
-    history = docker_client_method(
-      "image_history", api_client, fix = fix_id_as_name),
-    ## TODO: this needs to add a 'filename' option for saving
-    export = docker_client_method(
-      "image_tarball", api_client, fix = fix_id_as_name),
-    tag = docker_client_method(
-      "image_tag", api_client, fix = fix_id_as_name,
-      after = invisible_self, defaults = alist(repo =)),
-    untag = untag,
-    ## NOTE: this always tries to remove the image by *id* not by
-    ## name, which is not ideal really.  When force = TRUE it's
-    ## basically the same I think.
-    remove = docker_client_method(
-      "image_delete", api_client, fix = fix_id_as_name),
-    reload = reload)
-  self
+
+  self$id <- function() self$.attrs$id
+  self$name <- function() name
+  self$labels <- function() self$.attrs$config$labels # reload?
+  self$short_id <- function() short_id(self$.attrs$id)
+  self$tags <- function() setdiff(self$.attrs$repo_tags, "<none>:<none>")
+  self$inspect <- function(reload = TRUE) {
+    if (reload) {
+      self$reload()
+    }
+    self$.attrs
+  }
+  self$reload = reload
+
+  self$history <- docker_client_method(
+    "image_history", self, fix = fix_id_as_name)
+
+  ## TODO: this needs to add a 'filename' option for saving
+  self$export <- docker_client_method(
+    "image_tarball", self, fix = fix_id_as_name)
+
+  self$tag <- docker_client_method(
+    "image_tag", self, fix = fix_id_as_name,
+    after = invisible_self, defaults = alist(repo =))
+
+  self$untag <- untag
+
+  ## NOTE: this always tries to remove the image by *id* not by
+  ## name, which is not ideal really.  When force = TRUE it's
+  ## basically the same I think.
+  self$remove <- docker_client_method(
+    "image_delete", self, fix = fix_id_as_name)
+
+  stevedore_object(self, "docker_image")
 }
 
-docker_client_network_collection <- function(api_client, parent) {
-  stevedore_object(
-    "docker_network_collection",
-    api_client,
-    create = docker_client_method(
-      "network_create", api_client, after = after_network_create,
-      defaults = alist(check_duplicate = TRUE)),
-    get = docker_client_getter(docker_client_network, api_client),
-    list = docker_client_method(
-      "network_list", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    remove = docker_client_method("network_delete", api_client),
-    prune = docker_client_method(
-      "network_prune", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))))
+docker_client_network_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$create <- docker_client_method(
+    "network_create", self, after = after_network_create,
+    defaults = alist(check_duplicate = TRUE))
+
+  self$get <- docker_client_getter(docker_client_network, parent)
+
+  self$list <- docker_client_method(
+    "network_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$remove <- docker_client_method("network_delete", self)
+
+  self$prune <- docker_client_method(
+    "network_prune", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  stevedore_object(self, "docker_network_collection")
 }
 
-docker_client_network <- function(id, api_client) {
-  network_inspect <- docker_client_method("network_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) list(id = id) else network_inspect(id)
-  id <- attrs$id
-  self <- NULL
+docker_client_network <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+  network_inspect <- docker_client_method("network_inspect", self)
+
+  self$.attrs <- if (is_dummy_id(id)) list(id = id) else network_inspect(id)
+  id <- self$.attrs$id
   reload <- function() {
-    attrs <<- network_inspect(id)
+    self$.attrs <- network_inspect(id)
     invisible(self)
   }
   containers <- function(reload = TRUE) {
     containers <- self$inspect(reload)$containers
-    lapply(names(containers), docker_client_container, api_client)
+    lapply(names(containers), docker_client_container, parent)
   }
   fix_id <- list(id = id)
 
-  self <- stevedore_object(
-    "docker_network",
-    api_client,
-    id = function() id,
-    name = function() attrs$name,
-    inspect = function(reload = TRUE) {
-      if (reload) {
-        reload()
-      }
-      attrs
-    },
-    containers = containers,
-    connect = docker_client_method(
-      "network_connect", api_client, fix = fix_id),
-    disconnect = docker_client_method(
-      "network_disconnect", api_client, fix = fix_id),
-    remove = docker_client_method(
-      "network_delete", api_client, fix = fix_id),
-    reload = reload)
-  self
+  self$id = function() id
+  self$name = function() self$.attrs$name
+  self$inspect = function(reload = TRUE) {
+    if (reload) {
+      reload()
+    }
+    self$.attrs
+  }
+
+  self$containers <- containers
+
+  self$connect <- docker_client_method(
+    "network_connect", self, fix = fix_id)
+
+  self$disconnect <- docker_client_method(
+    "network_disconnect", self, fix = fix_id)
+
+  self$remove <- docker_client_method(
+    "network_delete", self, fix = fix_id)
+
+  self$reload <- reload
+  stevedore_object(self, "docker_network")
 }
 
-docker_client_volume_collection <- function(api_client, parent) {
-  stevedore_object(
-    "docker_volume_collection",
-    api_client,
-    create = docker_client_method(
-      "volume_create", api_client, after = after_volume_create),
-    get = docker_client_getter(docker_client_volume, api_client, "name"),
-    list = docker_client_method(
-      "volume_list", api_client, after = after_volume_list,
-      process = list(quote(filters <- as_docker_filter(filters)))),
-    remove = docker_client_method("volume_delete", api_client),
-    prune = docker_client_method(
-      "volume_prune", api_client,
-      process = list(quote(filters <- as_docker_filter(filters)))))
+docker_client_volume_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$create <- docker_client_method(
+    "volume_create", self, after = after_volume_create)
+
+  self$get <- docker_client_getter(docker_client_volume, parent,
+                                   "name")
+
+  self$list <- docker_client_method(
+    "volume_list", self, after = after_volume_list,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$remove <- docker_client_method("volume_delete", self)
+
+  self$prune <- docker_client_method(
+    "volume_prune", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+  stevedore_object(self, "docker_volume_collection")
 }
 
-docker_client_volume <- function(name, api_client) {
-  volume_inspect <- docker_client_method("volume_inspect", api_client)
-  attrs <- if (is_dummy_id(name)) list(name = name) else volume_inspect(name)
-  name <- attrs$name
-  self <- NULL
+docker_client_volume <- function(name, parent) {
+  self <- new_stevedore_object(parent)
+  volume_inspect <- docker_client_method(
+    "volume_inspect", self)
+
+  self$.attrs <-
+    if (is_dummy_id(name)) list(name = name) else volume_inspect(name)
+  name <- self$.attrs$name
   reload <- function() {
-    attrs <<- volume_inspect(name)
+    self$.attrs <- volume_inspect(name)
     invisible(self)
   }
 
-  self <- stevedore_object(
-    "docker_volume",
-    api_client,
-    name = function() attrs$name,
-    inspect = function(reload = TRUE) {
+  self$name <- function() self$.attrs$name
+
+  self$inspect <- function(reload = TRUE) {
       if (reload) {
         reload()
       }
-      attrs
-    },
-    map = function(path, readonly = FALSE) {
-      assert_scalar_character(path)
-      assert_scalar_logical(readonly)
-      fmt <- "%s:%s"
-      if (readonly) {
-        fmt <- paste0(fmt, ":ro")
-      }
-      sprintf(fmt, name, path)
-    },
-    remove = docker_client_method(
-      "volume_delete", api_client, fix = list(name = name)),
-    reload = reload)
-  self
+      self$.attrs
+    }
+
+  self$map <- function(path, readonly = FALSE) {
+    assert_scalar_character(path)
+    assert_scalar_logical(readonly)
+    fmt <- "%s:%s"
+    if (readonly) {
+      fmt <- paste0(fmt, ":ro")
+    }
+    sprintf(fmt, name, path)
+  }
+
+  self$remove <- docker_client_method(
+    "volume_delete", self, fix = list(name = name))
+
+  self$reload = reload
+
+  stevedore_object(self, "docker_volume")
 }
 
-docker_client_exec <- function(id, api_client) {
-  exec_inspect <- docker_client_method("exec_inspect", api_client)
-  attrs <- if (is_dummy_id(id)) NULL else exec_inspect(id)
-  self <- NULL
+docker_client_exec <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+
+  exec_inspect <- docker_client_method("exec_inspect", self)
+  self$.attrs <- if (is_dummy_id(id)) NULL else exec_inspect(id)
   reload <- function() {
-    attrs <<- exec_inspect(id)
+    self$.attrs <- exec_inspect(id)
     invisible(self)
   }
+
   ## Even though it feels like there *should* be a way, there is no
   ## way to get back to a detached exec instance.
   ## https://github.com/moby/moby/issues/9527
-  self <- stevedore_object(
-    "docker_exec",
-    api_client,
-    id = function() id,
-    ## TODO: control stream (location etc) following the same problem
-    ## in build.
-    ## TODO: explicitly set 'detach' argument
-    start = docker_client_method(
-      "exec_start", api_client, fix = list(id = id),
-      extra = alist(stream = stdout()),
-      hijack = quote(streaming_text(docker_stream_printer(stream))),
-      allow_hijack_without_stream = TRUE,
-      process = list(mcr_prepare_stream_and_close(quote(stream))),
-      after = after_exec_start),
-    inspect = function(reload = TRUE) {
-      if (reload) {
-        reload()
-      }
-      attrs
-    },
-    resize = docker_client_method(
-      "exec_resize", api_client, fix = list(id = id)),
-    reload = reload)
-  self
+  self$id <- function() id
+
+  ## TODO: control stream (location etc) following the same problem
+  ## in build.
+  ## TODO: explicitly set 'detach' argument
+  self$start <- docker_client_method(
+    "exec_start", self, fix = list(id = id),
+    extra = alist(stream = stdout()),
+    hijack = quote(streaming_text(docker_stream_printer(stream))),
+    allow_hijack_without_stream = TRUE,
+    process = list(mcr_prepare_stream_and_close(quote(stream))),
+    after = after_exec_start)
+
+  self$inspect = function(reload = TRUE) {
+    if (reload) {
+      reload()
+    }
+    self$.attrs
+  }
+
+  self$resize <- docker_client_method(
+    "exec_resize", self, fix = list(id = id))
+
+  self$reload <- reload
+
+  stevedore_object(self, "docker_exec")
 }
