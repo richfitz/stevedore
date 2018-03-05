@@ -268,12 +268,29 @@ yaml_handlers <- function() {
 }
 
 yaml_load_file <- function(path) {
+  yaml_check_version()
   yaml::yaml.load_file(path, handlers = yaml_handlers())
 }
 
 yaml_load <- function(str) {
+  yaml_check_version()
   yaml::yaml.load(str, handlers = yaml_handlers())
 }
+
+
+
+
+## Until https://github.com/viking/r-yaml/issues/52 is updated
+yaml_check_version <- function(yaml_version = packageVersion("yaml")) {
+  if (!isTRUE(.stevedore$yaml_version_ok)) {
+    if (yaml_version == numeric_version("2.1.17")) {
+      stop(
+        "This version of yaml will crash with docker's yaml: please downgrade")
+    }
+    .stevedore$yaml_version_ok <- TRUE
+  }
+}
+
 
 has_colour <- function(dest) {
   if (!is.null(dest) && !isatty(dest)) {

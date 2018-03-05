@@ -345,3 +345,13 @@ test_that("download_file", {
   expect_silent(download_file("https://google.com", dest, FALSE))
   expect_equal(readLines(dest), "testing")
 })
+
+
+## Until https://github.com/viking/r-yaml/issues/52 is updated
+test_that("yaml_check_version", {
+  .stevedore$yaml_version_ok <- NULL
+  expect_error(
+    yaml_check_version("2.1.17"),
+    "This version of yaml will crash with docker's yaml: please downgrade",
+    fixed = TRUE)
+})

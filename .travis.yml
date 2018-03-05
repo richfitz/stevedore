@@ -14,6 +14,9 @@ before_script:
   - docker pull bfirsh/reticulate-splines
   - docker pull nginx
   - (cd tests/testthat/images && ./build.sh)
+after_install:
+  # Force old version for now
+  - Rscript -e 'install.packages("https://cran.r-project.org/src/contrib/Archive/yaml/yaml_2.1.16.tar.gz", repos = NULL)'
 after_success:
   - Rscript -e 'covr::codecov()'
 env:
