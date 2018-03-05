@@ -665,7 +665,8 @@ docker_client_getter <- function(getter, parent, name = "id") {
 }
 
 
-docker_client_add_inspect <- function(id, key_name, inspect_name, self) {
+docker_client_add_inspect <- function(id, key_name, inspect_name, self,
+                                      key_name_in = key_name) {
   if (is_dummy_id(id)) {
     inspect <- function(id) set_names(list(id), key_name)
   } else {
@@ -675,7 +676,7 @@ docker_client_add_inspect <- function(id, key_name, inspect_name, self) {
   self$.attrs <- inspect(id)
 
   self$reload <- function() {
-    self$.attrs <- inspect(self$.attrs$id)
+    self$.attrs <- inspect(self$.attrs[[key_name]])
     invisible(self)
   }
 
@@ -688,8 +689,7 @@ docker_client_add_inspect <- function(id, key_name, inspect_name, self) {
 
   self[[key_name]] <- function() self$.attrs[[key_name]]
 
-  ## Used to fix ids, and may move into the self object?
-  self$.attrs[key_name]
+  set_names(list(self$.attrs[[key_name]]), key_name_in)
 }
 
 
@@ -713,6 +713,42 @@ docker_client_container_ports <- function(attrs) {
 
 docker_client_container_image <- function(self) {
   attrs <- self$inspect(FALSE)
-  image_id <- strsplit(attrs$image, ":", fixed = TRUE)[[1L]][[2L]]
+  image_id <- sub("^(sha256:)", "", attrs$image)
   docker_client_image(image_id, self$.parent)
+}
+
+
+## TODO: repo and tag should be separate as for tag (with option
+## to do them together).
+docker_client_image_untag <- function(repo_tag, image) {
+  repo_tag <- image_name_with_tag(repo_tag)
+  valid <- setdiff(image$inspect()$repo_tags, "<none>:<none>")
+  if (!(repo_tag %in% valid)) {
+    stop(sprintf("Invalid repo_tag '%s' for image '%s'",
+                 repo_tag, image$id()))
+  }
+  image$.parent$images$remove(repo_tag, noprune = TRUE)
+  image$reload()
+}
+
+
+docker_client_image_tags <- function(attrs) {
+  setdiff(attrs$repo_tags, "<none>:<none>")
+}
+
+
+docker_client_network_containers <- function(reload, self) {
+  containers <- self$inspect(reload)$containers
+  lapply(names(containers), docker_client_container, self$.parent)
+}
+
+
+docker_client_volume_map <- function(attrs, path, readonly = FALSE) {
+  assert_scalar_character(path)
+  assert_scalar_logical(readonly)
+  fmt <- "%s:%s"
+  if (readonly) {
+    fmt <- paste0(fmt, ":ro")
+  }
+  sprintf(fmt, attrs$name, path)
 }

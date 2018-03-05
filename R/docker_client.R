@@ -111,18 +111,13 @@ docker_client_container_collection <- function(parent) {
 
 docker_client_container <- function(id, parent) {
   self <- new_stevedore_object(parent)
-
-  ## Will add an .attrs field, and reload, inspect and id methods
-  fix_id <-
-    docker_client_add_inspect(id, "id", "container_inspect", self)
+  fix_id <- docker_client_add_inspect(id, "id", "container_inspect", self)
 
   ## These will probably get rationalised soon as there is a pattern here
   self$name <- function() drop_leading_slash(self$inspect(FALSE)$name)
   self$labels <- function(reload = TRUE) self$inspect(reload)$config$labels
   self$status <- function(reload = TRUE) self$inspect(reload)$state$status
-  self$image <- function() {
-    docker_client_container_image(self)
-  }
+  self$image <- function() docker_client_container_image(self)
   self$ports <- function(reload = TRUE) {
     docker_client_container_ports(self$inspect(reload))
   }
@@ -309,57 +304,23 @@ docker_client_image_collection <- function(parent) {
 }
 
 docker_client_image <- function(id, parent) {
-  self <- new_stevedore_object(parent)
-
-  ## TODO: do this by using the parent.  That requires a bit of wor
-  ## because all sorts of things can be the parent here so we'll need
-  ## to go back up until we hit the main object and then come back
-  ## down to the image collection I think?  But then that does not
-  ## include the free version of inspect so that's not much use.
-  image_inspect <- docker_client_method(
-    "image_inspect", self)
-
-  self$.attrs <- if (is_dummy_id(id)) list(id = id) else image_inspect(id)
+  ## NOTE: used in 'name()' to record the given name - this is
+  ## different to most of the other cases here and I'm not sure how
+  ## incredibly useful this is.  But it's the only way that we get to
+  ## record how the user requested the object vs all of the collected
+  ## information attached to it.
   name <- id
-  id <- self$.attrs$id
-  reload <- function() {
-    self$.attrs <- image_inspect(id)
-    invisible(self)
-  }
-  invisible_self <- function(...) {
-    invisible(self$reload())
-  }
-  ## TODO: repo and tag should be separate as for tag (with option
-  ## to do them together).
-  untag <- function(repo_tag) {
-    repo_tag <- image_name_with_tag(repo_tag)
-    valid <- setdiff(self$inspect()$repo_tags, "<none>:<none>")
-    if (!(repo_tag %in% valid)) {
-      stop(sprintf("Invalid repo_tag '%s' for image '%s'",
-                   repo_tag, self$.attrs$id))
-    }
-    ## NOTE: this is a little awkward - we can't use self$remove()
-    ## because that refers to the actual iage id, which is not what we
-    ## want.  So we rebuild the endpoint without the `fix` argument
-    ## and then call it with just the tag.
-    docker_client_method(
-      "image_delete", self)(repo_tag, noprune = TRUE)
-    invisible(self$reload())
-  }
-  fix_id_as_name = list(name = id)
 
-  self$id <- function() self$.attrs$id
+  self <- new_stevedore_object(parent)
+  fix_id_as_name <-
+    docker_client_add_inspect(id, "id", "image_inspect", self, "name")
+
   self$name <- function() name
-  self$labels <- function() self$.attrs$config$labels # reload?
-  self$short_id <- function() short_id(self$.attrs$id)
-  self$tags <- function() setdiff(self$.attrs$repo_tags, "<none>:<none>")
-  self$inspect <- function(reload = TRUE) {
-    if (reload) {
-      self$reload()
-    }
-    self$.attrs
+  self$labels <- function(reload = TRUE) self$inspect(reload)$config$labels
+  self$short_id <- function() short_id(self$inspect(FALSE)$id)
+  self$tags <- function(reload = TRUE) {
+    docker_client_image_tags(self$inspect(reload))
   }
-  self$reload = reload
 
   self$history <- docker_client_method(
     "image_history", self, fix = fix_id_as_name)
@@ -372,7 +333,7 @@ docker_client_image <- function(id, parent) {
     "image_tag", self, fix = fix_id_as_name,
     after = invisible_self, defaults = alist(repo =))
 
-  self$untag <- untag
+  self$untag <- function(repo_tag) docker_client_image_untag(repo_tag, self)
 
   ## NOTE: this always tries to remove the image by *id* not by
   ## name, which is not ideal really.  When force = TRUE it's
@@ -407,30 +368,14 @@ docker_client_network_collection <- function(parent) {
 
 docker_client_network <- function(id, parent) {
   self <- new_stevedore_object(parent)
-  network_inspect <- docker_client_method("network_inspect", self)
 
-  self$.attrs <- if (is_dummy_id(id)) list(id = id) else network_inspect(id)
-  id <- self$.attrs$id
-  reload <- function() {
-    self$.attrs <- network_inspect(id)
-    invisible(self)
-  }
-  containers <- function(reload = TRUE) {
-    containers <- self$inspect(reload)$containers
-    lapply(names(containers), docker_client_container, parent)
-  }
-  fix_id <- list(id = id)
+  fix_id <- docker_client_add_inspect(id, "id", "network_inspect", self)
 
-  self$id = function() id
-  self$name = function() self$.attrs$name
-  self$inspect = function(reload = TRUE) {
-    if (reload) {
-      reload()
-    }
-    self$.attrs
-  }
+  self$name <- function(reload = TRUE) self$inspect(reload)$name
 
-  self$containers <- containers
+  self$containers <- function(reload = TRUE) {
+    docker_client_network_containers(reload, self)
+  }
 
   self$connect <- docker_client_method(
     "network_connect", self, fix = fix_id)
@@ -441,7 +386,6 @@ docker_client_network <- function(id, parent) {
   self$remove <- docker_client_method(
     "network_delete", self, fix = fix_id)
 
-  self$reload <- reload
   stevedore_object(self, "docker_network")
 }
 
@@ -451,8 +395,7 @@ docker_client_volume_collection <- function(parent) {
   self$create <- docker_client_method(
     "volume_create", self, after = after_volume_create)
 
-  self$get <- docker_client_getter(docker_client_volume, parent,
-                                   "name")
+  self$get <- docker_client_getter(docker_client_volume, parent, "name")
 
   self$list <- docker_client_method(
     "volume_list", self, after = after_volume_list,
@@ -468,81 +411,37 @@ docker_client_volume_collection <- function(parent) {
 
 docker_client_volume <- function(name, parent) {
   self <- new_stevedore_object(parent)
-  volume_inspect <- docker_client_method(
-    "volume_inspect", self)
-
-  self$.attrs <-
-    if (is_dummy_id(name)) list(name = name) else volume_inspect(name)
-  name <- self$.attrs$name
-  reload <- function() {
-    self$.attrs <- volume_inspect(name)
-    invisible(self)
-  }
-
-  self$name <- function() self$.attrs$name
-
-  self$inspect <- function(reload = TRUE) {
-      if (reload) {
-        reload()
-      }
-      self$.attrs
-    }
+  fix_name <- docker_client_add_inspect(name, "name", "volume_inspect", self)
 
   self$map <- function(path, readonly = FALSE) {
-    assert_scalar_character(path)
-    assert_scalar_logical(readonly)
-    fmt <- "%s:%s"
-    if (readonly) {
-      fmt <- paste0(fmt, ":ro")
-    }
-    sprintf(fmt, name, path)
+    docker_client_volume_map(self$inspect(FALSE), path, readonly)
   }
 
   self$remove <- docker_client_method(
-    "volume_delete", self, fix = list(name = name))
-
-  self$reload = reload
+    "volume_delete", self, fix = fix_name)
 
   stevedore_object(self, "docker_volume")
 }
 
 docker_client_exec <- function(id, parent) {
   self <- new_stevedore_object(parent)
-
-  exec_inspect <- docker_client_method("exec_inspect", self)
-  self$.attrs <- if (is_dummy_id(id)) NULL else exec_inspect(id)
-  reload <- function() {
-    self$.attrs <- exec_inspect(id)
-    invisible(self)
-  }
+  fix_id <- docker_client_add_inspect(id, "id", "exec_inspect", self)
 
   ## Even though it feels like there *should* be a way, there is no
   ## way to get back to a detached exec instance.
   ## https://github.com/moby/moby/issues/9527
-  self$id <- function() id
 
-  ## TODO: control stream (location etc) following the same problem
-  ## in build.
   ## TODO: explicitly set 'detach' argument
   self$start <- docker_client_method(
-    "exec_start", self, fix = list(id = id),
+    "exec_start", self, fix = fix_id,
     extra = alist(stream = stdout()),
     hijack = quote(streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = TRUE,
     process = list(mcr_prepare_stream_and_close(quote(stream))),
     after = after_exec_start)
 
-  self$inspect = function(reload = TRUE) {
-    if (reload) {
-      reload()
-    }
-    self$.attrs
-  }
-
   self$resize <- docker_client_method(
-    "exec_resize", self, fix = list(id = id))
-
-  self$reload <- reload
+    "exec_resize", self, fix = fix_id)
 
   stevedore_object(self, "docker_exec")
 }

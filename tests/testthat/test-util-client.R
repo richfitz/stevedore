@@ -658,3 +658,99 @@ test_that("after_exec_start", {
   res <- withVisible(after_exec_start(response))
   expect_identical(res, list(value = str, visible = FALSE))
 })
+
+
+test_that("after_container_update", {
+  cl <- docker_client(http_client_type = "null")
+  self <- docker_client_container(dummy_id(), cl)
+
+  response <- NULL
+  expect_identical(after_container_update(response, NULL, self), self)
+
+  response <- list(warnings = "this is a warning")
+  expect_warning(res <- after_container_update(response, NULL, self),
+                 "this is a warning")
+  expect_identical(res, self)
+})
+
+
+test_that("invisible_self", {
+  r <- runif(20)
+  expect_identical(invisible_self(NULL, NULL, r), r)
+  expect_silent(invisible_self(stop("untouched"), stop("untouched"), r))
+})
+
+
+test_that("docker_client_container_image", {
+  cl <- docker_client(http_client_type = "null")
+  self <- docker_client_container(dummy_id(), cl)
+
+  id <- random_hex(32)
+  prev <- set_dummy_id(id)
+  on.exit(set_dummy_id(prev))
+
+  update_dummy_attrs(self, list(image = paste0("sha256:", id)))
+
+  img <- docker_client_container_image(self)
+  expect_is(img, "docker_image")
+  expect_equal(img$id(), id)
+})
+
+
+test_that("docker_client_image_tags", {
+  f <- function(...) {
+    list(repo_tags = c(...))
+  }
+
+  expect_equal(docker_client_image_tags(f(character(0))), character(0))
+  expect_equal(docker_client_image_tags(f("foo:bar")), "foo:bar")
+  expect_equal(docker_client_image_tags(f("<none>:<none>", "foo:bar")),
+               "foo:bar")
+
+  cl <- docker_client(http_client_type = "null")
+  image <- docker_client_image(dummy_id(), cl)
+
+  update_dummy_attrs(image, f(character(0)))
+  expect_equal(image$tags(FALSE), character(0))
+
+  update_dummy_attrs(image, f("<none>:<none>", "foo:bar"))
+  expect_equal(image$tags(FALSE), "foo:bar")
+})
+
+
+test_that("docker_client_network_containers", {
+  cl <- docker_client(http_client_type = "null")
+  nw <- docker_client_network(dummy_id(), cl)
+  expect_identical(nw$containers(), list())
+
+  id <- random_hex(32)
+  prev <- set_dummy_id(id)
+  on.exit(set_dummy_id(prev))
+
+  update_dummy_attrs(nw, list(containers = set_names(list(NULL), id)))
+
+  res <- nw$containers(FALSE)
+  expect_is(res, "list")
+  expect_equal(length(res), 1L)
+  expect_is(res[[1]], "docker_container")
+  expect_identical(res[[1]]$id(), id)
+})
+
+
+test_that("docker_client_volume_map", {
+  attrs <- list(name = "foo")
+  expect_equal(docker_client_volume_map(attrs, "dest", FALSE),
+               "foo:dest")
+  expect_equal(docker_client_volume_map(attrs, "dest", TRUE),
+               "foo:dest:ro")
+
+  id <- "myvolume"
+  prev <- set_dummy_id(id)
+  on.exit(set_dummy_id(prev))
+
+  cl <- docker_client(http_client_type = "null")
+  vol <- docker_client_volume(dummy_id(), cl)
+
+  expect_equal(vol$map("/dest"), "myvolume:/dest")
+  expect_equal(vol$map("/dest", TRUE), "myvolume:/dest:ro")
+})

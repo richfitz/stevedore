@@ -183,6 +183,8 @@ docker_image:
   labels:
     summary: >-
       Return labels for this image
+    args:
+      reload: *reload
   reload:
     summary: >-
       Refresh infomation on the image from the server, returning
@@ -194,6 +196,8 @@ docker_image:
   tags:
     summary: >-
       Return tags for this image
+    args:
+      reload: *reload
   untag:
     summary: >-
       Remove tags from the image.  This is a lot like
@@ -227,6 +231,8 @@ docker_network:
   name:
     summary: >-
       Return name for this network
+    args:
+      reload: *reload
   reload:
     summary: >-
       Refresh infomation on the network from the server, returning

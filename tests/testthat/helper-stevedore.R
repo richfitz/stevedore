@@ -193,6 +193,13 @@ rand_str <- function(n, prefix = "") {
   paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
 }
 
+
+random_hex <- function(n, prefix = "") {
+  pool <- c(as.character(0:9), letters[1:6])
+  paste0(prefix, paste0(sample(pool, n, replace = TRUE), collapse = ""))
+}
+
+
 get_error <- function(expr) {
   tryCatch(expr, error = identity)
 }
@@ -384,4 +391,10 @@ set_dummy_id <- function(value) {
   prev <- .stevedore$dummy_id
   .stevedore$dummy_id <- value
   invisible(prev)
+}
+
+
+update_dummy_attrs <- function(object, value) {
+  object$.attrs[names(value)] <- value
+  invisible(object)
 }
