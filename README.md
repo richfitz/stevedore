@@ -14,7 +14,7 @@ A docker client for R
 **WARNING**: The current CRAN version of `yaml` (2.1.17) will crash or misread the large yaml files that hold the spec.  If you have that version installed then please downgrade with
 
 ```r
-install.packages("https://cran.r-project.org/src/contrib/Archive/yaml/yaml_2.1.16.tar.gz)"
+install.packages("https://cran.r-project.org/src/contrib/Archive/yaml/yaml_2.1.16.tar.gz")
 ```
 
 (this requires a working C compiler).
