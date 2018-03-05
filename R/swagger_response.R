@@ -236,8 +236,14 @@ swagger_response_handler_array <- function(schema, spec) {
 swagger_response_handler_array_atomic <- function(missing, empty) {
   force(missing)
   force(empty)
-  function(x, as_is_names) {
-    if (is.null(x)) empty else vapply(x, identity, missing, USE.NAMES = FALSE)
+  if (is.integer(missing)) {
+    function(x, as_is_names) {
+      if (is.null(x)) empty else viapply(x, identity, USE.NAMES = FALSE)
+    }
+  } else {
+    function(x, as_is_names) {
+      if (is.null(x)) empty else vapply(x, identity, missing, USE.NAMES = FALSE)
+    }
   }
 }
 
@@ -277,9 +283,15 @@ swagger_response_handler_array_object_df <- function(items, spec) {
     swagger_response_handler_array(x, spec))
 
   f_atomic <- function(v, data) {
-    vapply(data, pick, atomic$type[[type[[v]]]], v, atomic$missing[[type[[v]]]],
-           USE.NAMES = FALSE)
-  }
+    if (type[[v]] == "integer") {
+      viapply(data, pick, v, atomic$missing[[type[[v]]]],
+              USE.NAMES = FALSE)
+    } else {
+      vapply(data, pick, atomic$type[[type[[v]]]], v,
+             atomic$missing[[type[[v]]]],
+             USE.NAMES = FALSE)
+    }
+ }
   f_array <- function(v, data, as_is_names) {
     x <- lapply(data, pick, v, NULL)
     I(lapply(x, array_handlers[[v]], as_is_names))
