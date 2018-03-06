@@ -70,6 +70,11 @@ test_that("assert_integer", {
   expect_silent(assert_integer(1L))
 
   expect_error(assert_integer(1, strict = TRUE), "must be integer")
+
+  large <- .Machine$integer.max * 2
+  expect_silent(assert_integer(large))
+  expect_error(assert_integer(large, strict = TRUE),
+               "'large' must be integer")
 })
 
 test_that("assert_named", {

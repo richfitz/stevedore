@@ -73,7 +73,7 @@ assert_integer <- function(x, strict = FALSE, name = deparse(substitute(x)),
                            what = "integer") {
   if (!(is.integer(x))) {
     usable_as_integer <-
-      !strict && is.numeric(x) && (max(abs(as.integer(x) - x)) < 1e-8)
+      !strict && is.numeric(x) && (max(abs(round(x) - x)) < 1e-8)
     if (!usable_as_integer) {
       stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
     }
