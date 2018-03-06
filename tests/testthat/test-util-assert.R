@@ -77,6 +77,19 @@ test_that("assert_integer", {
                "'large' must be integer")
 })
 
+
+test_that("assert_numeric", {
+  object <- NULL
+  expect_error(assert_numeric(object), "'object' must be numeric")
+
+  expect_error(assert_numeric("a"), "must be numeric")
+  expect_error(assert_numeric(TRUE), "must be numeric")
+
+  expect_silent(assert_numeric(pi))
+  expect_silent(assert_numeric(1L))
+})
+
+
 test_that("assert_named", {
   object <- list(1, 2, 3)
   expect_error(assert_named(object), "'object' must be named")

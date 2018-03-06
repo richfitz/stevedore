@@ -15,6 +15,16 @@ assert_scalar_integer <- function(x, strict = FALSE,
   invisible(x)
 }
 
+
+assert_scalar_numeric <- function(x, name = deparse(substitute(x)),
+                                  what = "a scalar numeric (non-NA)") {
+  assert_scalar(x, name, what)
+  assert_nonmissing(x, name, what)
+  assert_numeric(x, name, what)
+  invisible(x)
+}
+
+
 assert_scalar_logical <- function(x, name = deparse(substitute(x)),
                                   what = "scalar logical (non-NA)") {
   assert_scalar(x, name, what)
@@ -58,6 +68,15 @@ assert_logical <- function(x, name = deparse(substitute(x)), what = "logical") {
   }
   invisible(x)
 }
+
+
+assert_numeric <- function(x, name = deparse(substitute(x)), what = "numeric") {
+  if (!is.numeric(x)) {
+    stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
+  }
+  invisible(x)
+}
+
 
 assert_is <- function(x, cl, name = deparse(substitute(x)), what = NULL) {
   if (!inherits(x, cl)) {
