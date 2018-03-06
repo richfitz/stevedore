@@ -362,10 +362,20 @@ atomic_types <- function() {
                "boolean" = logical(1))
   missing <- lapply(type, as_na)
   empty <- lapply(type, "[", 0L)
+  validate_scalar <- list(string = assert_scalar_character,
+                          number = assert_scalar_numeric,
+                          integer = assert_scalar_integer,
+                          boolean = assert_scalar_logical)
+  validate_vector <- list(string = assert_character,
+                          number = assert_numeric,
+                          integer = assert_integer,
+                          boolean = assert_logical)
   list(names = names(type),
        type = type,
        missing = missing,
-       empty = empty)
+       empty = empty,
+       validate_scalar = validate_scalar,
+       validate_vector = validate_vector)
 }
 
 
@@ -407,6 +417,11 @@ base64decode <- function(x) {
 
 new_empty_env <- function() {
   new.env(parent = emptyenv())
+}
+
+
+new_base_env <- function() {
+  new.env(parent = baseenv())
 }
 
 
