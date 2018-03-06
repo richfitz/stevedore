@@ -2,7 +2,11 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
                               type = NULL) {
   self <- new.env(parent = parent.env(environment()))
   self$http_client <- http_client(base_url, api_version, type)
-  self$endpoints <- docker_api_client_data(self$http_client$api_version)
+
+  data <- docker_api_client_data(self$http_client$api_version)
+  self$endpoints <- data$endpoints
+  self$types <- data$types
+
   self$api_version <- self$http_client$api_version
   self$auth <- docker_api_client_auth()
   lock_environment(self)
@@ -13,13 +17,18 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
 docker_api_client_data <- function(version) {
   if (!(version %in% names(.stevedore$client_data))) {
     spec <- swagger_spec_read(version)
-    endpoints <- docker_api_client_endpoints(version)
+    endpoints <- docker_api_client_endpoints()
     docker_api_client_data_check(spec, endpoints)
 
-    dat <- lapply(endpoints, function(x)
+    dat <- list()
+
+    dat$endpoints <- lapply(endpoints, function(x)
       swagger_endpoint(x$name, x$method, x$path, x$cli, x$from, spec))
-    names(dat) <- vcapply(endpoints, "[[", "name")
-    attr(dat, "version") <- version
+    names(dat$endpoints) <- vcapply(endpoints, "[[", "name")
+
+    dat$types <- swagger_types(version, spec)
+
+    dat$version <- version
 
     .stevedore$client_data[[version]] <- dat
   }
@@ -117,7 +126,7 @@ docker_api_client_data_check <- function(spec, endpoints) {
 }
 
 
-docker_api_client_endpoints <- function(version) {
+docker_api_client_endpoints <- function() {
   if (is.null(.stevedore$endpoints)) {
     path <- stevedore_file("spec/endpoints.yaml")
     dat <- yaml_load_file(path)
@@ -129,6 +138,19 @@ docker_api_client_endpoints <- function(version) {
 
   endpoints <- .stevedore$endpoints
   endpoints
+}
+
+
+docker_api_client_types <- function() {
+  if (is.null(.stevedore$types)) {
+    path <- stevedore_file("spec/types.yaml")
+    dat <- yaml_load_file(path)
+    for (i in seq_along(dat)) {
+      dat[[i]]$name <- names(dat)[[i]]
+    }
+    .stevedore$types <- unname(dat)
+  }
+  .stevedore$types
 }
 
 

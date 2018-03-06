@@ -15,16 +15,16 @@ test_that("build", {
   for (v in swagger_spec_versions()) {
     message(v)
     dat <- docker_api_client_data(v)
-    expect_equal(attr(dat, "version"), v)
-    expected <- vcapply(docker_api_client_endpoints(v), "[[", "name")
-    expect_true(all(expected %in% names(dat)))
+    expect_equal(dat$version, v)
+    expected <- vcapply(docker_api_client_endpoints(), "[[", "name")
+    expect_true(all(expected %in% names(dat$endpoints)))
   }
 })
 
 
 test_that("spec check", {
   spec <- swagger_spec_read("1.29")
-  endpoints <- docker_api_client_endpoints("1.29")
+  endpoints <- docker_api_client_endpoints()
 
   expect_silent(docker_api_client_data_check(spec, endpoints))
 

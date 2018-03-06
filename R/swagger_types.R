@@ -1,28 +1,18 @@
+swagger_types <- function(version, spec) {
+  types <- docker_api_client_types()
+  ret <- lapply(types, swagger_type, spec)
+  names(ret) <- vcapply(types, "[[", "name")
+  ret
+}
+
 ## Support for complex types (e.g. TaskSpec).  This is a similar
 ## amount of work to swagger args unfortunately, but might be somewhat
 ## easier to test.
-swagger_type <- function(x, spec) {
-  browser()
-}
-
-
-swagger_type_make_handler_scalar_atomic <- function(name, type) {
-  force(name)
-  validate <- atomic_types()$validate_scalar[[type]]
-  stopifnot(is.function(validate))
-  function(x) {
-    jsonlite::unbox(validate(x, name = name))
-  }
-}
-
-
-swagger_type_make_handler_vector_atomic <- function(name, type) {
-  force(name)
-  validate <- atomic_types()$validate_vector[[type]]
-  stopifnot(is.function(validate))
-  function(x) {
-    validate(x, name = name)
-  }
+swagger_type <- function(info, spec) {
+  x <- spec[[info$path]]
+  handler <- swagger_type_make_handler_object(x, info$name, spec)
+  reciever <- swagger_type_make_reciever(x, handler)
+  list(name = info$name, handler = handler, reciever = reciever)
 }
 
 
@@ -82,18 +72,39 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
 }
 
 
-swagger_type_make_reciever <- function(x) {
+swagger_type_make_reciever <- function(x, handler) {
   nms <- names(x$properties)
   nms_r <- pascal_to_snake(nms)
 
   env <- new_base_env()
+  env$.handler <- handler
 
   args <- rep(alist(a = NULL), length(nms))
   names(args) <- nms_r
 
   rec <- args
   rec[] <- lapply(nms_r, as.name)
-  body <- as.call(c(quote(list), rec))
+  body <- call(".handler", as.call(c(quote(list), rec)))
 
   as.function(c(args, body), env)
+}
+
+
+swagger_type_make_handler_scalar_atomic <- function(name, type) {
+  force(name)
+  validate <- atomic_types()$validate_scalar[[type]]
+  stopifnot(is.function(validate))
+  function(x) {
+    jsonlite::unbox(validate(x, name = name))
+  }
+}
+
+
+swagger_type_make_handler_vector_atomic <- function(name, type) {
+  force(name)
+  validate <- atomic_types()$validate_vector[[type]]
+  stopifnot(is.function(validate))
+  function(x) {
+    validate(x, name = name)
+  }
 }
