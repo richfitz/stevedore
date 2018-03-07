@@ -1,2 +1,5 @@
 health_config:
   path: ["definitions", "HealthConfig"]
+
+container_spec:
+  path: ["definitions", "TaskSpec", "properties", "ContainerSpec"]

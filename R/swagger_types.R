@@ -25,21 +25,25 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
 
   atomic <- atomic_types()
 
-  nms <- names(x$properties)
+  properties <- lapply(x$properties, resolve_schema_ref, spec)
+
+  nms <- names(properties)
   nms_r <- pascal_to_snake(nms)
-  type <- vcapply(x$properties, "[[", "type")
+  type <- vcapply(properties, "[[", "type")
   is_atomic <- type %in% names(atomic$type)
   is_array <- type == "array"
 
-  array_type <- vcapply(x$properties[is_array], function(x) x$items$type)
-  is_array_atomic <- logical(length(is_array))
-  is_array_atomic[is_array] <- array_type %in% names(atomic$type)
+  array_type <- rep(NA_character_, length(properties))
+  array_type[is_array] <- vcapply(properties[is_array], function(x)
+    x$items$type %||% "object")
+  is_array_atomic <- logical(length(properties))
+  is_array_atomic[is_array] <- array_type[is_array] %in% names(atomic$type)
+
+  is_string_map <- vlapply(properties, object_is_string_map)
 
   ## For now nothing else is handled - object (which we go recursive
   ## with) and arrays of objects (which are going to require some
   ## care)
-  stopifnot(all(is_array_atomic | is_atomic))
-
   handlers <- vector("list", length(nms_r))
   names(handlers) <- nms_r
 
@@ -49,6 +53,8 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
   handlers[is_array_atomic] <- Map(swagger_type_make_handler_vector_atomic,
                                    nms_r[is_array_atomic],
                                    array_type[is_array_atomic])
+  handlers[is_string_map] <- lapply(nms_r[is_string_map],
+                                    swagger_type_make_handler_string_map)
 
   function(data, name = "data") {
     assert_named(data, unique = TRUE, name = name)
@@ -61,7 +67,12 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
     data <- data[!vlapply(data, is.null)]
 
     for (i in seq_along(data)) {
-      data[[i]] <- handlers[[names(data)[[i]]]](data[[i]])
+      nm <- names(data)[[i]]
+      h <- handlers[[nm]]
+      if (is.null(h)) {
+        stop(sprintf("Handler for '%s' not yet implemented", nm))
+      }
+      data[[i]] <- h(data[[i]])
     }
 
     names(data) <- nms[match(names(data), nms_r)]
@@ -107,4 +118,28 @@ swagger_type_make_handler_vector_atomic <- function(name, type) {
   function(x) {
     validate(x, name = name)
   }
+}
+
+
+swagger_type_make_handler_string_map <- function(name) {
+  force(name)
+  function(x) {
+    if (length(x) == 0L) {
+      return(NULL)
+    }
+    ## I'm pretty sure I've done this already somewhere
+    assert_named(x, unique = TRUE)
+    if (!is.character(x)) {
+      ok <- vlapply(x, function(el) length(el) == 1 && is.character(x))
+      stopifnot(all(ok))
+    }
+    lapply(x, jsonlite::unbox)
+  }
+}
+
+
+object_is_string_map <- function(x) {
+  x$type == "object" &&
+    is.null(x$properties) &&
+    identical(x$additionalProperties, list(type = "string"))
 }
