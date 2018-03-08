@@ -11,13 +11,19 @@ A docker client for R
 
 ![hello world example of stevedore](https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif)
 
-**WARNING**: The current CRAN version of `yaml` (2.1.17) will crash or misread the large yaml files that hold the spec.  If you have that version installed then please downgrade with
+**WARNING**: The current CRAN version of `yaml` (2.1.17) will crash or misread the large yaml files that hold the spec.  If you have that version installed then please either downgrade with
 
 ```r
 install.packages("https://cran.r-project.org/src/contrib/Archive/yaml/yaml_2.1.16.tar.gz")
 ```
 
-(this requires a working C compiler).
+or install the new `yaml` version from github:
+
+```r
+devtools::install_github("viking/r-yaml")
+```
+
+(this requires a working C compiler to install).
 
 ## Background
 
