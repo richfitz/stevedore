@@ -63,3 +63,8 @@
   path: ["definitions", "PeerNode"]
   value:
     type: object
+
+- version: ["1.29", "1.29"]
+  path: ["definitions", "TaskSpec", "properties", "Resources", "properties", "Reservation"]
+  value:
+    type: object
