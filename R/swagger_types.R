@@ -1,17 +1,21 @@
 swagger_types <- function(version, spec) {
   types <- docker_api_client_types()
-  ret <- lapply(types, swagger_type, spec)
-  names(ret) <- vcapply(types, "[[", "name")
+
+  ret <- set_names(vector("list", length(types)),
+                   vcapply(types, "[[", "name"))
+  for (t in types) {
+    ret[[t$name]] <- swagger_type(t, ret, spec)
+  }
+
   ret
 }
 
 ## Support for complex types (e.g. TaskSpec).  This is a similar
 ## amount of work to swagger args unfortunately, but might be somewhat
 ## easier to test.
-swagger_type <- function(info, spec) {
-  x <- spec[[info$path]]
-  handler <- swagger_type_make_handler_object(x, info$name, spec)
-  reciever <- swagger_type_make_reciever(x, handler)
+swagger_type <- function(info, types, spec) {
+  handler <- swagger_type_make_handler_object(info, types, spec)
+  reciever <- swagger_type_make_reciever(spec[[info$path]], handler)
   list(name = info$name, handler = handler, reciever = reciever)
 }
 
@@ -19,9 +23,11 @@ swagger_type <- function(info, spec) {
 ## TODO: this is going to require, for things like ports, special
 ## treatment that is similar to how we do these things in the method
 ## creation.  That's a bit of an annoyance!
-swagger_type_make_handler_object <- function(x, typename, spec) {
+swagger_type_make_handler_object <- function(info, types, spec) {
+  typename <- info$name
+  x <- spec[[info$path]]
+
   stopifnot(x$type == "object")
-  force(typename)
 
   atomic <- atomic_types()
 
@@ -56,6 +62,18 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
   handlers[is_string_map] <- lapply(nms_r[is_string_map],
                                     swagger_type_make_handler_string_map)
 
+  if (!is.null(info$special)) {
+    handlers[names(info$special)] <-
+      lapply(info$special, swagger_type_make_handler_subtype, types)
+  }
+
+  msg <- lengths(handlers) == 0
+  if (any(msg)) {
+    message(sprintf("Skipping %d/%d handlers for '%s':\n\t%s",
+                    sum(msg), length(msg), typename,
+                    paste(squote(nms[msg]), collapse = ", ")))
+  }
+
   function(data, name = "data") {
     assert_named(data, unique = TRUE, name = name)
     extra <- setdiff(names(data), nms_r)
@@ -77,7 +95,9 @@ swagger_type_make_handler_object <- function(x, typename, spec) {
 
     names(data) <- nms[match(names(data), nms_r)]
 
-    class(data) <- c(typename, "steverdore_type")
+    class(data) <- "steverdore_type"
+    attr(data, "typename") <- type
+
     data
   }
 }
@@ -134,6 +154,15 @@ swagger_type_make_handler_string_map <- function(name) {
       stopifnot(all(ok))
     }
     lapply(x, jsonlite::unbox)
+  }
+}
+
+
+swagger_type_make_handler_subtype <- function(typename, types) {
+  h <- types[[typename]]$handler
+  stopifnot(is.function(h))
+  function(data, name = "data") {
+    h(data, sprintf("%s$%s", name, typename))
   }
 }
 
