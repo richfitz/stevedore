@@ -5,10 +5,14 @@
 health_config:
   path: ["definitions", "HealthConfig"]
 
+dns_config:
+  path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
+
 container_spec:
   path: ["definitions", "TaskSpec", "properties", "ContainerSpec"]
   special:
     health_check: health_config
+    dns_config: dns_config
 
 task_resources:
   path: ["definitions", "TaskSpec", "properties", "Resources"]
@@ -21,6 +25,3 @@ task_placement:
 
 mount:
   path: ["definitions", "Mount"]
-
-dns_config:
-  path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
