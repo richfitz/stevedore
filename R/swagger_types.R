@@ -53,6 +53,11 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   is_array_atomic[is_array] <- array_type[is_array] %in% names(atomic$type)
 
   is_string_map <- vlapply(properties, object_is_string_map)
+  is_enum <- vlapply(properties, function(x)
+    !is.null(x$enum) && identical(x$type, "string"))
+  if (any(is_enum)) {
+    is_atomic[is_enum] <- FALSE
+  }
 
   ## For now nothing else is handled - object (which we go recursive
   ## with) and arrays of objects (which are going to require some
@@ -68,6 +73,9 @@ swagger_type_make_handler_object <- function(info, types, spec) {
                                    array_type[is_array_atomic])
   handlers[is_string_map] <- lapply(nms_r[is_string_map],
                                     swagger_type_make_handler_string_map)
+  handlers[is_enum] <- Map(swagger_type_make_handler_enum,
+                           nms_r[is_enum],
+                           lapply(properties[is_enum], "[[", "enum"))
 
   if (!is.null(info$special)) {
     handlers[names(info$special)] <-
@@ -173,6 +181,15 @@ swagger_type_make_handler_string_map <- function(name) {
       stopifnot(all(ok))
     }
     lapply(x, jsonlite::unbox)
+  }
+}
+
+
+swagger_type_make_handler_enum <- function(name, enum) {
+  force(name)
+  force(enum)
+  function(x) {
+    match_value(x, enum, name = name)
   }
 }
 
