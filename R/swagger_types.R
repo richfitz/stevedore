@@ -99,6 +99,10 @@ swagger_type_make_handler_object <- function(info, types, spec) {
     }
     data <- data[!vlapply(data, is.null)]
 
+    if (length(data) == 0L) {
+      return(NULL)
+    }
+
     for (i in seq_along(data)) {
       nm <- names(data)[[i]]
       h <- handlers[[nm]]
