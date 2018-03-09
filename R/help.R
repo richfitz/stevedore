@@ -128,6 +128,28 @@ NULL
 NULL
 
 
+##' Methods for building complex docker types.  This is most objects
+##' more complicated than R's atomic types.  Most functions will
+##' indicate if they require one of these objects in their help.
+##'
+##' These functions are needed because \code{stevedore} aims to be a
+##' fairly direct wrapping aroud the docker API.  For most of the
+##' single host methods the types here are not really used (with the
+##' notable exception of \code{host_config} which is used by
+##' \code{$containers$create} and \code{$containers$update}).  But for
+##' the swarm endpoints the function definitions would be impossibly
+##' complex if we did not reflect the types.  So rather than one
+##' function call with a hundred arguments, we can build up the
+##' required types.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("types")}
+##'
+##' @title Constructors for complex types
+##'
+##' @name docker_types
+NULL
+
+
 generate_help <- function(sub = NULL, api_version = NULL) {
   oo <- options(stevedore.silent = TRUE)
   on.exit(options(oo))
