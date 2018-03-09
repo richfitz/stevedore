@@ -1,7 +1,7 @@
 ## Convert a specification for an endpoint into an R function that o
 swagger_args <- function(method, path, x, spec) {
   args <- swagger_args_parse(method, path, x, spec)
-  help <- get_help(x, args)
+  help <- swagger_args_help(x, args)
   list(help = help,
        handler = swagger_args_handler(args))
 }
@@ -266,6 +266,17 @@ swagger_arg_collect_header <- function(p, dest) {
     expr <- bquote(if (!is.null(.(sym))) .(expr))
   }
   expr
+}
+
+
+swagger_args_help <- function(x, args) {
+  if (length(args) == 0L) {
+    args <- NULL
+  } else {
+    args <- set_names(vcapply(args, pick, "description", NA_character_),
+                      vcapply(args, "[[", "name_r"))
+  }
+  list(summary = x$summary, description = x$description, args = args)
 }
 
 

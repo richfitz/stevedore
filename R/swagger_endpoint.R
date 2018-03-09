@@ -79,16 +79,6 @@ get_response_type <- function(method, path, data) {
 }
 
 
-get_help <- function(x, args) {
-  if (length(args) == 0L) {
-    args <- NULL
-  } else {
-    args <- set_names(vcapply(args, pick, "description", NA_character_),
-                      vcapply(args, "[[", "name_r"))
-  }
-  list(summary = x$summary, description = x$description, args = args)
-}
-
 swagger_endpoint_unsupported <- function(name, method, path,
                                          version_required, version_used) {
   list(name = name,
