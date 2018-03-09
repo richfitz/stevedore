@@ -292,6 +292,9 @@ docker_exec:
       Refresh infomation on the exec instance from the server, returning
       `$inspect()` invisibly.
 
+docker_types:
+  help: *help
+
 unsupported:
   image_build_clean:
     summary: Delete builder cache

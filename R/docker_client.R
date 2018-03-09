@@ -68,6 +68,8 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$networks <- docker_client_network_collection(self)
   self$volumes <- docker_client_volume_collection(self)
 
+  self$types <- docker_client_types(self)
+
   stevedore_object(self, "docker_client")
 }
 
@@ -444,4 +446,12 @@ docker_client_exec <- function(id, parent) {
     "exec_resize", self, fix = fix_id)
 
   stevedore_object(self, "docker_exec")
+}
+
+
+docker_client_types <- function(parent) {
+  self <- new_stevedore_object(parent)
+  types <- lapply(parent$.api_client$types, "[[", "reciever")
+  list2env(types, self)
+  stevedore_object(self, "docker_types")
 }
