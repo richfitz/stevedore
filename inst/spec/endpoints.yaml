@@ -41,6 +41,8 @@ container_create:
   method: post
   path: "/containers/create"
   cli: ["create", "container create"]
+  handlers:
+    healthcheck: health_config
 
 container_inspect:
   method: get

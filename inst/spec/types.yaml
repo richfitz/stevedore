@@ -9,20 +9,20 @@ health_config:
 dns_config:
   path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
 
+mount:
+  path: ["definitions", "Mount"]
+
 container_spec:
   path: ["definitions", "TaskSpec", "properties", "ContainerSpec"]
   special:
     health_check: health_config
     dns_config: dns_config
 
-# task_resources:
-#   path: ["definitions", "TaskSpec", "properties", "Resources"]
+task_resources:
+  path: ["definitions", "TaskSpec", "properties", "Resources"]
 
-# task_restart_policy:
-#   path: ["definitions", "TaskSpec", "properties", "RestartPolicy"]
+task_restart_policy:
+  path: ["definitions", "TaskSpec", "properties", "RestartPolicy"]
 
-# task_placement:
-#   path: ["definitions", "TaskSpec", "properties", "Placement"]
-
-# mount:
-#   path: ["definitions", "Mount"]
+task_placement:
+  path: ["definitions", "TaskSpec", "properties", "Placement"]

@@ -22,11 +22,12 @@ docker_api_client_data <- function(version) {
 
     dat <- list()
 
-    dat$endpoints <- lapply(endpoints, function(x)
-      swagger_endpoint(x$name, x$method, x$path, x$cli, x$from, spec))
-    names(dat$endpoints) <- vcapply(endpoints, "[[", "name")
-
     dat$types <- swagger_types(version, spec)
+
+    dat$endpoints <- lapply(endpoints, function(x)
+      swagger_endpoint(x$name, x$method, x$path, x$cli, x$from, x$handlers,
+                       dat$types, spec))
+    names(dat$endpoints) <- vcapply(endpoints, "[[", "name")
 
     dat$version <- version
 

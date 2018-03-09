@@ -1,9 +1,9 @@
 ## Convert a specification for an endpoint into an R function that o
-swagger_args <- function(method, path, x, spec) {
+swagger_args <- function(method, path, x, handlers, types, spec) {
   args <- swagger_args_parse(method, path, x, spec)
-  help <- swagger_args_help(x, args)
+  help <- swagger_args_help(x, args, handlers)
   list(help = help,
-       handler = swagger_args_handler(args))
+       handler = swagger_args_handler(args, handlers, types))
 }
 
 
@@ -71,12 +71,21 @@ swagger_args_parse <- function(method, path, x, spec) {
 }
 
 
-swagger_args_handler <- function(args) {
+swagger_args_handler <- function(args, handlers, types) {
   ## All the stopifnot bits are assertions that have more to do with
   ## making sure that the spec confirms to what we are expecting.
   ## They'd probably be better done with debugme because I don't think
   ## they should be run by users.
   dest <- quote(dest)
+
+  env <- new.env(parent = parent.env(environment()))
+
+  if (!is.null(handlers)) {
+    handler_fns <- lapply(handlers, function(x) types[[x]]$handler)
+    names(handler_fns) <- handler_name(names(handler_fns))
+    list2env(handler_fns, env)
+    handlers[] <- names(handler_fns)
+  }
 
   body_type <- attr(args, "body_type")
   if (is.null(body_type)) {
@@ -95,7 +104,7 @@ swagger_args_handler <- function(args) {
       .(dollar(dest, quote(body))) <- .(fbody_body_combine))
   }
 
-  fbody_collect <- lapply(args, swagger_arg_collect, dest)
+  fbody_collect <- lapply(args, swagger_arg_collect, dest, handlers)
   fbody <- c(quote(`{`),
             bquote(.(dest) <- list()),
             fbody_collect,
@@ -107,17 +116,16 @@ swagger_args_handler <- function(args) {
 
   a <- rep(alist(. =, . = NULL), c(sum(!args_optional), sum(args_optional)))
   names(a) <- args_name_r
-  env <- parent.env(environment())
   as.function(c(a, as.call(fbody)), env)
 }
 
 
 ## The actual argument collectors (used only in this file)
-swagger_arg_collect <- function(p, dest) {
+swagger_arg_collect <- function(p, dest, handlers) {
   switch(p[["in"]],
          path = swagger_arg_collect_path(p, dest),
          query = swagger_arg_collect_query(p, dest),
-         body = swagger_arg_collect_body(p, dest),
+         body = swagger_arg_collect_body(p, dest, handlers),
          header = swagger_arg_collect_header(p, dest),
          stop("assertion error"))
 }
@@ -170,9 +178,12 @@ swagger_arg_collect_query <- function(p, dest) {
 
 ## This is really similar to above but not *that* similar really -
 ## when combined they're clumsy and hard to reason about.
-swagger_arg_collect_body <- function(p, dest) {
+swagger_arg_collect_body <- function(p, dest, handlers) {
   type <- p$type
-  if (setequal(type, c("array", "string"))) {
+  if (p$name_r %in% names(handlers)) {
+    is_scalar <- FALSE
+    validate <- as.name(handlers[[p$name_r]])
+  } else if (setequal(type, c("array", "string"))) {
     is_scalar <- FALSE
     validate <- quote(as_body_array_string)
   } else if (type == "boolean") {
@@ -269,12 +280,17 @@ swagger_arg_collect_header <- function(p, dest) {
 }
 
 
-swagger_args_help <- function(x, args) {
+swagger_args_help <- function(x, args, handlers) {
   if (length(args) == 0L) {
     args <- NULL
   } else {
     args <- set_names(vcapply(args, pick, "description", NA_character_),
                       vcapply(args, "[[", "name_r"))
+  }
+  if (!is.null(handlers)) {
+    str <- sprintf(" Construct with `$types$%s()`",
+                   vcapply(handlers, identity))
+    args[names(handlers)] <- paste0(args[names(handlers)], str)
   }
   list(summary = x$summary, description = x$description, args = args)
 }
@@ -300,4 +316,9 @@ as_string_map <- function(x, name = deparse(substitute(x))) {
     assert_character(x, name, what)
     lapply(x, jsonlite::unbox)
   }
+}
+
+
+handler_name <- function(x) {
+  sprintf(".handle_%s", x)
 }
