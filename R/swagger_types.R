@@ -16,7 +16,7 @@ swagger_types <- function(version, spec) {
 swagger_type <- function(info, types, spec) {
   handler <- swagger_type_make_handler_object(info, types, spec)
   reciever <- swagger_type_make_reciever(spec[[info$path]], handler)
-  help <- swagger_type_help(spec[[info$path]], info)
+  help <- swagger_type_help(spec[[info$path]], info, spec)
 
   ## NOTE: this name lets us reuse all the formatting bits elsewhere,
   ## even though it's not really quite the right name?
@@ -196,7 +196,7 @@ object_is_string_map <- function(x) {
 ## TODO: there's some repetition here with above, but that can be
 ## eliminated later - we'd preprodcess the args list and work with
 ## that
-swagger_type_help <- function(x, info) {
+swagger_type_help <- function(x, info, spec) {
   properties <- lapply(x$properties, resolve_schema_ref, spec)
   nms_r <- pascal_to_snake(names(properties))
   args <- set_names(vcapply(properties, pick, "description", NA_character_),
