@@ -197,16 +197,20 @@ object_is_string_map <- function(x) {
 ## eliminated later - we'd preprodcess the args list and work with
 ## that
 swagger_type_help <- function(x, info) {
-  if (!is.null(info$special)) {
-    browser()
-  }
-
   properties <- lapply(x$properties, resolve_schema_ref, spec)
   nms_r <- pascal_to_snake(names(properties))
   args <- set_names(vcapply(properties, pick, "description", NA_character_),
                     nms_r)
 
+  if (!is.null(info$special)) {
+    str <- sprintf(" Construct with `$types$%s()`",
+                   vcapply(info$special, identity))
+    args[names(info$special)] <- paste0(args[names(info$special)], str)
+  }
+
+  description <- x$description %||% info$name
+
   list(name = info$name,
-       summary = x$description, # to match method
+       summary = description,
        args = args)
 }
