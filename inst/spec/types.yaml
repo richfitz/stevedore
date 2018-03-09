@@ -1,27 +1,28 @@
 ## The types here needs to be topologically ordered - if type 'A'
 ## includes type 'B', then 'B' must be listed first.
 
-## For example, 'health_config' is used by 'container_spec'
+## For example, 'health_config' is used by 'container_spec' (it's also
+## used by container create)
 health_config:
   path: ["definitions", "HealthConfig"]
 
-dns_config:
-  path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
+# dns_config:
+#   path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
 
-container_spec:
-  path: ["definitions", "TaskSpec", "properties", "ContainerSpec"]
-  special:
-    health_check: health_config
-    dns_config: dns_config
+# container_spec:
+#   path: ["definitions", "TaskSpec", "properties", "ContainerSpec"]
+#   special:
+#     health_check: health_config
+#     dns_config: dns_config
 
-task_resources:
-  path: ["definitions", "TaskSpec", "properties", "Resources"]
+# task_resources:
+#   path: ["definitions", "TaskSpec", "properties", "Resources"]
 
-task_restart_policy:
-  path: ["definitions", "TaskSpec", "properties", "RestartPolicy"]
+# task_restart_policy:
+#   path: ["definitions", "TaskSpec", "properties", "RestartPolicy"]
 
-task_placement:
-  path: ["definitions", "TaskSpec", "properties", "Placement"]
+# task_placement:
+#   path: ["definitions", "TaskSpec", "properties", "Placement"]
 
-mount:
-  path: ["definitions", "Mount"]
+# mount:
+#   path: ["definitions", "Mount"]
