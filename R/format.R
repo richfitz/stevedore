@@ -104,9 +104,14 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
 
   cat(sprintf("<%s>\n", class(x)[[1]]))
-  cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn],
-              vcapply(nms[!is_fn], function(el) class(x[[el]])[[1]])),
-      sep = "")
+
+  if (any(!is_fn)) {
+    cl <- vcapply(nms[!is_fn], function(el) class(x[[el]])[[1]])
+    i <- order(cl == "docker_types")
+    cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn][i], cl[i]),
+        sep = "")
+  }
+
   defns <- vcapply(nms[is_fn], function(el) capture_args(x[[el]], el, indent),
                    USE.NAMES = FALSE)
   cat(paste0(defns, "\n", collapse = ""))
