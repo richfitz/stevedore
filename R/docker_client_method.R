@@ -152,7 +152,7 @@ docker_client_method_unsupported <- function(endpoint, name) {
 }
 
 
-#' @export
+##' @export
 print.docker_client_method <- function(x, indent = 2, exdent = 8, args = TRUE,
                                        ...) {
   str <- format.docker_client_method(x, "text",

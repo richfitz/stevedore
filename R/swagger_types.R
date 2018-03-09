@@ -16,6 +16,13 @@ swagger_types <- function(version, spec) {
 swagger_type <- function(info, types, spec) {
   handler <- swagger_type_make_handler_object(info, types, spec)
   reciever <- swagger_type_make_reciever(spec[[info$path]], handler)
+  help <- swagger_type_help(spec[[info$path]], info)
+
+  ## NOTE: this name lets us reuse all the formatting bits elsewhere,
+  ## even though it's not really quite the right name?
+  class(reciever) <- "docker_client_method"
+  attr(reciever, "help") <- help
+
   list(name = info$name, handler = handler, reciever = reciever)
 }
 
@@ -75,6 +82,14 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   }
 
   function(data, name = "data") {
+    if (inherits(data, "stevedore_type")) {
+      found <- attr(data, "typename")
+      if (!identical(found, typename)) {
+        stop("Unexpected input for ", name) # TODO: better message
+      }
+      return(data)
+    }
+
     assert_named(data, unique = TRUE, name = name)
     extra <- setdiff(names(data), nms_r)
     if (length(extra) > 0L) {
@@ -95,8 +110,8 @@ swagger_type_make_handler_object <- function(info, types, spec) {
 
     names(data) <- nms[match(names(data), nms_r)]
 
-    class(data) <- "steverdore_type"
-    attr(data, "typename") <- type
+    class(data) <- "stevedore_type"
+    attr(data, "typename") <- typename
 
     data
   }
@@ -171,4 +186,23 @@ object_is_string_map <- function(x) {
   x$type == "object" &&
     is.null(x$properties) &&
     identical(x$additionalProperties, list(type = "string"))
+}
+
+
+## TODO: there's some repetition here with above, but that can be
+## eliminated later - we'd preprodcess the args list and work with
+## that
+swagger_type_help <- function(x, info) {
+  if (!is.null(info$special)) {
+    browser()
+  }
+
+  properties <- lapply(x$properties, resolve_schema_ref, spec)
+  nms_r <- pascal_to_snake(names(properties))
+  args <- set_names(vcapply(properties, pick, "description", NA_character_),
+                    nms_r)
+
+  list(name = info$name,
+       summary = x$description, # to match method
+       args = args)
 }
