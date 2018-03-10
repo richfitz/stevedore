@@ -376,26 +376,32 @@ node_update:
 service_list:
   method: get
   path: "/services"
+  cli: "service list"
 
 service_create:
   method: post
   path: "/services/create"
+  cli: "service create"
 
 service_inspect:
   method: get
   path: "/services/{id}"
+  cli: "service inspect"
 
 service_delete:
   method: delete
   path: "/services/{id}"
+  cli: "service rm"
 
 service_update:
   method: post
   path: "/services/{id}/update"
+  cli: "service update"
 
 service_logs:
   method: get
   path: "/services/{id}/logs"
+  cli: "service logs"
 
 
 task_list:

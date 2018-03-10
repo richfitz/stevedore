@@ -301,6 +301,11 @@ after_container_update <- function(response, params, self) {
 }
 
 
+after_service_create <- function(response, params, self) {
+  docker_client_service(response$id, self$.parent)
+}
+
+
 invisible_self <- function(response, params, self) {
   invisible(self)
 }

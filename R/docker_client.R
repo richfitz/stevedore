@@ -70,6 +70,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
 
   self$swarm <- docker_client_swarm_collection(self)
   self$nodes <- docker_client_node_collection(self)
+  self$services <- docker_client_service_collection(self)
 
   self$types <- docker_client_types(self)
 
@@ -483,6 +484,34 @@ docker_client_node_collection <- function(parent) {
   self$update <- docker_client_method("node_update", self)
 
   stevedore_object(self, "docker_swarm_collection")
+}
+
+
+docker_client_service_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$create <- docker_client_method(
+    "service_create", self, after = after_service_create)
+
+  self$get <- docker_client_getter(docker_client_service, parent, "id")
+
+  self$list <- docker_client_method(
+    "service_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$remove <- docker_client_method(
+    "service_delete", self)
+
+  stevedore_object(self, "docker_service_collection")
+}
+
+
+docker_client_service <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+
+  fix_id <- docker_client_add_inspect(id, "id", "service_inspect", self)
+
+  stevedore_object(self, "docker_service")
 }
 
 

@@ -101,7 +101,7 @@ docker_image_collection:
 docker_network_collection:
   get:
     summary: >-
-      Get an network by name or id
+      Get a network by name or id
     args:
       id: >-
         A scalar character with the network's name or id
@@ -112,7 +112,7 @@ docker_network_collection:
 docker_volume_collection:
   get:
     summary: >-
-      Get an volume by name or id
+      Get a volume by name or id
     args:
       name: >-
         A scalar character with the volume's name.
@@ -296,6 +296,20 @@ docker_swarm_collection:
   help: *help
 
 docker_node_collection:
+  help: *help
+
+docker_service_collection:
+  help: *help
+  get:
+    summary: >-
+      Get a service by name or id
+    args:
+      id: >-
+        A scalar character with the network's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+
+docker_service:
   help: *help
 
 docker_types:
