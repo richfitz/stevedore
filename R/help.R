@@ -145,11 +145,25 @@ NULL
 ##' Methods for managing docker swarm nodes.  This object is
 ##'   \code{$nodes} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("swarm")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("nodes")}
 ##'
 ##' @name docker_node_collection
 ##'
 ##' @title Management commands for working with swarm nodes
+##'
+##' @seealso \code{\link{docker_swarm}} for management commands for
+##'   the swarm itself.
+NULL
+
+
+##' Methods for managing docker swarm secrets.  This object is
+##'   \code{$secrets} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("secrets")}
+##'
+##' @name docker_secret_collection
+##'
+##' @title Management commands for working with swarm secrets
 ##'
 ##' @seealso \code{\link{docker_swarm}} for management commands for
 ##'   the swarm itself.
