@@ -321,3 +321,5 @@ docker_types:
 unsupported:
   image_build_clean:
     summary: Delete builder cache
+  secret_update:
+    summary: Update a Secret

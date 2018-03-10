@@ -137,7 +137,7 @@
   value:
     produces: "application/chunked-string"
 
-- version: ["1.29", "1.35"]
+- version: ["1.29", "1.36"]
   path: ["paths", "/tasks/{id}/logs", "get"]
   value:
     produces: "application/chunked-string"
