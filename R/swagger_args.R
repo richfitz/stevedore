@@ -81,6 +81,7 @@ swagger_args_handler <- function(args, handlers, types) {
   env <- new.env(parent = parent.env(environment()))
 
   if (!is.null(handlers)) {
+    stopifnot(names(handlers) %in% vcapply(args, "[[", "name_r"))
     handler_fns <- lapply(handlers, function(x) types[[x]]$handler)
     names(handler_fns) <- handler_name(names(handler_fns))
     list2env(handler_fns, env)
