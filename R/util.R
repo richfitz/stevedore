@@ -222,14 +222,44 @@ reset_line <- function(stream, width, is_tty = isatty(stream)) {
   }
 }
 
-capture_args <- function(f, name, indent = 4) {
-  ## This could be controlled more nicely (never wrapping but using
-  ## all space) by doing it manually - deparse all pairs into chunks
-  ## and then combine.
-  args <- deparse(args(f), width.cutoff = getOption("width") - 25L)
-  txt <- sub("^function ", name, args[-length(args)])
-  paste0(trimws(sprintf("%s%s\n", strrep(" " , indent), txt), "right"),
-         collapse = "\n")
+## Previously this did a deparse(args(f)) with a width cutoff, but
+## that does not format long arg/default pairs nicely, eventually
+## walking off the right edge.  This version will not go past
+## options("width") at the cost of being potentially slower (though I
+## don't think it's much worse than strwrap).
+capture_args <- function(f, name, indent = 4, width = getOption("width")) {
+  args <- formals(f)
+
+  if (length(args) == 0L) {
+    return(sprintf("%s%s()", strrep(" ", indent), name))
+  }
+
+  args_default <- vcapply(args, deparse)
+  args_str <- sprintf("%s = %s", names(args), args_default)
+  args_str[!nzchar(args_default)] <- names(args)[!nzchar(args_default)]
+  args_str[[1]] <- sprintf("%s(%s", name, args_str[[1]])
+  args_str[[length(args)]] <- paste0(args_str[[length(args)]], ")")
+
+  w <- width - indent - 2L
+  ret <- character()
+  s <- ""
+
+  for (i in args_str) {
+    ns <- nchar(s)
+    ni <- nchar(i)
+    if (ns == 0) {
+      s <- paste0(strrep(" ", indent * (min(length(ret), 1L) + 1)), i)
+    } else if (ns + ni + 2 < w) {
+      s <- paste(s, i, sep = ", ")
+    } else {
+      ret <- c(ret, paste0(s, ","))
+      s <- paste0(strrep(" ", indent * 2), i)
+    }
+  }
+
+  ret <- c(ret, s)
+
+  paste0(trimws(ret, "right"), collapse = "\n")
 }
 
 is_directory <- function(x) {

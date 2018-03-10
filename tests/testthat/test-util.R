@@ -361,3 +361,27 @@ test_that("download_file", {
   expect_silent(download_file("https://google.com", dest, FALSE))
   expect_equal(readLines(dest), "testing")
 })
+
+
+test_that("capture_args", {
+  expect_identical(capture_args(function() 1, "foo"), "    foo()")
+  expect_identical(capture_args(function() 1, "foo", 2), "  foo()")
+
+  expect_identical(capture_args(function(a = 1) 1, "foo"), "    foo(a = 1)")
+  expect_identical(capture_args(function(a = 1) 1, "foo", 2), "  foo(a = 1)")
+  expect_identical(capture_args(function(a = 1L) 1, "foo"), "    foo(a = 1L)")
+
+  expect_identical(capture_args(function(a) 1, "foo"), "    foo(a)")
+
+  expect_identical(capture_args(
+    function(very_long_first_arg = very_long_default_value) 1, "foo", 4, 20),
+    "    foo(very_long_first_arg = very_long_default_value)")
+  expect_identical(capture_args(
+    function(very_long_first_arg = very_long_default_value, b = 1) 1, "foo",
+    4, 20),
+    "    foo(very_long_first_arg = very_long_default_value,\n        b = 1)")
+  expect_identical(capture_args(
+    function(very_long_first_arg = very_long_default_value, b = 1) 1, "foo",
+    4, 1000),
+    "    foo(very_long_first_arg = very_long_default_value, b = 1)")
+})
