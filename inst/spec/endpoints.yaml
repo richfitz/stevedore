@@ -421,18 +421,22 @@ task_logs:
 secret_list:
   method: get
   path: "/secrets"
+  cli: "secret ls"
 
 secret_create:
   method: post
   path: "/secrets/create"
+  cli: "secret create"
 
 secret_inspect:
   method: get
   path: "/secrets/{id}"
+  cli: "secret inspect"
 
 secret_delete:
   method: delete
   path: "/secrets/{id}"
+  cli: "secret rm"
 
 secret_update:
   method: post

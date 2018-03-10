@@ -71,6 +71,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$swarm <- docker_client_swarm_collection(self)
   self$nodes <- docker_client_node_collection(self)
   self$services <- docker_client_service_collection(self)
+  self$secrets <- docker_client_secret_collection(self)
 
   self$types <- docker_client_types(self)
 
@@ -512,6 +513,29 @@ docker_client_service <- function(id, parent) {
   fix_id <- docker_client_add_inspect(id, "id", "service_inspect", self)
 
   stevedore_object(self, "docker_service")
+}
+
+
+docker_client_secret_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$create <- docker_client_method(
+    "secret_create", self)
+
+  self$inspect <- docker_client_method(
+    "secret_inspect", self)
+
+  self$list <- docker_client_method(
+    "secret_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+
+  self$remove <- docker_client_method(
+    "secret_delete", self)
+
+  self$update <- docker_client_method(
+    "secret_update", self)
+
+  stevedore_object(self, "docker_secret_collection")
 }
 
 

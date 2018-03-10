@@ -309,6 +309,9 @@ docker_service_collection:
         (abbreviations of the id are allowed and will be resolved by
         the docker daemon).
 
+docker_secret_collection:
+  help: *help
+
 docker_service:
   help: *help
 
