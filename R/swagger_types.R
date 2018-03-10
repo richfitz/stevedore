@@ -83,7 +83,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   }
 
   msg <- lengths(handlers) == 0
-  if (any(msg)) {
+  if (any(msg) && isTRUE(getOption("stevedore.verbose.missing.types"))) {
     message(sprintf("Skipping %d/%d handlers for '%s':\n\t%s",
                     sum(msg), length(msg), typename,
                     paste(squote(nms[msg]), collapse = ", ")))
