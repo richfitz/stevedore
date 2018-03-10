@@ -31,7 +31,7 @@ container_spec <- list(
   stop_grace_period = NA_integer_,
   health_check = NULL,
   hosts = character(0),
-  d_nsconfig = NULL,
+  dns_config = NULL,
   secrets = data_frame(
     file = I(list()),
     secret_id = character(0),
