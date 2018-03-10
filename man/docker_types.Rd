@@ -6,9 +6,15 @@
 \description{
 Methods for building complex docker types.  This is most objects
 more complicated than R's atomic types.  Most functions will
-indicate if they require one of these objects in their help.
+indicate if they require one of these objects in their help.  None
+of these functions do anything interesting in their own regard -
+they just validate inputs.
 }
 \details{
+The functions here will all depend on the API versions - some of
+the most fluid parts of the docker API are the different options
+that are supported via things like \code{host_config}.
+
 These functions are needed because \code{stevedore} aims to be a
 fairly direct wrapping aroud the docker API.  For most of the
 single host methods the types here are not really used (with the
