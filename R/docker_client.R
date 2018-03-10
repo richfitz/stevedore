@@ -68,6 +68,9 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$networks <- docker_client_network_collection(self)
   self$volumes <- docker_client_volume_collection(self)
 
+  self$swarm <- docker_client_swarm_collection(self)
+  self$nodes <- docker_client_node_collection(self)
+
   self$types <- docker_client_types(self)
 
   stevedore_object(self, "docker_client")
@@ -447,6 +450,39 @@ docker_client_exec <- function(id, parent) {
     "exec_resize", self, fix = fix_id)
 
   stevedore_object(self, "docker_exec")
+}
+
+
+docker_client_swarm_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$init <- docker_client_method(
+    "swarm_init", self, defaults = alist(listen_addr = "0.0.0.0:2377"))
+  self$inspect <- docker_client_method("swarm_inspect", self)
+  self$join <- docker_client_method("swarm_join", self)
+  self$leave <- docker_client_method("swarm_leave", self)
+  self$update <- docker_client_method("swarm_update", self)
+  self$unlock_key <- docker_client_method("swarm_unlock_key", self)
+  self$unlock <- docker_client_method("swarm_unlock", self)
+
+  stevedore_object(self, "docker_swarm_collection")
+}
+
+
+docker_client_node_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$inspect <- docker_client_method("node_inspect", self)
+  self$list <- docker_client_method(
+    "node_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+  self$delete <- docker_client_method("node_delete", self)
+
+  ## TODO: this one here needs a bunch of work actually - we need to
+  ## automate the index but also allow for *partial* updates, perhaps.
+  self$update <- docker_client_method("node_update", self)
+
+  stevedore_object(self, "docker_swarm_collection")
 }
 
 

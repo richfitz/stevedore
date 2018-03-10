@@ -341,7 +341,7 @@ swarm_update:
   path: "/swarm/update"
   cli: "swarm update"
 
-swarm_unlockkey:
+swarm_unlock_key:
   method: get
   path: "/swarm/unlockkey"
   cli: "swarm unlock-key"

@@ -292,6 +292,12 @@ docker_exec:
       Refresh infomation on the exec instance from the server, returning
       `$inspect()` invisibly.
 
+docker_swarm_collection:
+  help: *help
+
+docker_node_collection:
+  help: *help
+
 docker_types:
   help: *help
 

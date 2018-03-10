@@ -128,6 +128,34 @@ NULL
 NULL
 
 
+##' Methods for managing the docker swarm.  This object is
+##'   \code{$swarm} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("swarm")}
+##'
+##' @name docker_swarm_collection
+##'
+##' @title Management commands for working with docker swarm
+##'
+##' @seealso \code{\link{docker_node}} for management commands for
+##'   swarm nodes.
+NULL
+
+
+##' Methods for managing docker swarm nodes.  This object is
+##'   \code{$nodes} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("swarm")}
+##'
+##' @name docker_node_collection
+##'
+##' @title Management commands for working with swarm nodes
+##'
+##' @seealso \code{\link{docker_swarm}} for management commands for
+##'   the swarm itself.
+NULL
+
+
 ##' Methods for building complex docker types.  This is most objects
 ##' more complicated than R's atomic types.  Most functions will
 ##' indicate if they require one of these objects in their help.  None
@@ -303,7 +331,7 @@ format_docker_client_method_rd <- function(x, ...) {
   h <- attr(x, "help")
   ## stopifnot(!is.null(h$name))
   name <- h$name
-  call <- capture_args(x, name, 0L)
+  call <- capture_args(x, name, 2L, getOption("width") - 13L)
   summary <- help_summary(h)
   summary <- markdown_to_rd(summary)
 
