@@ -309,10 +309,26 @@ docker_service_collection:
         (abbreviations of the id are allowed and will be resolved by
         the docker daemon).
 
-docker_secret_collection:
-  help: *help
-
 docker_service:
+  help: *help
+  id:
+    summary: >-
+      Return the services's id
+  inspect:
+    summary: >-
+      Return detailed information about this service
+    args:
+      reload: >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after an volume has been removed.
+    cli: "volume inspect"
+  reload:
+    summary: >-
+      Refresh infomation on the service from the server, returning
+      `$inspect()` invisibly.
+
+docker_secret_collection:
   help: *help
 
 docker_types:

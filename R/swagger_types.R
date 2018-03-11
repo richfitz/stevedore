@@ -79,7 +79,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
 
   if (!is.null(info$special)) {
     handlers[names(info$special)] <-
-      lapply(info$special, swagger_type_make_handler_subtype, types)
+      lapply(info$special, swagger_type_make_handler_subtype, typename, types)
   }
 
   msg <- lengths(handlers) == 0
@@ -93,17 +93,24 @@ swagger_type_make_handler_object <- function(info, types, spec) {
     if (inherits(data, "stevedore_type")) {
       found <- attr(data, "typename")
       if (!identical(found, typename)) {
-        stop("Unexpected input for ", name) # TODO: better message
+        stop(sprintf(
+          "Unexpected input: recieved a '%s' when '%s' was expected",
+          found, typename))
       }
       return(data)
+    }
+
+    if (length(data) == 0L) {
+      return(NULL)
     }
 
     assert_named(data, unique = TRUE, name = name)
     extra <- setdiff(names(data), nms_r)
     if (length(extra) > 0L) {
-      stop("Unhandled %s %s",
-           ngettext(length(extra), "property", "properties"),
-           squote(extra))
+      stop(sprintf("Unexpected %s %s in %s",
+                   ngettext(length(extra), "property", "properties"),
+                   paste(squote(extra), collapse = ", "),
+                   squote(typename)))
     }
     data <- data[!vlapply(data, is.null)]
 
@@ -115,17 +122,15 @@ swagger_type_make_handler_object <- function(info, types, spec) {
       nm <- names(data)[[i]]
       h <- handlers[[nm]]
       if (is.null(h)) {
-        stop(sprintf("Handler for '%s' not yet implemented", nm))
+        stop(sprintf("Handler for '%s' (in '%s') not yet implemented",
+                     nm, typename))
       }
       data[[i]] <- h(data[[i]])
     }
 
     names(data) <- nms[match(names(data), nms_r)]
 
-    class(data) <- "stevedore_type"
-    attr(data, "typename") <- typename
-
-    data
+    stevedore_type(data, typename)
   }
 }
 
@@ -177,8 +182,10 @@ swagger_type_make_handler_string_map <- function(name) {
     ## I'm pretty sure I've done this already somewhere
     assert_named(x, unique = TRUE)
     if (!is.character(x)) {
-      ok <- vlapply(x, function(el) length(el) == 1 && is.character(x))
-      stopifnot(all(ok))
+      ok <- vlapply(x, function(el) length(el) == 1 && is.character(el))
+      if (!all(ok)) {
+        stop(sprintf("All elements of '%s' must be scalar character", name))
+      }
     }
     lapply(x, jsonlite::unbox)
   }
@@ -189,16 +196,20 @@ swagger_type_make_handler_enum <- function(name, enum) {
   force(name)
   force(enum)
   function(x) {
-    match_value(x, enum, name = name)
+    jsonlite::unbox(match_value(x, enum, name = name))
   }
 }
 
 
-swagger_type_make_handler_subtype <- function(typename, types) {
+swagger_type_make_handler_subtype <- function(typename, elementname, types) {
   h <- types[[typename]]$handler
   stopifnot(is.function(h))
-  function(data, name = "data") {
-    h(data, sprintf("%s$%s", name, typename))
+  msg <- sprintf("while processing '%s':\n", elementname)
+  function(x) {
+    withCallingHandlers(h(x), error = function(e) {
+      e$message <- paste0(msg, e$message)
+      stop(e)
+    })
   }
 }
 
@@ -230,4 +241,11 @@ swagger_type_help <- function(x, info, spec) {
   list(name = info$name,
        summary = description,
        args = args)
+}
+
+
+stevedore_type <- function(data, typename) {
+  class(data) <- "stevedore_type"
+  attr(data, "typename") <- typename
+  data
 }

@@ -90,6 +90,12 @@ test_that("assert_numeric", {
 })
 
 
+test_that("assert_scalar_numeric", {
+  expect_silent(assert_scalar_numeric(pi))
+  expect_error(assert_scalar_numeric(TRUE))
+})
+
+
 test_that("assert_named", {
   object <- list(1, 2, 3)
   expect_error(assert_named(object), "'object' must be named")

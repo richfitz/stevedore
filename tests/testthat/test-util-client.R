@@ -754,3 +754,11 @@ test_that("docker_client_volume_map", {
   expect_equal(vol$map("/dest"), "myvolume:/dest")
   expect_equal(vol$map("/dest", TRUE), "myvolume:/dest:ro")
 })
+
+
+test_that("after_service_create", {
+  cl <- docker_client(http_client_type = "null")
+  res <- after_service_create(list(id = dummy_id()), NULL, cl)
+  expect_is(res, "docker_service")
+  expect_equal(res$id(), dummy_id())
+})
