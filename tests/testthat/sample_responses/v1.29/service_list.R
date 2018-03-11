@@ -35,7 +35,7 @@ container_spec <- list(
   dir = NA_character_,
   user = NA_character_,
   groups = character(0),
-  t_ty = NA,
+  tty = NA,
   open_stdin = NA,
   read_only = NA,
   mounts = data_frame(
