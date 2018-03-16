@@ -43,7 +43,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   nms <- names(properties)
   nms_r <- pascal_to_snake(nms)
   type <- vcapply(properties, "[[", "type")
-  is_atomic <- type %in% names(atomic$type)
+  is_scalar_atomic <- type %in% names(atomic$type)
   is_array <- type == "array"
 
   array_type <- rep(NA_character_, length(properties))
@@ -56,7 +56,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   is_enum <- vlapply(properties, function(x)
     !is.null(x$enum) && identical(x$type, "string"))
   if (any(is_enum)) {
-    is_atomic[is_enum] <- FALSE
+    is_scalar_atomic[is_enum] <- FALSE
   }
 
   ## For now nothing else is handled - object (which we go recursive
@@ -65,9 +65,9 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   handlers <- vector("list", length(nms_r))
   names(handlers) <- nms_r
 
-  handlers[is_atomic] <- Map(swagger_type_make_handler_vector_atomic,
-                             nms_r[is_atomic],
-                             type[is_atomic])
+  handlers[is_scalar_atomic] <- Map(swagger_type_make_handler_scalar_atomic,
+                                    nms_r[is_scalar_atomic],
+                                    type[is_scalar_atomic])
   handlers[is_array_atomic] <- Map(swagger_type_make_handler_vector_atomic,
                                    nms_r[is_array_atomic],
                                    array_type[is_array_atomic])
