@@ -512,6 +512,11 @@ docker_client_service <- function(id, parent) {
 
   fix_id <- docker_client_add_inspect(id, "id", "service_inspect", self)
 
+  self$name <- function(reload = TRUE) self$inspect(reload)$spec$name
+  self$version <- function(reload = TRUE) self$inspect(reload)$version$index
+  self$remove <- docker_client_method(
+    "service_delete", self, fix = fix_id)
+
   stevedore_object(self, "docker_service")
 }
 

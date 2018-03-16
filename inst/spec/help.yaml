@@ -318,11 +318,22 @@ docker_service:
     summary: >-
       Return detailed information about this service
     args:
-      reload: >-
+      reload: &reload-service >-
         Logical scalar, indicating if the information should be
         refreshed from the daemon.  This is useful to set to
-        `FALSE` after an volume has been removed.
-    cli: "volume inspect"
+        `FALSE` after a service has been removed.
+    cli: "service inspect"
+  name:
+    summary: >-
+      Return the service's name
+    args:
+      reload: *reload-service
+  version:
+    summary: >-
+      Return the service's version.  This is used by some other
+      methods to avoid conflicting writes.
+    args:
+      reload: *reload-service
   reload:
     summary: >-
       Refresh infomation on the service from the server, returning
