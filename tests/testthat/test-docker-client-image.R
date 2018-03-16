@@ -317,7 +317,7 @@ test_that("push/pull with auth", {
 
 
 test_that("get (offline)", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   x <- cl$images$get(dummy_id())
   expect_is(x, "docker_image")
   expect_equal(x$id(), dummy_id())

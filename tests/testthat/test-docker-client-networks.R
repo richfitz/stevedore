@@ -83,7 +83,7 @@ test_that("disconnect", {
 
 
 test_that("get (offline)", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   x <- cl$networks$get(dummy_id())
   expect_is(x, "docker_network")
   expect_equal(x$id(), dummy_id())

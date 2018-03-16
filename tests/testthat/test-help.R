@@ -64,7 +64,7 @@ test_that("generate help via utils::help", {
 test_that("construct all api versions", {
   for (v in swagger_spec_versions()) {
     ## This does the core object and collections:
-    d <- docker_client(api_version = v, http_client_type = "null")
+    d <- null_docker_client(api_version = v)
     expect_equal(d$api_version(), v)
 
     ## then the special objects:
@@ -77,17 +77,10 @@ test_that("construct all api versions", {
 })
 
 test_that("format one method", {
-  d <- docker_client(http_client_type = "null")
+  d <- null_docker_client()
   s1 <- format(d$ping)
   s2 <- format(d$ping, type = "text")
   s3 <- format(d$ping, type = "rd")
-  expect_identical(s1, s2)
-  expect_false(identical(s3, s1))
-
-  d <- docker_client(http_client_type = "null")
-  s1 <- format(d$api_version)
-  s2 <- format(d$api_version, type = "text")
-  s3 <- format(d$api_version, type = "rd")
   expect_identical(s1, s2)
   expect_false(identical(s3, s1))
 })

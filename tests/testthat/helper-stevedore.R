@@ -237,6 +237,12 @@ test_docker_client <- function(...) {
   docker_client(...)
 }
 
+
+null_docker_client <- function(...) {
+  docker_client(..., http_client_type = "null")
+}
+
+
 test_docker_client_httppipe <- function(...) {
   skip_if_no_httppipe_support()
   docker_client(..., type = "httppipe")

@@ -1033,7 +1033,7 @@ test_that("set user", {
 
 
 test_that("get (offline)", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   x <- cl$containers$get(dummy_id())
   expect_is(x, "docker_container")
   expect_equal(x$id(), dummy_id())
@@ -1056,7 +1056,7 @@ test_that("process ports", {
                           host_ip = "0.0.0.0",
                           host_port = "32789"))
 
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   x <- cl$containers$get(dummy_id())
   expect_equal(x$ports(),
                data_frame(container_port = character(0),

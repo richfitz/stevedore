@@ -70,7 +70,7 @@ test_that("Prevent invalid access", {
 })
 
 test_that("print", {
-  d <- docker_client(http_client_type = "null")
+  d <- null_docker_client()
   out <- capture.output(x <- print(d))
   expect_identical(x, d)
   expect_true(any(out == "<docker_client>"))

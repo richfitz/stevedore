@@ -69,7 +69,7 @@ test_that("labels", {
 
 
 test_that("get (offline)", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   x <- cl$volumes$get(dummy_id())
   expect_is(x, "docker_volume")
   expect_equal(x$name(), dummy_id())

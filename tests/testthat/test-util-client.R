@@ -468,7 +468,7 @@ test_that("validate_tar", {
 
 
 test_that("support_set_login", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   auth <- cl$.api_client$auth
 
   expect_null(auth$get("server.io"))
@@ -493,7 +493,7 @@ test_that("after_container_list", {
 
 test_that("after_container_create", {
   response <- list(id = dummy_id())
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
 
   res <- after_container_create(response, NULL, cl)
   expect_is(res, "docker_container")
@@ -503,7 +503,7 @@ test_that("after_container_create", {
 
 test_that("after_container_create: warnings", {
   response <- list(id = dummy_id(), warnings = "here is a warning")
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   expect_warning(res <- after_container_create(response, NULL, cl),
                  "here is a warning")
   expect_is(res, "docker_container")
@@ -525,7 +525,7 @@ test_that("after_container_archive", {
 
 
 test_that("after_exec_create", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   res <- after_exec_create(list(id = dummy_id()), NULL, cl)
   expect_is(res, "docker_exec")
   expect_identical(res$id(), dummy_id())
@@ -570,7 +570,7 @@ test_that("after_container_top", {
 
 
 test_that("after_image_commit", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   img <- after_image_commit(list(id = dummy_id()), NULL, cl)
   expect_is(img, "docker_image")
   expect_equal(img$id(), dummy_id())
@@ -578,7 +578,7 @@ test_that("after_image_commit", {
 
 
 test_that("after_image_build", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
 
   bin <- read_binary("sample_responses/build/success")
   id <- "8d9538fe3885"
@@ -595,7 +595,7 @@ test_that("after_image_build", {
 
 
 test_that("after_image_pull", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
 
   params <- list(query = list(fromImage = "ubuntu", tag = "latest"))
   id <- sprintf("%s:%s", params$query$fromImage, params$query$tag)
@@ -626,7 +626,7 @@ test_that("after_image_push", {
 
 
 test_that("after_network_create", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   res <- after_network_create(list(id = dummy_id()), NULL, cl)
   expect_is(res, "docker_network")
   expect_equal(res$id(), dummy_id())
@@ -634,7 +634,7 @@ test_that("after_network_create", {
 
 
 test_that("after_volume_create", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   res <- after_volume_create(list(name = dummy_id()), NULL, cl)
   expect_is(res, "docker_volume")
   expect_equal(res$name(), dummy_id())
@@ -661,7 +661,7 @@ test_that("after_exec_start", {
 
 
 test_that("after_container_update", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   self <- docker_client_container(dummy_id(), cl)
 
   response <- NULL
@@ -682,7 +682,7 @@ test_that("invisible_self", {
 
 
 test_that("docker_client_container_image", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   self <- docker_client_container(dummy_id(), cl)
 
   id <- random_hex(32)
@@ -707,7 +707,7 @@ test_that("docker_client_image_tags", {
   expect_equal(docker_client_image_tags(f("<none>:<none>", "foo:bar")),
                "foo:bar")
 
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   image <- docker_client_image(dummy_id(), cl)
 
   update_dummy_attrs(image, f(character(0)))
@@ -719,7 +719,7 @@ test_that("docker_client_image_tags", {
 
 
 test_that("docker_client_network_containers", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   nw <- docker_client_network(dummy_id(), cl)
   expect_identical(nw$containers(), list())
 
@@ -748,7 +748,7 @@ test_that("docker_client_volume_map", {
   prev <- set_dummy_id(id)
   on.exit(set_dummy_id(prev))
 
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   vol <- docker_client_volume(dummy_id(), cl)
 
   expect_equal(vol$map("/dest"), "myvolume:/dest")
@@ -757,7 +757,7 @@ test_that("docker_client_volume_map", {
 
 
 test_that("after_service_create", {
-  cl <- docker_client(http_client_type = "null")
+  cl <- null_docker_client()
   res <- after_service_create(list(id = dummy_id()), NULL, cl)
   expect_is(res, "docker_service")
   expect_equal(res$id(), dummy_id())
