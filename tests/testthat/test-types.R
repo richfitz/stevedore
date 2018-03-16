@@ -76,7 +76,7 @@ test_that("pass through", {
   types <- docker_api_client_data("1.29")$types
 
   x <- structure(list(a = 1, b = 2),
-                 class = "stevedore_type", typename = "health_config")
+                 stevedore_type = "health_config")
 
   expect_identical(types$health_config$handler(x), x)
   expect_error(
@@ -130,4 +130,15 @@ test_that("nested types", {
   expect_error(
     types$container_spec$reciever(dns_config = list(test = "foo")),
     "while processing 'container_spec':\nUnexpected property")
+})
+
+
+test_that("complex types", {
+  cl <- null_docker_client()
+  container <- cl$types$container_spec("redis")
+  expect_equal(container,
+               stevedore_type(list(Image = jsonlite::unbox("redis")),
+                              "container_spec"))
+  expect_equal(as.character(jsonlite::toJSON(container)),
+               '{"Image":"redis"}')
 })

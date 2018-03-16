@@ -90,12 +90,12 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   }
 
   function(data, name = "data") {
-    if (inherits(data, "stevedore_type")) {
-      found <- attr(data, "typename")
-      if (!identical(found, typename)) {
+    stevedore_type <- attr(data, "stevedore_type", exact = TRUE)
+    if (!is.null(stevedore_type)) {
+      if (!identical(stevedore_type, typename)) {
         stop(sprintf(
           "Unexpected input: recieved a '%s' when '%s' was expected",
-          found, typename))
+          stevedore_type, typename))
       }
       return(data)
     }
@@ -245,7 +245,6 @@ swagger_type_help <- function(x, info, spec) {
 
 
 stevedore_type <- function(data, typename) {
-  class(data) <- "stevedore_type"
-  attr(data, "typename") <- typename
+  attr(data, "stevedore_type") <- typename
   data
 }
