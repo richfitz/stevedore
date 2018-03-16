@@ -170,6 +170,21 @@ NULL
 NULL
 
 
+##' Methods for working with a particular docker service.  Service
+##' objects are returned by creating a docker service, or by using
+##' \code{$services$get} to fetch an existing service by name or id.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_service")}
+##'
+##' @name docker_service
+##'
+##' @title Management commands for working with a particular docker service
+##'
+##' @seealso \code{\link{docker_service_collection}} for other
+##'   service management methods.
+NULL
+
+
 ##' Methods for building complex docker types.  This is most objects
 ##' more complicated than R's atomic types.  Most functions will
 ##' indicate if they require one of these objects in their help.  None
@@ -220,6 +235,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
                   docker_network = docker_client_network,
                   docker_volume = docker_client_volume,
                   docker_exec = docker_client_exec,
+                  docker_service = docker_client_service,
                   stop("impossible!"))
       x <- f(dummy_id(), x)
     }

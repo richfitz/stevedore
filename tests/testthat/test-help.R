@@ -14,6 +14,7 @@ test_that("all help generates", {
                  "docker_image",
                  "docker_network",
                  "docker_volume",
+                 "docker_service",
                  "docker_exec")
 
   stevedore_reset()
