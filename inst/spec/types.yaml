@@ -26,3 +26,11 @@ task_restart_policy:
 
 task_placement:
   path: ["definitions", "TaskSpec", "properties", "Placement"]
+
+task_spec:
+  path: ["definitions", "TaskSpec"]
+  special:
+    container_spec: container_spec
+    resources: task_resources
+    restart_policy: task_restart_policy
+    placement: task_placement

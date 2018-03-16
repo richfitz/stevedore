@@ -47,6 +47,7 @@ container_create:
   method: post
   path: "/containers/create"
   cli: ["create", "container create"]
+  ## TODO: 'handlers' vs 'special'
   handlers:
     healthcheck: health_config
 
@@ -382,6 +383,8 @@ service_create:
   method: post
   path: "/services/create"
   cli: "service create"
+  handlers:
+    task_template: task_spec
 
 service_inspect:
   method: get
