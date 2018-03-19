@@ -422,7 +422,7 @@ stevedore_file <- function(path) {
 pretty_bytes <- function(bytes) {
   unit <- c("", "k", "M", "G")
   exponent <- min(floor(log(bytes, 1000)), length(unit) - 1)
-  sprintf("%s %sB", round(bytes /1000^exponent, 2), unit[exponent + 1])
+  sprintf("%s %sB", round(bytes / 1000^exponent, 2), unit[exponent + 1])
 }
 
 
