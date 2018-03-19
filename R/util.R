@@ -436,12 +436,12 @@ file_path <- function(a, b) {
 
 
 base64encode <- function(x) {
-  openssl::base64_encode(x)
+  jsonlite::base64_enc(x)
 }
 
 
 base64decode <- function(x) {
-  rawToChar(openssl::base64_decode(x))
+  rawToChar(jsonlite::base64_dec(x))
 }
 
 
