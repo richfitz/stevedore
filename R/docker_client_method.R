@@ -54,27 +54,35 @@ docker_client_method <- function(name, object,
 
   if (!is.null(expand)) {
     types <- object$.parent$types
-    stopifnot(all(names(expand) %in% names(args_use)))
     stopifnot(all(expand %in% names(types)))
     expand <- as.list(expand)
 
     for (i in seq_along(expand)) {
       arg <- names(expand)[[i]]
       type <- expand[[i]]
+      stopifnot(arg %in% names(args_use))
 
-      if (any(names(type) %in% names(args_use))) {
-        stop("FIXME")
+      type_fn <- types[[type]]
+      type_args <- formals(type_fn)
+      type_help <- attr(type_fn, "help")$args
+
+      ## The downside of this approach is that if additional colliding
+      ## arguments are given in future versions, this will require
+      ## backward-incompatible name changes.
+      fix_name <- names(type_args) %in% names(args_use)
+      if (any(fix_name)) {
+        stopifnot(identical(names(type_help), names(type_args)))
+        names(type_args)[fix_name] <-
+          sprintf("%s_%s", type, names(type_args)[fix_name])
+        names(type_help)[fix_name] <-
+          sprintf("%s_%s", type, names(type_help)[fix_name])
       }
 
       j <- match(arg, names(args_use))
-      args_use <- append(args_use[-j], formals(types[[type]]), j)
+      args_use <- c(append(args_use[-j], type_args, j), args_use[j])
+      process <- process_expanded_arg(as.name(arg), type, names(type_args))
 
-      process <- as.call(c(list(bquote(api_client$types[[.(type)]])),
-                           lapply(names(formals(types[[type]])), as.name)))
-
-      expand[[i]] <- list(
-        process = call("<-", as.name(arg), process),
-        help = attr(types[[type]], "help")$args)
+      expand[[i]] <- list(process = process, help = type_help)
     }
 
     ## Now, run the process args _backwards_ to deal with nested types
@@ -151,8 +159,12 @@ docker_client_method <- function(name, object,
   }
   if (!is.null(expand)) {
     for (i in seq_along(expand)) {
-      j <- match(names(expand)[[i]], names(help$args))
-      help$args <- append(help$args[-j], expand[[i]]$help, j)
+      arg <- names(expand)[[i]]
+      help$args[[arg]] <- sprintf(
+        "%s.  If this is given then %s must all be NULL.",
+        help$args[[arg]],
+        join_text_list(squote(names(expand[[i]]$help))))
+      help$args <- c(help$args, expand[[i]]$help)
     }
   }
   if (length(help$args) > 0L || length(args_use) > 0L) {
@@ -207,4 +219,21 @@ format.docker_client_method <- function(x, type = "text", ...) {
   } else {
     format_docker_client_method_rd(x, ...)
   }
+}
+
+
+process_expanded_arg <- function(dest, typename, args) {
+  collect <- as.call(c(list(bquote(api_client$types[[.(typename)]]$reciever)),
+                       lapply(args, as.name)))
+  assert_null <- as.call(c(list(quote(assert_arg_is_null), dest),
+                           set_names(lapply(args, as.name), args)))
+  substitute(
+    if (is.null(dest)) {
+      dest <- collect
+    } else {
+      assert_null
+      dest <- api_client$types[[typename]]$handler(dest)
+    },
+    list(dest = as.name(dest), typename = typename, collect = collect,
+         assert_null = assert_null))
 }
