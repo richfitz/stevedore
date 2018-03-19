@@ -188,6 +188,17 @@ assert_nonempty_character <- function(x, name = deparse(substitute(x)),
 }
 
 
+assert_arg_is_null <- function(.type, ...) {
+  args <- list(...)
+  ok <- vlapply(args, is.null)
+  if (!all(ok)) {
+    err <- names(args)[!ok]
+    stop(sprintf("Argument %s must be NULL because '%s' was provided",
+                 paste(squote(err), collapse = ", "), .type), call. = FALSE)
+  }
+}
+
+
 match_value <- function(x, values, name = deparse(substitute(x))) {
   assert_scalar_character(x, name)
   if (is.na(match(x, values))) {

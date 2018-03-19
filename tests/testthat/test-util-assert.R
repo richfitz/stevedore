@@ -213,6 +213,18 @@ test_that("assert_scalar_character_or_null", {
   expect_silent(assert_scalar_character_or_null("a"))
 })
 
+
+test_that("assert_arg_is_null", {
+  expect_silent(assert_arg_is_null("x"))
+  expect_silent(assert_arg_is_null("x", a = NULL))
+
+  expect_error(assert_arg_is_null("x", a = NULL, b = 1),
+               "Argument 'b' must be NULL because 'x' was provided")
+  expect_error(assert_arg_is_null("x", a = NULL, b = 1, c = 2),
+               "Argument 'b', 'c' must be NULL because 'x' was provided")
+})
+
+
 test_that("match_value", {
   object <- "foo"
   expect_error(match_value(object, letters), "'object' must be one of 'a', ")
