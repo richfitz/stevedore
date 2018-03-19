@@ -1,6 +1,7 @@
 docker_client_method <- function(name, object,
                                  fix = NULL, rename = NULL,
                                  drop = NULL, defaults = NULL, extra = NULL,
+                                 expand = NULL,
                                  promote = NULL, process = NULL,
                                  after = NULL,
                                  hijack = NULL,
@@ -49,6 +50,35 @@ docker_client_method <- function(name, object,
 
   if (!is.null(extra)) {
     args_use <- c(args_use, extra)
+  }
+
+  if (!is.null(expand)) {
+    types <- object$.parent$types
+    stopifnot(all(names(expand) %in% names(args_use)))
+    stopifnot(all(expand %in% names(types)))
+    expand <- as.list(expand)
+
+    for (i in seq_along(expand)) {
+      arg <- names(expand)[[i]]
+      type <- expand[[i]]
+
+      if (any(names(type) %in% names(args_use))) {
+        stop("FIXME")
+      }
+
+      j <- match(arg, names(args_use))
+      args_use <- append(args_use[-j], formals(types[[type]]), j)
+
+      process <- as.call(c(list(bquote(api_client$types[[.(type)]])),
+                           lapply(names(formals(types[[type]])), as.name)))
+
+      expand[[i]] <- list(
+        process = call("<-", as.name(arg), process),
+        help = attr(types[[type]], "help")$args)
+    }
+
+    ## Now, run the process args _backwards_ to deal with nested types
+    process <- c(process, rev(unname(lapply(expand, "[[", "process"))))
   }
 
   if (!is.null(promote)) {
@@ -118,6 +148,12 @@ docker_client_method <- function(name, object,
     ## yaml which would provide a much nicer place to put the extra
     ## args than in code.
     help$args[names(extra)] <- names(extra)
+  }
+  if (!is.null(expand)) {
+    for (i in seq_along(expand)) {
+      j <- match(names(expand)[[i]], names(help$args))
+      help$args <- append(help$args[-j], expand[[i]]$help, j)
+    }
   }
   if (length(help$args) > 0L || length(args_use) > 0L) {
     stopifnot(all(names(args_use) %in% names(help$args)))

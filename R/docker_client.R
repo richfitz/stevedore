@@ -46,6 +46,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$.api_client <-
     docker_api_client(base_url = url, api_version = api_version,
                       type = http_client_type, ...)
+  self$types <- docker_client_types(self)
 
   self$events <- docker_client_method(
     "system_events", self,
@@ -73,8 +74,6 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$services <- docker_client_service_collection(self)
   self$secrets <- docker_client_secret_collection(self)
 
-  self$types <- docker_client_types(self)
-
   stevedore_object(self, "docker_client")
 }
 
@@ -86,7 +85,8 @@ docker_client_container_collection <- function(parent) {
   self$create <- docker_client_method(
     "container_create", self,
     promote = c("image", "cmd"),
-    rename = c(ports = "exposed_ports", network = "networking_config",
+    rename = c(ports = "exposed_ports",
+               network = "networking_config",
                health_check = "healthcheck"),
     defaults = alist(image =),
     process = list(
@@ -492,7 +492,9 @@ docker_client_service_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
-    "service_create", self, after = after_service_create)
+    "service_create", self,
+    expand = c("task_template" = "task_spec"),
+    after = after_service_create)
 
   self$get <- docker_client_getter(docker_client_service, parent, "id")
 
