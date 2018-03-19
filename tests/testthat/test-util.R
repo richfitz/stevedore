@@ -385,3 +385,11 @@ test_that("capture_args", {
     4, 1000),
     "    foo(very_long_first_arg = very_long_default_value, b = 1)")
 })
+
+
+test_that("join_text_list", {
+  expect_identical(join_text_list(character()), character())
+  expect_identical(join_text_list("a"), "a")
+  expect_identical(join_text_list(c("a", "b")), "a and b")
+  expect_identical(join_text_list(c("a", "b", "c")), "a, b and c")
+})

@@ -473,3 +473,13 @@ new_empty_env <- function() {
 new_base_env <- function() {
   new.env(parent = baseenv())
 }
+
+
+join_text_list <- function(x) {
+  n <- length(x)
+  if (n <= 1L) {
+    x
+  } else {
+    sprintf("%s and %s", paste(x[seq_len(n - 1L)], collapse = ", "), x[[n]])
+  }
+}
