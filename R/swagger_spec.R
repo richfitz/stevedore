@@ -111,7 +111,7 @@ swagger_spec_versions <- function() {
 ## This is used only in the package Makefile
 swagger_spec_index_write <- function(path) {
   versions <- swagger_spec_versions()
-  files <- vapply(versions, swagger_spec_fetch, character(1), path)
+  files <- vcapply(versions, swagger_spec_fetch, path)
   md5 <- hash_file(files)
   names(md5) <- paste0("v", names(files))
   cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
@@ -132,7 +132,7 @@ swagger_spec_path_resolve <- function(path, data) {
     if (needs_resolve[[i]]) {
       key <- sub(re, "\\1", path[[i]])
       value <- sub(re, "\\2", path[[i]])
-      found <- vapply(data, function(x) x[[key]] == value, logical(1))
+      found <- vlapply(data, function(x) x[[key]] == value)
       stopifnot(sum(found) == 1L)
       j <- which(found)
     } else  {

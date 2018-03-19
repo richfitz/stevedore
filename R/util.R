@@ -1,13 +1,18 @@
 `%||%` <- function(a, b) {
   if (is.null(a)) b else a
 }
+
+
 `%&&%` <- function(a, b) {
   if (is.null(a)) a else b
 }
 
+
 vlapply <- function(X, FUN, ...) {
   vapply(X, FUN, logical(1), ...)
 }
+
+
 viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
   ## Because we might bump into things like large image sizes that are
   ## essentially integers but overflow what R can store as integers
@@ -43,12 +48,27 @@ viapply <- function(X, FUN, ..., USE.NAMES = TRUE) {
     }
   }
 }
+
+
 vnapply <- function(X, FUN, ...) {
   vapply(X, FUN, numeric(1), ...)
 }
+
+
 vcapply <- function(X, FUN, ...) {
   vapply(X, FUN, character(1), ...)
 }
+
+
+## Version of vapply that will cope with integer overflow
+vapply2 <- function(X, FUN, FUN.VALUE, ...) {
+  if (is.integer(FUN.VALUE) && length(FUN.VALUE) == 1L) {
+    viapply(X, FUN, ...)
+  } else {
+    vapply(X, FUN, FUN.VALUE, ...)
+  }
+}
+
 
 substr_len <- function(x, start, len) {
   substr(x, start, start + len - 1L)
@@ -452,14 +472,4 @@ new_empty_env <- function() {
 
 new_base_env <- function() {
   new.env(parent = baseenv())
-}
-
-
-## Version of vapply that will cope with integer overflow
-vapply2 <- function(X, FUN, FUN.VALUE, ...) {
-  if (is.integer(FUN.VALUE) && length(FUN.VALUE) == 1L) {
-    viapply(X, FUN, ...)
-  } else {
-    vapply(X, FUN, FUN.VALUE, ...)
-  }
 }
