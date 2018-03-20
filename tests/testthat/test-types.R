@@ -142,3 +142,21 @@ test_that("complex types", {
   expect_equal(as.character(jsonlite::toJSON(container)),
                '{"Image":"redis"}')
 })
+
+
+test_that("unsupported type", {
+  x <- swagger_type_unsupported("foo", "1.23", "1.30")
+  expect_equal(x$name, "foo")
+  expect_is(x$handler, "function")
+  expect_error(
+    x$handler(1),
+    "'foo' requires docker API version at least 1.23 (version 1.30 used)",
+    fixed = TRUE)
+  expect_is(x$reciever, "docker_client_method")
+  expect_error(
+    x$reciever(1),
+    "'foo' requires docker API version at least 1.23 (version 1.30 used)",
+    fixed = TRUE)
+  expect_true(setequal(names(attr(x$reciever, "help")),
+                       c("name", "summary", "args")))
+})

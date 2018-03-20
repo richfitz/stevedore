@@ -249,3 +249,26 @@ stevedore_type <- function(data, typename) {
   attr(data, "stevedore_type") <- typename
   data
 }
+
+
+swagger_type_unsupported <- function(name, version_required, version_used) {
+  msg <- sprintf(
+    "'%s' requires docker API version at least %s (version %s used)",
+    name, version_required, version_used)
+  handler <- function(...) {
+    stop(msg, call. = FALSE)
+  }
+  reciever <- function(...) {
+    handler()
+  }
+
+  help <- list(name = name,
+               summary = paste("Unsupported type", msg),
+               args = list("..." = "Ignored in this version"))
+  class(reciever) <- "docker_client_method"
+  attr(reciever, "help") <- help
+
+  list(name = name,
+       handler = handler,
+       reciever = reciever)
+}
