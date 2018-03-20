@@ -230,10 +230,11 @@ swagger_type_help <- function(x, info, spec) {
   args <- set_names(vcapply(properties, pick, "description", NA_character_),
                     nms_r)
 
-  if (!is.null(info$special)) {
+  special <- intersect(info$special, names(args))
+  if (length(special) > 0L) {
     str <- sprintf(" Construct with `$types$%s()`",
-                   vcapply(info$special, identity))
-    args[names(info$special)] <- paste0(args[names(info$special)], str)
+                   vcapply(info$special[special], identity))
+    args[special] <- paste0(args[special], str)
   }
 
   description <- x$description %||% info$name
