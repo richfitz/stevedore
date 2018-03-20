@@ -14,6 +14,10 @@ swagger_types <- function(version, spec) {
 ## amount of work to swagger args unfortunately, but might be somewhat
 ## easier to test.
 swagger_type <- function(info, types, spec) {
+  if (!is.null(info$from) && !version_at_least(spec$info$version, info$from)) {
+    return(swagger_type_unsupported(info$name, info$from, spec$info$version))
+  }
+
   handler <- swagger_type_make_handler_object(info, types, spec)
   reciever <- swagger_type_make_reciever(spec[[info$path]], handler)
   help <- swagger_type_help(spec[[info$path]], info, spec)
@@ -34,7 +38,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   typename <- info$name
   x <- spec[[info$path]]
 
-  stopifnot(x$type == "object")
+  stopifnot(!is.null(x), x$type == "object")
 
   atomic <- atomic_types()
 

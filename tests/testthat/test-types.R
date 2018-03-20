@@ -160,3 +160,14 @@ test_that("unsupported type", {
   expect_true(setequal(names(attr(x$reciever, "help")),
                        c("name", "summary", "args")))
 })
+
+
+test_that("1.25 does not support health_config, 1.26 does", {
+  cl <- null_docker_client(api_version = "1.25")
+  expect_error(
+    cl$types$health_config(),
+    "'health_config' requires docker API version at least 1.26",
+    fixed = TRUE)
+  cl <- null_docker_client(api_version = "1.26")
+  expect_null(cl$types$health_config())
+})
