@@ -57,7 +57,8 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$info <- docker_client_method("system_info", self)
 
   self$login <- docker_client_method(
-    "system_auth", self, after = after_system_login)
+    "system_auth", self,
+    after = after_system_login)
 
   self$ping <- docker_client_method("system_ping", self)
 
@@ -143,17 +144,21 @@ docker_client_container <- function(id, parent) {
     "image_commit", self,
     process = list(quote(env <- validate_env(env))),
     promote = c("repo", "tag", "author", "changes", "comment", "pause"),
-    fix = list(container = id), after = after_image_commit)
+    fix = list(container = id),
+    after = after_image_commit)
 
   self$diff <- docker_client_method(
-    "container_changes", self, fix = fix_id)
+    "container_changes", self,
+    fix = fix_id)
 
   ## TODO: inject 'start' into here too, which then requires passing
   ## detach through as well and dealing with those through the
   ## 'after' function.
   self$exec <- docker_client_method(
-    "exec_create", self, fix = fix_id,
-    rename = c(stdout = "attach_stdout", stderr = "attach_stderr",
+    "exec_create", self,
+    fix = fix_id,
+    rename = c(stdout = "attach_stdout",
+               stderr = "attach_stderr",
                stdin = "attach_stdin"),
     defaults = alist(stdout = TRUE, stderr = TRUE, cmd =),
     promote = "cmd",
@@ -162,14 +167,17 @@ docker_client_container <- function(id, parent) {
     after = after_exec_create)
 
   self$export <- docker_client_method(
-    "container_export", self, fix = fix_id)
+    "container_export", self,
+    fix = fix_id)
 
   self$path_stat <- docker_client_method(
-    "container_path_stat", self, fix = fix_id,
+    "container_path_stat", self,
+    fix = fix_id,
     after = after_container_path_stat)
 
   self$get_archive <- docker_client_method(
-    "container_archive", self, fix = fix_id,
+    "container_archive", self,
+    fix = fix_id,
     extra = alist(dest =),
     process = list(quote(assert_scalar_character_or_null(dest))),
     after = after_container_archive)
@@ -177,68 +185,84 @@ docker_client_container <- function(id, parent) {
   ## TODO: option for compression, pass through to tar file (much
   ## easier to get right if we can rely on R tar)
   self$put_archive <- docker_client_method(
-    "container_import", self, fix = fix_id,
+    "container_import", self,
+    fix = fix_id,
     rename = c(src = "input_stream"),
     process = list(quote(src <- validate_tar_input(src))),
     after = nothing)
 
   self$kill <- docker_client_method(
-    "container_kill", self, fix = fix_id)
+    "container_kill", self,
+    fix = fix_id)
 
   ## Logs; quite complicated in the case of 'follow'
   ## -  stream has an effect *only* if follow is TRUE
   self$logs <- docker_client_method(
-    "container_logs", self, fix = fix_id,
+    "container_logs", self,
+    fix = fix_id,
     defaults = list(stdout = TRUE, stderr = TRUE),
     process = list(
       quote(if (is.numeric(tail)) tail <- as.character(tail)),
       mcr_prepare_stream_and_close(quote(stream))),
     extra = alist(stream = stdout()),
-    hijack = quote(if (isTRUE(follow))
-                     streaming_text(docker_stream_printer(stream))),
+    hijack = quote(
+      if (isTRUE(follow)) streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = FALSE,
     after = after_container_logs)
 
   self$pause <- docker_client_method(
-    "container_pause", self, fix = fix_id)
+    "container_pause", self,
+    fix = fix_id)
 
   self$remove <- docker_client_method(
-    "container_delete", self, fix = fix_id,
+    "container_delete", self,
+    fix = fix_id,
     rename = c(delete_volumes = "v"))
 
   ## This might force refresh?
   self$rename <- docker_client_method(
-      "container_rename", self, fix = fix_id)
+    "container_rename", self,
+    fix = fix_id)
 
   self$resize <- docker_client_method(
-    "container_resize", self, fix = fix_id)
+    "container_resize", self,
+    fix = fix_id)
 
   self$restart <- docker_client_method(
-      "container_restart", self, fix = fix_id)
+    "container_restart", self,
+    fix = fix_id)
 
   self$start <- docker_client_method(
-    "container_start", self, fix = fix_id, after = invisible_self)
+    "container_start", self,
+    fix = fix_id,
+    after = invisible_self)
 
   ## TODO: expose stream (but with nice printing and escape instructions?)
   self$stats <- docker_client_method(
-    "container_stats", self, fix = c(fix_id, stream = FALSE))
+    "container_stats", self,
+    fix = c(fix_id, stream = FALSE))
 
   self$stop <- docker_client_method(
-    "container_stop", self, fix = fix_id)
+    "container_stop", self,
+    fix = fix_id)
 
   self$top <- docker_client_method(
-    "container_top", self, fix = fix_id,
+    "container_top", self,
+    fix = fix_id,
     after = after_container_top)
 
   self$unpause <- docker_client_method(
-    "container_unpause", self, fix = fix_id)
+    "container_unpause", self,
+    fix = fix_id)
 
   self$update <- docker_client_method(
-    "container_update", self, fix = fix_id,
+    "container_update", self,
+    fix = fix_id,
     after = after_container_update)
 
   self$wait <- docker_client_method(
-    "container_wait", self, fix = fix_id)
+    "container_wait", self,
+    fix = fix_id)
 
   stevedore_object(self, "docker_container")
 }
@@ -273,7 +297,8 @@ docker_client_image_collection <- function(parent) {
   self$export <- docker_client_method("image_export", self)
 
   self$pull <- docker_client_method(
-    "image_create", self, rename = c("name" = "from_image"),
+    "image_create", self,
+    rename = c("name" = "from_image"),
     drop = c("input_image", "from_src", "repo", "registry_auth"),
     process = list(
       mcr_prepare_stream_and_close(quote(stream)),
@@ -331,15 +356,19 @@ docker_client_image <- function(id, parent) {
   }
 
   self$history <- docker_client_method(
-    "image_history", self, fix = fix_id_as_name)
+    "image_history", self,
+    fix = fix_id_as_name)
 
   ## TODO: this needs to add a 'filename' option for saving
   self$export <- docker_client_method(
-    "image_tarball", self, fix = fix_id_as_name)
+    "image_tarball", self,
+    fix = fix_id_as_name)
 
   self$tag <- docker_client_method(
-    "image_tag", self, fix = fix_id_as_name,
-    after = invisible_self, defaults = alist(repo =))
+    "image_tag", self,
+    fix = fix_id_as_name,
+    after = invisible_self,
+    defaults = alist(repo =))
 
   self$untag <- function(repo_tag) docker_client_image_untag(repo_tag, self)
 
@@ -347,7 +376,8 @@ docker_client_image <- function(id, parent) {
   ## name, which is not ideal really.  When force = TRUE it's
   ## basically the same I think.
   self$remove <- docker_client_method(
-    "image_delete", self, fix = fix_id_as_name)
+    "image_delete", self,
+    fix = fix_id_as_name)
 
   stevedore_object(self, "docker_image")
 }
@@ -356,7 +386,8 @@ docker_client_network_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
-    "network_create", self, after = after_network_create,
+    "network_create", self,
+    after = after_network_create,
     defaults = alist(check_duplicate = TRUE))
 
   self$get <- docker_client_getter(docker_client_network, parent)
@@ -386,13 +417,16 @@ docker_client_network <- function(id, parent) {
   }
 
   self$connect <- docker_client_method(
-    "network_connect", self, fix = fix_id)
+    "network_connect", self,
+    fix = fix_id)
 
   self$disconnect <- docker_client_method(
-    "network_disconnect", self, fix = fix_id)
+    "network_disconnect", self,
+    fix = fix_id)
 
   self$remove <- docker_client_method(
-    "network_delete", self, fix = fix_id)
+    "network_delete", self,
+    fix = fix_id)
 
   stevedore_object(self, "docker_network")
 }
@@ -401,12 +435,14 @@ docker_client_volume_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
-    "volume_create", self, after = after_volume_create)
+    "volume_create", self,
+    after = after_volume_create)
 
   self$get <- docker_client_getter(docker_client_volume, parent, "name")
 
   self$list <- docker_client_method(
-    "volume_list", self, after = after_volume_list,
+    "volume_list", self,
+    after = after_volume_list,
     process = list(quote(filters <- as_docker_filter(filters))))
 
   self$remove <- docker_client_method("volume_delete", self)
@@ -426,7 +462,8 @@ docker_client_volume <- function(name, parent) {
   }
 
   self$remove <- docker_client_method(
-    "volume_delete", self, fix = fix_name)
+    "volume_delete", self,
+    fix = fix_name)
 
   stevedore_object(self, "docker_volume")
 }
@@ -441,7 +478,8 @@ docker_client_exec <- function(id, parent) {
 
   ## TODO: explicitly set 'detach' argument
   self$start <- docker_client_method(
-    "exec_start", self, fix = fix_id,
+    "exec_start", self,
+    fix = fix_id,
     extra = alist(stream = stdout()),
     hijack = quote(streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = TRUE,
@@ -449,7 +487,8 @@ docker_client_exec <- function(id, parent) {
     after = after_exec_start)
 
   self$resize <- docker_client_method(
-    "exec_resize", self, fix = fix_id)
+    "exec_resize", self,
+    fix = fix_id)
 
   stevedore_object(self, "docker_exec")
 }
@@ -459,7 +498,8 @@ docker_client_swarm_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$init <- docker_client_method(
-    "swarm_init", self, defaults = alist(listen_addr = "0.0.0.0:2377"))
+    "swarm_init", self,
+    defaults = alist(listen_addr = "0.0.0.0:2377"))
   self$inspect <- docker_client_method("swarm_inspect", self)
   self$join <- docker_client_method("swarm_join", self)
   self$leave <- docker_client_method("swarm_leave", self)
@@ -518,7 +558,8 @@ docker_client_service <- function(id, parent) {
   self$name <- function(reload = TRUE) self$inspect(reload)$spec$name
   self$version <- function(reload = TRUE) self$inspect(reload)$version$index
   self$remove <- docker_client_method(
-    "service_delete", self, fix = fix_id)
+    "service_delete", self,
+    fix = fix_id)
 
   stevedore_object(self, "docker_service")
 }
