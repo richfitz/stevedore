@@ -80,9 +80,9 @@ docker_client_method <- function(name, object,
 
       j <- match(arg, names(args_use))
       args_use <- c(append(args_use[-j], type_args, j), args_use[j])
-      process <- process_expanded_arg(as.name(arg), type, names(type_args))
+      p <- process_expanded_arg(as.name(arg), type, names(type_args))
 
-      expand[[i]] <- list(process = process, help = type_help)
+      expand[[i]] <- list(process = p, help = type_help)
     }
 
     ## Now, run the process args _backwards_ to deal with nested types
@@ -225,7 +225,7 @@ format.docker_client_method <- function(x, type = "text", ...) {
 process_expanded_arg <- function(dest, typename, args) {
   collect <- as.call(c(list(bquote(api_client$types[[.(typename)]]$reciever)),
                        lapply(args, as.name)))
-  assert_null <- as.call(c(list(quote(assert_arg_is_null), dest),
+  assert_null <- as.call(c(list(quote(assert_arg_is_null), as.character(dest)),
                            set_names(lapply(args, as.name), args)))
   substitute(
     if (is.null(dest)) {
