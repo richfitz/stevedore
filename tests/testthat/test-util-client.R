@@ -798,3 +798,27 @@ test_that("validate_secret_data", {
   expect_error(validate_secret_data(1),
                "'data' must be a scalar character or raw", fixed = TRUE)
 })
+
+
+test_that("validate_service_secrets", {
+  expect_null(validate_service_secrets(NULL))
+  expect_null(validate_service_secrets(list()))
+  expect_null(validate_service_secrets(character()))
+
+  ## _very_ dummy client:
+  cl <- function(ids = character()) {
+    list(secrets = list(list = function() list(id = ids)))
+  }
+
+  expect_equal(validate_service_secrets("foo", cl()),
+               list(list(SecretName = jsonlite::unbox("foo"))))
+  expect_equal(validate_service_secrets(c("foo", "bar"), cl()),
+               list(list(SecretName = jsonlite::unbox("foo")),
+                    list(SecretName = jsonlite::unbox("bar"))))
+
+  expect_equal(validate_service_secrets("foo", cl("foo")),
+               list(list(SecretID = jsonlite::unbox("foo"))))
+  expect_equal(validate_service_secrets(c("foo", "bar"), cl("foo")),
+               list(list(SecretID = jsonlite::unbox("foo")),
+                    list(SecretName = jsonlite::unbox("bar"))))
+})

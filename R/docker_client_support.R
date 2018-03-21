@@ -556,6 +556,29 @@ validate_secret_data <- function(data) {
 }
 
 
+validate_service_secrets <- function(secrets, client = NULL) {
+  if (length(secrets) == 0L) {
+    return(NULL)
+  }
+
+  ## Don't allow the most complex interface here yet
+  assert_character(secrets)
+
+  ## Known secret ids:
+  secret_ids <- client$secrets$list()$id
+
+  ## It's not totally clear what do here - we can accept secrets by
+  ## name or id but it's not clear how one detects that!  It's
+  ## possible that a secret id is always 25 character alphanumeric
+  ## but that's not always obvious!
+  vss_char <- function(x) {
+    set_names(list(jsonlite::unbox(x)),
+              if (x %in% secret_ids) "SecretID" else "SecretName")
+  }
+
+  lapply(secrets, vss_char)
+}
+
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
