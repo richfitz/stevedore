@@ -455,12 +455,19 @@ file_path <- function(a, b) {
 }
 
 
-base64encode <- function(x) {
-  jsonlite::base64_enc(x)
+base64encode <- function(x, urlsafe = FALSE) {
+  ret <- gsub("\n", "", jsonlite::base64_enc(x), fixed = TRUE)
+  if (urlsafe) {
+    ret <- chartr("+/", "-_", ret)
+  }
+  ret
 }
 
 
-base64decode <- function(x) {
+base64decode <- function(x, urlsafe = FALSE) {
+  if (urlsafe) {
+    x <- chartr("-_", "+/", x)
+  }
   rawToChar(jsonlite::base64_dec(x))
 }
 

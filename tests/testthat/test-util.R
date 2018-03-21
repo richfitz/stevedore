@@ -343,6 +343,18 @@ test_that("base64encode", {
 })
 
 
+test_that("base64encode - urlsafe", {
+  d <- as.raw(c(0xf9, 0x9f, 0xe3, 0xb7, 0x93, 0x17, 0xcb, 0xc4, 0x53, 0x03))
+  s1 <- "+Z/jt5MXy8RTAw=="
+  s2 <- "-Z_jt5MXy8RTAw=="
+  expect_equal(base64encode(d), s1)
+  expect_equal(base64encode(d, TRUE), s2)
+
+  expect_equal(base64decode(s1), rawToChar(d))
+  expect_equal(base64decode(s2, TRUE), rawToChar(d))
+})
+
+
 test_that("sprintfn", {
   expect_equal(sprintfn("mystring", character(0)), "mystring")
   expect_equal(sprintfn("xx %s yy", "aa"), "xx aa yy")
