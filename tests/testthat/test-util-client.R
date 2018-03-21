@@ -762,3 +762,26 @@ test_that("after_service_create", {
   expect_is(res, "docker_service")
   expect_equal(res$id(), dummy_id())
 })
+
+
+test_that("after_secret_create", {
+  expect_equal(after_secret_create(list(id = 1)), 1)
+})
+
+
+test_that("after_secret_list", {
+  id <- replicate(2, rand_str())
+  name <- replicate(2, rand_str())
+  other <- runif(2)
+  spec <- lapply(name, function(x) list(name = x, value = runif(1)))
+  d <- data.frame(id = replicate(2, rand_str()),
+                  other = other,
+                  spec = I(spec))
+
+  d2 <- after_secret_list(d)
+  expect_equal(names(d2), c("id", "name", "other", "spec"))
+  expect_equal(d2$name, name)
+
+  d3 <- after_secret_list(d[integer(0), ])
+  expect_equal(d3, d2[integer(0), ])
+})
