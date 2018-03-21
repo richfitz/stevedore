@@ -561,6 +561,9 @@ docker_client_service <- function(id, parent) {
   self$remove <- docker_client_method(
     "service_delete", self,
     fix = fix_id)
+  self$tasks <- function(filters = NULL) {
+    docker_client_service_tasks(self, filters)
+  }
 
   stevedore_object(self, "docker_service")
 }

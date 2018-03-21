@@ -766,3 +766,15 @@ docker_client_volume_map <- function(attrs, path, readonly = FALSE) {
   }
   sprintf(fmt, attrs$name, path)
 }
+
+
+docker_client_service_tasks <- function(self, filters) {
+  if (length(filters) == 0L) {
+    filters <- character(0)
+  } else if ("service" %in% names(filters)) {
+    stop("'service' is not a valid filter name for this method")
+  }
+  filters[["service"]] <- self$id()
+  tasks <- self$.parent$tasks$list(filters)
+  lapply(tasks$id, self$.parent$tasks$get)
+}
