@@ -79,7 +79,7 @@ docker_client_method <- function(name, object,
       }
 
       j <- match(arg, names(args_use))
-      args_use <- c(append(args_use[-j], type_args, j), args_use[j])
+      args_use <- c(append(args_use[-j], type_args, j - 1L), args_use[j])
       p <- process_expanded_arg(as.name(arg), type, names(type_args))
 
       expand[[i]] <- list(process = p, help = type_help)
