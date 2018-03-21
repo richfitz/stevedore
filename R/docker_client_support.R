@@ -548,6 +548,14 @@ validate_env <- function(env, name = deparse(substitute(env))) {
 }
 
 
+validate_secret_data <- function(data) {
+  if (!is.raw(data)) {
+    assert_scalar_character(data, what = "a scalar character or raw")
+  }
+  base64encode(data, TRUE)
+}
+
+
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {

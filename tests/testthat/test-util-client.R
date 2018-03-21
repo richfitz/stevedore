@@ -785,3 +785,16 @@ test_that("after_secret_list", {
   d3 <- after_secret_list(d[integer(0), ])
   expect_equal(d3, d2[integer(0), ])
 })
+
+
+test_that("validate_secret_data", {
+  expect_equal(validate_secret_data("hello"),
+               base64encode("hello", TRUE))
+
+  bytes <- serialize(iris, NULL)
+  expect_equal(validate_secret_data(bytes),
+               base64encode(bytes, TRUE))
+
+  expect_error(validate_secret_data(1),
+               "'data' must be a scalar character or raw", fixed = TRUE)
+})

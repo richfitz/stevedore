@@ -11,9 +11,8 @@ test_that("create and delete", {
   for (v in swagger_spec_versions()) {
     cl_v <- test_docker_client(api_version = v)
 
-    data <- base64encode("secret!", TRUE)
     key <- rand_str()
-    id <- cl$secrets$create(key, data)
+    id <- cl$secrets$create(key, "secret!")
     expect_is(id, "character")
     expect_true(id %in% cl$secrets$list()$id)
     expect_true(key %in% cl$secrets$list()$name)

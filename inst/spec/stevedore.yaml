@@ -78,6 +78,9 @@
   "description"]
   transform: patch_doc_filters
 
+- path: ["definitions", "SecretSpec", "properties", "Data", "description"]
+  value: "Secret data, as a raw vector or character string"
+
 # totally different!
 
 # TODO: I like the idea of putting links in here but they play poorly

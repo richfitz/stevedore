@@ -614,6 +614,7 @@ docker_client_secret_collection <- function(parent) {
     "secret_create", self,
     defaults = alist(name = , data =),
     promote = c("name", "data"),
+    process = list(quote(data <- validate_secret_data(data))),
     after = after_secret_create)
 
   self$inspect <- docker_client_method(
