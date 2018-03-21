@@ -405,3 +405,8 @@ test_that("join_text_list", {
   expect_identical(join_text_list(c("a", "b")), "a and b")
   expect_identical(join_text_list(c("a", "b", "c")), "a, b and c")
 })
+
+
+test_that("pass_through", {
+  expect_identical(pass_through(iris), iris)
+})

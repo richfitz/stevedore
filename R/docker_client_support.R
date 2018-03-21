@@ -556,28 +556,52 @@ validate_secret_data <- function(data) {
 }
 
 
-validate_service_secrets <- function(secrets, client = NULL) {
-  if (length(secrets) == 0L) {
-    return(NULL)
+## This needs major work:
+##
+## - proper interface for remapping to different files (e.g. secret:dest)
+## - UID/GID/Mode handling (though defaults here will generally be ok)
+## - this will need a lot of tweaking if the docker API changes with
+##   versions, because this depends on the api structure .
+validate_service_secrets <- function(task_template, client) {
+  if (length(task_template$ContainerSpec$Secrets) == 0L) {
+    task_template$ContainerSpec$Secrets <- NULL
+    return(task_template)
   }
 
-  ## Don't allow the most complex interface here yet
-  assert_character(secrets)
+  given <- task_template$ContainerSpec$Secrets
+  assert_character(given)
+  known <- client$secrets$list()
 
-  ## Known secret ids:
-  secret_ids <- client$secrets$list()$id
+  id <- name <- rep(NA_character_, length(given))
 
-  ## It's not totally clear what do here - we can accept secrets by
-  ## name or id but it's not clear how one detects that!  It's
-  ## possible that a secret id is always 25 character alphanumeric
-  ## but that's not always obvious!
-  vss_char <- function(x) {
-    set_names(list(jsonlite::unbox(x)),
-              if (x %in% secret_ids) "SecretID" else "SecretName")
+  ## This feels really awkward!
+  i <- given %in% known$id
+  id[i] <- given[i]
+  name[i] <- known$name[match(given[i], known$id)]
+  i <- given %in% known$name & is.na(id)
+  name[i] <- given[i]
+  id[i] <- known$id[match(given[i], known$name)]
+
+  if (any(is.na(id))) {
+    err <- given[is.na(id)]
+    stop(sprintf("Unknown %s: %s",
+                 ngettext(length(err), "secret", "secrets"),
+                 paste(squote(err), collapse = ", ")))
   }
 
-  lapply(secrets, vss_char)
+  f <- function(id, name) {
+    list(SecretID = jsonlite::unbox(id),
+         SecretName = jsonlite::unbox(name),
+         File = list(Name = jsonlite::unbox(name),
+                     UID = jsonlite::unbox("0"),
+                     GID = jsonlite::unbox("0"),
+                     Mode = jsonlite::unbox(292L))) # 292 -> 444 in oct
+  }
+  task_template$ContainerSpec$Secrets <- unname(Map(f, id, name))
+
+  task_template
 }
+
 
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
@@ -820,4 +844,9 @@ docker_client_service_tasks <- function(self, filters) {
   filters[["service"]] <- self$id()
   tasks <- self$.parent$tasks$list(filters)
   lapply(tasks$id, self$.parent$tasks$get)
+}
+
+
+pass_through <- function(x) {
+  x
 }

@@ -86,6 +86,13 @@ swagger_type_make_handler_object <- function(info, types, spec) {
       lapply(info$special, swagger_type_make_handler_subtype, typename, types)
   }
 
+  if (!is.null(info$custom)) {
+    stopifnot(all(names(info$custom) %in% names(handlers)))
+    handlers[names(info$custom)] <-
+      lapply(info$custom, get, asNamespace("stevedore"),
+             mode = "function", inherits = FALSE)
+  }
+
   msg <- lengths(handlers) == 0
   if (any(msg) && isTRUE(getOption("stevedore.verbose.missing.types"))) {
     message(sprintf("Skipping %d/%d handlers for '%s':\n\t%s",

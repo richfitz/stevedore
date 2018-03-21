@@ -801,24 +801,36 @@ test_that("validate_secret_data", {
 
 
 test_that("validate_service_secrets", {
-  expect_null(validate_service_secrets(NULL))
-  expect_null(validate_service_secrets(list()))
-  expect_null(validate_service_secrets(character()))
-
-  ## _very_ dummy client:
-  cl <- function(ids = character()) {
-    list(secrets = list(list = function() list(id = ids)))
+  cl <- function(id, name) {
+    secrets <- data.frame(id = id, name = name, stringsAsFactors = FALSE)
+    list(secrets = list(list = function() secrets))
   }
 
-  expect_equal(validate_service_secrets("foo", cl()),
-               list(list(SecretName = jsonlite::unbox("foo"))))
-  expect_equal(validate_service_secrets(c("foo", "bar"), cl()),
-               list(list(SecretName = jsonlite::unbox("foo")),
-                    list(SecretName = jsonlite::unbox("bar"))))
+  f <- function(secrets) {
+    cl <- null_docker_client()
+    cl$types$task_spec(
+      cl$types$container_spec(
+        image = "foo",
+        secrets = secrets))
+  }
 
-  expect_equal(validate_service_secrets("foo", cl("foo")),
-               list(list(SecretID = jsonlite::unbox("foo"))))
-  expect_equal(validate_service_secrets(c("foo", "bar"), cl("foo")),
-               list(list(SecretID = jsonlite::unbox("foo")),
-                    list(SecretName = jsonlite::unbox("bar"))))
+  expect_equal(validate_service_secrets(f(NULL), NULL), f(NULL))
+
+  expect_error(validate_service_secrets(f("foo"), cl("a", "b")),
+               "Unknown secret: 'foo'")
+  expect_error(validate_service_secrets(f(c("foo", "bar")), cl("a", "b")),
+               "Unknown secrets: 'foo', 'bar'")
+
+  u <- jsonlite::unbox
+  s <-
+    validate_service_secrets(f("foo"), cl("foo", "bar"))$ContainerSpec$Secrets
+  cmp <- list(list(SecretID = u("foo"), SecretName = u("bar"),
+                   File = list(Name = u("bar"), UID = u("0"), GID = u("0"),
+                               Mode = u(292L))))
+  expect_equal(s, cmp)
+
+  u <- jsonlite::unbox
+  s <-
+    validate_service_secrets(f("bar"), cl("foo", "bar"))$ContainerSpec$Secrets
+  expect_equal(s, cmp)
 })

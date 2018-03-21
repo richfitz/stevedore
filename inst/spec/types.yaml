@@ -18,6 +18,9 @@ container_spec:
   special:
     health_check: health_config
     dns_config: dns_config
+  custom:
+    # validated elsewhere:
+    secrets: pass_through
 
 task_resources:
   path: ["definitions", "TaskSpec", "properties", "Resources"]
