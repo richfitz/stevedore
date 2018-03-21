@@ -611,14 +611,18 @@ docker_client_secret_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
-    "secret_create", self)
+    "secret_create", self,
+    defaults = alist(name = , data =),
+    promote = c("name", "data"),
+    after = after_secret_create)
 
   self$inspect <- docker_client_method(
     "secret_inspect", self)
 
   self$list <- docker_client_method(
     "secret_list", self,
-    process = list(quote(filters <- as_docker_filter(filters))))
+    process = list(quote(filters <- as_docker_filter(filters))),
+    after = after_secret_list)
 
   self$remove <- docker_client_method(
     "secret_delete", self)

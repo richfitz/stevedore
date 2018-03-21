@@ -131,6 +131,30 @@
   value:
     type: "integer"
 
+- version: ["1.25", "1.30"]
+  path: ["definitions", "SecretSpec", "properties", "Data"]
+  value:
+    type: "string"
+
+# This one seems bad - might be worth reporting.  The server I have at
+# least is returning 'ID' rather than 'Id' for the created secret.
+# Not sure if this will persist in 1.37 onwards, or if patching it
+# here is even the correct thing to do.
+- version: ["1.36"]
+  path: ["paths", "/secrets/create", "post", "responses", "201", "schema"]
+  replace: true
+  value:
+    type: "object"
+    properties:
+      ID:
+        type: "string"
+
+# This one is me getting null types wrong I think - rather than looking
+- version: ["1.25", "1.36"]
+  path: ["paths", "/secrets/{id}", "delete", "produces"]
+  value: ~
+  replace: true
+
 # NOTE: debateably belongs in stevedore.yaml, but the spec appears
 # wrong so we'll just do this all at once.
 - path: ["paths", "/services/{id}/logs", "get"]

@@ -315,6 +315,18 @@ after_task_logs <- function(response, params, ...) {
 }
 
 
+after_secret_create <- function(response, ...) {
+  response$id
+}
+
+
+after_secret_list <- function(response, ...) {
+  response$name <- vcapply(response$spec, function(x) x$name)
+  ord <- c("id", "name")
+  response[c(ord, setdiff(names(response), ord))]
+}
+
+
 invisible_self <- function(response, params, self) {
   invisible(self)
 }
