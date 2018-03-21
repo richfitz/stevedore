@@ -74,6 +74,10 @@
   "description"]
   transform: patch_doc_filters
 
+- path: ["paths", "/tasks", "get", "parameters", "@name = filters",
+  "description"]
+  transform: patch_doc_filters
+
 # totally different!
 
 # TODO: I like the idea of putting links in here but they play poorly

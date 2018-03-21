@@ -339,6 +339,45 @@ docker_service:
       Refresh infomation on the service from the server, returning
       `$inspect()` invisibly.
 
+docker_task_collection:
+  help: *help
+  get:
+    summary: >-
+      Get a task by name or id
+    args:
+      id: >-
+        A scalar character with the network's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+
+docker_task:
+  help: *help
+  id:
+    summary: >-
+      Return the tasks's id
+  inspect:
+    summary: >-
+      Return detailed information about this task
+    args:
+      reload: &reload-task >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after a task has been removed.
+  reload:
+    summary: >-
+      Refresh infomation on the task from the server, returning
+      `$inspect()` invisibly.
+  state:
+    summary: >-
+      Retrieve task state (running, shutdown, etc).  Richer
+      information about task status is available as
+      `$inspect()$status`
+    args:
+      reload: *reload-task
+  service:
+    summary: >-
+      Return parent service
+
 docker_secret_collection:
   help: *help
 
@@ -350,3 +389,5 @@ unsupported:
     summary: Delete builder cache
   secret_update:
     summary: Update a Secret
+  task_logs:
+    summary: Get task logs

@@ -306,6 +306,15 @@ after_service_create <- function(response, params, self) {
 }
 
 
+after_task_logs <- function(response, params, ...) {
+  if (isTRUE(params$query$follow)) {
+    invisible(response$content_handler(response$response$content))
+  } else {
+    response
+  }
+}
+
+
 invisible_self <- function(response, params, self) {
   invisible(self)
 }

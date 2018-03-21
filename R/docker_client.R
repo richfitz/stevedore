@@ -73,6 +73,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$swarm <- docker_client_swarm_collection(self)
   self$nodes <- docker_client_node_collection(self)
   self$services <- docker_client_service_collection(self)
+  self$tasks <- docker_client_task_collection(self)
   self$secrets <- docker_client_secret_collection(self)
 
   stevedore_object(self, "docker_client")
@@ -562,6 +563,44 @@ docker_client_service <- function(id, parent) {
     fix = fix_id)
 
   stevedore_object(self, "docker_service")
+}
+
+
+docker_client_task_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$list <- docker_client_method(
+    "task_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))))
+  self$get <- docker_client_getter(docker_client_task, parent, "id")
+
+  stevedore_object(self, "docker_task_collection")
+}
+
+docker_client_task <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+
+  fix_id <- docker_client_add_inspect(id, "id", "task_inspect", self)
+
+  self$logs <- docker_client_method(
+    "task_logs", self,
+    fix = fix_id,
+    defaults = list(stdout = TRUE, stderr = TRUE),
+    process = list(
+      quote(if (is.numeric(tail)) tail <- as.character(tail)),
+      mcr_prepare_stream_and_close(quote(stream))),
+    extra = alist(stream = stdout()),
+    hijack = quote(
+      if (isTRUE(follow)) streaming_text(docker_stream_printer(stream))),
+    allow_hijack_without_stream = FALSE,
+    after = after_task_logs)
+
+  self$state <- function(reload = TRUE) self$inspect(reload)$status$state
+  self$service <- function() {
+    self$.parent$services$get(self$inspect(FALSE)$service_id)
+  }
+
+  stevedore_object(self, "docker_task")
 }
 
 

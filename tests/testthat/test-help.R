@@ -9,12 +9,14 @@ test_that("all help generates", {
                  "swarm",
                  "nodes",
                  "services",
+                 "tasks",
                  "secrets",
                  "docker_container",
                  "docker_image",
                  "docker_network",
                  "docker_volume",
                  "docker_service",
+                 "docker_task",
                  "docker_exec")
 
   stevedore_reset()
