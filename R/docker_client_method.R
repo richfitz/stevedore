@@ -86,7 +86,7 @@ docker_client_method <- function(name, object,
     }
 
     ## Now, run the process args _backwards_ to deal with nested types
-    process <- c(process, rev(unname(lapply(expand, "[[", "process"))))
+    process <- c(rev(unname(lapply(expand, "[[", "process"))), process)
   }
 
   if (!is.null(promote)) {

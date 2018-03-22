@@ -536,6 +536,9 @@ docker_client_service_collection <- function(parent) {
     "service_create", self,
     expand = c("task_template" = "task_spec",
                "container_spec" = "container_spec"),
+    process = list(quote(
+      task_template <-
+        validate_service_secrets(task_template, object$.parent))),
     after = after_service_create)
 
   self$get <- docker_client_getter(docker_client_service, parent, "id")
