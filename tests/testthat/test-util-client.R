@@ -834,3 +834,24 @@ test_that("validate_service_secrets", {
     validate_service_secrets(f("bar"), cl("foo", "bar"))$ContainerSpec$Secrets
   expect_equal(s, cmp)
 })
+
+
+test_that("validate_service_replicas", {
+  expect_null(validate_service_replicas(NULL, FALSE))
+
+  expect_equal(
+    validate_service_replicas(2L, FALSE),
+    list(Replicated = list(Replicas = jsonlite::unbox(2L))))
+  expect_error(
+    validate_service_replicas(pi, FALSE),
+    "'replicas' must be a scalar integer (non-NA)",
+    fixed = TRUE)
+
+  expect_equal(
+    validate_service_replicas(NULL, TRUE),
+    list(Global = NULL))
+  expect_error(
+    validate_service_replicas(pi, TRUE),
+    "Cannot use 'replicas' with 'global'",
+    fixed = TRUE)
+})

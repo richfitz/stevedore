@@ -603,6 +603,26 @@ validate_service_secrets <- function(task_template, client) {
 }
 
 
+validate_service_replicas <- function(replicas, global) {
+  global <- isTRUE(assert_scalar_logical(global))
+  if (is.null(replicas) && !global) { # default:
+    return(NULL)
+  }
+
+  if (global && !is.null(replicas)) {
+    stop("Cannot use 'replicas' with 'global'")
+  }
+  if (global) {
+    mode <- list(Global = NULL)
+  } else {
+    replicas <- assert_scalar_integer(replicas)
+    mode <- list(Replicated = list(Replicas = jsonlite::unbox(replicas)))
+  }
+
+  mode
+}
+
+
 ## ** utilities **
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
