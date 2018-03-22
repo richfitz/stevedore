@@ -410,3 +410,29 @@ test_that("join_text_list", {
 test_that("pass_through", {
   expect_identical(pass_through(iris), iris)
 })
+
+
+test_that("parse_timestamp", {
+  t <- parse_timestamp("2018-03-22T11:51:26.854401Z")
+  expect_false(is.na(t))
+  expect_is(t, "POSIXt")
+  expect_is(t, "POSIXlt")
+
+  cmp <- structure(list(sec = 26.854401, min = 51L, hour = 11L, mday = 22L,
+                        mon = 2L, year = 118L, wday = 4L, yday = 80L,
+                        isdst = 0L),
+                   class = c("POSIXlt", "POSIXt"), tzone = "GMT")
+  expect_identical(t, cmp)
+})
+
+
+test_that("time_ago", {
+  timestamp <- "2018-03-22T11:51:26.854401Z"
+  t <- parse_timestamp(timestamp)
+
+  expect_equal(time_ago(timestamp, t), "0 secs ago")
+  expect_equal(time_ago(timestamp, t + 20), "20 secs ago")
+  expect_equal(time_ago(timestamp, t + 20 * 60), "20 mins ago")
+  expect_equal(time_ago(timestamp, t + 60 * 60 * 3), "3 hours ago")
+  expect_equal(time_ago(timestamp, t + 60 * 60 * 24 * 2), "2 days ago")
+})

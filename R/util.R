@@ -490,3 +490,19 @@ join_text_list <- function(x) {
     sprintf("%s and %s", paste(x[seq_len(n - 1L)], collapse = ", "), x[[n]])
   }
 }
+
+
+## TODO: what does this do out of timezone?
+parse_timestamp <- function(timestamp) {
+  t <- strptime(timestamp, "%Y-%m-%dT%H:%M:%OS", "GMT")
+}
+
+
+## TODO: consider full prettyunits::vague_dt here?
+time_ago <- function(x, now = Sys.time()) {
+  ago1 <- function(t) {
+    dt <- now - parse_timestamp(t)
+    sprintf("%s %s ago", round(dt), attr(dt, "units"))
+  }
+  vcapply(x, ago1, USE.NAMES = FALSE)
+}
