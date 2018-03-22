@@ -573,6 +573,9 @@ docker_client_service <- function(id, parent) {
   self$tasks <- function(filters = NULL) {
     docker_client_service_tasks(self, filters)
   }
+  self$ps <- function(resolve_names = TRUE, filters = NULL) {
+    docker_client_service_ps(self, resolve_names, filters)
+  }
 
   stevedore_object(self, "docker_service")
 }

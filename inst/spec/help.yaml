@@ -343,12 +343,23 @@ docker_service:
       Fetch tasks associated with this service.  Returns a list of
       `docker_task` objects
     args:
-      filters: >-
+      filters: &service-task-filters >-
         A named character vector of filters to process on the tasks
         list.  Available filters are the same as `$tasks$list()`,
         except that `service` is not accepted (it is used internally
         by this method).  Useful filters include `desired-state`,
         `label`, `node`, `name` and `id`.
+  ps:
+    summary: >-
+      Get summary information about a service.
+    args:
+      resolve_names: >-
+        Resolve task and node names, from their ids?  If `FALSE`,
+        rather than do this instead only print ids.  Task "names" are
+        constructed from a combination of service name (or id) and the
+        replicate number.
+      filters: *service-task-filters
+    cli: "docker service ps"
 
 docker_task_collection:
   help: *help

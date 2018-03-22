@@ -867,6 +867,46 @@ docker_client_service_tasks <- function(self, filters) {
 }
 
 
+docker_client_service_ps <- function(self, resolve_names, filters) {
+  tasks <- self$tasks(filters = filters)
+
+  d <- lapply(tasks, function(t) t$inspect(FALSE))
+
+  task_id <- substr(vcapply(d, "[[", "id"), 1L, 12L)
+  slot <- viapply(d, "[[", "slot")
+  image <- vcapply(d, function(x) x$spec$container_spec$image)
+
+  desired_state <- vcapply(d, "[[", "desired_state")
+  current_state <- vcapply(d, function(x) x$status$state)
+  when <- time_ago(vcapply(d, function(x) x$status$timestamp))
+  node_id <- vcapply(d, "[[", "node_id")
+
+  if (resolve_names) {
+    nodes <- self$.parent$nodes$list()
+    node_name <-
+      vcapply(nodes$description, "[[", "hostname")[match(node_id, nodes$id)]
+    task_prefix <- self$name(FALSE)
+  } else {
+    node_name <- node_id
+    task_prefix <- self$id()
+  }
+  task_name <- sprintf("%s.%d", task_prefix, slot)
+
+  ## TODO: error and ports are not done yet
+  ret <- data_frame(
+    id = task_id,
+    name = task_name,
+    image = image,
+    node = node_name,
+    desired_state = desired_state,
+    current_state = current_state,
+    when = when)
+  ret <- ret[order(slot), ]
+  rownames(ret) <- NULL
+  ret
+}
+
+
 pass_through <- function(x) {
   x
 }
