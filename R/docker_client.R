@@ -536,11 +536,16 @@ docker_client_service_collection <- function(parent) {
     "service_create", self,
     expand = c("task_template" = "task_spec",
                "container_spec" = "container_spec"),
-    extra = alist(replicas = NULL, global = FALSE),
+    extra = alist(replicas = NULL, global = FALSE, detach = FALSE,
+                  timeout = 60, time_wait_stable = 5, stream = stdout()),
     ## All the processing here is quite hard, but could be formalised
     ## - this is all processing of arguments that are in expanded
     ## types.  That's not a pattern used elsewhere yet.
     process = list(
+      quote(assert_scalar_logical(detach)),
+      quote(assert_scalar_numeric(timeout)),
+      quote(assert_scalar_numeric(time_wait_stable)),
+      mcr_prepare_stream_and_close(quote(stream)),
       quote(task_template <-
               validate_service_secrets(task_template, object$.parent)),
       quote(mode <- validate_service_replicas(replicas, global))),

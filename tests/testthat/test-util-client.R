@@ -758,7 +758,7 @@ test_that("docker_client_volume_map", {
 
 test_that("after_service_create", {
   cl <- null_docker_client()
-  res <- after_service_create(list(id = dummy_id()), NULL, cl)
+  res <- after_service_create(list(id = dummy_id()), list(detach = TRUE), cl)
   expect_is(res, "docker_service")
   expect_equal(res$id(), dummy_id())
 })

@@ -302,7 +302,13 @@ after_container_update <- function(response, params, self) {
 
 
 after_service_create <- function(response, params, self) {
-  docker_client_service(response$id, self$.parent)
+  ret <- docker_client_service(response$id, self$.parent)
+  if (!params$detach) {
+    docker_client_service_wait_converged(
+      ret, params$timeout, time_wait_stable = params$time_wait_stable,
+      stream = params$stream)
+  }
+  ret
 }
 
 
@@ -863,7 +869,10 @@ docker_client_service_tasks <- function(self, filters) {
   }
   filters[["service"]] <- self$id()
   tasks <- self$.parent$tasks$list(filters)
-  lapply(tasks$id, self$.parent$tasks$get)
+
+  ret <- lapply(tasks$id, function(id)
+    tryCatch(self$.parent$tasks$get(id), error = function(e) NULL))
+  ret[!vlapply(ret, is.null)]
 }
 
 
@@ -904,6 +913,105 @@ docker_client_service_ps <- function(self, resolve_names, filters) {
   ret <- ret[order(slot), ]
   rownames(ret) <- NULL
   ret
+}
+
+
+docker_client_service_wait_converged <- function(service, timeout,
+                                                 t0 = Sys.time(),
+                                                 time_poll = 0.1,
+                                                 time_wait_stable = 5,
+                                                 stream = stdout()) {
+  ## TODO: report that tasks are erroring
+  n <- service$inspect(FALSE)$spec$mode$replicated$replicas
+  pr <- make_service_start_progress(stream)
+
+  message(sprintf("Waiting for %d %s for %s (%s) to start",
+                  n, ngettext(n, "task", "tasks"),
+                  service$name(FALSE), service$id()))
+  t1 <- t0 + timeout
+  repeat {
+    tasks <- service$tasks()
+    state <- vcapply(tasks, function(t) t$inspect(FALSE)$status$state)
+    m <- pr(state)
+    if (sum(state == "running") == n) {
+      cat2("\n", file = stream)
+      break
+    }
+    if (Sys.time() > t1) {
+      cat2("\n", file = stream)
+      stop("service has not converged in time (but docker is still trying)",
+           call. = FALSE)
+    }
+    Sys.sleep(time_poll)
+  }
+
+  tasks <- tasks[state == "running"]
+  message(sprintf("Wating %s seconds for service to ensure convergence",
+                  time_wait_stable))
+  t1 <- Sys.time() + time_wait_stable
+  while (Sys.time() < t1) {
+    cat2(".", file = stream)
+    ok <- vcapply(tasks, function(t)
+      tryCatch(t$state(), error = function(e) "gone")) == "running"
+    if (!all(ok)) {
+      cat2("\n", file = stream)
+      message("Task has failed, trying again")
+      docker_client_service_wait_converged(service, timeout, t0,
+                                           time_poll, time_wait_stable,
+                                           stream)
+    }
+    Sys.sleep(time_poll)
+  }
+  cat2("done\n", file = stream)
+}
+
+
+make_service_start_progress <- function(stream) {
+  states_active <- c("new" = "new",
+                   "allocated" = "alloc",
+                   "pending" = "pend",
+                   "assigned" = "assign",
+                   "accepted" = "accept",
+                   "preparing" = "prep",
+                   "ready" = "ready",
+                   "starting" = "start",
+                   "running" = "running")
+  states_end <- c("complete", "shutdown", "rejected", "failed")
+  title <- paste0(paste(states_active, collapse = " > "), "\n")
+  pos_end <- cumsum(unname(nchar(states_active)) + 3L) - 3L
+
+  if (is.null(stream)) {
+    return(function(state) NULL)
+  }
+
+  last <- NULL
+  function(state) {
+    i <- na.omit(match(state, names(states_active)))
+    n <- tabulate(i, length(states_active))
+    np <- pos_end[seq_along(n)[n > 0L]]
+    nn <- n[n > 0L]
+
+    progress <- ""
+    for (j in seq_along(nn)) {
+      ns <- as.character(nn[[j]])
+      len_bar <- np[[j]] - nchar(progress) - nchar(ns) - 1L
+      char <- if (nchar(progress) == 0) "=" else "-"
+      progress <- paste0(progress, strrep(char, len_bar), ">", ns)
+    }
+
+    if (any(state == "failed")) {
+      pad <- strrep(" ", nchar(title) - nchar(progress) + 1L)
+      progress <- paste0(progress, pad, "w/ fails")
+    }
+
+    if (is.null(last)) {
+      cat(title, file = stream)
+    } else {
+      reset_line(stream, nchar(last))
+    }
+    cat(progress, file = stream)
+    last <<- progress
+  }
 }
 
 

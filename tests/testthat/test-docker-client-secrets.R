@@ -37,20 +37,14 @@ test_that("add to container", {
   data <- "secret!"
   id <- cl$secrets$create(name, data)
 
-  cl <- test_docker_client()
   ans <- cl$services$create(name = "redis",
                             image = "redis",
-                            secrets = name)
+                            secrets = name,
+                            timeout = 20,
+                            time_wait_stable = 0,
+                            stream = NULL)
 
-  ## TODO: need to do a convergence test here first in order to be
-  ## able to do this reliably!
-  for (i in 1:10) {
-    tasks <- ans$tasks(list("desired-state" = "running"))
-    if (length(tasks) > 0L) {
-      break
-    }
-    Sys.sleep(0.2)
-  }
+  tasks <- ans$tasks(list("desired-state" = "running"))
   expect_equal(length(tasks), 1L)
 
   container_id <- tasks[[1]]$inspect()$status$container_status$container_id
@@ -58,4 +52,6 @@ test_that("add to container", {
   e <- container$exec(c("cat", sprintf("/run/secrets/%s", name)))
   log <- e$start(detach = FALSE, stream = FALSE)
   expect_identical(as.character(log), data)
+
+  ans$remove()
 })

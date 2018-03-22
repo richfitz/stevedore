@@ -87,7 +87,6 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   }
 
   if (!is.null(info$custom)) {
-    stopifnot(all(names(info$custom) %in% names(handlers)))
     handlers[names(info$custom)] <-
       lapply(info$custom, get, asNamespace("stevedore"),
              mode = "function", inherits = FALSE)

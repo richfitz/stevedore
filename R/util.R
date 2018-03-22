@@ -506,3 +506,10 @@ time_ago <- function(x, now = Sys.time()) {
   }
   vcapply(x, ago1, USE.NAMES = FALSE)
 }
+
+
+cat2 <- function(..., file) {
+  if (!is.null(file)) {
+    cat(..., file = file)
+  }
+}
