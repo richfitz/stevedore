@@ -421,7 +421,8 @@ test_that("exec", {
 
   txt <- capture.output(res <- ans$start(detach = FALSE))
   expect_is(res, "docker_stream")
-  expect_equal(txt, strsplit(format(res, style = "prefix"), "\n")[[1]])
+  cmp <- unlist(strsplit(format(res, style = "prefix"), "\n"))
+  expect_equal(txt, cmp)
 
   x$kill()
   x$remove()
