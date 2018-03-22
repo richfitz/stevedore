@@ -536,9 +536,15 @@ docker_client_service_collection <- function(parent) {
     "service_create", self,
     expand = c("task_template" = "task_spec",
                "container_spec" = "container_spec"),
-    process = list(quote(
-      task_template <-
-        validate_service_secrets(task_template, object$.parent))),
+    extra = alist(replicas = NULL, global = FALSE),
+    ## All the processing here is quite hard, but could be formalised
+    ## - this is all processing of arguments that are in expanded
+    ## types.  That's not a pattern used elsewhere yet.
+    process = list(
+      quote(task_template <-
+              validate_service_secrets(task_template, object$.parent)),
+      quote(mode <- validate_service_replicas(replicas, global))),
+    drop = "mode",
     after = after_service_create)
 
   self$get <- docker_client_getter(docker_client_service, parent, "id")
