@@ -436,3 +436,9 @@ test_that("time_ago", {
   expect_equal(time_ago(timestamp, t + 60 * 60 * 3), "3 hours ago")
   expect_equal(time_ago(timestamp, t + 60 * 60 * 24 * 2), "2 days ago")
 })
+
+
+test_that("cat2", {
+  expect_output(cat2("hello", file = stdout()), "hello")
+  expect_silent(cat2("hello", file = NULL))
+})
