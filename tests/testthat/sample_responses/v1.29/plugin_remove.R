@@ -44,7 +44,7 @@ config <- list(
     socket = "plugins.sock"),
   entrypoint = c("/usr/bin/sample-volume-plugin", "/data"),
   work_dir = "",
-  user = list(u_id = NA_integer_, g_id = NA_integer_),
+  user = list(uid = NA_integer_, gid = NA_integer_),
   network = list(type = ""),
   linux = list(
     capabilities = character(0),

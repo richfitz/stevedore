@@ -72,3 +72,28 @@ To handle this request we need to collect up parameters `id`, `v`, `force` and `
 
   - `docker_api_client.R` defines the main object.  It has two objects - `http_client` which contains the transport support and `endpoints`, which has information on each endpoint.
   - The `run_endpoint` function takes this `http_client` and one of the endpoint object, along with any parameters (a list with elements `path`, `query`, `body` and `header`) and performs the request
+
+## Notes
+
+### The names cache
+
+```r
+test_file("tests/testthat/test-help.R")
+names <- .stevedore$names
+names <- names[order(names[, 1L]), ]
+write.csv(names, "inst/spec/names.csv", row.names = FALSE)
+```
+
+check for possible special cases here:
+
+```r
+tmp <- names[grepl("^[a-z]_", names[, 2L]), ]
+```
+
+Update the tests in test-util.R
+
+```r
+tmp <- names[grepl("^[A-Z]{2}", names[, 1L]), ]
+writeLines(sprintf('  expect_equal(pascal_to_snake("%s"), "%s")',
+                   tmp[, 1L], tmp[, 2L]))
+```

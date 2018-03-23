@@ -77,6 +77,6 @@ list(
     err = NA_character_,
     container_status = list(
       container_id = "e5d62702a1b48d01c3e02ca1e0212a250801fa8d67caca0b6f35919ebc12f035",
-      p_id = 677L,
+      pid = 677L,
       exit_code = NA_integer_)),
   desired_state = "running")

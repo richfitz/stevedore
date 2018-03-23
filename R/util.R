@@ -105,8 +105,9 @@ download_file <- function(url, dest, quiet = FALSE) {
 }
 
 RE_PASCAL_START <- local({
-  special <- c("CA", "CPU", "DNS", "ID", "IO", "IP", "IPAM",
-               "OOM", "OS", "RW", "TLS", "TTY", "URL", "UTS")
+  special <- c("CA", "CPU", "DNS", "GID", "ID", "IO", "IP", "IPAM",
+               "OOM", "OS", "PID", "RW", "SELinux", "TLS", "TTY",
+               "UID", "URL", "UTS")
   sprintf("^([A-Z]|%s)", paste(special, collapse = "|"))
 })
 

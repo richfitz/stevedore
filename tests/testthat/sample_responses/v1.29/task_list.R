@@ -66,7 +66,7 @@ status1 <- list(
   err = NA_character_,
   container_status = list(
     container_id = "e5d62702a1b48d01c3e02ca1e0212a250801fa8d67caca0b6f35919ebc12f035",
-    p_id = 677L,
+    pid = 677L,
     exit_code = NA_integer_))
 
 status2 <- list(
@@ -76,7 +76,7 @@ status2 <- list(
   err = NA_character_,
   container_status = list(
     container_id = "1cf8d63d18e79668b0004a4be4c6ee58cddfad2dae29506d8781581d0688a213",
-    p_id = NA_integer_,
+    pid = NA_integer_,
     exit_code = NA_integer_))
 
 data_frame(
