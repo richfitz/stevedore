@@ -158,7 +158,7 @@ test_that("stability failure", {
                        command = "fail",
                        args = "0.5",
                        replicas = 2,
-                       timeout = 2,
+                       timeout = 3.5,
                        time_wait_stable = 10,
                        stream = tmp),
     "service has not converged in time")
