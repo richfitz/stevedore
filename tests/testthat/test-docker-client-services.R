@@ -144,6 +144,32 @@ test_that("convergence: failure", {
 })
 
 
+test_that("stability failure", {
+  ## A service that starts but does not stay up:
+  cl <- test_docker_client()
+
+  id <- cl$swarm$init()
+  on.exit(cl$swarm$leave(TRUE))
+
+  tmp <- tempfile()
+  expect_error(
+    cl$services$create(name = "myservice",
+                       image = "richfitz/fail",
+                       command = "fail",
+                       args = "0.5",
+                       replicas = 2,
+                       timeout = 2,
+                       time_wait_stable = 10,
+                       stream = tmp),
+    "service has not converged in time")
+  txt <- readLines(tmp)
+  expect_true(length(grep("^new", txt)) >= 2L)
+  expect_match(txt, "Task has failed, trying again", all = FALSE, fixed = TRUE)
+
+  cl$services$get("myservice")$remove()
+})
+
+
 test_that("don't detach", {
   cl <- test_docker_client()
 

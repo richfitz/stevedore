@@ -954,8 +954,7 @@ docker_client_service_wait_converged <- function(service, timeout,
     ok <- vcapply(tasks, function(t)
       tryCatch(t$state(), error = function(e) "gone")) == "running"
     if (!all(ok)) {
-      cat2("\n", file = stream)
-      message("Task has failed, trying again")
+      cat2("\nTask has failed, trying again\n", file = stream)
       docker_client_service_wait_converged(service, timeout, t0,
                                            time_poll, time_wait_stable,
                                            stream)
