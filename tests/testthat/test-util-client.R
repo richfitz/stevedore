@@ -545,6 +545,22 @@ test_that("after_container_logs", {
 })
 
 
+## For now this is identical to the tests for `after_container_logs` -
+## the functions could be merged together but that's not essential
+## really.
+test_that("after_task_logs", {
+  bin <- as.raw(0:10)
+  expect_identical(after_task_logs("hello", NULL, NULL), "hello")
+  expect_identical(after_task_logs(bin, NULL, NULL), bin)
+
+  response <- list(content_handler = rawToChar,
+                   response = list(content = charToRaw("hello")))
+  params <- list(query = list(follow = TRUE))
+
+  expect_identical(after_task_logs(response, params), "hello")
+})
+
+
 test_that("after_container_path_stat", {
   data <- list(a = 1, b = "hello")
   str <- jsonlite::toJSON(data, auto_unbox = TRUE)
