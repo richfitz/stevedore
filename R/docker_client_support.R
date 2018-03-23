@@ -1006,7 +1006,7 @@ make_service_start_progress <- function(stream) {
     if (is.null(last)) {
       cat(title, file = stream)
     } else {
-      reset_line(stream, nchar(last))
+      reset_line(stream, nchar(last), newline_if_not_tty = TRUE)
     }
     cat(progress, file = stream)
     last <<- progress

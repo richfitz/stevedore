@@ -236,10 +236,11 @@ string_starts_with <- function(x, sub) {
   substr(x, 1, nchar(sub)) == sub
 }
 
-reset_line <- function(stream, width, is_tty = isatty(stream)) {
+reset_line <- function(stream, width, newline_if_not_tty = FALSE,
+                       is_tty = isatty(stream)) {
   if (is_tty) {
     cat(paste0(c("\r", strrep(" ", width), "\r"), collapse = ""), file = stream)
-  } else {
+  } else if (newline_if_not_tty) {
     cat("\n", file = stream)
   }
 }
