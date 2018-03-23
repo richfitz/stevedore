@@ -1,0 +1,12 @@
+#!/bin/sh
+set -e
+
+WAIT=$1
+if [ -z "$WAIT" ]; then
+    WAIT=2
+fi
+
+echo "Starting someting up"
+sleep $WAIT
+echo "thing failed!"
+exit 1
