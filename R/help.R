@@ -396,6 +396,9 @@ help_summary <- function(h) {
   }
   if (!is.null(h$cli)) {
     cli <- paste(sprintf("`docker %s`", h$cli), collapse = " or ")
+    if (!grepl("\\.$", summary)) {
+      summary <- paste0(summary, ".")
+    }
     summary <- sprintf("%s  Similar to the cli command %s.",
                        summary, cli)
   }
