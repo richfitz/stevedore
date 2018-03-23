@@ -967,14 +967,14 @@ docker_client_service_wait_converged <- function(service, timeout,
 
 make_service_start_progress <- function(stream) {
   states_active <- c("new" = "new",
-                   "allocated" = "alloc",
-                   "pending" = "pend",
-                   "assigned" = "assign",
-                   "accepted" = "accept",
-                   "preparing" = "prep",
-                   "ready" = "ready",
-                   "starting" = "start",
-                   "running" = "running")
+                     "allocated" = "alloc",
+                     "pending" = "pend",
+                     "assigned" = "assign",
+                     "accepted" = "accept",
+                     "preparing" = "prep",
+                     "ready" = "ready",
+                     "starting" = "start",
+                     "running" = "running")
   states_end <- c("complete", "shutdown", "rejected", "failed")
   title <- paste0(paste(states_active, collapse = " > "), "\n")
   pos_end <- cumsum(unname(nchar(states_active)) + 3L) - 3L

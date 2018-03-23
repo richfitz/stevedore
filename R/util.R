@@ -239,6 +239,8 @@ string_starts_with <- function(x, sub) {
 reset_line <- function(stream, width, is_tty = isatty(stream)) {
   if (is_tty) {
     cat(paste0(c("\r", strrep(" ", width), "\r"), collapse = ""), file = stream)
+  } else {
+    cat("\n", file = stream)
   }
 }
 

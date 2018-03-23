@@ -877,3 +877,36 @@ test_that("docker_client_service_tasks (offline)", {
   expect_error(docker_client_service_tasks(NULL, list(service = "foo")),
                "'service' is not a valid filter name for this method")
 })
+
+
+test_that("service progress: null", {
+  pr <- make_service_start_progress(NULL)
+  expect_is(pr, "function")
+  expect_silent(ans <- pr("running"))
+  expect_null(ans)
+})
+
+
+test_that("service progress", {
+  txt <- capture.output({
+    pr <- make_service_start_progress(stdout())
+    pr(c("assigned", "ready"))
+  })
+  expect_equal(
+    txt,
+    c("new > alloc > pend > assign > accept > prep > ready > start > running",
+        "=========================>1---------------------->1"))
+
+  txt <- capture.output({
+    pr <- make_service_start_progress(stdout())
+    pr("new")
+    pr(rep("new", 10))
+    pr(c("assigned", "ready", rep("preparing", 12)))
+  })
+  expect_equal(
+    txt,
+    c("new > alloc > pend > assign > accept > prep > ready > start > running",
+      "=>1",
+      ">10",
+      "=========================>1------------->12------>1"))
+})
