@@ -77,7 +77,9 @@ test_that("exec", {
   e1 <- x$exec("ls")
   txt1 <- capture.output(res1 <- e1$start(detach = FALSE))
   expect_is(res1, "docker_stream")
-  expect_equal(txt1, strsplit(format(res1, style = "prefix"), "\n")[[1]])
+
+  cmp <- unlist(strsplit(format(res1, style = "prefix"), "\n"))
+  expect_equal(txt1, cmp)
 
   e2 <- x$exec("ls")
   expect_silent(res2 <- e2$start(detach = FALSE, stream = FALSE))
