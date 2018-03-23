@@ -855,3 +855,9 @@ test_that("validate_service_replicas", {
     "Cannot use 'replicas' with 'global'",
     fixed = TRUE)
 })
+
+
+test_that("docker_client_service_tasks (offline)", {
+  expect_error(docker_client_service_tasks(NULL, list(service = "foo")),
+               "'service' is not a valid filter name for this method")
+})

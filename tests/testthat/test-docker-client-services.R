@@ -75,6 +75,15 @@ test_that("basic swarm service create - expanded types", {
   expect_equal(s$id(), ans$id())
   expect_is(s, "docker_service")
 
+  ts <- ans$tasks()
+  expect_is(ts, "list")
+  expect_is(ts[[1]], "docker_task")
+  expect_equal(ts[[1]]$id(), t$id())
+
+  expect_equal(ans$tasks(list("desired-state" = "shutdown")), list())
+  expect_error(ans$tasks(list(service = "foo")),
+               "'service' is not a valid filter name for this method")
+
   expect_null(ans$remove())
 })
 
