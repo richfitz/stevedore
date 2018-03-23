@@ -251,7 +251,8 @@ reset_line <- function(stream, width, newline_if_not_tty = FALSE,
 ## walking off the right edge.  This version will not go past
 ## options("width") at the cost of being potentially slower (though I
 ## don't think it's much worse than strwrap).
-capture_args <- function(f, name, indent = 4, width = getOption("width")) {
+capture_args <- function(f, name, indent = 4, width = getOption("width"),
+                         exdent = 4L) {
   args <- formals(f)
 
   if (length(args) == 0L) {
@@ -272,12 +273,12 @@ capture_args <- function(f, name, indent = 4, width = getOption("width")) {
     ns <- nchar(s)
     ni <- nchar(i)
     if (ns == 0) {
-      s <- paste0(strrep(" ", indent * (min(length(ret), 1L) + 1)), i)
+      s <- paste0(strrep(" ", indent + if (length(ret) > 0L) exdent else 0L), i)
     } else if (ns + ni + 2 < w) {
       s <- paste(s, i, sep = ", ")
     } else {
       ret <- c(ret, paste0(s, ","))
-      s <- paste0(strrep(" ", indent * 2), i)
+      s <- paste0(strrep(" ", indent + exdent), i)
     }
   }
 
