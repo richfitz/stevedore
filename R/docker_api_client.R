@@ -64,51 +64,7 @@ docker_api_client_auth <- function() {
 }
 
 
-STEVEDORE_UNIMPLEMENTED <-
-  c("get /containers/{id}/attach/ws",
-    "get /plugins",
-    "get /plugins/privileges",
-    "post /plugins/pull",
-    "get /plugins/{name}/json",
-    "delete /plugins/{name}",
-    "post /plugins/{name}/enable",
-    "post /plugins/{name}/disable",
-    "post /plugins/{name}/upgrade",
-    "post /plugins/create",
-    "post /plugins/{name}/push",
-    "post /plugins/{name}/set",
-    "get /nodes",
-    "get /nodes/{id}",
-    "delete /nodes/{id}",
-    "post /nodes/{id}/update",
-    "get /swarm",
-    "post /swarm/init",
-    "post /swarm/join",
-    "post /swarm/leave",
-    "post /swarm/update",
-    "get /swarm/unlockkey",
-    "post /swarm/unlock",
-    "get /services",
-    "post /services/create",
-    "get /services/{id}",
-    "delete /services/{id}",
-    "post /services/{id}/update",
-    "get /services/{id}/logs",
-    "get /tasks",
-    "get /tasks/{id}",
-    "get /tasks/{id}/logs",
-    "get /secrets",
-    "post /secrets/create",
-    "get /secrets/{id}",
-    "delete /secrets/{id}",
-    "post /secrets/{id}/update",
-    "post /session",
-    "get /configs",
-    "post /configs/create",
-    "get /configs/{id}",
-    "delete /configs/{id}",
-    "post /configs/{id}/update",
-    "get /distribution/{name}/json")
+STEVEDORE_UNIMPLEMENTED <- "post /session"
 
 
 docker_api_client_data_check <- function(spec, endpoints) {
@@ -119,10 +75,15 @@ docker_api_client_data_check <- function(spec, endpoints) {
   pos_check <- setdiff(pos, STEVEDORE_UNIMPLEMENTED)
 
   msg <- setdiff(pos_check, done)
-
   if (length(msg) > 0L) {
     stop("Unimplemented endpoints (stevedore bug):\n",
          paste("  -", msg, collapse = "\n"))
+  }
+
+  err <- intersect(done, STEVEDORE_UNIMPLEMENTED)
+  if (length(err) > 0L) {
+    stop("Unexpected implemented methods (stevedore bug):\n",
+         paste("  -", err, collapse = "\n"))
   }
 }
 

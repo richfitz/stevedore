@@ -32,6 +32,19 @@ test_that("spec check", {
     docker_api_client_data_check(spec, endpoints[-1]),
     "Unimplemented endpoints (stevedore bug)",
     fixed = TRUE)
+
+  if (length(STEVEDORE_UNIMPLEMENTED) > 0L) {
+    tmp <- endpoints[seq_along(STEVEDORE_UNIMPLEMENTED)]
+    for (i in seq_along(STEVEDORE_UNIMPLEMENTED)) {
+      m <- strsplit(STEVEDORE_UNIMPLEMENTED[[i]], " ")[[1]]
+      tmp[[i]]$method <- m[[1]]
+      tmp[[i]]$path <- m[[2]]
+    }
+    expect_error(
+      docker_api_client_data_check(spec, c(endpoints, tmp)),
+       "Unexpected implemented methods (stevedore bug):",
+      fixed = TRUE)
+  }
 })
 
 
