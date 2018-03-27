@@ -45,7 +45,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
   properties <- lapply(x$properties, resolve_schema_ref, spec)
 
   nms <- names(properties)
-  nms_r <- pascal_to_snake(nms)
+  nms_r <- pascal_to_snake_cached(nms)
   type <- vcapply(properties, "[[", "type")
   is_scalar_atomic <- type %in% names(atomic$type)
   is_array <- type == "array"
@@ -147,7 +147,7 @@ swagger_type_make_handler_object <- function(info, types, spec) {
 
 swagger_type_make_reciever <- function(x, handler) {
   nms <- names(x$properties)
-  nms_r <- pascal_to_snake(nms)
+  nms_r <- pascal_to_snake_cached(nms)
 
   env <- new_base_env()
   env$.handler <- handler
@@ -236,7 +236,7 @@ object_is_string_map <- function(x) {
 ## that
 swagger_type_help <- function(x, info, spec) {
   properties <- lapply(x$properties, resolve_schema_ref, spec)
-  nms_r <- pascal_to_snake(names(properties))
+  nms_r <- pascal_to_snake_cached(names(properties))
   args <- set_names(vcapply(properties, pick, "description", NA_character_),
                     nms_r)
 
