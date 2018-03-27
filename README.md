@@ -875,8 +875,6 @@ There is still a lot of work to do here:
 * unix non-socket (tcp) access, including TLS.  Setting it up is not too bad but testing it securely is a pain.
 * endpoints that require http hijacking are not fully supported (i.e., attach) but the foundations are there to support this - stdin is likely to be a major hassle though and I'm not sure if it's possible from within R's REPL.  The websockets approach might be better but stands very little chance of working on windows.
 * endpoints that require tar input and output (equivalents of `docker cp` especially) need major work
-* lots of work on parameter wrangling for the more complicated endpoints (basically things that take anything more complicated than a string array are prone to failure because I've not tested them yet)
-* swarm features (`nodes`, `plugins`, `secrets`, `services` and `swarm`) are not implemented - not because they'd be any harder but just because I've never used them
 
 
 ## Development and testing
