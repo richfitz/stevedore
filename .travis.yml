@@ -8,8 +8,8 @@ r_packages:
 r_github_packages:
   - richfitz/httppipe
 before_script:
-  - pip install -U setuptools
-  - pip install -U docker
+  - sudo pip install -U setuptools
+  - sudo pip install -U docker
   - docker pull hello-world
   - docker pull alpine
   - docker pull alpine:3.1
