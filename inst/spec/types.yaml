@@ -21,6 +21,7 @@ container_spec:
   custom:
     # validated elsewhere:
     secrets: pass_through
+    configs: pass_through
 
 task_resources:
   path: ["definitions", "TaskSpec", "properties", "Resources"]

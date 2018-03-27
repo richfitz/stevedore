@@ -11,6 +11,7 @@ test_that("all help generates", {
                  "services",
                  "tasks",
                  "secrets",
+                 "configs",
                  "docker_container",
                  "docker_image",
                  "docker_network",

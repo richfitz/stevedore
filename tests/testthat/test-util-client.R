@@ -852,6 +852,42 @@ test_that("validate_service_secrets", {
 })
 
 
+test_that("validate_service_configs", {
+  cl <- function(id, name) {
+    configs <- data.frame(id = id, name = name, stringsAsFactors = FALSE)
+    list(configs = list(list = function() configs))
+  }
+
+  f <- function(configs) {
+    cl <- null_docker_client(api_version = "1.30")
+    cl$types$task_spec(
+      cl$types$container_spec(
+        image = "foo",
+        configs = configs))
+  }
+
+  expect_equal(validate_service_configs(f(NULL), NULL), f(NULL))
+
+  expect_error(validate_service_configs(f("foo"), cl("a", "b")),
+               "Unknown config: 'foo'")
+  expect_error(validate_service_configs(f(c("foo", "bar")), cl("a", "b")),
+               "Unknown configs: 'foo', 'bar'")
+
+  u <- jsonlite::unbox
+  s <-
+    validate_service_configs(f("foo"), cl("foo", "bar"))$ContainerSpec$Configs
+  cmp <- list(list(ConfigID = u("foo"), ConfigName = u("bar"),
+                   File = list(Name = u("bar"), UID = u("0"), GID = u("0"),
+                               Mode = u(292L))))
+  expect_equal(s, cmp)
+
+  u <- jsonlite::unbox
+  s <-
+    validate_service_configs(f("bar"), cl("foo", "bar"))$ContainerSpec$Configs
+  expect_equal(s, cmp)
+})
+
+
 test_that("validate_service_replicas", {
   expect_null(validate_service_replicas(NULL, FALSE))
 

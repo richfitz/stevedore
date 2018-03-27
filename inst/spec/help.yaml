@@ -403,6 +403,9 @@ docker_task:
 docker_secret_collection:
   help: *help
 
+docker_config_collection:
+  help: *help
+
 docker_types:
   help: *help
 
@@ -413,3 +416,13 @@ unsupported:
     summary: Update a Secret
   task_logs:
     summary: Get task logs
+  config_create:
+    summary: Create a config
+  config_inspect:
+    summary: Inspect a config
+  config_list:
+    summary: List configs
+  config_delete:
+    summary: Delete a config
+  config_update:
+    summary: Update a Config

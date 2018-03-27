@@ -75,6 +75,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$services <- docker_client_service_collection(self)
   self$tasks <- docker_client_task_collection(self)
   self$secrets <- docker_client_secret_collection(self)
+  self$configs <- docker_client_config_collection(self)
 
   stevedore_object(self, "docker_client")
 }
@@ -548,6 +549,8 @@ docker_client_service_collection <- function(parent) {
       mcr_prepare_stream_and_close(quote(stream)),
       quote(task_template <-
               validate_service_secrets(task_template, object$.parent)),
+      quote(task_template <-
+              validate_service_configs(task_template, object$.parent)),
       quote(mode <- validate_service_replicas(replicas, global))),
     drop = "mode",
     after = after_service_create)
@@ -649,6 +652,34 @@ docker_client_secret_collection <- function(parent) {
     "secret_update", self)
 
   stevedore_object(self, "docker_secret_collection")
+}
+
+
+docker_client_config_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$create <- docker_client_method(
+    "config_create", self,
+    defaults = alist(name = , data =),
+    promote = c("name", "data"),
+    process = list(quote(data <- validate_secret_data(data))),
+    after = after_secret_create)
+
+  self$inspect <- docker_client_method(
+    "config_inspect", self)
+
+  self$list <- docker_client_method(
+    "config_list", self,
+    process = list(quote(filters <- as_docker_filter(filters))),
+    after = after_secret_list)
+
+  self$remove <- docker_client_method(
+    "config_delete", self)
+
+  self$update <- docker_client_method(
+    "config_update", self)
+
+  stevedore_object(self, "docker_config_collection")
 }
 
 

@@ -568,15 +568,30 @@ validate_secret_data <- function(data) {
 ## - UID/GID/Mode handling (though defaults here will generally be ok)
 ## - this will need a lot of tweaking if the docker API changes with
 ##   versions, because this depends on the api structure .
-validate_service_secrets <- function(task_template, client) {
-  if (length(task_template$ContainerSpec$Secrets) == 0L) {
-    task_template$ContainerSpec$Secrets <- NULL
+##
+## NOTE: The same interface is used for both secret and config because
+## they are basically the same thing.
+validate_service_secrets <- function(task_template, client, config = FALSE) {
+  if (config) {
+    key_spec <- "Configs"
+    key_obj <- "configs"
+    data_prefix <- "Config"
+    data_name <- c("config", "configs")
+  } else {
+    key_spec <- "Secrets"
+    key_obj <- "secrets"
+    data_prefix <- "Secret"
+    data_name <- c("secret", "secrets")
+  }
+
+  if (length(task_template$ContainerSpec[[key_spec]]) == 0L) {
+    task_template$ContainerSpec[[key_spec]] <- NULL
     return(task_template)
   }
 
-  given <- task_template$ContainerSpec$Secrets
+  given <- task_template$ContainerSpec[[key_spec]]
   assert_character(given)
-  known <- client$secrets$list()
+  known <- client[[key_obj]]$list()
 
   id <- name <- rep(NA_character_, length(given))
 
@@ -591,21 +606,28 @@ validate_service_secrets <- function(task_template, client) {
   if (any(is.na(id))) {
     err <- given[is.na(id)]
     stop(sprintf("Unknown %s: %s",
-                 ngettext(length(err), "secret", "secrets"),
+                 ngettext(length(err), data_name[[1L]], data_name[[2L]]),
                  paste(squote(err), collapse = ", ")))
   }
 
   f <- function(id, name) {
-    list(SecretID = jsonlite::unbox(id),
-         SecretName = jsonlite::unbox(name),
-         File = list(Name = jsonlite::unbox(name),
-                     UID = jsonlite::unbox("0"),
-                     GID = jsonlite::unbox("0"),
-                     Mode = jsonlite::unbox(292L))) # 292 -> 444 in oct
+    ret <- list(ID = jsonlite::unbox(id),
+                Name = jsonlite::unbox(name),
+                File = list(Name = jsonlite::unbox(name),
+                            UID = jsonlite::unbox("0"),
+                            GID = jsonlite::unbox("0"),
+                            Mode = jsonlite::unbox(292L))) # 292 -> 444 in oct
+    names(ret)[1:2] <- paste0(data_prefix, names(ret)[1:2])
+    ret
   }
-  task_template$ContainerSpec$Secrets <- unname(Map(f, id, name))
+  task_template$ContainerSpec[[key_spec]] <- unname(Map(f, id, name))
 
   task_template
+}
+
+
+validate_service_configs <- function(task_template, client) {
+  validate_service_secrets(task_template, client, TRUE)
 }
 
 
