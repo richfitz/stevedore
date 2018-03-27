@@ -8,7 +8,7 @@ test_that("create and delete", {
 
   ## This set of tests is highly version specific with at three
   ## patches so I am going to test it over all supported versions:
-  for (v in swagger_spec_versions()) {
+  for (v in test_docker_versions()) {
     cl_v <- test_docker_client(api_version = v)
 
     key <- rand_str()

@@ -404,3 +404,18 @@ update_dummy_attrs <- function(object, value) {
   object$.attrs[names(value)] <- value
   invisible(object)
 }
+
+
+TEST_DOCKER_VERSIONS <- NULL
+test_docker_versions <- function() {
+  if (is.null(TEST_DOCKER_VERSIONS)) {
+    cl <- test_docker_client()
+    v <- cl$version()
+    v_min <- max(numeric_version(v$min_apiversion),
+                 numeric_version(MIN_DOCKER_API_VERSION))
+    v_max <- min(numeric_version(v$api_version),
+                 numeric_version(MAX_DOCKER_API_VERSION))
+    TEST_DOCKER_VERSIONS <<- version_range(v_min, v_max)
+  }
+  TEST_DOCKER_VERSIONS
+}

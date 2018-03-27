@@ -6,7 +6,7 @@ test_that("create and delete", {
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
 
-  for (v in swagger_spec_versions()) {
+  for (v in test_docker_versions()) {
     cl_v <- test_docker_client(api_version = v)
 
     key <- rand_str()

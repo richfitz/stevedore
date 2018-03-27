@@ -523,3 +523,11 @@ cat2 <- function(..., file) {
 na_drop <- function(x) {
   x[!is.na(x)]
 }
+
+
+## This is _only_ for the 1.xx versions that the docker api uses
+version_range <- function(v_min, v_max) {
+  min_version <- unclass(numeric_version(v_min))[[c(1, 2)]]
+  max_version <- unclass(numeric_version(v_max))[[c(1, 2)]]
+  sprintf("1.%d", min_version:max_version)
+}
