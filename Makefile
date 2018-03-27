@@ -58,7 +58,6 @@ vignettes_install: vignettes/stevedore.Rmd vignettes/examples.Rmd
 	${RSCRIPT} -e 'library(methods); devtools::build_vignettes()'
 
 vignettes:
-	rm -f vignettes/stevedore.Rmd vignettes/examples.Rmd
 	make vignettes_install
 
 pkgdown:

@@ -44,6 +44,22 @@ local({
   stopifnot(file.copy(p, ".", recursive = TRUE))
   stevedore::docker_client()$images$build("iterate", tag = "richfitz/iterate")
 })
+nginx_ready <- function(port, attempts = 10) {
+
+  f <- function() {
+    url <- sprintf("http://localhost:%s", port)
+    curl::parse_headers(curl::curl_fetch_memory(url)$headers)
+    TRUE
+  }
+  for (i in seq_len(attempts)) {
+    if (tryCatch(f(), error = function(e) FALSE)) {
+      return()
+    }
+    Sys.sleep(1)
+  }
+  stop("nginx not available in time")
+}
+
 
 ### TODO: A constant challenge here is printing large output in a way
 ### that doesn't look awful.  tibble might help, but I am not
@@ -258,6 +274,9 @@ nginx$ports()
 
 ## (alternatively, use `ports = TRUE` to act like `docker run`'s `-P`
 ## and "publish all ports to random ports).
+
+##+ include=FALSE
+nginx_ready(nginx$ports()$host_port)
 
 ## This shows that the port exposed by the the container (80) is
 ## mapped to the port `r as.integer(nginx$ports()$host_port)` on the
