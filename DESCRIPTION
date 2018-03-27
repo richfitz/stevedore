@@ -15,7 +15,7 @@ Imports:
     curl (>= 2.3.0),
     jsonlite,
     openssl,
-    yaml
+    yaml (>= 2.1.18)
 Suggests:
     httppipe,
     knitr,

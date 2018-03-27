@@ -11,20 +11,6 @@ A docker client for R
 
 ![hello world example of stevedore](https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif)
 
-**WARNING**: The current CRAN version of `yaml` (2.1.17) will crash or misread the large yaml files that hold the spec.  If you have that version installed then please either downgrade with
-
-```r
-install.packages("https://cran.r-project.org/src/contrib/Archive/yaml/yaml_2.1.16.tar.gz")
-```
-
-or install the new `yaml` version from github:
-
-```r
-devtools::install_github("viking/r-yaml")
-```
-
-(this requires a working C compiler to install).
-
 ## Background
 
 **What is docker?** Docker is a platform for "containerising" applications - running them in isolation from one another, removing differences of how they are built, what they are built from, and what resources they need (disk, ports, users, etc).  It's similar conceptually to virtualisation, but much more light weight.
