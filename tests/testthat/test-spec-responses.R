@@ -322,7 +322,7 @@ test_that("auto: system_version", {
 
   expect_equal(ans1, dat$reference)
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
-  expect_equal(names(ans1), pascal_to_snake(names(ans2)))
+  expect_equal(names(ans1), pascal_to_snake_cached(names(ans2)))
 })
 
 test_that("auto: volume_create", {

@@ -20,7 +20,10 @@ test_that("case convert with consecutive capitals", {
 
 test_that("case convert: reference check", {
   nms <- read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE)
-  expect_equal(nms$to, pascal_to_snake(nms$from))
+  ex <- read.csv(stevedore_file("spec/names_override.csv"),
+                 stringsAsFactors = FALSE)
+  i <- !(nms$from %in% ex$from)
+  expect_equal(nms$to[i], pascal_to_snake(nms$from[i]))
 })
 
 test_that("case convert: caching", {
@@ -75,6 +78,11 @@ test_that("case convert: special cases", {
   expect_equal(pascal_to_snake("URL"), "url")
   expect_equal(pascal_to_snake("URLs"), "urls")
   expect_equal(pascal_to_snake("UTSMode"), "uts_mode")
+})
+
+test_that("case convert: exceptions", {
+  expect_equal(pascal_to_snake("MinAPIVersion"), "min_apiversion")
+  expect_equal(pascal_to_snake_cached("MinAPIVersion"), "min_api_version")
 })
 
 test_that("is_error", {

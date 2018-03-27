@@ -78,10 +78,8 @@ To handle this request we need to collect up parameters `id`, `v`, `force` and `
 ### The names cache
 
 ```r
-test_file("tests/testthat/test-help.R")
-names <- .stevedore$names
-names <- names[order(names[, 1L]), ]
-write.csv(names, "inst/spec/names.csv", row.names = FALSE)
+devtools::load_all()
+names <- update_name_cache(".")
 ```
 
 check for possible special cases here:

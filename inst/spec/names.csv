@@ -312,7 +312,7 @@
 "MemTotal","mem_total"
 "Message","message"
 "Metadata","metadata"
-"MinAPIVersion","min_apiversion"
+"MinAPIVersion","min_api_version"
 "Mirrors","mirrors"
 "Mode","mode"
 "Monitor","monitor"

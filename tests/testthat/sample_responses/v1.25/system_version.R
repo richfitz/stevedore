@@ -6,7 +6,7 @@
 list(
   version = "1.13.0",
   api_version = "1.25",
-  min_apiversion = "1.12",
+  min_api_version = "1.12",
   git_commit = "deadbee",
   go_version = "go1.6.3",
   os = "linux",

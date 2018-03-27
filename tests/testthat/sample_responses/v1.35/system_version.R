@@ -11,7 +11,7 @@ list(
     stringsAsFactors = FALSE),
   version = "17.04.0",
   api_version = "1.27",
-  min_apiversion = "1.12",
+  min_api_version = "1.12",
   git_commit = "deadbee",
   go_version = "go1.7.5",
   os = "linux",
