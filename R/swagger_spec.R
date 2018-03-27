@@ -158,7 +158,7 @@ patch_doc_filters <- function(x) {
   re <- paste('(encoded as JSON \\(a `map\\[string\\]\\[\\]string`\\))\\.',
               'For example, `\\{"(.*?)": \\["(.*)"\\]\\}`')
   if (grepl(re, x)) {
-    x<- sub(re, paste0(to1, '.  For example `c(\\2 = "\\3")`'), x)
+    x <- sub(re, paste0(to1, '.  For example `c(\\2 = "\\3")`'), x)
   } else if (grepl(from1, x, fixed = TRUE)) {
     x <- sub(from1, to1, x, fixed = TRUE)
   } else if (grepl(from2, x)) {
@@ -166,5 +166,16 @@ patch_doc_filters <- function(x) {
   } else {
     stop("Failure to patch filter doc [stevedore bug]") # nocov
   }
+
+  ## Fixes
+  ##   - `membership=`(`accepted`|`pending`)`
+  ## to
+  ##   - `membership`=(`accepted`|`pending`)
+  if (grepl("`)`(\n|$)", x)) {
+    re <- "- `([^=`]+)=`\\(([^)]+)\\)`"
+    stopifnot(grepl(re, x))
+    x <- gsub(re, "- `\\1`=(\\2)", x)
+  }
+
   x
 }
