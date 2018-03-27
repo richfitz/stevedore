@@ -136,9 +136,6 @@ NULL
 ##' @name docker_swarm_collection
 ##'
 ##' @title Management commands for working with docker swarm
-##'
-##' @seealso \code{\link{docker_node}} for management commands for
-##'   swarm nodes.
 NULL
 
 
@@ -151,38 +148,22 @@ NULL
 ##'
 ##' @title Management commands for working with swarm nodes
 ##'
-##' @seealso \code{\link{docker_swarm}} for management commands for
-##'   the swarm itself.
+##' @seealso \code{\link{docker_swarm_collection}} for management
+##'   commands for the swarm itself.
 NULL
 
 
-##' Methods for managing docker swarm secrets.  This object is
-##'   \code{$secrets} within a \code{\link{docker_client}} object.
+##' Methods for working with docker services.  This object is
+##'   \code{$services} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("secrets")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("services")}
 ##'
-##' @name docker_secret_collection
+##' @name docker_service_collection
 ##'
-##' @title Management commands for working with swarm secrets
+##' @title Management commands for working with docker services
 ##'
-##' @seealso \code{\link{docker_swarm}} for management commands for
-##'   the swarm itself, and \code{\link{docker_config_collection}} for
-##'   a similar inteface for configuring non-sensitive configurations.
-NULL
-
-
-##' Methods for managing docker swarm configs.  This object is
-##'   \code{$configs} within a \code{\link{docker_client}} object.
-##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("configs")}
-##'
-##' @name docker_config_collection
-##'
-##' @title Management commands for working with swarm configs
-##'
-##' @seealso \code{\link{docker_swarm}} for management commands for
-##'   the swarm itself, and \code{\link{docker_secret_collection}} for
-##'   a similar inteface for configuring sensitive configurations.
+##' @seealso \code{\link{docker_service}} for information on
+##'   service objects.
 NULL
 
 
@@ -198,6 +179,38 @@ NULL
 ##'
 ##' @seealso \code{\link{docker_service_collection}} for other
 ##'   service management methods.
+NULL
+
+
+##' Methods for managing docker swarm secrets.  This object is
+##'   \code{$secrets} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("secrets")}
+##'
+##' @name docker_secret_collection
+##'
+##' @title Management commands for working with swarm secrets
+##'
+##' @seealso \code{\link{docker_swarm_collection}} for management
+##'   commands for the swarm itself, and
+##'   \code{\link{docker_config_collection}} for a similar inteface
+##'   for configuring non-sensitive configurations.
+NULL
+
+
+##' Methods for managing docker swarm configs.  This object is
+##'   \code{$configs} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("configs")}
+##'
+##' @name docker_config_collection
+##'
+##' @title Management commands for working with swarm configs
+##'
+##' @seealso \code{\link{docker_swarm_collection}} for management
+##'   commands for the swarm itself, and
+##'   \code{\link{docker_secret_collection}} for a similar inteface
+##'   for configuring sensitive configurations.
 NULL
 
 

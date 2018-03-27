@@ -11,7 +11,8 @@ Methods for managing docker swarm configs.  This object is
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("configs")}
 }
 \seealso{
-\code{\link{docker_swarm}} for management commands for
-  the swarm itself, and \code{\link{docker_secret_collection}} for
-  a similar inteface for configuring sensitive configurations.
+\code{\link{docker_swarm_collection}} for management
+  commands for the swarm itself, and
+  \code{\link{docker_secret_collection}} for a similar inteface
+  for configuring sensitive configurations.
 }

@@ -10,7 +10,3 @@ Methods for managing the docker swarm.  This object is
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("swarm")}
 }
-\seealso{
-\code{\link{docker_node}} for management commands for
-  swarm nodes.
-}
