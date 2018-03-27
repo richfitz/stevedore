@@ -1007,7 +1007,7 @@ make_service_start_progress <- function(stream) {
 
   last <- NULL
   function(state) {
-    i <- na.omit(match(state, names(states_active)))
+    i <- na_drop(match(state, names(states_active)))
     n <- tabulate(i, length(states_active))
     np <- pos_end[seq_along(n)[n > 0L]]
     nn <- n[n > 0L]

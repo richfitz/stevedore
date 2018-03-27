@@ -518,3 +518,8 @@ cat2 <- function(..., file) {
     cat(..., file = file)
   }
 }
+
+
+na_drop <- function(x) {
+  x[!is.na(x)]
+}
