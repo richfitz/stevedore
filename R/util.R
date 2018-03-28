@@ -531,3 +531,8 @@ version_range <- function(v_min, v_max) {
   max_version <- unclass(numeric_version(v_max))[[c(1, 2)]]
   sprintf("1.%d", min_version:max_version)
 }
+
+
+prompt_ask_yes_no <- function(reason) {
+  menu(c("no", "yes"), FALSE, title = reason) == 2 # nocov
+}

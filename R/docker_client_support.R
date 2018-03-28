@@ -333,6 +333,16 @@ after_secret_list <- function(response, ...) {
 }
 
 
+after_plugin_install <- function(response, params, self) {
+  key <- params$query$name %||% params$query$remote
+  ret <- self$get(key)
+  if (!params$disable) {
+    ret$enable()
+  }
+  ret
+}
+
+
 invisible_self <- function(response, params, self) {
   invisible(self)
 }
@@ -648,6 +658,38 @@ validate_service_replicas <- function(replicas, global) {
   }
 
   mode
+}
+
+
+validate_plugin_privileges <- function(object, remote, grant_all, dat = NULL) {
+  dat <- dat %||% object$privileges(remote)
+
+  dat_value <- vcapply(dat$value, paste, collapse = ", ")
+  msg <- paste(c(
+    sprintf("Plugin '%s' is requesting permissions:", remote),
+    sprintf("  - %s (%s): [%s]", dat$description, dat$name, dat_value)),
+    collapse = "\n")
+  message(msg)
+
+  continue <-
+    grant_all %||% prompt_ask_yes_no("Do you grant the above permissions?")
+  if (!continue) {
+    stop("Not installing plugin ", squote(remote), call. = FALSE)
+  }
+  message(sprintf("Granting all the above permissions to '%s'", remote))
+
+  f <- function(i) {
+    list(Name = jsonlite::unbox(dat$name[[i]]),
+         Description = jsonlite::unbox(dat$description[[i]]),
+         Value = dat$value[[i]])
+  }
+  ## I don't think this should be required, but it does seem to be:
+  as.character(jsonlite::toJSON(lapply(seq_len(nrow(dat)), f)))
+}
+
+
+validate_plugin_configure_body <- function(body) {
+  as.character(jsonlite::toJSON(as_string_map(body)))
 }
 
 

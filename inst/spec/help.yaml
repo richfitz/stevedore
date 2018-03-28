@@ -406,6 +406,35 @@ docker_secret_collection:
 docker_config_collection:
   help: *help
 
+docker_plugin_collection:
+  help: *help
+  get:
+    summary: >-
+      Get a plugin by name or id
+    args:
+      name: "A scalar character with the plugins' name."
+
+docker_plugin:
+  help: *help
+  id:
+    summary: >-
+      Return the plugins' id
+  name:
+    summary: >-
+      Return the plugin's name
+  inspect:
+    summary: >-
+      Return detailed information about this plugin
+    args:
+      reload: &reload-plugin >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after a plugin has been removed.
+  reload:
+    summary: >-
+      Refresh infomation on the plugin from the server, returning
+      `$inspect()` invisibly.
+
 docker_types:
   help: *help
 

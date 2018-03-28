@@ -946,3 +946,67 @@ test_that("service progress", {
       ">10",
       "=========================>1------------->12------>1"))
 })
+
+
+test_that("validate_plugin_privileges", {
+  dat <- data_frame(
+    name = c("network", "mount", "mount", "device", "capabilities"),
+    description = c(
+      "permissions to access a network", "host path to mount",
+      "host path to mount",
+      "host device to access", "list of additional capabilities required"),
+    value = I(list("host", "/var/lib/docker/plugins/", "", "/dev/fuse",
+                   "CAP_SYS_ADMIN")))
+
+  f <- function(i) {
+    list(Name = jsonlite::unbox(dat$name[[i]]),
+         Description = jsonlite::unbox(dat$description[[i]]),
+         Value = dat$value[[i]])
+  }
+  cmp <- lapply(seq_len(nrow(dat)), f)
+
+  expect_message(
+    res <- validate_plugin_privileges(NULL, "vieux/sshfs:latest", TRUE, dat),
+    "Plugin 'vieux/sshfs:latest' is requesting permissions:",
+    fixed = TRUE)
+  expect_message(
+    res <- validate_plugin_privileges(NULL, "vieux/sshfs:latest", TRUE, dat),
+    "  - host path to mount (mount): [/var/lib/docker/plugins/]",
+    fixed = TRUE)
+  expect_equal(res, cmp)
+
+  expect_error(
+    validate_plugin_privileges(NULL, "vieux/sshfs:latest", FALSE, dat),
+    "Not installing plugin 'vieux/sshfs:latest'")
+})
+
+
+test_that("after_plugin_install", {
+  cl <- null_docker_client()
+
+  p <- list(query = list(name = dummy_id(), remote = "xxx"),
+            disable = TRUE)
+  res <- after_plugin_install(NULL, p, cl$plugins)
+  expect_is(res, "docker_plugin")
+  expect_equal(res$name(), dummy_id())
+
+  p <- list(query = list(name = NULL, remote = dummy_id()),
+            disable = TRUE)
+
+  res <- after_plugin_install(NULL, p, cl$plugins)
+  expect_is(res, "docker_plugin")
+  expect_equal(res$name(), dummy_id())
+
+  p <- list(query = list(name = NULL, remote = dummy_id()),
+            disable = FALSE)
+  expect_error(after_plugin_install(NULL, p, cl$plugins),
+               "Can't make requests with the null client")
+})
+
+
+test_that("validate_plugin_configure_body", {
+  expect_equal(validate_plugin_configure_body(NULL), "{}")
+  expect_equal(
+    validate_plugin_configure_body(c(foo = "xxx")),
+    as.character(jsonlite::toJSON(list(foo = "xxx"), auto_unbox = TRUE)))
+})

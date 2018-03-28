@@ -77,6 +77,8 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$secrets <- docker_client_secret_collection(self)
   self$configs <- docker_client_config_collection(self)
 
+  self$plugins <- docker_client_plugin_collection(self)
+
   stevedore_object(self, "docker_client")
 }
 
@@ -680,6 +682,66 @@ docker_client_config_collection <- function(parent) {
     "config_update", self)
 
   stevedore_object(self, "docker_config_collection")
+}
+
+
+docker_client_plugin_collection <- function(parent) {
+  self <- new_stevedore_object(parent)
+
+  self$list <- docker_client_method(
+    "plugin_list", self)
+
+  self$privileges <- docker_client_method(
+    "plugin_privileges", self)
+
+  self$install <- docker_client_method(
+    "plugin_install", self,
+    rename = c("alias" = "name"),
+    fix = list(body = NULL),
+    extra = alist(disable = FALSE, grant_all = NULL, stream = stdout()),
+    process = list(
+      mcr_prepare_stream_and_close(quote(stream)),
+      quote(assert_scalar_logical_or_null(grant_all)),
+      quote(assert_scalar_logical(disable)),
+      quote(body <- validate_plugin_privileges(object, remote, grant_all))),
+    hijack = quote(streaming_json(pull_status_printer(stream))),
+    allow_hijack_without_stream = TRUE,
+    after = after_plugin_install)
+
+  self$get <- docker_client_getter(docker_client_plugin, parent, "name")
+
+  stevedore_object(self, "docker_plugin_collection")
+}
+
+
+docker_client_plugin <- function(name, parent) {
+  self <- new_stevedore_object(parent)
+  fix_name <- docker_client_add_inspect(name, "name", "plugin_inspect", self)
+
+  self$id <- function() self$inspect(FALSE)$id
+
+  self$remove <- docker_client_method(
+    "plugin_remove", self,
+    fix = fix_name)
+
+  self$enable <- docker_client_method(
+    "plugin_enable", self,
+    fix = fix_name,
+    defaults = alist(timeout = 0L),
+    process = list(
+      quote(timeout <- assert_scalar_integer(timeout))))
+
+  self$disable <- docker_client_method(
+    "plugin_disable", self,
+    fix = fix_name)
+
+  self$configure <- docker_client_method(
+    "plugin_configure", self,
+    fix = fix_name,
+    process = list(
+      quote(body <- validate_plugin_configure_body(body))))
+
+  stevedore_object(self, "docker_plugin")
 }
 
 

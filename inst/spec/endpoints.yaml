@@ -478,6 +478,7 @@ config_update:
 plugin_list:
   method: get
   path: "/plugins"
+  cli: "plugin ls"
 
 plugin_privileges:
   method: get
@@ -486,30 +487,37 @@ plugin_privileges:
 plugin_install:
   method: post
   path: "/plugins/pull"
+  cli: "plugin install"
 
 plugin_inspect:
   method: get
   path: "/plugins/{name}/json"
+  cli: "plugin inspect"
 
 plugin_remove:
   method: delete
   path: "/plugins/{name}"
+  cli: "plugin rm"
 
 plugin_enable:
   method: post
   path: "/plugins/{name}/enable"
+  cli: "plugin enable"
 
 plugin_disable:
   method: post
   path: "/plugins/{name}/disable"
+  cli: "plugin disable"
 
 plugin_create:
   method: post
   path: "/plugins/create"
+  cli: "plugin create"
 
 plugin_push:
   method: post
   path: "/plugins/{name}/push"
+  cli: "plugin push"
 
 plugin_configure:
   method: post
