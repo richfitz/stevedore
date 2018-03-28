@@ -120,6 +120,15 @@ assert_directory <- function(x, name = deparse(substitute(x))) {
   }
 }
 
+assert_scalar_logical_or_null <- function(x, name = deparse(substitute(x)),
+                                          what = NULL) {
+  if (!is.null(x)) {
+    assert_scalar_logical(x, name,
+                            what %||% "a scalar logical (non-NA), or NULL")
+  }
+}
+
+
 assert_scalar_character_or_null <- function(x, name = deparse(substitute(x)),
                                             what = NULL) {
   if (!is.null(x)) {

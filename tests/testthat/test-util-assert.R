@@ -214,6 +214,16 @@ test_that("assert_scalar_character_or_null", {
 })
 
 
+test_that("assert_scalar_logical_or_null", {
+  value <- 1
+  expect_error(assert_scalar_logical_or_null(value),
+               "'value' must be a scalar logical (non-NA), or NULL",
+               fixed = TRUE)
+  expect_silent(assert_scalar_logical_or_null(NULL))
+  expect_silent(assert_scalar_logical_or_null(TRUE))
+})
+
+
 test_that("assert_arg_is_null", {
   expect_silent(assert_arg_is_null("x"))
   expect_silent(assert_arg_is_null("x", a = NULL))
