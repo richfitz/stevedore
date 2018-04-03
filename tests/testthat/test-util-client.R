@@ -819,7 +819,7 @@ test_that("validate_secret_data", {
 test_that("validate_service_secrets", {
   cl <- function(id, name) {
     secrets <- data.frame(id = id, name = name, stringsAsFactors = FALSE)
-    list(secrets = list(list = function() secrets))
+    list(secret = list(list = function() secrets))
   }
 
   f <- function(secrets) {
@@ -855,7 +855,7 @@ test_that("validate_service_secrets", {
 test_that("validate_service_configs", {
   cl <- function(id, name) {
     configs <- data.frame(id = id, name = name, stringsAsFactors = FALSE)
-    list(configs = list(list = function() configs))
+    list(config = list(list = function() configs))
   }
 
   f <- function(configs) {
