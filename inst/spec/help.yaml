@@ -434,6 +434,11 @@ docker_plugin:
     summary: >-
       Refresh infomation on the plugin from the server, returning
       `$inspect()` invisibly.
+  is_enabled:
+    summary: >-
+      Test if plugin is enabled
+    args:
+      reload: *reload-plugin
 
 docker_types:
   help: *help

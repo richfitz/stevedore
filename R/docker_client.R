@@ -719,6 +719,7 @@ docker_client_plugin <- function(name, parent) {
   fix_name <- docker_client_add_inspect(name, "name", "plugin_inspect", self)
 
   self$id <- function() self$inspect(FALSE)$id
+  self$is_enabled <- function(reload = TRUE) self$inspect(reload)$enabled
 
   self$remove <- docker_client_method(
     "plugin_remove", self,
