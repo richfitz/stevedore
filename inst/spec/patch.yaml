@@ -187,20 +187,25 @@
   value:
     produces: "application/chunked-string"
 
+- version: ["1.25", "1.26"]
+  path: ["paths", "/plugins/privileges", "get", "parameters", "@name = name"]
+  value:
+    name: remote
+
 # this is pretty bad: the spec claims it will return 204 but instead
 # returns 200
-- version: ["1.27", "1.36"]
+- version: ["1.25", "1.36"]
   path: ["paths", "/plugins/pull", "post", "responses"]
   value:
     200:
       description: "no error"
 
-- version: ["1.27", "1.36"]
+- version: ["1.25", "1.36"]
   path: ["paths", "/plugins/{name}", "delete", "responses", "200", "schema"]
   value: ~
   replace: true
 
-- version: ["1.27", "1.36"]
+- version: ["1.25", "1.36"]
   path: ["paths", "/plugins/{name}", "delete", "produces"]
   value: ~
   replace: true
