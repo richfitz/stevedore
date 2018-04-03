@@ -1,7 +1,7 @@
 ---
 title: "Examples and use-cases"
 author: "Rich FitzJohn"
-date: "2018-03-27"
+date: "2018-04-03"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using docker with stevedore}
@@ -29,11 +29,11 @@ docker <- stevedore::docker_client()
 ```
 
 ```r
-redis <- docker$containers$run("redis", name = "redis", ports = "6379",
-                               detach = TRUE, rm = TRUE)
+redis <- docker$container$run("redis", name = "redis", ports = "6379",
+                              detach = TRUE, rm = TRUE)
 ```
 
-We now have a redis server running on 32797
+We now have a redis server running on 32781
 
 ```r
 redis$ports()
@@ -41,7 +41,7 @@ redis$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1           6379      tcp 0.0.0.0     32797
+## 1           6379      tcp 0.0.0.0     32781
 ```
 
 Make a connection to the Redis server:
@@ -91,8 +91,8 @@ redis$kill()
 ```
 
 ```r
-redis <- docker$containers$run("redis", name = "redis", ports = "6379",
-                               detach = TRUE, rm = TRUE)
+redis <- docker$container$run("redis", name = "redis", ports = "6379",
+                              detach = TRUE, rm = TRUE)
 con <- redux::hiredis(port = redis$ports()$host_port)
 con$KEYS("*")
 ```
@@ -113,8 +113,8 @@ The same approach works for other database that might be large or
 awkward to install
 
 ```r
-pg <- docker$containers$run("postgres", name = "pg", ports = "5432",
-                            detach = TRUE, rm = TRUE)
+pg <- docker$container$run("postgres", name = "pg", ports = "5432",
+                           detach = TRUE, rm = TRUE)
 ```
 
 
@@ -133,10 +133,6 @@ con <- DBI::dbConnect(RPostgres::Postgres(),
 DBI::dbWriteTable(con, "mtcars", mtcars)
 ```
 
-```
-## [1] TRUE
-```
-
 And if anything goes wrong, you can inspect the logs of the server
 easily if the client does not give informative error messages:
 
@@ -145,7 +141,7 @@ DBI::dbWriteTable(con, "mtcars", iris, append = TRUE)
 ```
 
 ```
-## Error in connection_copy_data(conn@ptr, sql, value): Failed to initialise COPY
+## Error in connection_copy_data(conn@ptr, sql, value): Failed to initialise COPY: ERROR:  column "Sepal.Length" of relation "mtcars" does not exist
 ```
 
 ```r
@@ -153,8 +149,8 @@ pg$logs(tail = 2)
 ```
 
 ```
-## E> 2018-03-27 14:57:36.577 UTC [67] ERROR:  column "Sepal.Length" of relation "mtcars" does not exist
-## E> 2018-03-27 14:57:36.577 UTC [67] STATEMENT:  COPY "mtcars" ("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species") FROM STDIN
+## E> ERROR:  column "Sepal.Length" of relation "mtcars" does not exist
+## E> STATEMENT:  COPY "mtcars" ("Sepal.Length", "Sepal.Width", "Petal.Length", "Petal.Width", "Species") FROM STDIN
 ```
 
 ```r
@@ -185,9 +181,9 @@ destination path.
 We can start this with
 
 ```r
-shiny <- docker$containers$run("rocker/shiny", name = "shiny", ports = "3838",
-                               volumes = volumes,
-                               detach = TRUE, rm = TRUE)
+shiny <- docker$container$run("rocker/shiny", name = "shiny", ports = "3838",
+                              volumes = volumes,
+                              detach = TRUE, rm = TRUE)
 ```
 
 In an interactive session, you can visit the shiny server:
@@ -271,7 +267,7 @@ lang_output(readLines("tester/tester.sh"), "shell")
 ```
 
 ```r
-img <- docker$images$build("tester", tag = "richfitz/tester")
+img <- docker$image$build("tester", tag = "richfitz/tester")
 ```
 
 ```
@@ -279,33 +275,33 @@ img <- docker$images$build("tester", tag = "richfitz/tester")
 ##  ---> 524f705b5ed1
 ## Step 2/6 : RUN apt-get update &&         apt-get install -yy                 git                 libcurl4-openssl-dev                 libssl-dev                 qpdf
 ##  ---> Using cache
-##  ---> 22a6f3676106
+##  ---> dce0f4c1ce03
 ## Step 3/6 : RUN install2.r --error         curl         knitr         openssl         rcmdcheck         rmarkdown         rcorpora         testthat         uuid
 ##  ---> Using cache
-##  ---> 6a0af620c786
+##  ---> 520fadf49963
 ## Step 4/6 : COPY tester.sh /usr/local/bin
 ##  ---> Using cache
-##  ---> c0b2b0cfec3b
+##  ---> dbca6ff297c1
 ## Step 5/6 : RUN chmod +x /usr/local/bin/tester.sh
 ##  ---> Using cache
-##  ---> 6c89f016add6
+##  ---> e6a4a6747494
 ## Step 6/6 : ENTRYPOINT ["/usr/local/bin/tester.sh"]
 ##  ---> Using cache
-##  ---> 12fcbaa1b768
-## Successfully built 12fcbaa1b768
+##  ---> e323b50143e6
+## Successfully built e323b50143e6
 ## Successfully tagged richfitz/tester:latest
 ```
 
 With this image we can then test packages off github:
 
 ```r
-invisible(docker$containers$run(img, "https://github.com/richfitz/ids",
-                                rm = TRUE, stream = stdout()))
+invisible(docker$container$run(img, "https://github.com/richfitz/ids",
+                               rm = TRUE, stream = stdout()))
 ```
 
 ```
-## E> Cloning into '/tmp/tmp.zDDKoiJI3e'...
-## O> * checking for file ‘/tmp/tmp.zDDKoiJI3e/DESCRIPTION’ ... OK
+## E> Cloning into '/tmp/tmp.8Dp4rBQSiY'...
+## O> * checking for file ‘/tmp/tmp.8Dp4rBQSiY/DESCRIPTION’ ... OK
 ## O> * preparing ‘ids’:
 ## O> * checking DESCRIPTION meta-information ... OK
 ## O> * installing the package to build vignettes
@@ -316,7 +312,7 @@ invisible(docker$containers$run(img, "https://github.com/richfitz/ids",
 ## O> * building ‘ids_1.0.1.tar.gz’
 ## E>
 ## O> ────────────────────────────────────────────────────────────────────────────────
-## O> ─  using log directory ‘/tmp/RtmpgnGIlw/file3f27848356/ids.Rcheck’
+## O> ─  using log directory ‘/tmp/RtmpgLpZeu/file3c4c65c411/ids.Rcheck’
 ## O> ─  using R version 3.4.3 (2017-11-30)
 ## O> ─  using platform: x86_64-pc-linux-gnu (64-bit)
 ## O> ─  using session charset: UTF-8
@@ -384,3 +380,5 @@ the docker image via the Dockerfile).
 The same approach would work by mounting the package source
 directory into the container and passing the path (within the
 container) to `$run()`.
+
+

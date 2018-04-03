@@ -43,7 +43,7 @@ plain_output <- function(x) lang_output(x, "plain")
 local({
   p <- system.file("images/iterate", package = "stevedore", mustWork = TRUE)
   stopifnot(file.copy(p, ".", recursive = TRUE))
-  stevedore::docker_client()$images$build("iterate", tag = "richfitz/iterate")
+  stevedore::docker_client()$image$build("iterate", tag = "richfitz/iterate")
 })
 nginx_ready <- function(port, attempts = 10) {
 
@@ -88,10 +88,10 @@ Each function call (e.g., `ping`) is callable by accessing with
 docker$ping()
 ```
 
-In addition there are "collection" objects (e.g., `containers`)
+In addition there are "collection" objects (e.g., `container`)
 that are accessed using `$`, like a directory structure
 ``` {r }
-docker$containers
+docker$container
 ```
 
 The interface is designed similarly to the command line docker
@@ -99,10 +99,10 @@ client (and to the Python docker client), where container commands
 are within the `container` collection and image commands are within
 the `image` collection and so on (the main difference with the
 command line client is that the container commands are not at the
-top level, so it is `docker$containers$run(...)` not
+top level, so it is `docker$container$run(...)` not
 `docker$run(...)`).
 
-To run a container, the `docker$containers$run` command follows the
+To run a container, the `docker$container$run` command follows the
 semantics of the command line client and will
 
 * pull a image if it does not exist
@@ -110,7 +110,7 @@ semantics of the command line client and will
 * run the container
 * fetch the logs
 ``` {r }
-res <- docker$containers$run("hello-world")
+res <- docker$container$run("hello-world")
 ```
 
 This returns a list with two elements:
@@ -153,23 +153,23 @@ img$history()
 
 ## Containers
 
-The `$containers` object containers methods for interacting with
+The `$container` object includes methods for interacting with
 containers:
 ``` {r }
-docker$containers
+docker$container
 ```
 
 `$create` creates a new container (similar to `docker container
 create` on the command line) but does not start it.
 ``` {r }
-x <- docker$containers$create("hello-world", name = "hello-stevedore")
+x <- docker$container$create("hello-world", name = "hello-stevedore")
 x
 ```
 
 `$get` creates a `docker_container` object from an container id or
 name:
 ``` {r }
-y <- docker$containers$get("hello-stevedore")
+y <- docker$container$get("hello-stevedore")
 x$id()
 y$id()
 ```
@@ -177,20 +177,20 @@ y$id()
 `$list()` lists containers (like `docker list` on the command line)
 - by default showing only running containers
 ``` {r }
-docker$containers$list()
-docker$containers$list(all = TRUE, limit = 2)
+docker$container$list()
+docker$container$list(all = TRUE, limit = 2)
 ```
 
 `$remove()` removes a container by name or id:
 ``` {r }
-docker$containers$remove("hello-stevedore")
+docker$container$remove("hello-stevedore")
 ```
 
 `$prune()` removes non-running containers (i.e., containers that
 have exited or containers that have been created but not yet
 started)
 ``` {r }
-docker$containers$prune()
+docker$container$prune()
 ```
 
 ### Working with containers
@@ -198,7 +198,7 @@ docker$containers$prune()
 After creating a container object, there are many more methods to
 use - all apply to the individual container
 ``` {r }
-x <- docker$containers$create("richfitz/iterate", c("1000", "1"))
+x <- docker$container$create("richfitz/iterate", c("1000", "1"))
 ```
 
 Most are analogues of similarly named `docker` command line
@@ -271,7 +271,7 @@ to provide a `stream` argument too, which is where to stream the
 log to.  This can be `stdout()` or `stderr()`, a file or an R
 connection.
 ``` {r }
-y <- docker$containers$create("richfitz/iterate", c("10", "0.1"))
+y <- docker$container$create("richfitz/iterate", c("10", "0.1"))
 y$start()
 y$logs(stream = stdout(), follow = TRUE)
 ```
@@ -337,9 +337,9 @@ server/proxy that exposes port 80 from the container.  We can map
 that to a random port by asking docker to expose port 80 but not
 saying what to map it to:
 ``` {r }
-nginx <- docker$containers$run("nginx", ports = 80,
-                               detach = TRUE, rm = TRUE,
-                               name = "stevedore-nginx")
+nginx <- docker$container$run("nginx", ports = 80,
+                              detach = TRUE, rm = TRUE,
+                              name = "stevedore-nginx")
 nginx$ports()
 ```
 
@@ -365,21 +365,21 @@ nginx$stop(t = 0)
 ### Pulling
 
 ``` {r include = FALSE, error = FALSE}
-docker$images$remove("bash:latest")
+docker$image$remove("bash:latest")
 ```
 
-Images can be directly pulled with `docker$images$pull` providing
+Images can be directly pulled with `docker$image$pull` providing
 an image name (as either `<repo>` or `<repo>:<tag>`.  If the image
 exists already this will be quick, and if the network connection is
 down then this will fail.
 ``` {r }
-docker$images$pull("bash:latest")
+docker$image$pull("bash:latest")
 ```
 
 ### The object returned by pull is an image object - that can be
 ### created by using `$get`
 ``` {r }
-img <- docker$images$get("bash:latest")
+img <- docker$image$get("bash:latest")
 ```
 
 ### Building
@@ -403,15 +403,15 @@ lang_output(readLines("iterate/iterate"), "shell")
 
 We can build this image using:
 ``` {r }
-img <- docker$images$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
+img <- docker$image$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
 img
 ```
 
 The newly created image is returned as an image object and can be
-used via `$containers$run()`
+used via `$container$run()`
 ``` {r }
 invisible(
-  docker$containers$run(img, c("10", "0.1"), rm = TRUE, stream = stdout()))
+  docker$container$run(img, c("10", "0.1"), rm = TRUE, stream = stdout()))
 ```
 
 ``` {r include = FALSE}
@@ -422,13 +422,13 @@ unlink("iterate", recursive = TRUE)
 
 There is a third way of creating an image, which is to import it
 from a tar archive.  This is not yet documented (**TODO**) but can
-be done via `$images$import()`
+be done via `$image$import()`
 
 ### Working with image objects
 
 Eachimage object has a number of methods.
 ``` {r }
-img <- docker$images$get("richfitz/iterate")
+img <- docker$image$get("richfitz/iterate")
 img
 ```
 
@@ -493,14 +493,14 @@ img$remove()
 Docker volumes provide a useful abstraction for interacting with
 (possibly persistent) file volumes across containers.  To create a
 volume using `stevedore` (equivalent to `docker volume create`) use
-`$volumes$create()`:
+`$volume$create()`:
 ``` {r }
-vol <- docker$volumes$create("myvolume")
+vol <- docker$volume$create("myvolume")
 ```
 
 Volumes can be listed:
 ``` {r }
-docker$volumes$list()
+docker$volume$list()
 ```
 
 ### Working with volume objects
@@ -538,8 +538,8 @@ the volume name on the host side, so saying `<myvolume>:/myvolume`
 mounts our volume at `/myvolume` within the container.  This can be
 done easily with the `$map()` method.
 ``` {r }
-vol <- docker$volumes$create("myvolume")
-docker$containers$run(
+vol <- docker$volume$create("myvolume")
+docker$container$run(
   "alpine:latest",
   c("sh", "-c", "echo hello world > /myvolume/output"),
   volumes = vol$map("/myvolume"),
@@ -553,7 +553,7 @@ container and redirects the value that is echoed to a file.)
 We can see the result of this by using a second container to read
 the file:
 ``` {r }
-docker$containers$run(
+docker$container$run(
   "alpine:latest",
   c("cat", "/myvolume/output"),
   volumes = vol$map("/myvolume"),
@@ -572,12 +572,12 @@ creates a docker network, then create containers attached to that
 network (containers can also be attached to networks after
 creation).
 ``` {r }
-nw <- docker$networks$create("mynetwork")
+nw <- docker$network$create("mynetwork")
 ```
 
 Networks can be listed:
 ``` {r }
-docker$networks$list()
+docker$network$list()
 ```
 
 The networks `bridge`, `host` and `none` always exist - they are
@@ -615,35 +615,35 @@ nw$remove()
 Generally you'll want to put containers onto a network.
 
 The setup here is to create a network, and then use the `network`
-argument to `$containers$run()` to attach a container to that
+argument to `$container$run()` to attach a container to that
 network.  Once established, containers on the same network can use
 another docker container's name as the hostname and communicate!
 ``` {r }
-nw <- docker$networks$create("mynetwork")
-server <- docker$containers$run("nginx", network = nw, name = "server",
-                                detach = TRUE, rm = TRUE)
+nw <- docker$network$create("mynetwork")
+server <- docker$container$run("nginx", network = nw, name = "server",
+                               detach = TRUE, rm = TRUE)
 server$status()
 ```
 
 Now we can attach other networks to this container and communicate
 with the server:
 ``` {r }
-docker$containers$run("alpine:latest", c("ping", "server", "-c", "3"),
-                      network = nw, stream = stdout(), rm = TRUE)
+docker$container$run("alpine:latest", c("ping", "server", "-c", "3"),
+                     network = nw, stream = stdout(), rm = TRUE)
 ```
 
 Omitting the `network` argument, the second container can't find
 the server:
 ``` {r error = TRUE}
-docker$containers$run("alpine:latest", c("ping", "server", "-c", "3"),
-                      stream = stdout(), rm = TRUE)
+docker$container$run("alpine:latest", c("ping", "server", "-c", "3"),
+                     stream = stdout(), rm = TRUE)
 ```
 
 The server container exposes a webserver on port 80.  For
 containers on the network we can access this port:
 ``` {r }
-res <- docker$containers$run("richfitz/curl", c("curl", "-s", "http://server"),
-                             network = nw, rm = TRUE)
+res <- docker$container$run("richfitz/curl", c("curl", "-s", "http://server"),
+                            network = nw, rm = TRUE)
 head(res$logs, 10)
 
 server$stop()

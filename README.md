@@ -37,16 +37,17 @@ docker
 
 ```
 ## <docker_client>
-##   configs: docker_config_collection
-##   containers: docker_container_collection
-##   images: docker_image_collection
-##   networks: docker_network_collection
-##   nodes: docker_swarm_collection
-##   secrets: docker_secret_collection
-##   services: docker_service_collection
+##   config: docker_config_collection
+##   container: docker_container_collection
+##   image: docker_image_collection
+##   network: docker_network_collection
+##   node: docker_node_collection
+##   plugin: docker_plugin_collection
+##   secret: docker_secret_collection
+##   service: docker_service_collection
 ##   swarm: docker_swarm_collection
-##   tasks: docker_task_collection
-##   volumes: docker_volume_collection
+##   task: docker_task_collection
+##   volume: docker_volume_collection
 ##   types: docker_types
 ##   api_version()
 ##   df()
@@ -63,7 +64,7 @@ With this you can run containers:
 
 
 ```r
-docker$containers$run("alpine:3.1", c("echo", "hello world"))
+docker$container$run("alpine:3.1", c("echo", "hello world"))
 ```
 
 ```
@@ -73,11 +74,18 @@ docker$containers$run("alpine:3.1", c("echo", "hello world"))
 ```
 ## Pulling from library/alpine 3.1
 ## Pulling fs layer 61aa778aed31
-## 61aa778aed31: Downloading 32.77 kB/2.3 MB 1%
+## 61aa778aed31: Downloading 32.27 kB/2.3 MB 1%
+## 61aa778aed31: Downloading 687.22 kB/2.3 MB 30%
+## 61aa778aed31: Downloading 1.76 MB/2.3 MB 76%
+## 61aa778aed31: Downloading 1.78 MB/2.3 MB 77%
+## 61aa778aed31: Downloading 1.8 MB/2.3 MB 78%
+## 61aa778aed31: Downloading 1.83 MB/2.3 MB 79%
+## 61aa778aed31: Downloading 2 MB/2.3 MB 87%
+## 61aa778aed31: Downloading 2.23 MB/2.3 MB 97%
 ## Verifying Checksum 61aa778aed31
 ## Download complete 61aa778aed31
 ## 61aa778aed31: Extracting 32.77 kB/2.3 MB 1%
-## 61aa778aed31: Extracting 1.25 MB/2.3 MB 54%
+## 61aa778aed31: Extracting 425.98 kB/2.3 MB 18%
 ## 61aa778aed31: Extracting 2.3 MB/2.3 MB 100%
 ## Pull complete 61aa778aed31
 ## Digest: sha256:10de714727daa45047abdfb81c98dbf45e1cad3b590b5043d0da139bfeacebe5
@@ -89,8 +97,8 @@ docker$containers$run("alpine:3.1", c("echo", "hello world"))
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: 5c1721d8554be6a19c1d0eb9c6af6b310d4b8ae2220857ad072fe61cf0c8d8a2
-##       name: awesome_goldwasser
+##       id: 4202b4970975966cc74c05c5f90bab8be515927559d2730080830d7a03e2fc19
+##       name: modest_boyd
 ##
 ##   $logs:
 ##     O> hello world
@@ -100,7 +108,7 @@ Or run containers in the background
 
 
 ```r
-docker$containers$run("bfirsh/reticulate-splines", detach = TRUE)
+docker$container$run("bfirsh/reticulate-splines", detach = TRUE)
 ```
 
 ```
@@ -165,29 +173,29 @@ You can manage containers
 
 
 ```r
-docker$containers$list()
+docker$container$list()
 ```
 
 ```
 ##                                                                 id
-## 1 ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a
+## 1 ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a
 ##          names
-## 1 vigilant....
+## 1 heuristi....
 ##                                                                     image
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                                                                  image_id
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                 command    created        ports size_rw size_root_fs
-## 1 /usr/local/bin/run.sh 1522162863 characte....      NA           NA
+## 1 /usr/local/bin/run.sh 1522758457 characte....      NA           NA
 ##   labels   state                status host_config network_settings
 ## 1        running Up Less than a second     default     list(bri....
-##         mounts          name
-## 1 characte.... vigilant_benz
+##         mounts              name
+## 1 characte.... heuristic_bardeen
 ```
 
 ```r
-id <- docker$containers$list(limit = 1L)$id
-container <- docker$containers$get(id)
+id <- docker$container$list(limit = 1L)$id
+container <- docker$container$get(id)
 container
 ```
 
@@ -288,45 +296,45 @@ And manage images
 
 
 ```r
-head(docker$images$list())
+head(docker$image$list())
 ```
 
 ```
 ##                                                                        id
-## 1 sha256:12fcbaa1b768e020e4bda482568286a9e527fd9850fc6f8e5df3aa2c3efcccfa
-## 2 sha256:29f79adfac599c10a4608304f8cf93597ad208a1299591e1f23745f491dbccb7
-## 3 sha256:ddb138ffcfd5c98182123a72d871350ef408e906b03d9cc947d9e3d28d5126e4
-## 4 sha256:e06220dbd9c0af0b20951504b14cbf5ce106ddd27d1d251d63e51a96f9688f44
-## 5 sha256:265fea0fa5c3fff4151df5136829b8b475e3ff63da70941358f13dcb8739fb8b
-## 6 sha256:6912fa3f863789cb1014ad4da71c82857e5918188cddb5261a8eb9e579497ce2
+## 1 sha256:f75cd4ed8904a3736ea82ed7147d93271ea7a494103a3752b824ec8093fc507c
+## 2 sha256:408e9ddc2942aeebd389d904e866628c9dcd89171e3b660dc74562c32d812260
+## 3 sha256:9d505334bd040a2860bd97e9ead4654f5f1402e087c61f6818f987f440f92d6f
+## 4 sha256:dc6f3597b4761fbaa4f5627c5d4676b0cd1bbdcd7dfd5b2771de665f915f6df6
+## 5 sha256:1effd9a7a4f1b32e32c3f87d46e9043dafdf1f23ac7be8a735bcf4931c23b1d9
+## 6 sha256:7b460cb22d8fa0c9f13f5c0c8013a1a8f075754aa8fc6bbb47a3ff1271bd3644
 ##                                                                 parent_id
-## 1 sha256:6c89f016add6fc97c335c70fe51b47fee95633da31edf44ce1654cff5bfa38ff
-## 2
-## 3
-## 4
-## 5
-## 6
-##      repo_tags repo_digests    created      size shared_size virtual_size
-## 1 richfitz....              1522160216 855293381          -1    855293381
-## 2 richfitz.... richfitz.... 1521560490 759007139          -1    759007139
-## 3 docker.m.... docker.m.... 1521543255 263775213          -1    263775213
-## 4 docker.m.... docker.m.... 1521214167 312997301          -1    312997301
-## 5 docker.m.... docker.m.... 1521209642 312997187          -1    312997187
-## 6 docker.m.... docker.m.... 1521209220 100448405          -1    100448405
+## 1 sha256:04c6ba921e7052402df7f9f2a1b71ce6cbec41c5b613eb21fd6b16fcc846cbf1
+## 2 sha256:14cf779a91a3ea612fc573bf14f10e33428c9a8367c2aaa2f18d198ba4e39816
+## 3 sha256:ede8bb8daee3d08ab80a805ba9c071468d3b15f7576acc1774295c9bee59d815
+## 4 sha256:e39d6710ee9c9394b015b0c51037b445826170d7d003fca0b6ed516a262415dd
+## 5 sha256:6b6e065cc923fa3d085df0ebe5a46a2479923449a3f035d87440d1c24ae406ae
+## 6 sha256:4e88526c21d3bae31cc77c361698c3e3cc468e8b0f3d047c56c93c8854b09b11
+##      repo_tags repo_digests    created    size shared_size virtual_size
+## 1 richfitz....              1522758233 4148087          -1      4148087
+## 2 <none>:<.... <none>@<.... 1522758232 4148087          -1      4148087
+## 3 <none>:<.... <none>@<.... 1522758231 4148087          -1      4148087
+## 4 <none>:<.... <none>@<.... 1522758230 4148087          -1      4148087
+## 5 <none>:<.... <none>@<.... 1522758229 4148087          -1      4148087
+## 6 <none>:<.... <none>@<.... 1522758227 4148087          -1      4148087
 ##   labels containers
-## 1                -1
-## 2                -1
-## 3                -1
-## 4                -1
-## 5                -1
-## 6                -1
+## 1  0.0.1         -1
+## 2  0.0.1         -1
+## 3  0.0.1         -1
+## 4  0.0.1         -1
+## 5  0.0.1         -1
+## 6  0.0.1         -1
 ```
 
 Some of these functions have many arguments, but `stevedore` includes help inline:
 
 
 ```r
-docker$containers$create
+docker$container$create
 ```
 
 ```
@@ -340,7 +348,7 @@ docker$containers$create
 ##     stop_timeout = NULL, shell = NULL, host_config = NULL,
 ##     network = NULL, name = NULL)
 ## ----------------------------------------------------------------------
-## Create a container.  Similar to the cli command `docker create` or
+## Create a container. Similar to the cli command `docker create` or
 ##   `docker container create`.
 ## ----------------------------------------------------------------------
 ##   image: The name of the image to use when creating the container
@@ -406,7 +414,7 @@ docker$containers$create
 ##         `/?[a-zA-Z0-9_-]+`.
 ```
 
-as well as via an `help()` method on each object (e.g., `docker$help()`, `docker$containers$help()`) which will display help for the API version that you are using.
+as well as via an `help()` method on each object (e.g., `docker$help()`, `docker$container$help()`) which will display help for the API version that you are using.
 
 ## Approach
 
@@ -421,10 +429,10 @@ container$inspect(reload = FALSE)
 
 ```
 ## $id
-## [1] "ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a"
+## [1] "ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a"
 ##
 ## $created
-## [1] "2018-03-27T15:01:03.733952395Z"
+## [1] "2018-04-03T12:27:37.8965375Z"
 ##
 ## $path
 ## [1] "/usr/local/bin/run.sh"
@@ -452,7 +460,7 @@ container$inspect(reload = FALSE)
 ## [1] FALSE
 ##
 ## $state$pid
-## [1] 3994
+## [1] 18697
 ##
 ## $state$exit_code
 ## [1] 0
@@ -461,7 +469,7 @@ container$inspect(reload = FALSE)
 ## [1] ""
 ##
 ## $state$started_at
-## [1] "2018-03-27T15:01:04.452272327Z"
+## [1] "2018-04-03T12:27:38.4701217Z"
 ##
 ## $state$finished_at
 ## [1] "0001-01-01T00:00:00Z"
@@ -471,28 +479,28 @@ container$inspect(reload = FALSE)
 ## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"
 ##
 ## $resolv_conf_path
-## [1] "/mnt/storage/docker/var-lib-docker/containers/ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a/resolv.conf"
+## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/resolv.conf"
 ##
 ## $hostname_path
-## [1] "/mnt/storage/docker/var-lib-docker/containers/ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a/hostname"
+## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/hostname"
 ##
 ## $hosts_path
-## [1] "/mnt/storage/docker/var-lib-docker/containers/ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a/hosts"
+## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/hosts"
 ##
 ## $log_path
-## [1] "/mnt/storage/docker/var-lib-docker/containers/ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a/ca29748dfc48d057b895ac84c43a51ebb589a23fe3f21c588ffee87d7f92123a-json.log"
+## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a-json.log"
 ##
 ## $node
 ## NULL
 ##
 ## $name
-## [1] "/vigilant_benz"
+## [1] "/heuristic_bardeen"
 ##
 ## $restart_count
 ## [1] 0
 ##
 ## $driver
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $mount_label
 ## [1] ""
@@ -501,7 +509,7 @@ container$inspect(reload = FALSE)
 ## [1] ""
 ##
 ## $app_armor_profile
-## [1] "docker-default"
+## [1] ""
 ##
 ## $exec_ids
 ## [1] NA
@@ -724,10 +732,17 @@ container$inspect(reload = FALSE)
 ##
 ## $graph_driver
 ## $graph_driver$name
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $graph_driver$data
-## NULL
+##                                                                                                                                                                                                                                                                                                                                                                                          lower_dir
+## "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b-init/diff:/var/lib/docker/overlay2/7815d9bac55ed4ceb36bd625979dfcd06330e8253b9f71c95795ce5c5b247dd0/diff:/var/lib/docker/overlay2/2b72161d0aefe066769d9334de310b36616ae170f4472a7384324d378dd82cb5/diff:/var/lib/docker/overlay2/d4903c54aa9b839529e6b24e2293abe7cbea0093a5106726c0e93754cb105591/diff"
+##                                                                                                                                                                                                                                                                                                                                                                                         merged_dir
+##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/merged"
+##                                                                                                                                                                                                                                                                                                                                                                                          upper_dir
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/diff"
+##                                                                                                                                                                                                                                                                                                                                                                                           work_dir
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/work"
 ##
 ##
 ## $size_rw
@@ -743,7 +758,7 @@ container$inspect(reload = FALSE)
 ##
 ## $config
 ## $config$hostname
-## [1] "ca29748dfc48"
+## [1] "ca1d81ae60d8"
 ##
 ## $config$domainname
 ## [1] ""

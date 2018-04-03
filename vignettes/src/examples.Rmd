@@ -47,8 +47,8 @@ install.packages("redux")
 ``` {r }
 docker <- stevedore::docker_client()
 
-redis <- docker$containers$run("redis", name = "redis", ports = "6379",
-                               detach = TRUE, rm = TRUE)
+redis <- docker$container$run("redis", name = "redis", ports = "6379",
+                              detach = TRUE, rm = TRUE)
 ```
 
 We now have a redis server running on `r redis$ports()$host_port`
@@ -77,8 +77,8 @@ And we can get a fresh copy of Redis by simply starting a new copy
 of redis
 ``` {r }
 redis$kill()
-redis <- docker$containers$run("redis", name = "redis", ports = "6379",
-                               detach = TRUE, rm = TRUE)
+redis <- docker$container$run("redis", name = "redis", ports = "6379",
+                              detach = TRUE, rm = TRUE)
 con <- redux::hiredis(port = redis$ports()$host_port)
 con$KEYS("*")
 
@@ -88,8 +88,8 @@ redis$kill()
 The same approach works for other database that might be large or
 awkward to install
 ``` {r }
-pg <- docker$containers$run("postgres", name = "pg", ports = "5432",
-                            detach = TRUE, rm = TRUE)
+pg <- docker$container$run("postgres", name = "pg", ports = "5432",
+                           detach = TRUE, rm = TRUE)
 ```
 
 ``` {r echo = FALSE}
@@ -133,9 +133,9 @@ destination path.
 
 We can start this with
 ``` {r eval = FALSE}
-shiny <- docker$containers$run("rocker/shiny", name = "shiny", ports = "3838",
-                               volumes = volumes,
-                               detach = TRUE, rm = TRUE)
+shiny <- docker$container$run("rocker/shiny", name = "shiny", ports = "3838",
+                              volumes = volumes,
+                              detach = TRUE, rm = TRUE)
 ```
 
 In an interactive session, you can visit the shiny server:
@@ -166,13 +166,13 @@ which contains:
 ``` {r }
 lang_output(readLines("tester/tester.sh"), "shell")
 
-img <- docker$images$build("tester", tag = "richfitz/tester")
+img <- docker$image$build("tester", tag = "richfitz/tester")
 ```
 
 With this image we can then test packages off github:
 ``` {r }
-invisible(docker$containers$run(img, "https://github.com/richfitz/ids",
-                                rm = TRUE, stream = stdout()))
+invisible(docker$container$run(img, "https://github.com/richfitz/ids",
+                               rm = TRUE, stream = stdout()))
 ```
 
 (I have cheated here and put all of the dependencies of `ids` into

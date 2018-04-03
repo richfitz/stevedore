@@ -1,7 +1,7 @@
 ---
 title: "Using docker with stevedore"
 author: "Rich FitzJohn"
-date: "2018-03-27"
+date: "2018-04-03"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using docker with stevedore}
@@ -57,16 +57,17 @@ docker
 
 ```
 ## <docker_client>
-##   configs: docker_config_collection
-##   containers: docker_container_collection
-##   images: docker_image_collection
-##   networks: docker_network_collection
-##   nodes: docker_swarm_collection
-##   secrets: docker_secret_collection
-##   services: docker_service_collection
+##   config: docker_config_collection
+##   container: docker_container_collection
+##   image: docker_image_collection
+##   network: docker_network_collection
+##   node: docker_node_collection
+##   plugin: docker_plugin_collection
+##   secret: docker_secret_collection
+##   service: docker_service_collection
 ##   swarm: docker_swarm_collection
-##   tasks: docker_task_collection
-##   volumes: docker_volume_collection
+##   task: docker_task_collection
+##   volume: docker_volume_collection
 ##   types: docker_types
 ##   api_version()
 ##   df()
@@ -89,16 +90,16 @@ docker$ping()
 ```
 ## [1] "OK"
 ## attr(,"api_version")
-## [1] "1.35"
+## [1] "1.36"
 ## attr(,"docker_experimental")
-## [1] FALSE
+## [1] TRUE
 ```
 
-In addition there are "collection" objects (e.g., `containers`)
+In addition there are "collection" objects (e.g., `container`)
 that are accessed using `$`, like a directory structure
 
 ```r
-docker$containers
+docker$container
 ```
 
 ```
@@ -126,10 +127,10 @@ client (and to the Python docker client), where container commands
 are within the `container` collection and image commands are within
 the `image` collection and so on (the main difference with the
 command line client is that the container commands are not at the
-top level, so it is `docker$containers$run(...)` not
+top level, so it is `docker$container$run(...)` not
 `docker$run(...)`).
 
-To run a container, the `docker$containers$run` command follows the
+To run a container, the `docker$container$run` command follows the
 semantics of the command line client and will
 
 * pull a image if it does not exist
@@ -138,7 +139,7 @@ semantics of the command line client and will
 * fetch the logs
 
 ```r
-res <- docker$containers$run("hello-world")
+res <- docker$container$run("hello-world")
 ```
 
 ```
@@ -348,11 +349,11 @@ img$history()
 
 ## Containers
 
-The `$containers` object containers methods for interacting with
+The `$container` object includes methods for interacting with
 containers:
 
 ```r
-docker$containers
+docker$container
 ```
 
 ```
@@ -379,7 +380,7 @@ docker$containers
 create` on the command line) but does not start it.
 
 ```r
-x <- docker$containers$create("hello-world", name = "hello-stevedore")
+x <- docker$container$create("hello-world", name = "hello-stevedore")
 x
 ```
 
@@ -445,12 +446,12 @@ x
 name:
 
 ```r
-y <- docker$containers$get("hello-stevedore")
+y <- docker$container$get("hello-stevedore")
 x$id()
 ```
 
 ```
-## [1] "6a7a2ea6b9c1254159337ab773b4329b725a6850c61c26e6b83e2a4ff858c9cc"
+## [1] "ef72133fcfa804043fe08fa1b4ebd069426445351a4a7dfb8da241dd7f6b685b"
 ```
 
 ```r
@@ -458,14 +459,14 @@ y$id()
 ```
 
 ```
-## [1] "6a7a2ea6b9c1254159337ab773b4329b725a6850c61c26e6b83e2a4ff858c9cc"
+## [1] "ef72133fcfa804043fe08fa1b4ebd069426445351a4a7dfb8da241dd7f6b685b"
 ```
 
 `$list()` lists containers (like `docker list` on the command line)
 - by default showing only running containers
 
 ```r
-docker$containers$list()
+docker$container$list()
 ```
 
 ```
@@ -477,16 +478,16 @@ docker$containers$list()
 ```
 
 ```r
-docker$containers$list(all = TRUE, limit = 2)
+docker$container$list(all = TRUE, limit = 2)
 ```
 
 ```
 ##                                                                 id
-## 1 6a7a2ea6b9c1254159337ab773b4329b725a6850c61c26e6b83e2a4ff858c9cc
-## 2 01c3bac87189574733c34c4831ed9a373bae1bc4d6800a9ba628efe9ef5e0dbc
+## 1 ef72133fcfa804043fe08fa1b4ebd069426445351a4a7dfb8da241dd7f6b685b
+## 2 7c57b7824f1cba9370c2ff61e25d1dc64a40d8e6d1edf77bd6acbcb044941a76
 ##          names
 ## 1 hello-st....
-## 2 reverent....
+## 2 optimist....
 ##                                                                     image
 ## 1                                                             hello-world
 ## 2 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
@@ -494,20 +495,20 @@ docker$containers$list(all = TRUE, limit = 2)
 ## 1 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
 ## 2 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
 ##   command    created        ports size_rw size_root_fs labels   state
-## 1  /hello 1522162606 characte....      NA           NA        created
-## 2  /hello 1522162605 characte....      NA           NA         exited
+## 1  /hello 1522758376 characte....      NA           NA        created
+## 2  /hello 1522758375 characte....      NA           NA         exited
 ##                              status host_config network_settings
 ## 1                           Created     default     list(bri....
 ## 2 Exited (0) Less than a second ago     default     list(bri....
 ##         mounts            name
 ## 1 characte.... hello-stevedore
-## 2 characte.... reverent_sammet
+## 2 characte.... optimistic_kare
 ```
 
 `$remove()` removes a container by name or id:
 
 ```r
-docker$containers$remove("hello-stevedore")
+docker$container$remove("hello-stevedore")
 ```
 
 ```
@@ -519,14 +520,13 @@ have exited or containers that have been created but not yet
 started)
 
 ```r
-docker$containers$prune()
+docker$container$prune()
 ```
 
 ```
 ## $containers_deleted
-## [1] "01c3bac87189574733c34c4831ed9a373bae1bc4d6800a9ba628efe9ef5e0dbc"
-## [2] "d92a318e22371e32982064ea00bd15118b0303a018251df9a27d8cba32da457e"
-## [3] "dc9b3bb43d268433fb461cec8aac0be7275efa3569137c97d8557af7998113dd"
+## [1] "7c57b7824f1cba9370c2ff61e25d1dc64a40d8e6d1edf77bd6acbcb044941a76"
+## [2] "852f4d0350a7d991636282fb906f95340641fba4cde4c305190299484627e62e"
 ##
 ## $space_reclaimed
 ## [1] 0
@@ -538,7 +538,7 @@ After creating a container object, there are many more methods to
 use - all apply to the individual container
 
 ```r
-x <- docker$containers$create("richfitz/iterate", c("1000", "1"))
+x <- docker$container$create("richfitz/iterate", c("1000", "1"))
 ```
 
 Most are analogues of similarly named `docker` command line
@@ -552,7 +552,7 @@ x$id()
 ```
 
 ```
-## [1] "9483b1acc56875ec96069f3caa725a629347f3ee6fab715aca9c07636f8b5eb1"
+## [1] "f281bd7c65c43fd448d9904db11f60a95c527bc46fb117bb0a20ddd518700566"
 ```
 
 ```r
@@ -560,7 +560,7 @@ x$name()
 ```
 
 ```
-## [1] "jolly_goodall"
+## [1] "practical_minsky"
 ```
 
 ```r
@@ -581,10 +581,10 @@ x$inspect()
 
 ```
 ## $id
-## [1] "9483b1acc56875ec96069f3caa725a629347f3ee6fab715aca9c07636f8b5eb1"
+## [1] "f281bd7c65c43fd448d9904db11f60a95c527bc46fb117bb0a20ddd518700566"
 ##
 ## $created
-## [1] "2018-03-27T14:56:47.39473625Z"
+## [1] "2018-04-03T12:26:17.1409989Z"
 ##
 ## $path
 ## [1] "/usr/local/bin/iterate"
@@ -628,7 +628,7 @@ x$inspect()
 ##
 ##
 ## $image
-## [1] "sha256:85a7d17164f909eef1d5a783e943ee56e78b36d0338560bfd3b64a20977bb638"
+## [1] "sha256:f75cd4ed8904a3736ea82ed7147d93271ea7a494103a3752b824ec8093fc507c"
 ##
 ## $resolv_conf_path
 ## [1] ""
@@ -646,13 +646,13 @@ x$inspect()
 ## NULL
 ##
 ## $name
-## [1] "/jolly_goodall"
+## [1] "/practical_minsky"
 ##
 ## $restart_count
 ## [1] 0
 ##
 ## $driver
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $mount_label
 ## [1] ""
@@ -884,10 +884,17 @@ x$inspect()
 ##
 ## $graph_driver
 ## $graph_driver$name
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $graph_driver$data
-## NULL
+##                                                                                                                                                                                                                                                                                           lower_dir
+## "/var/lib/docker/overlay2/2bcbd3cdd934c53b2249740e5cf5649308e8064b5a8a900b746f8e1c48a24f4c-init/diff:/var/lib/docker/overlay2/4e53c7db0d3b7ba9557ef2d9ccb48ec85751857f64af8566708a03cc3bc4f3bf/diff:/var/lib/docker/overlay2/230714ad111869ebfb07688b547b1b23992cac8971b6a40f79b1753eb07335c2/diff"
+##                                                                                                                                                                                                                                                                                          merged_dir
+##                                                                                                                                                                                                  "/var/lib/docker/overlay2/2bcbd3cdd934c53b2249740e5cf5649308e8064b5a8a900b746f8e1c48a24f4c/merged"
+##                                                                                                                                                                                                                                                                                           upper_dir
+##                                                                                                                                                                                                    "/var/lib/docker/overlay2/2bcbd3cdd934c53b2249740e5cf5649308e8064b5a8a900b746f8e1c48a24f4c/diff"
+##                                                                                                                                                                                                                                                                                            work_dir
+##                                                                                                                                                                                                    "/var/lib/docker/overlay2/2bcbd3cdd934c53b2249740e5cf5649308e8064b5a8a900b746f8e1c48a24f4c/work"
 ##
 ##
 ## $size_rw
@@ -903,7 +910,7 @@ x$inspect()
 ##
 ## $config
 ## $config$hostname
-## [1] "9483b1acc568"
+## [1] "f281bd7c65c4"
 ##
 ## $config$domainname
 ## [1] ""
@@ -1059,12 +1066,9 @@ x$top()
 ```
 
 ```
-##    UID   PID  PPID C STIME TTY     TIME
-## 1 root 28014 27998 0 15:56   ? 00:00:00
-## 2 root 28072 28014 0 15:56   ? 00:00:00
-##                                     CMD
-## 1 /bin/sh /usr/local/bin/iterate 1000 1
-## 2                               sleep 1
+##     PID USER TIME                                         COMMAND
+## 1 15378    0 0:00 {iterate} /bin/sh /usr/local/bin/iterate 1000 1
+## 2 15405    0 0:00                                         sleep 1
 ```
 
 We can also get the logs:
@@ -1112,7 +1116,7 @@ log to.  This can be `stdout()` or `stderr()`, a file or an R
 connection.
 
 ```r
-y <- docker$containers$create("richfitz/iterate", c("10", "0.1"))
+y <- docker$container$create("richfitz/iterate", c("10", "0.1"))
 y$start()
 y$logs(stream = stdout(), follow = TRUE)
 ```
@@ -1258,7 +1262,7 @@ x$status()
 ```
 
 ```
-## Error: No such container: 9483b1acc56875ec96069f3caa725a629347f3ee6fab715aca9c07636f8b5eb1
+## Error: No such container: f281bd7c65c43fd448d9904db11f60a95c527bc46fb117bb0a20ddd518700566
 ```
 
 Information about ports (for containers that expose them) can be
@@ -1268,15 +1272,15 @@ that to a random port by asking docker to expose port 80 but not
 saying what to map it to:
 
 ```r
-nginx <- docker$containers$run("nginx", ports = 80,
-                               detach = TRUE, rm = TRUE,
-                               name = "stevedore-nginx")
+nginx <- docker$container$run("nginx", ports = 80,
+                              detach = TRUE, rm = TRUE,
+                              name = "stevedore-nginx")
 nginx$ports()
 ```
 
 ```
 ##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32796
+## 1             80      tcp 0.0.0.0     32780
 ```
 
 (alternatively, use `ports = TRUE` to act like `docker run`'s `-P`
@@ -1285,7 +1289,7 @@ and "publish all ports to random ports).
 
 
 This shows that the port exposed by the the container (80) is
-mapped to the port 32796 on the
+mapped to the port 32780 on the
 host.  We can use this to communicate with the server:
 
 ```r
@@ -1296,7 +1300,7 @@ curl::parse_headers(curl::curl_fetch_memory(url)$headers)
 ```
 ## [1] "HTTP/1.1 200 OK"
 ## [2] "Server: nginx/1.13.8"
-## [3] "Date: Tue, 27 Mar 2018 14:56:55 GMT"
+## [3] "Date: Tue, 03 Apr 2018 12:26:25 GMT"
 ## [4] "Content-Type: text/html"
 ## [5] "Content-Length: 612"
 ## [6] "Last-Modified: Tue, 26 Dec 2017 11:11:22 GMT"
@@ -1320,13 +1324,13 @@ nginx$stop(t = 0)
 
 
 
-Images can be directly pulled with `docker$images$pull` providing
+Images can be directly pulled with `docker$image$pull` providing
 an image name (as either `<repo>` or `<repo>:<tag>`.  If the image
 exists already this will be quick, and if the network connection is
 down then this will fail.
 
 ```r
-docker$images$pull("bash:latest")
+docker$image$pull("bash:latest")
 ```
 
 ```
@@ -1334,14 +1338,26 @@ docker$images$pull("bash:latest")
 ## Already exists 605ce1bd3f31
 ## Pulling fs layer f691ab0a0436
 ## Pulling fs layer 3d7d3f4179eb
-## 3d7d3f4179eb: Downloading 342 B/342 B 100%
 ## Download complete 3d7d3f4179eb
-## f691ab0a0436: Downloading 32.26 kB/2.71 MB 1%
+## f691ab0a0436: Downloading 33.37 kB/2.71 MB 1%
+## f691ab0a0436: Downloading 100.07 kB/2.71 MB 4%
+## f691ab0a0436: Downloading 170.56 kB/2.71 MB 6%
+## f691ab0a0436: Downloading 241.24 kB/2.71 MB 9%
+## f691ab0a0436: Downloading 311.89 kB/2.71 MB 11%
+## f691ab0a0436: Downloading 415.88 kB/2.71 MB 15%
+## f691ab0a0436: Downloading 573.01 kB/2.71 MB 21%
+## f691ab0a0436: Downloading 712.28 kB/2.71 MB 26%
+## f691ab0a0436: Downloading 922.2 kB/2.71 MB 34%
+## f691ab0a0436: Downloading 1.15 MB/2.71 MB 42%
+## f691ab0a0436: Downloading 1.51 MB/2.71 MB 56%
+## f691ab0a0436: Downloading 1.97 MB/2.71 MB 72%
+## f691ab0a0436: Downloading 2.57 MB/2.71 MB 95%
+## f691ab0a0436: Downloading 2.71 MB/2.71 MB 100%
 ## Verifying Checksum f691ab0a0436
 ## Download complete f691ab0a0436
 ## f691ab0a0436: Extracting 32.77 kB/2.71 MB 1%
-## f691ab0a0436: Extracting 2.1 MB/2.71 MB 77%
-## f691ab0a0436: Extracting 2.69 MB/2.71 MB 99%
+## f691ab0a0436: Extracting 786.43 kB/2.71 MB 29%
+## f691ab0a0436: Extracting 2.59 MB/2.71 MB 95%
 ## f691ab0a0436: Extracting 2.71 MB/2.71 MB 100%
 ## Pull complete f691ab0a0436
 ## 3d7d3f4179eb: Extracting 342 B/342 B 100%
@@ -1372,7 +1388,7 @@ docker$images$pull("bash:latest")
 ### created by using `$get`
 
 ```r
-img <- docker$images$get("bash:latest")
+img <- docker$image$get("bash:latest")
 ```
 
 ### Building
@@ -1428,27 +1444,27 @@ echo "Done!"
 We can build this image using:
 
 ```r
-img <- docker$images$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
+img <- docker$image$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
 ```
 
 ```
 ## Step 1/5 : FROM alpine:latest
 ##  ---> 3fd9065eaf02
 ## Step 2/5 : COPY iterate /usr/local/bin/iterate
-##  ---> 0a5b4fc20d5f
+##  ---> 348b1c928665
 ## Step 3/5 : CMD chmod +x /usr/local/bin/iterate
-##  ---> Running in 483ba68e8bb7
-## Removing intermediate container 483ba68e8bb7
-##  ---> c4644c0466dc
+##  ---> Running in 9cccb03f4d1a
+## Removing intermediate container 9cccb03f4d1a
+##  ---> 3e588ff3f010
 ## Step 4/5 : LABEL stevedore_version 0.0.1
-##  ---> Running in 6edbf88b3db6
-## Removing intermediate container 6edbf88b3db6
-##  ---> 497f4b320c4d
+##  ---> Running in 3e1dbfdca02e
+## Removing intermediate container 3e1dbfdca02e
+##  ---> 44517ce15bc2
 ## Step 5/5 : ENTRYPOINT ["/usr/local/bin/iterate"]
-##  ---> Running in 6b38904e2edd
-## Removing intermediate container 6b38904e2edd
-##  ---> 49a5265c7e41
-## Successfully built 49a5265c7e41
+##  ---> Running in 7d8cb6716303
+## Removing intermediate container 7d8cb6716303
+##  ---> 4fb64bb79bb1
+## Successfully built 4fb64bb79bb1
 ## Successfully tagged richfitz/iterate:latest
 ```
 
@@ -1474,11 +1490,11 @@ img
 ```
 
 The newly created image is returned as an image object and can be
-used via `$containers$run()`
+used via `$container$run()`
 
 ```r
 invisible(
-  docker$containers$run(img, c("10", "0.1"), rm = TRUE, stream = stdout()))
+  docker$container$run(img, c("10", "0.1"), rm = TRUE, stream = stdout()))
 ```
 
 ```
@@ -1502,14 +1518,14 @@ invisible(
 
 There is a third way of creating an image, which is to import it
 from a tar archive.  This is not yet documented (**TODO**) but can
-be done via `$images$import()`
+be done via `$image$import()`
 
 ### Working with image objects
 
 Eachimage object has a number of methods.
 
 ```r
-img <- docker$images$get("richfitz/iterate")
+img <- docker$image$get("richfitz/iterate")
 img
 ```
 
@@ -1538,7 +1554,7 @@ img$id()
 ```
 
 ```
-## [1] "sha256:49a5265c7e419c57f7067cf2beedb9208357c521f23d8d7f104f5a3d8587d65d"
+## [1] "sha256:4fb64bb79bb19b040cb9aeb1034686810c0a19bd5c6cb136d3b88f0286138a73"
 ```
 
 ```r
@@ -1546,7 +1562,7 @@ img$short_id()
 ```
 
 ```
-## [1] "sha256:49a5265c7e"
+## [1] "sha256:4fb64bb79b"
 ```
 
 ```r
@@ -1585,7 +1601,7 @@ img$inspect()
 
 ```
 ## $id
-## [1] "sha256:49a5265c7e419c57f7067cf2beedb9208357c521f23d8d7f104f5a3d8587d65d"
+## [1] "sha256:4fb64bb79bb19b040cb9aeb1034686810c0a19bd5c6cb136d3b88f0286138a73"
 ##
 ## $repo_tags
 ## [1] "richfitz/iterate:latest"
@@ -1594,20 +1610,20 @@ img$inspect()
 ## character(0)
 ##
 ## $parent
-## [1] "sha256:497f4b320c4d610745863168d57d5c385eefa0abf5eb228eac1a263aa4f48e24"
+## [1] "sha256:44517ce15bc2b3afd5570c7cdf8dff936bbc95fbf45a47f601c074267b461418"
 ##
 ## $comment
 ## [1] ""
 ##
 ## $created
-## [1] "2018-03-27T14:57:02.406039235Z"
+## [1] "2018-04-03T12:26:34.3423669Z"
 ##
 ## $container
-## [1] "6b38904e2edddfb436700b0f2f7908978471e631fcd235e491ce3ea24ab57937"
+## [1] "7d8cb67163030229b784a7789176405d1626efe60c5d7037f7693cc6fbfe81ab"
 ##
 ## $container_config
 ## $container_config$hostname
-## [1] "6b38904e2edd"
+## [1] "7d8cb6716303"
 ##
 ## $container_config$domainname
 ## [1] ""
@@ -1652,7 +1668,7 @@ img$inspect()
 ## [1] TRUE
 ##
 ## $container_config$image
-## [1] "sha256:497f4b320c4d610745863168d57d5c385eefa0abf5eb228eac1a263aa4f48e24"
+## [1] "sha256:44517ce15bc2b3afd5570c7cdf8dff936bbc95fbf45a47f601c074267b461418"
 ##
 ## $container_config$volumes
 ## NULL
@@ -1687,7 +1703,7 @@ img$inspect()
 ##
 ##
 ## $docker_version
-## [1] "17.12.0-ce"
+## [1] "18.02.0-ce"
 ##
 ## $author
 ## [1] ""
@@ -1737,7 +1753,7 @@ img$inspect()
 ## [1] TRUE
 ##
 ## $config$image
-## [1] "sha256:497f4b320c4d610745863168d57d5c385eefa0abf5eb228eac1a263aa4f48e24"
+## [1] "sha256:44517ce15bc2b3afd5570c7cdf8dff936bbc95fbf45a47f601c074267b461418"
 ##
 ## $config$volumes
 ## NULL
@@ -1788,10 +1804,17 @@ img$inspect()
 ##
 ## $graph_driver
 ## $graph_driver$name
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $graph_driver$data
-## NULL
+##                                                                                          lower_dir
+##   "/var/lib/docker/overlay2/230714ad111869ebfb07688b547b1b23992cac8971b6a40f79b1753eb07335c2/diff"
+##                                                                                         merged_dir
+## "/var/lib/docker/overlay2/e4db5a335008cae122e92827529850b9c4b20c7affc22008e67d86441bce61f7/merged"
+##                                                                                          upper_dir
+##   "/var/lib/docker/overlay2/e4db5a335008cae122e92827529850b9c4b20c7affc22008e67d86441bce61f7/diff"
+##                                                                                           work_dir
+##   "/var/lib/docker/overlay2/e4db5a335008cae122e92827529850b9c4b20c7affc22008e67d86441bce61f7/work"
 ##
 ##
 ## $root_fs
@@ -1800,7 +1823,7 @@ img$inspect()
 ##
 ## $root_fs$layers
 ## [1] "sha256:cd7100a72410606589a54b932cabd804a17f9ae5b42a1882bd56d263e02b6215"
-## [2] "sha256:d30aef0309ec502f06f34ec4ac8afaef2533a59b358ae4392128d94bd3c8eea0"
+## [2] "sha256:e1fb9f7b70879a80d2f4c61c61dc9cbe599df7773981af3ad04ba97d8b764d8e"
 ##
 ## $root_fs$base_layer
 ## [1] NA
@@ -1819,24 +1842,24 @@ img$history()
 
 ```
 ##                                                                        id
-## 1 sha256:49a5265c7e419c57f7067cf2beedb9208357c521f23d8d7f104f5a3d8587d65d
-## 2 sha256:497f4b320c4d610745863168d57d5c385eefa0abf5eb228eac1a263aa4f48e24
-## 3 sha256:c4644c0466dca1bc14fe762cd43da41a93b95ee4db09ef617e1c01e1dc7e9250
-## 4 sha256:0a5b4fc20d5f8d6eebc3eb906c0d43f235a96d68bd49ce0a86130def9dcef76f
+## 1 sha256:4fb64bb79bb19b040cb9aeb1034686810c0a19bd5c6cb136d3b88f0286138a73
+## 2 sha256:44517ce15bc2b3afd5570c7cdf8dff936bbc95fbf45a47f601c074267b461418
+## 3 sha256:3e588ff3f0100a2aed50256978e32baaa80cb633e97d0e1b448856e128f15074
+## 4 sha256:348b1c928665253038431a34cbf8fa9a32ec1dce5f71f5e5bfaff88b4cb29037
 ## 5 sha256:3fd9065eaf02feaf94d68376da52541925650b81698c53c6824d92ff63f98353
 ## 6                                                               <missing>
 ##      created
-## 1 1522162622
-## 2 1522162621
-## 3 1522162620
-## 4 1522162620
+## 1 1522758394
+## 2 1522758394
+## 3 1522758393
+## 4 1522758393
 ## 5 1515532258
 ## 6 1515532258
 ##                                                                                                                created_by
 ## 1                                                                /bin/sh -c #(nop)  ENTRYPOINT ["/usr/local/bin/iterate"]
 ## 2                                                                        /bin/sh -c #(nop)  LABEL stevedore_version=0.0.1
 ## 3                                               /bin/sh -c #(nop)  CMD ["/bin/sh" "-c" "chmod +x /usr/local/bin/iterate"]
-## 4 /bin/sh -c #(nop) COPY file:48e845139b353a323e08aed200010b96c73e554c88abd4670b00fe70a435e118 in /usr/local/bin/iterate
+## 4 /bin/sh -c #(nop) COPY file:817b1679641b23eeaa7d56273e5ed5afba94d2effc1c32aea765ec2c77676730 in /usr/local/bin/iterate
 ## 5                                                                                      /bin/sh -c #(nop)  CMD ["/bin/sh"]
 ## 6                       /bin/sh -c #(nop) ADD file:093f0723fa46f6cdbd6f7bd146448bb70ecce54254c35701feeceb956414622f in /
 ##           tags    size comment
@@ -1893,11 +1916,11 @@ img$remove()
 ## 6                    <NA>
 ##                                                                   deleted
 ## 1                                                                    <NA>
-## 2 sha256:49a5265c7e419c57f7067cf2beedb9208357c521f23d8d7f104f5a3d8587d65d
-## 3 sha256:497f4b320c4d610745863168d57d5c385eefa0abf5eb228eac1a263aa4f48e24
-## 4 sha256:c4644c0466dca1bc14fe762cd43da41a93b95ee4db09ef617e1c01e1dc7e9250
-## 5 sha256:0a5b4fc20d5f8d6eebc3eb906c0d43f235a96d68bd49ce0a86130def9dcef76f
-## 6 sha256:40f4f22adea7c816b90f6621efa68f9d030e71e1cc8c16754f592806519b8c53
+## 2 sha256:4fb64bb79bb19b040cb9aeb1034686810c0a19bd5c6cb136d3b88f0286138a73
+## 3 sha256:44517ce15bc2b3afd5570c7cdf8dff936bbc95fbf45a47f601c074267b461418
+## 4 sha256:3e588ff3f0100a2aed50256978e32baaa80cb633e97d0e1b448856e128f15074
+## 5 sha256:348b1c928665253038431a34cbf8fa9a32ec1dce5f71f5e5bfaff88b4cb29037
+## 6 sha256:f4fa4ff40eadb2d6a893da24a0bc45bda2b1e65a42470b49965c3ff3b794a545
 ```
 
 ## Volumes
@@ -1905,31 +1928,31 @@ img$remove()
 Docker volumes provide a useful abstraction for interacting with
 (possibly persistent) file volumes across containers.  To create a
 volume using `stevedore` (equivalent to `docker volume create`) use
-`$volumes$create()`:
+`$volume$create()`:
 
 ```r
-vol <- docker$volumes$create("myvolume")
+vol <- docker$volume$create("myvolume")
 ```
 
 Volumes can be listed:
 
 ```r
-docker$volumes$list()
+docker$volume$list()
 ```
 
 ```
 ##                                                               name driver
-## 1 9efdefa9e449a8e0017db7511c9c9037835bce82ddfd9377b2e0ba0757532282  local
-## 2 5d616ec8e42c24b71453e67034229dea75159da085afeeef9dd66c64ba0d11f6  local
-## 3                                                         myvolume  local
-##                                                                                                          mountpoint
-## 1 /mnt/storage/docker/var-lib-docker/volumes/9efdefa9e449a8e0017db7511c9c9037835bce82ddfd9377b2e0ba0757532282/_data
-## 2 /mnt/storage/docker/var-lib-docker/volumes/5d616ec8e42c24b71453e67034229dea75159da085afeeef9dd66c64ba0d11f6/_data
-## 3                                                         /mnt/storage/docker/var-lib-docker/volumes/myvolume/_data
+## 1 ab9f7b0af0c80e15657b643b5840505d3b225dddfa5621fc3ab6921dbd637941  local
+## 2                                                         myvolume  local
+## 3 852d3f996efa24472005406db967292df5e43ae1e0c35eb5cf4d9ee5ea02afb9  local
+##                                                                                       mountpoint
+## 1 /var/lib/docker/volumes/ab9f7b0af0c80e15657b643b5840505d3b225dddfa5621fc3ab6921dbd637941/_data
+## 2                                                         /var/lib/docker/volumes/myvolume/_data
+## 3 /var/lib/docker/volumes/852d3f996efa24472005406db967292df5e43ae1e0c35eb5cf4d9ee5ea02afb9/_data
 ##   status labels scope options usage_data
 ## 1               local             NA, NA
 ## 2               local             NA, NA
-## 3               local             NA, NA
+## 3           bar local             NA, NA
 ```
 
 ### Working with volume objects
@@ -1974,7 +1997,7 @@ vol$inspect()
 ## [1] "local"
 ##
 ## $mountpoint
-## [1] "/mnt/storage/docker/var-lib-docker/volumes/myvolume/_data"
+## [1] "/var/lib/docker/volumes/myvolume/_data"
 ##
 ## $status
 ## NULL
@@ -2021,8 +2044,8 @@ mounts our volume at `/myvolume` within the container.  This can be
 done easily with the `$map()` method.
 
 ```r
-vol <- docker$volumes$create("myvolume")
-docker$containers$run(
+vol <- docker$volume$create("myvolume")
+docker$container$run(
   "alpine:latest",
   c("sh", "-c", "echo hello world > /myvolume/output"),
   volumes = vol$map("/myvolume"),
@@ -2033,8 +2056,8 @@ docker$containers$run(
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: 1374e25962591190a4ff5123b62b651a794b54fe62b59253f84ac70a45e5f381
-##       name: trusting_noyce
+##       id: ed14609cedd0ba0a7e10385edf5932a280bfef39fa40da72d0fb9f4c89d399b7
+##       name: jolly_lumiere
 ##
 ##   $logs:
 ##
@@ -2048,7 +2071,7 @@ We can see the result of this by using a second container to read
 the file:
 
 ```r
-docker$containers$run(
+docker$container$run(
   "alpine:latest",
   c("cat", "/myvolume/output"),
   volumes = vol$map("/myvolume"),
@@ -2074,36 +2097,40 @@ network (containers can also be attached to networks after
 creation).
 
 ```r
-nw <- docker$networks$create("mynetwork")
+nw <- docker$network$create("mynetwork")
 ```
 
 Networks can be listed:
 
 ```r
-docker$networks$list()
+docker$network$list()
 ```
 
 ```
-##        name
-## 1    bridge
-## 2      host
-## 3 mynetwork
-## 4      none
+##              name
+## 1       mynetwork
+## 2          bridge
+## 3 docker_gwbridge
+## 4            host
+## 5            none
 ##                                                                 id
-## 1 a34e6459727a52ee280df6337bb63b3262747badd7cf513a67177a9798a41d1c
-## 2 ef4b0161bbee83fe9d00026f59f17e7b2ef4e0f36d39f52d8fc7273cd028d3c9
-## 3 f0c49515017ddeaca44d16a26df000440d5f6d114194a403964d606c3f85e3d9
-## 4 9795a906cd0202f91ccbb24bbc8af582047d4d04de010445bd486cf59afdf723
-##                               created scope driver enable_ipv6
-## 1      2018-03-06T14:47:18.431897526Z local bridge       FALSE
-## 2                0001-01-01T00:00:00Z local   host       FALSE
-## 3 2018-03-27T15:57:09.995155394+01:00 local bridge       FALSE
-## 4                0001-01-01T00:00:00Z local   null       FALSE
-##           ipam internal attachable ingress containers      options labels
-## 1 default,....    FALSE      FALSE   FALSE            true, tr....
-## 2 default,....    FALSE      FALSE   FALSE
-## 3 default,....    FALSE      FALSE   FALSE
-## 4 default,....    FALSE      FALSE   FALSE
+## 1 55d47d534f579a6a74bd2b4990c008711520a0d8eda8e08ad18c793a7d6c4b5f
+## 2 84aa11a0f6ab3124874aa105deb41ce61960911eb000d5e936e12630a66e623c
+## 3 13b7bf3c9f73ae89582f2c9023447be00423aebc52f785c8cd9c8ba8c1f8363c
+## 4 2f80d37c9c534b35f1dfff0896f5391243432ad720dc6df371279dfb78fea0a3
+## 5 9bad2ae5c810c2d3fb9e2c73db5b733338189010b3e19803003051758a3962ba
+##                         created scope driver enable_ipv6         ipam
+## 1  2018-04-03T12:26:39.2179764Z local bridge       FALSE default,....
+## 2 2018-03-27T11:14:01.58076974Z local bridge       FALSE default,....
+## 3  2018-04-03T12:22:22.6752018Z local bridge       FALSE default,....
+## 4          0001-01-01T00:00:00Z local   host       FALSE default,....
+## 5          0001-01-01T00:00:00Z local   null       FALSE default,....
+##   internal attachable ingress containers      options labels
+## 1    FALSE      FALSE   FALSE
+## 2    FALSE      FALSE   FALSE            true, tr....
+## 3    FALSE      FALSE   FALSE            false, t....
+## 4    FALSE      FALSE   FALSE
+## 5    FALSE      FALSE   FALSE
 ```
 
 The networks `bridge`, `host` and `none` always exist - they are
@@ -2145,7 +2172,7 @@ nw$id()
 ```
 
 ```
-## [1] "f0c49515017ddeaca44d16a26df000440d5f6d114194a403964d606c3f85e3d9"
+## [1] "55d47d534f579a6a74bd2b4990c008711520a0d8eda8e08ad18c793a7d6c4b5f"
 ```
 
 `$inspect()` gets detailed metadata
@@ -2159,10 +2186,10 @@ nw$inspect()
 ## [1] "mynetwork"
 ##
 ## $id
-## [1] "f0c49515017ddeaca44d16a26df000440d5f6d114194a403964d606c3f85e3d9"
+## [1] "55d47d534f579a6a74bd2b4990c008711520a0d8eda8e08ad18c793a7d6c4b5f"
 ##
 ## $created
-## [1] "2018-03-27T15:57:09.995155394+01:00"
+## [1] "2018-04-03T12:26:39.2179764Z"
 ##
 ## $scope
 ## [1] "local"
@@ -2180,7 +2207,7 @@ nw$inspect()
 ## $ipam$config
 ## $ipam$config[[1]]
 ##          subnet         gateway
-## "172.18.0.0/16"    "172.18.0.1"
+## "172.19.0.0/16"    "172.19.0.1"
 ##
 ##
 ## $ipam$options
@@ -2230,14 +2257,14 @@ nw$remove()
 Generally you'll want to put containers onto a network.
 
 The setup here is to create a network, and then use the `network`
-argument to `$containers$run()` to attach a container to that
+argument to `$container$run()` to attach a container to that
 network.  Once established, containers on the same network can use
 another docker container's name as the hostname and communicate!
 
 ```r
-nw <- docker$networks$create("mynetwork")
-server <- docker$containers$run("nginx", network = nw, name = "server",
-                                detach = TRUE, rm = TRUE)
+nw <- docker$network$create("mynetwork")
+server <- docker$container$run("nginx", network = nw, name = "server",
+                               detach = TRUE, rm = TRUE)
 server$status()
 ```
 
@@ -2249,45 +2276,45 @@ Now we can attach other networks to this container and communicate
 with the server:
 
 ```r
-docker$containers$run("alpine:latest", c("ping", "server", "-c", "3"),
-                      network = nw, stream = stdout(), rm = TRUE)
+docker$container$run("alpine:latest", c("ping", "server", "-c", "3"),
+                     network = nw, stream = stdout(), rm = TRUE)
 ```
 
 ```
-## O> PING server (172.18.0.2): 56 data bytes
-## O> 64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.076 ms
-## O> 64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.048 ms
-## O> 64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.072 ms
+## O> PING server (172.19.0.2): 56 data bytes
+## O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.110 ms
+## O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.159 ms
+## O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.159 ms
 ## O>
 ## O> --- server ping statistics ---
 ## O> 3 packets transmitted, 3 packets received, 0% packet loss
-## O> round-trip min/avg/max = 0.048/0.065/0.076 ms
+## O> round-trip min/avg/max = 0.110/0.142/0.159 ms
 ```
 
 ```
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: 228ae6ea5a14596d7b659d3161bd36bc7c1f298a67b1376c8db1513a5d5afbb3
-##       name: dazzling_lamport
+##       id: c9ffc888b156a7fe09744e6d695454d7e988e4b00e0244eecc220346ec2838da
+##       name: happy_meitner
 ##
 ##   $logs:
-##     O> PING server (172.18.0.2): 56 data bytes
-##     O> 64 bytes from 172.18.0.2: seq=0 ttl=64 time=0.076 ms
-##     O> 64 bytes from 172.18.0.2: seq=1 ttl=64 time=0.048 ms
-##     O> 64 bytes from 172.18.0.2: seq=2 ttl=64 time=0.072 ms
+##     O> PING server (172.19.0.2): 56 data bytes
+##     O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.110 ms
+##     O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.159 ms
+##     O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.159 ms
 ##     O>
 ##     O> --- server ping statistics ---
 ##     O> 3 packets transmitted, 3 packets received, 0% packet loss
-##     O> round-trip min/avg/max = 0.048/0.065/0.076 ms
+##     O> round-trip min/avg/max = 0.110/0.142/0.159 ms
 ```
 
 Omitting the `network` argument, the second container can't find
 the server:
 
 ```r
-docker$containers$run("alpine:latest", c("ping", "server", "-c", "3"),
-                      stream = stdout(), rm = TRUE)
+docker$container$run("alpine:latest", c("ping", "server", "-c", "3"),
+                     stream = stdout(), rm = TRUE)
 ```
 
 ```
@@ -2303,8 +2330,8 @@ The server container exposes a webserver on port 80.  For
 containers on the network we can access this port:
 
 ```r
-res <- docker$containers$run("richfitz/curl", c("curl", "-s", "http://server"),
-                             network = nw, rm = TRUE)
+res <- docker$container$run("richfitz/curl", c("curl", "-s", "http://server"),
+                            network = nw, rm = TRUE)
 ```
 
 ```
@@ -2384,9 +2411,9 @@ docker$ping()
 ```
 ## [1] "OK"
 ## attr(,"api_version")
-## [1] "1.35"
+## [1] "1.36"
 ## attr(,"docker_experimental")
-## [1] FALSE
+## [1] TRUE
 ```
 
 `$api_version()` reports the API version that the *client* is using
@@ -2409,19 +2436,19 @@ docker$version()
 
 ```
 ## $version
-## [1] "17.12.0-ce"
+## [1] "18.02.0-ce"
 ##
 ## $api_version
-## [1] "1.35"
+## [1] "1.36"
 ##
-## $min_apiversion
+## $min_api_version
 ## [1] "1.12"
 ##
 ## $git_commit
-## [1] "c97c6d6"
+## [1] "fc4de44"
 ##
 ## $go_version
-## [1] "go1.9.2"
+## [1] "go1.9.3"
 ##
 ## $os
 ## [1] "linux"
@@ -2430,13 +2457,13 @@ docker$version()
 ## [1] "amd64"
 ##
 ## $kernel_version
-## [1] "4.4.0-79-generic"
+## [1] "4.9.75-linuxkit-aufs"
 ##
 ## $experimental
-## [1] NA
+## [1] TRUE
 ##
 ## $build_time
-## [1] "2017-12-27T20:09:53.000000000+00:00"
+## [1] "2018-02-07T21:20:15.000000000+00:00"
 ```
 
 `$info()` reports a bunch of other information about the state of
@@ -2470,30 +2497,26 @@ docker$info()
 ## [1] TRUE
 ##
 ## $debug
-## [1] FALSE
+## [1] TRUE
 ##
 ## $discovery_backend
 ## [1] NA
 ##
 ## $docker_root_dir
-## [1] "/mnt/storage/docker/var-lib-docker"
+## [1] "/var/lib/docker"
 ##
 ## $driver
-## [1] "aufs"
+## [1] "overlay2"
 ##
 ## $driver_status
 ## $driver_status[[1]]
-## [1] "Root Dir"
-## [2] "/mnt/storage/docker/var-lib-docker/aufs"
+## [1] "Backing Filesystem" "extfs"
 ##
 ## $driver_status[[2]]
-## [1] "Backing Filesystem" "xfs"
+## [1] "Supports d_type" "true"
 ##
 ## $driver_status[[3]]
-## [1] "Dirs" "639"
-##
-## $driver_status[[4]]
-## [1] "Dirperm1 Supported" "true"
+## [1] "Native Overlay Diff" "true"
 ##
 ##
 ## $system_status
@@ -2504,26 +2527,26 @@ docker$info()
 ## [1] "local"
 ##
 ## $plugins$network
-## [1] "bridge"  "host"    "macvlan" "null"    "overlay"
+## [1] "bridge"  "host"    "ipvlan"  "macvlan" "null"    "overlay"
 ##
 ##
 ## $experimental_build
-## [1] FALSE
+## [1] TRUE
 ##
 ## $http_proxy
-## [1] ""
+## [1] "docker.for.mac.http.internal:3128"
 ##
 ## $https_proxy
-## [1] ""
+## [1] "docker.for.mac.http.internal:3129"
 ##
 ## $id
-## [1] "374S:M5MM:BJHL:OJV7:PUWB:IWQN:CTWA:2RC7:6WKQ:RNTK:U5CZ:PN4B"
+## [1] "RB26:3XPC:MGQL:HN5P:3RCD:OB5S:ABKG:SZDI:KHTT:A6CQ:2CG3:Z3E4"
 ##
 ## $ipv4_forwarding
 ## [1] TRUE
 ##
 ## $images
-## [1] 222
+## [1] 530
 ##
 ## $index_server_address
 ## [1] "https://index.docker.io/v1/"
@@ -2535,31 +2558,31 @@ docker$info()
 ## [1] NA
 ##
 ## $kernel_version
-## [1] "4.4.0-79-generic"
+## [1] "4.9.75-linuxkit-aufs"
 ##
 ## $labels
 ## character(0)
 ##
 ## $mem_total
-## [1] 33623252992
+## [1] 2096074752
 ##
 ## $memory_limit
 ## [1] TRUE
 ##
 ## $n_cpu
-## [1] 8
+## [1] 2
 ##
 ## $n_events_listener
-## [1] 0
+## [1] 2
 ##
 ## $n_fd
-## [1] 19
+## [1] 23
 ##
 ## $n_goroutines
-## [1] 34
+## [1] 42
 ##
 ## $name
-## [1] "wpia-dide136.dide.ic.ac.uk"
+## [1] "linuxkit-025000000001"
 ##
 ## $no_proxy
 ## [1] ""
@@ -2574,7 +2597,7 @@ docker$info()
 ## [1] NA
 ##
 ## $operating_system
-## [1] "Linux Mint 18"
+## [1] "Docker for Mac"
 ##
 ## $registry_config
 ## $registry_config$index_configs
@@ -2598,13 +2621,13 @@ docker$info()
 ##
 ##
 ## $swap_limit
-## [1] FALSE
+## [1] TRUE
 ##
 ## $system_time
-## [1] "2018-03-27T15:57:26.26286749+01:00"
+## [1] "2018-04-03T12:26:47.6387942Z"
 ##
 ## $server_version
-## [1] "17.12.0-ce"
+## [1] "18.02.0-ce"
 ```
 
 Finally, `$df()` will return information about resource and data
