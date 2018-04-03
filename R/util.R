@@ -534,5 +534,5 @@ version_range <- function(v_min, v_max) {
 
 
 prompt_ask_yes_no <- function(reason) {
-  menu(c("no", "yes"), FALSE, title = reason) == 2 # nocov
+  utils::menu(c("no", "yes"), FALSE, title = reason) == 2 # nocov
 }
