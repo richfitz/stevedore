@@ -5,6 +5,7 @@
 ^docs$
 ^update_web\.sh$
 ^README\.Rmd$
+^README\.html$
 \.pyc$
 __pycache__
 ^demo$
