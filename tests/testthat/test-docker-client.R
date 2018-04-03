@@ -41,7 +41,7 @@ test_that("events", {
 })
 
 test_that("children", {
-  d <- test_docker_client()
+  d <- null_docker_client()
   expect_is(d$containers, "docker_container_collection")
   expect_is(d$containers, "stevedore_object")
 
@@ -56,7 +56,7 @@ test_that("children", {
 })
 
 test_that("Prevent invalid access", {
-  d <- test_docker_client()
+  d <- null_docker_client()
   expect_error(d$foo, "No element 'foo' within 'docker_client' object")
   expect_error(d[["foo"]], "No element 'foo' within 'docker_client' object")
   expect_error(d[[1]], "'i' must be a scalar character (non-NA)", fixed = TRUE)
@@ -83,12 +83,12 @@ test_that("print", {
 })
 
 test_that("api_version", {
-  d <- test_docker_client()
+  d <- null_docker_client()
   expect_equal(d$api_version(), DEFAULT_DOCKER_API_VERSION)
 })
 
 test_that("print endpoints", {
-  d <- test_docker_client()
+  d <- null_docker_client()
   expect_is(d$ping, "docker_client_method")
   txt <- capture.output(print(d$ping))
   expect <- c(
