@@ -48,7 +48,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$.api_client <-
     docker_api_client(base_url = url, api_version = api_version,
                       type = http_client_type, quiet = quiet, ...)
-  self$types <- docker_client_types(self)
+  self$types <- docker_types(self)
 
   self$events <- docker_client_method(
     "system_events", self,
@@ -67,25 +67,25 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$version <- docker_client_method("system_version", self)
   self$api_version <- function() self$.api_client$http_client$api_version
 
-  self$container <- docker_client_container_collection(self)
-  self$image <- docker_client_image_collection(self)
-  self$network <- docker_client_network_collection(self)
-  self$volume <- docker_client_volume_collection(self)
+  self$container <- docker_container_collection(self)
+  self$image <- docker_image_collection(self)
+  self$network <- docker_network_collection(self)
+  self$volume <- docker_volume_collection(self)
 
-  self$swarm <- docker_client_swarm_collection(self)
-  self$node <- docker_client_node_collection(self)
-  self$service <- docker_client_service_collection(self)
-  self$task <- docker_client_task_collection(self)
-  self$secret <- docker_client_secret_collection(self)
-  self$config <- docker_client_config_collection(self)
+  self$swarm <- docker_swarm_collection(self)
+  self$node <- docker_node_collection(self)
+  self$service <- docker_service_collection(self)
+  self$task <- docker_task_collection(self)
+  self$secret <- docker_secret_collection(self)
+  self$config <- docker_config_collection(self)
 
-  self$plugin <- docker_client_plugin_collection(self)
+  self$plugin <- docker_plugin_collection(self)
 
   stevedore_object(self, "docker_client",
                    "Control the docker daemon")
 }
 
-docker_client_container_collection <- function(parent) {
+docker_container_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$run <- make_docker_run(parent)
@@ -106,7 +106,7 @@ docker_client_container_collection <- function(parent) {
       mcr_network_for_create(quote(network), quote(host_config))),
     after = after_container_create)
 
-  self$get <- docker_client_getter(docker_client_container, parent)
+  self$get <- docker_client_getter(docker_container, parent)
 
   self$list <- docker_client_method(
     "container_list", self,
@@ -126,7 +126,7 @@ docker_client_container_collection <- function(parent) {
                    "Work with docker containers")
 }
 
-docker_client_container <- function(id, parent) {
+docker_container <- function(id, parent) {
   self <- new_stevedore_object(parent)
   fix_id <- docker_client_add_inspect(id, "id", "container_inspect", self)
 
@@ -134,9 +134,9 @@ docker_client_container <- function(id, parent) {
   self$name <- function() drop_leading_slash(self$inspect(FALSE)$name)
   self$labels <- function(reload = TRUE) self$inspect(reload)$config$labels
   self$status <- function(reload = TRUE) self$inspect(reload)$state$status
-  self$image <- function() docker_client_container_image(self)
+  self$image <- function() docker_container_image(self)
   self$ports <- function(reload = TRUE) {
-    docker_client_container_ports(self$inspect(reload))
+    docker_container_ports(self$inspect(reload))
   }
 
   ## TODO: "attach" is hard because it might need to hijack the
@@ -277,10 +277,10 @@ docker_client_container <- function(id, parent) {
 }
 
 
-docker_client_image_collection <- function(parent) {
+docker_image_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
-  self$get <- docker_client_getter(docker_client_image, parent)
+  self$get <- docker_client_getter(docker_image, parent)
 
   ## TODO: control returning output too
   self$build <- docker_client_method(
@@ -346,7 +346,7 @@ docker_client_image_collection <- function(parent) {
                    "Work with docker images")
 }
 
-docker_client_image <- function(id, parent) {
+docker_image <- function(id, parent) {
   ## NOTE: used in 'name()' to record the given name - this is
   ## different to most of the other cases here and I'm not sure how
   ## incredibly useful this is.  But it's the only way that we get to
@@ -362,7 +362,7 @@ docker_client_image <- function(id, parent) {
   self$labels <- function(reload = TRUE) self$inspect(reload)$config$labels
   self$short_id <- function() short_id(self$inspect(FALSE)$id)
   self$tags <- function(reload = TRUE) {
-    docker_client_image_tags(self$inspect(reload))
+    docker_image_tags(self$inspect(reload))
   }
 
   self$history <- docker_client_method(
@@ -380,7 +380,7 @@ docker_client_image <- function(id, parent) {
     after = invisible_self,
     defaults = alist(repo =))
 
-  self$untag <- function(repo_tag) docker_client_image_untag(repo_tag, self)
+  self$untag <- function(repo_tag) docker_image_untag(repo_tag, self)
 
   ## NOTE: this always tries to remove the image by *id* not by
   ## name, which is not ideal really.  When force = TRUE it's
@@ -393,7 +393,7 @@ docker_client_image <- function(id, parent) {
                    "Work with a particular docker image")
 }
 
-docker_client_network_collection <- function(parent) {
+docker_network_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
@@ -401,7 +401,7 @@ docker_client_network_collection <- function(parent) {
     after = after_network_create,
     defaults = alist(check_duplicate = TRUE))
 
-  self$get <- docker_client_getter(docker_client_network, parent)
+  self$get <- docker_client_getter(docker_network, parent)
 
   self$list <- docker_client_method(
     "network_list", self,
@@ -417,7 +417,7 @@ docker_client_network_collection <- function(parent) {
                    "Work with docker networks")
 }
 
-docker_client_network <- function(id, parent) {
+docker_network <- function(id, parent) {
   self <- new_stevedore_object(parent)
 
   fix_id <- docker_client_add_inspect(id, "id", "network_inspect", self)
@@ -425,7 +425,7 @@ docker_client_network <- function(id, parent) {
   self$name <- function(reload = TRUE) self$inspect(reload)$name
 
   self$containers <- function(reload = TRUE) {
-    docker_client_network_containers(reload, self)
+    docker_network_containers(reload, self)
   }
 
   self$connect <- docker_client_method(
@@ -444,14 +444,14 @@ docker_client_network <- function(id, parent) {
                    "Work with a particular docker network")
 }
 
-docker_client_volume_collection <- function(parent) {
+docker_volume_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
     "volume_create", self,
     after = after_volume_create)
 
-  self$get <- docker_client_getter(docker_client_volume, parent, "name")
+  self$get <- docker_client_getter(docker_volume, parent, "name")
 
   self$list <- docker_client_method(
     "volume_list", self,
@@ -467,12 +467,12 @@ docker_client_volume_collection <- function(parent) {
                    "Work with docker volumes")
 }
 
-docker_client_volume <- function(name, parent) {
+docker_volume <- function(name, parent) {
   self <- new_stevedore_object(parent)
   fix_name <- docker_client_add_inspect(name, "name", "volume_inspect", self)
 
   self$map <- function(path, readonly = FALSE) {
-    docker_client_volume_map(self$inspect(FALSE), path, readonly)
+    docker_volume_map(self$inspect(FALSE), path, readonly)
   }
 
   self$remove <- docker_client_method(
@@ -483,7 +483,7 @@ docker_client_volume <- function(name, parent) {
                    "Work with a particular docker volume")
 }
 
-docker_client_exec <- function(id, parent) {
+docker_exec <- function(id, parent) {
   self <- new_stevedore_object(parent)
   fix_id <- docker_client_add_inspect(id, "id", "exec_inspect", self)
 
@@ -510,7 +510,7 @@ docker_client_exec <- function(id, parent) {
 }
 
 
-docker_client_swarm_collection <- function(parent) {
+docker_swarm_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$init <- docker_client_method(
@@ -528,10 +528,10 @@ docker_client_swarm_collection <- function(parent) {
 }
 
 
-docker_client_node_collection <- function(parent) {
+docker_node_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
-  self$get <- docker_client_getter(docker_client_node, parent, "id")
+  self$get <- docker_client_getter(docker_node, parent, "id")
 
   self$list <- docker_client_method(
     "node_list", self,
@@ -543,7 +543,7 @@ docker_client_node_collection <- function(parent) {
 }
 
 
-docker_client_node <- function(id, parent) {
+docker_node <- function(id, parent) {
   self <- new_stevedore_object(parent)
 
   fix_id <- docker_client_add_inspect(id, "id", "node_inspect", self)
@@ -569,7 +569,7 @@ docker_client_node <- function(id, parent) {
 }
 
 
-docker_client_service_collection <- function(parent) {
+docker_service_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
@@ -594,7 +594,7 @@ docker_client_service_collection <- function(parent) {
     drop = "mode",
     after = after_service_create)
 
-  self$get <- docker_client_getter(docker_client_service, parent, "id")
+  self$get <- docker_client_getter(docker_service, parent, "id")
 
   self$list <- docker_client_method(
     "service_list", self,
@@ -608,7 +608,7 @@ docker_client_service_collection <- function(parent) {
 }
 
 
-docker_client_service <- function(id, parent) {
+docker_service <- function(id, parent) {
   self <- new_stevedore_object(parent)
 
   fix_id <- docker_client_add_inspect(id, "id", "service_inspect", self)
@@ -619,10 +619,10 @@ docker_client_service <- function(id, parent) {
     "service_delete", self,
     fix = fix_id)
   self$tasks <- function(filters = NULL) {
-    docker_client_service_tasks(self, filters)
+    docker_service_tasks(self, filters)
   }
   self$ps <- function(resolve_names = TRUE, filters = NULL) {
-    docker_client_service_ps(self, resolve_names, filters)
+    docker_service_ps(self, resolve_names, filters)
   }
 
   stevedore_object(self, "docker_service",
@@ -630,19 +630,19 @@ docker_client_service <- function(id, parent) {
 }
 
 
-docker_client_task_collection <- function(parent) {
+docker_task_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$list <- docker_client_method(
     "task_list", self,
     process = list(quote(filters <- as_docker_filter(filters))))
-  self$get <- docker_client_getter(docker_client_task, parent, "id")
+  self$get <- docker_client_getter(docker_task, parent, "id")
 
   stevedore_object(self, "docker_task_collection",
                    "Work with docker tasks")
 }
 
-docker_client_task <- function(id, parent) {
+docker_task <- function(id, parent) {
   self <- new_stevedore_object(parent)
 
   fix_id <- docker_client_add_inspect(id, "id", "task_inspect", self)
@@ -670,7 +670,7 @@ docker_client_task <- function(id, parent) {
 }
 
 
-docker_client_secret_collection <- function(parent) {
+docker_secret_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
@@ -699,7 +699,7 @@ docker_client_secret_collection <- function(parent) {
 }
 
 
-docker_client_config_collection <- function(parent) {
+docker_config_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$create <- docker_client_method(
@@ -728,7 +728,7 @@ docker_client_config_collection <- function(parent) {
 }
 
 
-docker_client_plugin_collection <- function(parent) {
+docker_plugin_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
   self$list <- docker_client_method(
@@ -751,7 +751,7 @@ docker_client_plugin_collection <- function(parent) {
     allow_hijack_without_stream = TRUE,
     after = after_plugin_install)
 
-  self$get <- docker_client_getter(docker_client_plugin, parent, "name")
+  self$get <- docker_client_getter(docker_plugin, parent, "name")
 
   self$create <- docker_client_method(
     "plugin_create", self,
@@ -766,7 +766,7 @@ docker_client_plugin_collection <- function(parent) {
 }
 
 
-docker_client_plugin <- function(name, parent) {
+docker_plugin <- function(name, parent) {
   self <- new_stevedore_object(parent)
   fix_name <- docker_client_add_inspect(name, "name", "plugin_inspect", self)
 
@@ -799,7 +799,7 @@ docker_client_plugin <- function(name, parent) {
 }
 
 
-docker_client_types <- function(parent) {
+docker_types <- function(parent) {
   self <- new_stevedore_object(parent)
   types <- lapply(parent$.api_client$types, "[[", "reciever")
   list2env(types, self)

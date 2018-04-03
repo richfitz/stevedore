@@ -332,15 +332,15 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
       x <- x[[sub]]
     } else {
       f <- switch(sub,
-                  docker_container = docker_client_container,
-                  docker_image = docker_client_image,
-                  docker_network = docker_client_network,
-                  docker_volume = docker_client_volume,
-                  docker_exec = docker_client_exec,
-                  docker_node = docker_client_node,
-                  docker_service = docker_client_service,
-                  docker_task = docker_client_task,
-                  docker_plugin = docker_client_plugin,
+                  docker_container = docker_container,
+                  docker_image = docker_image,
+                  docker_network = docker_network,
+                  docker_volume = docker_volume,
+                  docker_exec = docker_exec,
+                  docker_node = docker_node,
+                  docker_service = docker_service,
+                  docker_task = docker_task,
+                  docker_plugin = docker_plugin,
                   stop("impossible!"))
       x <- f(dummy_id(), x)
     }
@@ -450,7 +450,7 @@ format_docker_client_method_text <- function(x, indent = 2, exdent = 8,
     f <- function(nm, txt) {
       txt <- strsplit(txt, "\n", fixed = TRUE)[[1]]
       txt1 <- strwrap(sprintf("%s: %s", crayon::bold(nm), txt[[1]]),
-                         indent = indent, exdent = exdent)
+                      indent = indent, exdent = exdent)
       txt2 <- strwrap(txt[-1], indent = exdent, exdent = exdent)
       c(txt1, txt2)
     }

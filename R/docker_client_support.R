@@ -197,7 +197,7 @@ after_container_list <- function(response, ...) {
 
 after_container_create <- function(response, params, self) {
   report_warnings(response$warnings, "creating container")
-  docker_client_container(response$id, self$.parent)
+  docker_container(response$id, self$.parent)
 }
 
 
@@ -212,7 +212,7 @@ after_container_archive <- function(response, params, self) {
 
 
 after_exec_create <- function(response, params, self) {
-  docker_client_exec(response$id, self$.parent)
+  docker_exec(response$id, self$.parent)
 }
 
 
@@ -241,19 +241,19 @@ after_container_top <- function(response, ...) {
 
 
 after_image_commit <- function(response, params, self) {
-  docker_client_image(response$id, self$.parent)
+  docker_image(response$id, self$.parent)
 }
 
 
 after_image_build <- function(response, params, self) {
   id <- build_status_id(response$response$content)
-  docker_client_image(id, self$.parent)
+  docker_image(id, self$.parent)
 }
 
 
 after_image_pull <- function(response, params, self) {
   id <- sprintf("%s:%s", params$query$fromImage, params$query$tag)
-  docker_client_image(id, self$.parent)
+  docker_image(id, self$.parent)
 }
 
 
@@ -270,12 +270,12 @@ after_image_push <- function(response, ...) {
 
 
 after_network_create <- function(response, params, self) {
-  docker_client_network(response$id, self$.parent)
+  docker_network(response$id, self$.parent)
 }
 
 
 after_volume_create <- function(response, params, self) {
-  docker_client_volume(response$name, self$.parent)
+  docker_volume(response$name, self$.parent)
 }
 
 
@@ -303,9 +303,9 @@ after_container_update <- function(response, params, self) {
 
 
 after_service_create <- function(response, params, self) {
-  ret <- docker_client_service(response$id, self$.parent)
+  ret <- docker_service(response$id, self$.parent)
   if (!params$detach) {
-    docker_client_service_wait_converged(
+    docker_service_wait_converged(
       ret, params$timeout, time_wait_stable = params$time_wait_stable,
       stream = params$stream)
   }
@@ -870,7 +870,7 @@ docker_client_add_inspect <- function(id, key_name, inspect_name, self,
 }
 
 
-docker_client_container_ports <- function(attrs) {
+docker_container_ports <- function(attrs) {
   ports <- attrs$network_settings$ports
 
   if (length(ports) == 0L) {
@@ -888,16 +888,16 @@ docker_client_container_ports <- function(attrs) {
 }
 
 
-docker_client_container_image <- function(self) {
+docker_container_image <- function(self) {
   attrs <- self$inspect(FALSE)
   image_id <- sub("^(sha256:)", "", attrs$image)
-  docker_client_image(image_id, self$.parent)
+  docker_image(image_id, self$.parent)
 }
 
 
 ## TODO: repo and tag should be separate as for tag (with option
 ## to do them together).
-docker_client_image_untag <- function(repo_tag, image) {
+docker_image_untag <- function(repo_tag, image) {
   repo_tag <- image_name_with_tag(repo_tag)
   valid <- setdiff(image$inspect()$repo_tags, "<none>:<none>")
   if (!(repo_tag %in% valid)) {
@@ -909,18 +909,18 @@ docker_client_image_untag <- function(repo_tag, image) {
 }
 
 
-docker_client_image_tags <- function(attrs) {
+docker_image_tags <- function(attrs) {
   setdiff(attrs$repo_tags, "<none>:<none>")
 }
 
 
-docker_client_network_containers <- function(reload, self) {
+docker_network_containers <- function(reload, self) {
   containers <- self$inspect(reload)$containers
-  lapply(names(containers), docker_client_container, self$.parent)
+  lapply(names(containers), docker_container, self$.parent)
 }
 
 
-docker_client_volume_map <- function(attrs, path, readonly = FALSE) {
+docker_volume_map <- function(attrs, path, readonly = FALSE) {
   assert_scalar_character(path)
   assert_scalar_logical(readonly)
   fmt <- "%s:%s"
@@ -931,7 +931,7 @@ docker_client_volume_map <- function(attrs, path, readonly = FALSE) {
 }
 
 
-docker_client_service_tasks <- function(self, filters) {
+docker_service_tasks <- function(self, filters) {
   if (length(filters) == 0L) {
     filters <- character(0)
   } else if ("service" %in% names(filters)) {
@@ -946,7 +946,7 @@ docker_client_service_tasks <- function(self, filters) {
 }
 
 
-docker_client_service_ps <- function(self, resolve_names, filters) {
+docker_service_ps <- function(self, resolve_names, filters) {
   tasks <- self$tasks(filters = filters)
 
   d <- lapply(tasks, function(t) t$inspect(FALSE))
@@ -986,11 +986,11 @@ docker_client_service_ps <- function(self, resolve_names, filters) {
 }
 
 
-docker_client_service_wait_converged <- function(service, timeout,
-                                                 t0 = Sys.time(),
-                                                 time_poll = 0.1,
-                                                 time_wait_stable = 5,
-                                                 stream = stdout()) {
+docker_service_wait_converged <- function(service, timeout,
+                                          t0 = Sys.time(),
+                                          time_poll = 0.1,
+                                          time_wait_stable = 5,
+                                          stream = stdout()) {
   ## TODO: report that tasks are erroring
   n <- service$inspect(FALSE)$spec$mode$replicated$replicas
   pr <- make_service_start_progress(stream)
@@ -1025,9 +1025,9 @@ docker_client_service_wait_converged <- function(service, timeout,
       tryCatch(t$state(), error = function(e) "gone")) == "running"
     if (!all(ok)) {
       cat2("\nTask has failed, trying again\n", file = stream)
-      docker_client_service_wait_converged(service, timeout, t0,
-                                           time_poll, time_wait_stable,
-                                           stream)
+      docker_service_wait_converged(service, timeout, t0,
+                                    time_poll, time_wait_stable,
+                                    stream)
     }
     Sys.sleep(time_poll)
   }

@@ -663,7 +663,7 @@ test_that("after_volume_list", {
 
   response$warnings <- "something happened"
   expect_warning(res <- after_volume_list(response),
-                  response$warnings)
+                 response$warnings)
   expect_equal(res, response$volumes)
 })
 
@@ -678,7 +678,7 @@ test_that("after_exec_start", {
 
 test_that("after_container_update", {
   cl <- null_docker_client()
-  self <- docker_client_container(dummy_id(), cl)
+  self <- docker_container(dummy_id(), cl)
 
   response <- NULL
   expect_identical(after_container_update(response, NULL, self), self)
@@ -697,9 +697,9 @@ test_that("invisible_self", {
 })
 
 
-test_that("docker_client_container_image", {
+test_that("docker_container_image", {
   cl <- null_docker_client()
-  self <- docker_client_container(dummy_id(), cl)
+  self <- docker_container(dummy_id(), cl)
 
   id <- random_hex(32)
   prev <- set_dummy_id(id)
@@ -707,24 +707,24 @@ test_that("docker_client_container_image", {
 
   update_dummy_attrs(self, list(image = paste0("sha256:", id)))
 
-  img <- docker_client_container_image(self)
+  img <- docker_container_image(self)
   expect_is(img, "docker_image")
   expect_equal(img$id(), id)
 })
 
 
-test_that("docker_client_image_tags", {
+test_that("docker_image_tags", {
   f <- function(...) {
     list(repo_tags = c(...))
   }
 
-  expect_equal(docker_client_image_tags(f(character(0))), character(0))
-  expect_equal(docker_client_image_tags(f("foo:bar")), "foo:bar")
-  expect_equal(docker_client_image_tags(f("<none>:<none>", "foo:bar")),
+  expect_equal(docker_image_tags(f(character(0))), character(0))
+  expect_equal(docker_image_tags(f("foo:bar")), "foo:bar")
+  expect_equal(docker_image_tags(f("<none>:<none>", "foo:bar")),
                "foo:bar")
 
   cl <- null_docker_client()
-  image <- docker_client_image(dummy_id(), cl)
+  image <- docker_image(dummy_id(), cl)
 
   update_dummy_attrs(image, f(character(0)))
   expect_equal(image$tags(FALSE), character(0))
@@ -734,9 +734,9 @@ test_that("docker_client_image_tags", {
 })
 
 
-test_that("docker_client_network_containers", {
+test_that("docker_network_containers", {
   cl <- null_docker_client()
-  nw <- docker_client_network(dummy_id(), cl)
+  nw <- docker_network(dummy_id(), cl)
   expect_identical(nw$containers(), list())
 
   id <- random_hex(32)
@@ -753,11 +753,11 @@ test_that("docker_client_network_containers", {
 })
 
 
-test_that("docker_client_volume_map", {
+test_that("docker_volume_map", {
   attrs <- list(name = "foo")
-  expect_equal(docker_client_volume_map(attrs, "dest", FALSE),
+  expect_equal(docker_volume_map(attrs, "dest", FALSE),
                "foo:dest")
-  expect_equal(docker_client_volume_map(attrs, "dest", TRUE),
+  expect_equal(docker_volume_map(attrs, "dest", TRUE),
                "foo:dest:ro")
 
   id <- "myvolume"
@@ -765,7 +765,7 @@ test_that("docker_client_volume_map", {
   on.exit(set_dummy_id(prev))
 
   cl <- null_docker_client()
-  vol <- docker_client_volume(dummy_id(), cl)
+  vol <- docker_volume(dummy_id(), cl)
 
   expect_equal(vol$map("/dest"), "myvolume:/dest")
   expect_equal(vol$map("/dest", TRUE), "myvolume:/dest:ro")
@@ -909,8 +909,8 @@ test_that("validate_service_replicas", {
 })
 
 
-test_that("docker_client_service_tasks (offline)", {
-  expect_error(docker_client_service_tasks(NULL, list(service = "foo")),
+test_that("docker_service_tasks (offline)", {
+  expect_error(docker_service_tasks(NULL, list(service = "foo")),
                "'service' is not a valid filter name for this method")
 })
 
@@ -931,7 +931,7 @@ test_that("service progress", {
   expect_equal(
     txt,
     c("new > alloc > pend > assign > accept > prep > ready > start > running",
-        "=========================>1---------------------->1"))
+      "=========================>1---------------------->1"))
 
   txt <- capture.output({
     pr <- make_service_start_progress(stdout())
