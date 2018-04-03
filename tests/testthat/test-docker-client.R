@@ -42,8 +42,8 @@ test_that("events", {
 
 test_that("children", {
   d <- null_docker_client()
-  expect_is(d$containers, "docker_container_collection")
-  expect_is(d$containers, "stevedore_object")
+  expect_is(d$container, "docker_container_collection")
+  expect_is(d$container, "stevedore_object")
 
   expect_is(d$images, "docker_image_collection")
   expect_is(d$images, "stevedore_object")
@@ -82,11 +82,11 @@ test_that("Prevent invalid access", {
   expect_error(d[["foo"]], "No element 'foo' within 'docker_client' object")
   expect_error(d[[1]], "'i' must be a scalar character (non-NA)", fixed = TRUE)
 
-  expect_error(d$containers$foo,
+  expect_error(d$container$foo,
                "No element 'foo' within 'docker_container_collection' object")
-  expect_error(d[["containers"]][["foo"]],
+  expect_error(d[["container"]][["foo"]],
                "No element 'foo' within 'docker_container_collection' object")
-  expect_error(d$containers[[1]], "'i' must be a scalar character (non-NA)",
+  expect_error(d$container[[1]], "'i' must be a scalar character (non-NA)",
                fixed = TRUE)
 })
 
@@ -97,8 +97,8 @@ test_that("print", {
   expect_true(any(out == "<docker_client>"))
   expect_true(any(out == "  ping()"))
 
-  out <- capture.output(x <- print(d$containers))
-  expect_identical(x, d$containers)
+  out <- capture.output(x <- print(d$container))
+  expect_identical(x, d$container)
   expect_true(any(out == "<docker_container_collection>"))
   expect_true(any(out == "  get(id)"))
 })
@@ -137,7 +137,7 @@ test_that("print endpoints", {
     "Check auth configuration. Validate credentials for a registry and, if",
     all = FALSE, fixed = TRUE)
 
-  txt <- capture.output(print(d$containers$create))
+  txt <- capture.output(print(d$container$create))
   expect_match(
     txt,
     "  shell: Shell for when `RUN`, `CMD`, and `ENTRYPOINT` uses a shell",

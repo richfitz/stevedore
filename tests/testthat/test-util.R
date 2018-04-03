@@ -283,7 +283,7 @@ test_that("reset_line", {
 
 test_that("download_file", {
   d <- test_docker_client()
-  x <- d$containers$run("nginx", detach = TRUE, ports = TRUE, rm = TRUE)
+  x <- d$container$run("nginx", detach = TRUE, ports = TRUE, rm = TRUE)
   on.exit(x$stop(0))
 
   url <- sprintf("http://localhost:%s/index.html", x$ports()$host_port)

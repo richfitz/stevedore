@@ -3,7 +3,7 @@ context("docker client: containers")
 test_that("create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   expect_is(x, "docker_container")
   expect_is(x, "stevedore_object")
 
@@ -25,7 +25,7 @@ test_that("create, using image", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   img <- d$images$get("hello-world")
-  x <- d$containers$create(img, name = nm)
+  x <- d$container$create(img, name = nm)
   expect_equal(x$image()$id(), img$id())
   x$remove()
 })
@@ -33,13 +33,13 @@ test_that("create, using image", {
 test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x1 <- d$containers$create("hello-world", name = nm)
-  x2 <- d$containers$get(nm)
+  x1 <- d$container$create("hello-world", name = nm)
+  x2 <- d$container$get(nm)
   expect_identical(x1$inspect(FALSE), x2$inspect(FALSE))
 
-  d$containers$remove(nm)
+  d$container$remove(nm)
 
-  e <- get_error(d$containers$get(nm))
+  e <- get_error(d$container$get(nm))
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
 })
@@ -47,9 +47,9 @@ test_that("get", {
 test_that("list", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
 
-  cl <- d$containers$list(all = TRUE)
+  cl <- d$container$list(all = TRUE)
   expect_is(cl, "data.frame")
   expect_true("names" %in% names(cl))
   expect_true(list(nm) %in% cl$names)
@@ -60,13 +60,13 @@ test_that("list", {
 
 test_that("list with arguments", {
   d <- test_docker_client()
-  cl <- d$containers$list()
+  cl <- d$container$list()
 
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
 
   ## First, the easy arguments:
-  cl <- d$containers$list(all = TRUE, limit = 10L, size = TRUE)
+  cl <- d$container$list(all = TRUE, limit = 10L, size = TRUE)
   i <- match(nm, cl$name)
   expect_false(is.na(i))
   expect_false(is.na(cl$size_root_fs[i]))
@@ -75,16 +75,16 @@ test_that("list with arguments", {
   f1 <- c(status = "created")
   f2 <- list(status = "exited")
 
-  cl1 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
-  cl2 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
+  cl1 <- d$container$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
+  cl2 <- d$container$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
   expect_true(nm %in% cl1$name)
   expect_false(nm %in% cl2$name)
 
   expect_identical(x$start(), x)
   x$wait()
 
-  cl1 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
-  cl2 <- d$containers$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
+  cl1 <- d$container$list(all = TRUE, limit = 10L, size = TRUE, filters = f1)
+  cl2 <- d$container$list(all = TRUE, limit = 10L, size = TRUE, filters = f2)
   expect_false(nm %in% cl1$name)
   expect_true(nm %in% cl2$name)
 
@@ -94,9 +94,9 @@ test_that("list with arguments", {
 test_that("prune", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
 
-  ans <- d$containers$prune()
+  ans <- d$container$prune()
   expect_true(x$id() %in% ans$containers_deleted)
 })
 
@@ -106,7 +106,7 @@ test_that("diff", {
   ## endpoint works, I guess.
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   xd <- x$diff()
 
   expect_is(xd, "data.frame")
@@ -116,7 +116,7 @@ test_that("diff", {
 test_that("export", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
 
   ## TODO: here, and other export type ones - we need some optional
   ## 'filename' argument for dumping the export into.  It might be
@@ -139,7 +139,7 @@ test_that("export", {
 test_that("path_stat", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   on.exit(x$remove())
 
   ## There's no spec here so not much more we can do
@@ -156,7 +156,7 @@ test_that("archive export", {
   ## TODO: another tar endpoint
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   on.exit(x$remove())
 
   bin <- x$get_archive("hello", NULL)
@@ -175,7 +175,7 @@ test_that("archive export", {
 test_that("archive import", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   on.exit(x$remove())
 
   e <- get_error(x$path_stat("foo"))
@@ -199,8 +199,8 @@ test_that("archive import", {
 test_that("archive import (file)", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  ## x <- d$containers$create("hello-world", name = nm)
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  ## x <- d$container$create("hello-world", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   on.exit(x$remove(force = TRUE))
   x$start()
 
@@ -229,7 +229,7 @@ test_that("kill", {
   ## locally.
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("alpine", cmd = c("sleep", "10000"), name = nm)
+  x <- d$container$create("alpine", cmd = c("sleep", "10000"), name = nm)
   expect_identical(withVisible(x$start()),
                    list(value = x, visible = FALSE))
   expect_equal(x$status(), "running")
@@ -243,7 +243,7 @@ test_that("logs", {
   nm <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   expect_identical(withVisible(x$start()),
                    list(value = x, visible = FALSE))
   logs <- x$logs()
@@ -272,7 +272,7 @@ test_that("pause/unpause", {
   nm <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   expect_null(x$pause())
   expect_equal(x$status(), "paused")
@@ -299,7 +299,7 @@ test_that("rename", {
   nm2 <- rand_str(10, "stevedore_")
   ## TODO: this only prints out one per second - I'd like to up this
   ## to every 0.1s so that we can run this for less time.
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm1)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm1)
   expect_null(x$rename(nm2))
   expect_equal(x$reload()$name(), nm2)
   x$remove()
@@ -308,7 +308,7 @@ test_that("rename", {
 test_that("restart", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   Sys.sleep(0.5)
   logs1 <- x$logs()
@@ -324,7 +324,7 @@ test_that("restart", {
 test_that("stats", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   s <- x$stats()
   ## There is no spec here so I can't really test much here except
   ## that this does exist.  Note that this is quite slow if using a
@@ -336,7 +336,7 @@ test_that("stats", {
 test_that("stop", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   expect_null(x$stop(0))
   expect_equal(x$status(), "exited")
@@ -346,7 +346,7 @@ test_that("stop", {
 test_that("top", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   x$start()
   t <- x$top()
   expect_is(t, "data.frame")
@@ -358,7 +358,7 @@ test_that("top", {
 test_that("update", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   on.exit(x$remove())
   info <- x$inspect(FALSE)
   n <- as.integer(10 * 1001 * 1001)
@@ -373,7 +373,7 @@ test_that("update", {
 test_that("wait", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   x$start()
   expect_equal(x$wait(), list(status_code = 0L))
   expect_equal(x$status(), "exited")
@@ -383,8 +383,8 @@ test_that("wait", {
 test_that("prune", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
-  ans <- d$containers$prune()
+  x <- d$container$create("hello-world", name = nm)
+  ans <- d$container$prune()
   expect_true(x$id() %in% ans$containers_deleted)
   e <- get_error(x$status())
   expect_is(e, "docker_error")
@@ -394,7 +394,7 @@ test_that("prune", {
 test_that("image", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("hello-world", name = nm)
+  x <- d$container$create("hello-world", name = nm)
   img <- x$image()
   cmp <- d$images$get("hello-world")
   expect_equal(cmp$inspect(), img$inspect())
@@ -405,9 +405,9 @@ test_that("exec", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm)
   x$start()
   ans <- x$exec("ls")
 
@@ -433,9 +433,9 @@ test_that("exec, twice", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm)
   x$start()
   ans <- x$exec("ls")
 
@@ -457,7 +457,7 @@ test_that("attach", {
 
 test_that("run", {
   d <- test_docker_client()
-  txt <- capture.output(ans <- d$containers$run("hello-world"))
+  txt <- capture.output(ans <- d$container$run("hello-world"))
   expect_is(ans, "docker_run_output")
 
   expect_equal(names(ans), c("container", "logs"))
@@ -474,7 +474,7 @@ test_that("run", {
 
 test_that("run: detach", {
   d <- test_docker_client()
-  ans <- d$containers$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
+  ans <- d$container$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
   expect_is(ans, "docker_container")
   expect_equal(ans$wait(), list("status_code" = 0L))
   ans$remove()
@@ -483,7 +483,7 @@ test_that("run: detach", {
 test_that("run: no such container", {
   d <- test_docker_client()
   msg <- capture_messages(
-    e <- get_error(d$containers$run("richfitz/nosuchcontainer")))
+    e <- get_error(d$container$run("richfitz/nosuchcontainer")))
   expect_match(
     msg, "Unable to find image 'richfitz/nosuchcontainer:latest' locally",
     fixed = TRUE, all = FALSE) # allow additional here
@@ -503,25 +503,25 @@ test_that("run: no such container", {
 
 test_that("run with get/pull error handling", {
   d <- test_docker_client()
-  err <- get_error(d$containers$run("foo bar"))
+  err <- get_error(d$container$run("foo bar"))
   expect_is(err, "docker_error")
   expect_equal(err$code, 400L) # bad request
 })
 
 test_that("run: remove", {
   d <- test_docker_client()
-  ans <- d$containers$run("hello-world", rm = TRUE, stream = FALSE)
+  ans <- d$container$run("hello-world", rm = TRUE, stream = FALSE)
   expect_equal(names(ans), c("container", "logs"))
   expect_is(ans$container, "docker_container")
   expect_is(ans$logs, "docker_stream")
-  e <- get_error(d$containers$get(ans$container$id()))
+  e <- get_error(d$container$get(ans$container$id()))
   expect_true(is_docker_error_not_found(e))
 })
 
 test_that("run: error", {
   d <- test_docker_client()
   e <- get_error(
-    d$containers$run("richfitz/error", "4", rm = TRUE, stream = FALSE))
+    d$container$run("richfitz/error", "4", rm = TRUE, stream = FALSE))
 
   expect_is(e, "container_error")
 
@@ -540,7 +540,7 @@ test_that("run: error", {
 test_that("run: error to stderr", {
   d <- test_docker_client()
   e <- get_error(
-    d$containers$run("richfitz/error", "14", rm = TRUE, stream = FALSE))
+    d$container$run("richfitz/error", "14", rm = TRUE, stream = FALSE))
 
   expect_is(e, "container_error")
 
@@ -552,13 +552,13 @@ test_that("run: error to stderr", {
 test_that("run with image", {
   d <- test_docker_client()
   img <- d$images$get("hello-world")
-  ans <- d$containers$run(img, rm = TRUE, stream = FALSE)
+  ans <- d$container$run(img, rm = TRUE, stream = FALSE)
   expect_is(ans$logs, "docker_stream")
 })
 
 test_that("scalar cmd", {
   d <- test_docker_client()
-  c1 <- d$containers$create("alpine:3.1", I("echo hello world"))
+  c1 <- d$container$create("alpine:3.1", I("echo hello world"))
 
   dat <- c1$inspect(FALSE)
   expect_identical(dat$path, "echo")
@@ -576,9 +576,9 @@ test_that("scalar exec", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm)
   x$start()
   ans <- x$exec(I("echo hello world"))
   dat <- ans$inspect(FALSE)
@@ -596,9 +596,9 @@ test_that("stream logs", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   p <- tempfile()
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("10", "0.1"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("10", "0.1"),
+                          name = nm)
   x$start()
   res <- x$logs(follow = TRUE, stream = p)
   expect_is(res, "docker_stream")
@@ -613,9 +613,9 @@ test_that("fetch, but don't print, logs", {
   ## container - I *bet* that there's a cat
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("10", "0.1"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("10", "0.1"),
+                          name = nm)
   x$start()
   x$wait()
   p <- tempfile()
@@ -638,7 +638,7 @@ test_that("fetch, but don't print, logs", {
 test_that("auto-remove: create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create(
+  x <- d$container$create(
     "alpine:3.1", cmd = c("echo", "hello world"), name = nm,
     host_config = list(AutoRemove = jsonlite::unbox(TRUE)))
   expect_true(x$inspect(FALSE)$host_config$auto_remove)
@@ -651,7 +651,7 @@ test_that("auto-remove: create", {
 test_that("auto-remove: run", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$run(
+  x <- d$container$run(
     "alpine:3.1", cmd = c("echo", "hello world"), name = nm,
     rm = TRUE, detach = TRUE)
 
@@ -668,10 +668,10 @@ test_that("stream", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   p <- tempfile()
-  x <- d$containers$run("richfitz/iterate",
-                        cmd = c("10", "0.1"),
-                        name = nm, detach = FALSE,
-                        stream = p, rm = TRUE)
+  x <- d$container$run("richfitz/iterate",
+                       cmd = c("10", "0.1"),
+                       name = nm, detach = FALSE,
+                       stream = p, rm = TRUE)
   expect_equal(paste0(readLines(p), "\n"),
                format(x$logs, style = "prefix"))
 })
@@ -688,8 +688,8 @@ test_that("volume map", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
 
-  x <- d$containers$create("alpine:latest", cmd = c("ls", "/host"),
-                           name = nm, volumes = v)
+  x <- d$container$create("alpine:latest", cmd = c("ls", "/host"),
+                          name = nm, volumes = v)
   x$start()
   x$wait()
   expect_equal(sort(trimws(format(x$logs(), style = "plain"))),
@@ -705,9 +705,9 @@ test_that("volume map: docker volume", {
   nm <- rand_str(10, "stevedore_")
   v <- sprintf("%s:%s", volume$name(), "/host")
 
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm, volumes = v)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm, volumes = v)
 
   on.exit({
     x$remove(force = TRUE)
@@ -718,9 +718,9 @@ test_that("volume map: docker volume", {
   e1 <- x$exec(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
   e1$start(detach = FALSE)
 
-  y <- d$containers$create("alpine",
-                           cmd = c("ls", "/host"),
-                           name = rand_str(10, "stevedore_"), volumes = v)
+  y <- d$container$create("alpine",
+                          cmd = c("ls", "/host"),
+                          name = rand_str(10, "stevedore_"), volumes = v)
   y$start()
   y$wait()
   expect_equal(trimws(format(y$logs(), style = "plain")), "foo")
@@ -733,10 +733,10 @@ test_that("volume map: readonly", {
   volume <- d$volumes$create("avolume")
   nm <- rand_str(10, "stevedore_")
   dest <- "/host"
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm,
-                           volumes = volume$map(dest, TRUE))
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm,
+                          volumes = volume$map(dest, TRUE))
 
   on.exit({
     x$remove(force = TRUE)
@@ -760,7 +760,7 @@ test_that("port map", {
   ports <- sprintf("%s:80", port)
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("nginx", name = nm, ports = ports)
+  x <- d$container$create("nginx", name = nm, ports = ports)
   x$start()
   on.exit(x$remove(force = TRUE))
 
@@ -782,7 +782,7 @@ test_that("port map", {
 test_that("port map - random free port", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("nginx", name = nm, ports = 80L)
+  x <- d$container$create("nginx", name = nm, ports = 80L)
   x$start()
   on.exit(x$remove(force = TRUE))
 
@@ -804,7 +804,7 @@ test_that("port map - random free port", {
 test_that("port map - expose all ports", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("nginx", name = nm, ports = TRUE)
+  x <- d$container$create("nginx", name = nm, ports = TRUE)
   on.exit(x$remove(force = TRUE))
   x$start()
   ports <- x$ports()
@@ -814,9 +814,9 @@ test_that("port map - expose all ports", {
 test_that("query ports of container with none", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("100", "100"),
-                           name = nm)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm)
   ports <- x$ports()
   expect_equal(ports, data_frame(container_port = character(0),
                                  protocol = character(0),
@@ -829,7 +829,7 @@ test_that("query ports of container with none", {
 test_that("network: host", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  x <- d$containers$create("nginx", name = nm, ports = "80")
+  x <- d$container$create("nginx", name = nm, ports = "80")
   x$start()
   on.exit(x$remove(force = TRUE), add = TRUE)
   port <- x$ports()$host_port
@@ -841,7 +841,7 @@ test_that("network: host", {
   args <- c("-s", sprintf("http://localhost:%s", port))
 
   ## This will fail because we don't have host networking
-  y <- d$containers$create(image, args)
+  y <- d$container$create(image, args)
   on.exit(y$remove(force = TRUE), add = TRUE)
   y$start()
   code <- y$wait()
@@ -849,7 +849,7 @@ test_that("network: host", {
   expect_equal(format(y$logs(), style = "plain"), character(0))
 
   ## Then with host networking
-  z <- d$containers$create(image, args, network = "host")
+  z <- d$container$create(image, args, network = "host")
   on.exit(z$remove(force = TRUE), add = TRUE)
   z$start()
   code <- z$wait()
@@ -883,11 +883,11 @@ test_that("network: custom", {
     nw$remove()
   })
 
-  x <- d$containers$create("nginx", name = server, network = nw)
+  x <- d$container$create("nginx", name = server, network = nw)
   x$start()
 
-  y <- d$containers$create("richfitz/curl", c("-s", server),
-                           network = network, name = client)
+  y <- d$container$create("richfitz/curl", c("-s", server),
+                          network = network, name = client)
   y$start()
   code <- y$wait()
   expect_true(code$status_code == 0)
@@ -903,12 +903,12 @@ test_that("logs with tty", {
   nm1 <- rand_str(10, "stevedore_")
   nm2 <- rand_str(10, "stevedore_")
   p <- tempfile()
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("10", "0.1"),
-                           name = nm1, tty = TRUE)
-  y <- d$containers$create("richfitz/iterate",
-                           cmd = c("10", "0.1"),
-                           name = nm2, tty = FALSE)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("10", "0.1"),
+                          name = nm1, tty = TRUE)
+  y <- d$container$create("richfitz/iterate",
+                          cmd = c("10", "0.1"),
+                          name = nm2, tty = FALSE)
   x$start()
   y$start()
   x$wait()
@@ -929,9 +929,9 @@ test_that("stream logs with tty", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   p <- tempfile()
-  x <- d$containers$create("richfitz/iterate",
-                           cmd = c("10", "0.1"),
-                           name = nm, tty = TRUE)
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("10", "0.1"),
+                          name = nm, tty = TRUE)
   x$start()
   res <- x$logs(follow = TRUE, stream = p)
   expect_is(res, "character")
@@ -950,8 +950,8 @@ test_that("run, passing through host_config", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
 
-  res <- d$containers$run("alpine:latest", cmd = c("ls", "/host"),
-                          stream = FALSE, name = nm, volumes = v, rm = TRUE)
+  res <- d$container$run("alpine:latest", cmd = c("ls", "/host"),
+                         stream = FALSE, name = nm, volumes = v, rm = TRUE)
 
   expect_equal(sort(trimws(format(res$logs, style = "plain"))),
                sort(dir()))
@@ -961,8 +961,8 @@ test_that("run, passing through host_config", {
 
 test_that("commit", {
   d <- test_docker_client()
-  x <- d$containers$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"),
-                        stream = FALSE)
+  x <- d$container$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"),
+                       stream = FALSE)
   on.exit(x$container$remove())
   expect_equal(x$container$diff(),
                data_frame(path = "/etc.tar.gz", kind = 1L))
@@ -970,7 +970,7 @@ test_that("commit", {
   h <- img$history()
   expect_match(h[1, "created_by"], "^tar ")
 
-  files <- d$containers$run(img, c("ls", "/"), rm = TRUE, stream = FALSE)$logs
+  files <- d$container$run(img, c("ls", "/"), rm = TRUE, stream = FALSE)$logs
   expect_true("etc.tar.gz" %in% trimws(files))
 
   img$remove()
@@ -986,25 +986,25 @@ test_that("versioned responses", {
   d1 <- test_docker_client(api_version = MIN_DOCKER_API_VERSION)
   nm <- rand_str(10, "stevedore_")
   ## options(error = recover)
-  x <- d1$containers$create("nginx", ports = TRUE, name = nm)
+  x <- d1$container$create("nginx", ports = TRUE, name = nm)
 
   ## Error is with data: named empty list (json: {})
   ## From 'Ports'
 
   ## d1 <- test_docker_client(api_version = "1.29")
   d2 <- test_docker_client(api_version = MAX_DOCKER_API_VERSION)
-  x <- d2$containers$create("nginx", ports = TRUE)
+  x <- d2$container$create("nginx", ports = TRUE)
   ## on.exit(x$remove(force = TRUE))
   x$start()
   x$ports()
-  y <- d1$containers$get(x$id())
+  y <- d1$container$get(x$id())
   x$remove(force = TRUE)
 })
 
 test_that("environment variables on create", {
   d <- test_docker_client()
-  res <- d$containers$run("alpine", "env", detach = FALSE, stream = NULL,
-                          env = c("X_FOO" = "1"), rm = TRUE)
+  res <- d$container$run("alpine", "env", detach = FALSE, stream = NULL,
+                         env = c("X_FOO" = "1"), rm = TRUE)
   txt <- format(res$logs, style = "plain", strip_newline = TRUE)
   expect_true("X_FOO=1" %in% txt)
 })
@@ -1013,10 +1013,10 @@ test_that("set user", {
   skip_on_windows()
   d <- test_docker_client()
   uid <- user(group = TRUE)
-  res1 <- d$containers$run("alpine:3.1", "id",
-                           detach = FALSE, stream = NULL, rm = TRUE)
-  res2 <- d$containers$run("alpine:3.1", "id", user = uid,
-                           detach = FALSE, stream = NULL, rm = TRUE)
+  res1 <- d$container$run("alpine:3.1", "id",
+                          detach = FALSE, stream = NULL, rm = TRUE)
+  res2 <- d$container$run("alpine:3.1", "id", user = uid,
+                          detach = FALSE, stream = NULL, rm = TRUE)
 
   parse_id <- function(x) {
     x <- strsplit(x, "\\s+")[[1]]
@@ -1035,7 +1035,7 @@ test_that("set user", {
 
 test_that("get (offline)", {
   cl <- null_docker_client()
-  x <- cl$containers$get(dummy_id())
+  x <- cl$container$get(dummy_id())
   expect_is(x, "docker_container")
   expect_equal(x$id(), dummy_id())
 })
@@ -1058,7 +1058,7 @@ test_that("process ports", {
                           host_port = "32789"))
 
   cl <- null_docker_client()
-  x <- cl$containers$get(dummy_id())
+  x <- cl$container$get(dummy_id())
   expect_equal(x$ports(),
                data_frame(container_port = character(0),
                           protocol = character(0),

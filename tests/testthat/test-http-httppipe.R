@@ -26,7 +26,7 @@ test_that("binary output", {
   dh <- test_docker_client(http_client_type = "httppipe")
 
   nm <- rand_str(10, "stevedore_")
-  x <- dh$containers$create("bfirsh/reticulate-splines", name = nm)
+  x <- dh$container$create("bfirsh/reticulate-splines", name = nm)
   expect_identical(withVisible(x$start()),
                    list(value = x, visible = FALSE))
   logs <- x$logs()

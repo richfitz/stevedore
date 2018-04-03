@@ -1,7 +1,7 @@
 ##' Methods for working with docker containers.  This object is
-##'   \code{$containers} within a \code{\link{docker_client}} object.
+##'   \code{$container} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("containers")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("container")}
 ##'
 ##' @name docker_container_collection
 ##'
@@ -14,7 +14,7 @@ NULL
 
 ##' Methods for working with a particular docker container.  Container
 ##' objects are returned by creating or running a docker container, or
-##' by using \code{$containers$get} to fetch an existing container by
+##' by using \code{$container$get} to fetch an existing container by
 ##' name or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_container")}
@@ -258,7 +258,7 @@ NULL
 ##' fairly direct wrapping aroud the docker API.  For most of the
 ##' single host methods the types here are not really used (with the
 ##' notable exception of \code{host_config} which is used by
-##' \code{$containers$create} and \code{$containers$update}).  But for
+##' \code{$container$create} and \code{$container$update}).  But for
 ##' the swarm endpoints the function definitions would be impossibly
 ##' complex if we did not reflect the types.  So rather than one
 ##' function call with a hundred arguments, we can build up the

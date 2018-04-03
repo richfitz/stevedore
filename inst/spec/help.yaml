@@ -34,7 +34,7 @@ docker_container_collection:
 
       - Try to pull a container if it does not yet exist (see
         `$images$pull`; `docker_image_collection`)
-      - Create the container (see `$containers$create`;
+      - Create the container (see `$container$create`;
         `docker_container_collection`)
       - Start the container (see `$start`; `docker_container`)
       - Optionally stream the logs, if not detached (see
@@ -261,7 +261,7 @@ docker_volume:
   map:
     summary: >-
       Generate a path suitable to be passed in to
-      `docker$containers$run` or `docker$containers$create`
+      `docker$container$run` or `docker$container$create`
     args:
       path: >-
         Path in the container to map the volume to

@@ -2,7 +2,7 @@ context("help generation")
 
 test_that("all help generates", {
   topics <- list(NULL,
-                 "containers",
+                 "container",
                  "images",
                  "networks",
                  "volumes",

@@ -24,8 +24,8 @@ make_docker_run <- function(client) {
       host_config$AutoRemove <- jsonlite::unbox(TRUE)
     }
     image <- docker_get_image(image, client)
-    container <- client$containers$create(image, cmd, ...,
-                                          host_config = host_config)
+    container <- client$container$create(image, cmd, ...,
+                                         host_config = host_config)
     if (rm && !detach) {
       ## TODO: this should be configurable - do we want to background
       ## on interrupt?

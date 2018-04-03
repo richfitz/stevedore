@@ -59,7 +59,7 @@ test_that("containers", {
 
   expect_identical(nw$containers(), list())
 
-  x <- d$containers$create("nginx", name = server, network = network)
+  x <- d$container$create("nginx", name = server, network = network)
   on.exit({
     x$remove(force = TRUE)
     nw$remove()

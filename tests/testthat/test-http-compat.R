@@ -4,11 +4,11 @@ test_that("streaming raw", {
   dc <- test_docker_client()
   dh <- test_docker_client(http_client_type = "httppipe")
 
-  x1 <- dc$containers$create("richfitz/iterate", c("1000", "1"))
+  x1 <- dc$container$create("richfitz/iterate", c("1000", "1"))
   on.exit(x1$remove(force = TRUE))
   x1$start()
 
-  x2 <- dh$containers$get(x1$id())
+  x2 <- dh$container$get(x1$id())
 
   logs1 <- x1$logs()
   logs2 <- x2$logs()
@@ -51,16 +51,16 @@ test_that("build", {
 test_that("docker run", {
   dh <- test_docker_client(http_client_type = "httppipe")
   expect_output(
-    ans <- dh$containers$run("richfitz/iterate", c("10", "0"), detach = FALSE,
-                             rm = TRUE, stream = stdout()),
+    ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
+                            rm = TRUE, stream = stdout()),
     "Doing 10 iterations")
   expect_silent(
-    ans <- dh$containers$run("richfitz/iterate", c("10", "0"), detach = FALSE,
-                             rm = TRUE, stream = FALSE))
+    ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
+                            rm = TRUE, stream = FALSE))
   p <- tempfile()
   expect_silent(
-    ans <- dh$containers$run("richfitz/iterate", c("10", "0"), detach = FALSE,
-                             rm = TRUE, stream = p))
+    ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
+                            rm = TRUE, stream = p))
   expect_match(readLines(p), "Doing 10 iterations", all = FALSE)
 })
 
@@ -68,9 +68,9 @@ test_that("exec", {
   dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
-  x <- dh$containers$create("richfitz/iterate",
-                            cmd = c("100", "100"),
-                            name = nm)
+  x <- dh$container$create("richfitz/iterate",
+                           cmd = c("100", "100"),
+                           name = nm)
   x$start()
   on.exit(x$remove(force = TRUE))
 
@@ -118,7 +118,7 @@ test_that("pull", {
 test_that("log follow does not work", {
   dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
-  x <- dh$containers$create("richfitz/iterate", c("1000", "1"), name = nm)
+  x <- dh$container$create("richfitz/iterate", c("1000", "1"), name = nm)
   on.exit(x$remove())
   expect_error(
     x$logs(follow = TRUE),

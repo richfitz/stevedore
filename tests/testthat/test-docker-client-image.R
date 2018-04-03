@@ -210,7 +210,7 @@ test_that("build: dockerignore", {
   writeLines(dockerfile, file.path(root, "Dockerfile"))
 
   list_files <- function(container) {
-    logs <- cl$containers$run(container, c("find", "."),
+    logs <- cl$container$run(container, c("find", "."),
                               rm = TRUE, stream = FALSE)$logs
     setdiff(sub("^\\./", "", trimws(as.vector(logs))), ".")
   }

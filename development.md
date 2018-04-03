@@ -18,7 +18,7 @@ Implementation is spread across:
 
   - `docker_client.R` contains the implementation of the objects
   - `docker_client_support.R` contains support functions to make that work
-  - `docker_client_run.R` container the `docker$containers$run` function, which is by far the most complex
+  - `docker_client_run.R` container the `docker$container$run` function, which is by far the most complex
   - `docker_client_method.R` defines how methods for the docker client are implemented
 
 ### `docker_api_client`

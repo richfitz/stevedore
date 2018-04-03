@@ -48,7 +48,7 @@ test_that("add to container", {
   expect_equal(length(tasks), 1L)
 
   container_id <- tasks[[1]]$inspect()$status$container_status$container_id
-  container <- cl$containers$get(container_id)
+  container <- cl$container$get(container_id)
   e <- container$exec(c("cat", sprintf("/run/secrets/%s", name)))
   log <- e$start(detach = FALSE, stream = FALSE)
   expect_identical(as.character(log), data)
