@@ -327,10 +327,10 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
   preamble <- c(
     "Below is reference documentation for all methods for version",
     squote(api_version),
-    "of the docker API - other versions are available.  This documentation",
+    "of the docker API - other versions are available. This documentation",
     "is automatically generated from docker's API schema, and so",
     "inaccuracies may exist between it and stevedore's interface",
-    "(especially references to JSON objects).  Please report any",
+    "(especially references to JSON objects). Please report any",
     "documentation that might be improved at",
     "https://github.com/richfitz/stevedore/issues")
 
@@ -348,7 +348,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 markdown_to_rd <- function(str) {
   if (grepl("\n+(\\s*-\\s+)", str)) {
     ## Simplest thing that might work - keep going until the next
-    ## blank line or the end.  Otherwise assume only one group of
+    ## blank line or the end. Otherwise assume only one group of
     ## items
     tmp <- strsplit(str, "\n", fixed = TRUE)[[1]]
 
@@ -450,16 +450,16 @@ format_docker_client_method_rd <- function(x, ...) {
 
 
 help_summary <- function(h) {
-  summary <- h$summary
+  summary <- trimws(h$summary)
   if (!is.null(h$description)) {
-    summary <- sprintf("%s.  %s", summary, h$description)
+    summary <- sprintf("%s. %s", summary, trimws(h$description))
   }
   if (!is.null(h$cli)) {
     cli <- paste(sprintf("`docker %s`", h$cli), collapse = " or ")
     if (!grepl("\\.$", summary)) {
       summary <- paste0(summary, ".")
     }
-    summary <- sprintf("%s  Similar to the cli command %s.",
+    summary <- sprintf("%s Similar to the cli command %s.",
                        summary, cli)
   }
   summary
