@@ -65,6 +65,15 @@ container_logs:
   method: get
   path: "/containers/{id}/logs"
   cli: ["logs", "container logs"]
+  extra:
+    stream: &extra-stream
+      default: stdout()
+      help: >-
+        The stream to send output to.  Options here are (1) a
+        connection object (e.g. `stdout()`, `stderr()` or a writable
+        open file connection object, (2) a scalar character indicating
+        a filename to write to, or (3) `FALSE` or `NULL` to disable
+        any output.
 
 container_export:
   method: get
@@ -152,6 +161,12 @@ container_path_stat:
 container_archive:
   method: get
   path: "/containers/{id}/archive"
+  extra:
+    dest:
+      help: >-
+        Destination for the archive.  Must be either a scalar
+        character (representing a filename) or `NULL`, in which case a
+        raw vector is returned.
 
 container_import:
   method: put
@@ -172,11 +187,15 @@ image_build:
   method: post
   path: "/build"
   cli: ["build", "image build"]
+  extra:
+    stream: *extra-stream
 
 image_create:
   method: post
   path: "/images/create"
   cli: ["pull", "image pull"]
+  extra:
+    stream: *extra-stream
 
 image_inspect:
   method: get
@@ -192,6 +211,8 @@ image_push:
   method: post
   path: "/images/{name}/push"
   cli: ["push", "image push"]
+  extra:
+    stream: *extra-stream
 
 image_tag:
   method: post
@@ -307,6 +328,8 @@ exec_create:
 exec_start:
   method: post
   path: "/exec/{id}/start"
+  extra:
+    stream: *extra-stream
 
 exec_resize:
   method: post
@@ -385,6 +408,41 @@ service_create:
   cli: "service create"
   handlers:
     task_template: task_spec
+  extra:
+    stream: *extra-stream
+    replicas:
+      default: null
+      help: >-
+        Number of replicas to use.  If `NULL` (the default) then a
+        single replica is used (the same behaviour as the command line
+        client).
+    global:
+      default: false
+      help: >-
+        Logical, indicating if this should be a "global" service
+        (running one instance on each node) rather than a "replicated"
+        service (running across nodes - the default).
+    detach:
+      default: false
+      help: >-
+        Logical, indicating if we should exit immediately, rather than
+        waiting for the service to converge.  This option is named for
+        consistency with `docker service create` - this command never
+        "attaches" in the sense of a single container.
+    timeout:
+      default: 60
+      help: >-
+        Time, in seconds, to wait for the service to converge when
+        `detach = FALSE`.  If the service has not converged by this time
+        an error will be thrown, but the docker daemon will continue
+        trying to start the service.
+    time_wait_stable:
+      default: 5
+      help: >-
+        Time, in seconds, to wait for the service to stay up after it
+        has started.  This is needed to detect services that fail
+        shortly after starting.  The default is 5 seconds, which matches
+        the command line client.
 
 service_inspect:
   method: get
@@ -419,6 +477,8 @@ task_logs:
   method: get
   path: "/tasks/{id}/logs"
   from: "1.29"
+  extra:
+    stream: *extra-stream
 
 
 secret_list:
@@ -492,6 +552,19 @@ plugin_install:
   method: post
   path: "/plugins/pull"
   cli: "plugin install"
+  extra:
+    disable:
+      default: false
+      help: >-
+        Do not enable the plugin on install
+    grant_all:
+      default: NULL
+      help: >-
+        Logical, indicating if all requested permissions should be
+        granted.  If `NULL`, this will prompt interactively for
+        permission.  Setting this to `FALSE` will cause the
+        installation to fail.
+    stream: *extra-stream
 
 plugin_inspect:
   method: get

@@ -186,7 +186,6 @@ docker_container <- function(id, parent) {
   self$get_archive <- docker_client_method(
     "container_archive", self,
     fix = fix_id,
-    extra = alist(dest =),
     process = list(quote(assert_scalar_character_or_null(dest))),
     after = after_container_archive)
 
@@ -212,7 +211,6 @@ docker_container <- function(id, parent) {
     process = list(
       quote(if (is.numeric(tail)) tail <- as.character(tail)),
       mcr_prepare_stream_and_close(quote(stream))),
-    extra = alist(stream = stdout()),
     hijack = quote(
       if (isTRUE(follow)) streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = FALSE,
@@ -288,7 +286,6 @@ docker_image_collection <- function(parent) {
     drop = "content_type",
     rename = c(context = "input_stream", tag = "t"),
     defaults = alist(context =),
-    extra = alist(verbose = NULL, stream = stdout()),
     process = list(
       mcr_prepare_stream_and_close(quote(stream)),
       quote(context <- validate_tar_directory(context, dockerfile))),
@@ -313,7 +310,6 @@ docker_image_collection <- function(parent) {
       mcr_prepare_stream_and_close(quote(stream)),
       mcr_process_image_and_tag(quote(name), quote(tag)),
       mcr_prepare_auth(quote(name), quote(registry_auth))),
-    extra = alist(stream = stdout()),
     defaults = alist(name =),
     hijack = quote(streaming_json(pull_status_printer(stream))),
     allow_hijack_without_stream = TRUE,
@@ -322,7 +318,6 @@ docker_image_collection <- function(parent) {
   self$push <- docker_client_method(
     "image_push", self,
     drop = c("registry_auth", "tag"),
-    extra = alist(stream = stdout()),
     hijack = quote(streaming_json(pull_status_printer(stream))),
     process = list(
       mcr_prepare_stream_and_close(quote(stream)),
@@ -495,7 +490,6 @@ docker_exec <- function(id, parent) {
   self$start <- docker_client_method(
     "exec_start", self,
     fix = fix_id,
-    extra = alist(stream = stdout()),
     hijack = quote(streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = TRUE,
     process = list(mcr_prepare_stream_and_close(quote(stream))),
@@ -576,8 +570,6 @@ docker_service_collection <- function(parent) {
     "service_create", self,
     expand = c("task_template" = "task_spec",
                "container_spec" = "container_spec"),
-    extra = alist(replicas = NULL, global = FALSE, detach = FALSE,
-                  timeout = 60, time_wait_stable = 5, stream = stdout()),
     ## All the processing here is quite hard, but could be formalised
     ## - this is all processing of arguments that are in expanded
     ## types.  That's not a pattern used elsewhere yet.
@@ -654,7 +646,6 @@ docker_task <- function(id, parent) {
     process = list(
       quote(if (is.numeric(tail)) tail <- as.character(tail)),
       mcr_prepare_stream_and_close(quote(stream))),
-    extra = alist(stream = stdout()),
     hijack = quote(
       if (isTRUE(follow)) streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = FALSE,
@@ -741,7 +732,6 @@ docker_plugin_collection <- function(parent) {
     "plugin_install", self,
     rename = c("alias" = "name"),
     fix = list(body = NULL),
-    extra = alist(disable = FALSE, grant_all = NULL, stream = stdout()),
     process = list(
       mcr_prepare_stream_and_close(quote(stream)),
       quote(assert_scalar_logical_or_null(grant_all)),

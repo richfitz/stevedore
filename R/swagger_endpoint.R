@@ -41,6 +41,22 @@ swagger_endpoint <- function(x, types, spec) {
   help <- args$help
   help$cli <- x$cli
 
+  if (is.null(x$extra)) {
+    extra <- NULL
+  } else {
+    extra_default <- function(el) {
+      if (!("default" %in% names(el))) {
+        alist(a = )[[1L]]
+      } else if (is.null(el$default)) {
+        NULL
+      } else {
+        parse(text = el$default, n = 1L, keep.source = FALSE)[[1L]]
+      }
+    }
+    help$args[names(x$extra)] <- lapply(x$extra, "[[", "help")
+    extra <- lapply(x$extra, extra_default)
+  }
+
   list(
     name = x$name,
     path = x$path,
@@ -48,6 +64,7 @@ swagger_endpoint <- function(x, types, spec) {
     method = toupper(x$method),
     argument_handler = argument_handler,
     response_handlers = response_handlers,
+    extra = extra,
     header_handlers = header_handlers,
     response_description = response_description,
     help = help)

@@ -1,6 +1,6 @@
 docker_client_method <- function(name, object,
                                  fix = NULL, rename = NULL,
-                                 drop = NULL, defaults = NULL, extra = NULL,
+                                 drop = NULL, defaults = NULL,
                                  expand = NULL,
                                  promote = NULL, process = NULL,
                                  after = NULL,
@@ -48,8 +48,8 @@ docker_client_method <- function(name, object,
     args_use[names(defaults)] <- defaults
   }
 
-  if (!is.null(extra)) {
-    args_use <- c(args_use, extra)
+  if (!is.null(endpoint$extra)) {
+    args_use <- c(args_use, endpoint$extra)
   }
 
   if (!is.null(expand)) {
@@ -120,12 +120,12 @@ docker_client_method <- function(name, object,
                  allow_hijack_without_stream = allow_hijack_without_stream),
     list(hijack = hijack,
          allow_hijack_without_stream = allow_hijack_without_stream))
-  if (is.null(extra)) {
+  if (is.null(endpoint$extra)) {
     add_extra <- NULL
   } else {
     add_extra <- bquote(
-      params[.(as.call(c(quote(c), names(extra))))] <-
-        .(as.call(c(quote(list), lapply(names(extra), as.name)))))
+      params[.(as.call(c(quote(c), names(endpoint$extra))))] <-
+        .(as.call(c(quote(list), lapply(names(endpoint$extra), as.name)))))
   }
 
   if (!is.null(after)) {
@@ -149,13 +149,6 @@ docker_client_method <- function(name, object,
   if (!is.null(rename)) {
     i <- match(rename, names(help$args))
     names(help$args)[i] <- names(rename)
-  }
-  if (!is.null(extra)) {
-    ## TODO: pull in some decent help here from somewhere.  I am
-    ## punting on this for a bit as I might move the definitions into
-    ## yaml which would provide a much nicer place to put the extra
-    ## args than in code.
-    help$args[names(extra)] <- names(extra)
   }
   if (!is.null(expand)) {
     for (i in seq_along(expand)) {
