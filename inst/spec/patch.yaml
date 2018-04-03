@@ -187,18 +187,20 @@
   value:
     produces: "application/chunked-string"
 
-- version: ["1.29", "1.29"]
+# this is pretty bad: the spec claims it will return 204 but instead
+# returns 200
+- version: ["1.27", "1.36"]
   path: ["paths", "/plugins/pull", "post", "responses"]
   value:
     200:
       description: "no error"
 
-- version: ["1.29", "1.29"]
+- version: ["1.27", "1.36"]
   path: ["paths", "/plugins/{name}", "delete", "responses", "200", "schema"]
   value: ~
   replace: true
 
-- version: ["1.29", "1.29"]
+- version: ["1.27", "1.36"]
   path: ["paths", "/plugins/{name}", "delete", "produces"]
   value: ~
   replace: true
