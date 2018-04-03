@@ -6,6 +6,9 @@ test_that("privileges", {
   skip_if_no_internet()
   cl <- test_docker_client()
   dat <- cl$plugins$privileges("vieux/sshfs:latest")
+  ## TODO: I think that this would benefit from being a classed object
+  ## perhaps?  Something that can be agreed to?
+  expect_is(dat, "data.frame")
 })
 
 
