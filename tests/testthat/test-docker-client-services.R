@@ -2,7 +2,7 @@ context("docker client: services")
 
 test_that("create (offline)", {
   d <- null_docker_client()
-  s <- d$services$get(dummy_id())
+  s <- d$service$get(dummy_id())
   expect_is(s, "docker_service")
   expect_equal(s$id(), dummy_id())
 })
@@ -18,9 +18,9 @@ test_that("basic swarm service create", {
                                  args = c("1000", "1"))
   task <- cl$types$task_spec(container_spec = cnt)
 
-  ans <- cl$services$create(name = "hello", task_template = task,
-                            timeout = 20, time_wait_stable = 0,
-                            stream = NULL)
+  ans <- cl$service$create(name = "hello", task_template = task,
+                           timeout = 20, time_wait_stable = 0,
+                           stream = NULL)
 
   expect_is(ans, "docker_service")
   expect_is(ans$id(), "character")
@@ -34,7 +34,7 @@ test_that("basic swarm service create", {
   expect_equal(dat$spec$task_template$container_spec$image, "richfitz/iterate")
   expect_equal(dat$spec$task_template$container_spec$args, c("1000", "1"))
 
-  dat <- cl$services$list()
+  dat <- cl$service$list()
   expect_true(ans$id() %in% dat$id)
 
   expect_null(ans$remove())
@@ -47,12 +47,12 @@ test_that("basic swarm service create - expanded types", {
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
 
-  ans <- cl$services$create(name = "hello",
-                            image = "richfitz/iterate",
-                            args = c("1000", "1"),
-                            timeout = 20,
-                            time_wait_stable = 0,
-                            stream = NULL)
+  ans <- cl$service$create(name = "hello",
+                           image = "richfitz/iterate",
+                           args = c("1000", "1"),
+                           timeout = 20,
+                           time_wait_stable = 0,
+                           stream = NULL)
 
   expect_is(ans, "docker_service")
   expect_is(ans$id(), "character")
@@ -66,10 +66,10 @@ test_that("basic swarm service create - expanded types", {
   expect_equal(dat$spec$task_template$container_spec$image, "richfitz/iterate")
   expect_equal(dat$spec$task_template$container_spec$args, c("1000", "1"))
 
-  dat <- cl$services$list()
+  dat <- cl$service$list()
   expect_true(ans$id() %in% dat$id)
 
-  t <- cl$tasks$get(cl$tasks$list(list('desired-state' = "running"))$id)
+  t <- cl$task$get(cl$task$list(list('desired-state' = "running"))$id)
   expect_equal(t$state(), "running")
   s <- t$service()
   expect_equal(s$id(), ans$id())
@@ -95,12 +95,12 @@ test_that("replicas & swarm ps", {
   on.exit(cl$swarm$leave(TRUE))
 
   n <- 3L
-  ans <- cl$services$create(name = "redis",
-                            image = "redis",
-                            replicas = n,
-                            timeout = 20,
-                            time_wait_stable = 0,
-                            stream = NULL)
+  ans <- cl$service$create(name = "redis",
+                           image = "redis",
+                           replicas = n,
+                           timeout = 20,
+                           time_wait_stable = 0,
+                           stream = NULL)
 
   ps <- ans$ps()
   expect_is(ps, "data.frame")
@@ -117,7 +117,7 @@ test_that("replicas & swarm ps", {
   expect_equal(ps[v], ps2[v])
   expect_match(ps2$when, "ago$")
   expect_match(ps2$name, ans$id())
-  expect_match(ps2$node, cl$nodes$list()[[1L]])
+  expect_match(ps2$node, cl$node$list()[[1L]])
 
   ans$remove()
 })
@@ -131,14 +131,14 @@ test_that("convergence: failure", {
   on.exit(cl$swarm$leave(TRUE))
 
   expect_error(
-    cl$services$create(name = "myservice",
-                       image = "richfitz/iterate",
-                       command = "error-command",
-                       replicas = 2,
-                       timeout = 2,
-                       stream = NULL),
+    cl$service$create(name = "myservice",
+                      image = "richfitz/iterate",
+                      command = "error-command",
+                      replicas = 2,
+                      timeout = 2,
+                      stream = NULL),
     "service has not converged in time")
-  s <- cl$services$get("myservice")
+  s <- cl$service$get("myservice")
   expect_is(s, "docker_service")
   s$remove()
 })
@@ -153,20 +153,20 @@ test_that("stability failure", {
 
   tmp <- tempfile()
   expect_error(
-    cl$services$create(name = "myservice",
-                       image = "richfitz/fail",
-                       command = "fail",
-                       args = "0.5",
-                       replicas = 2,
-                       timeout = 3.5,
-                       time_wait_stable = 10,
-                       stream = tmp),
+    cl$service$create(name = "myservice",
+                      image = "richfitz/fail",
+                      command = "fail",
+                      args = "0.5",
+                      replicas = 2,
+                      timeout = 3.5,
+                      time_wait_stable = 10,
+                      stream = tmp),
     "service has not converged in time")
   txt <- readLines(tmp)
   expect_true(length(grep("^new", txt)) >= 2L)
   expect_match(txt, "Task has failed, trying again", all = FALSE, fixed = TRUE)
 
-  cl$services$get("myservice")$remove()
+  cl$service$get("myservice")$remove()
 })
 
 
@@ -176,10 +176,10 @@ test_that("don't detach", {
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
 
-  s <- cl$services$create(name = "myservice",
-                          image = "richfitz/iterate",
-                          command = "error-command",
-                          detach = TRUE)
+  s <- cl$service$create(name = "myservice",
+                         image = "richfitz/iterate",
+                         command = "error-command",
+                         detach = TRUE)
   expect_is(s, "docker_service")
   s$remove()
 })

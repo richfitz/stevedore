@@ -13,23 +13,23 @@ test_that("create and delete", {
 
     if (numeric_version(v) < numeric_version("1.30")) {
       expect_error(
-        cl_v$configs$create(key, "config"),
+        cl_v$config$create(key, "config"),
         "'config_create' (POST /configs/create) requires docker API version",
         fixed = TRUE)
       next
     }
 
-    id <- cl_v$configs$create(key, "config!")
+    id <- cl_v$config$create(key, "config!")
     expect_is(id, "character")
-    expect_true(id %in% cl_v$configs$list()$id)
-    expect_true(key %in% cl_v$configs$list()$name)
+    expect_true(id %in% cl_v$config$list()$id)
+    expect_true(key %in% cl_v$config$list()$name)
 
-    dat <- cl_v$configs$inspect(id)
-    expect_identical(cl_v$configs$inspect(key), dat)
+    dat <- cl_v$config$inspect(id)
+    expect_identical(cl_v$config$inspect(key), dat)
 
-    expect_null(cl_v$configs$remove(key))
-    expect_false(id %in% cl_v$configs$list()$id)
-    expect_false(key %in% cl_v$configs$list()$name)
+    expect_null(cl_v$config$remove(key))
+    expect_false(id %in% cl_v$config$list()$id)
+    expect_false(key %in% cl_v$config$list()$name)
   }
 })
 
@@ -42,14 +42,14 @@ test_that("add to container", {
 
   name <- "myconfig"
   data <- "config!"
-  id <- cl$configs$create(name, data)
+  id <- cl$config$create(name, data)
 
-  ans <- cl$services$create(name = "redis",
-                            image = "redis",
-                            configs = name,
-                            timeout = 20,
-                            time_wait_stable = 0,
-                            stream = NULL)
+  ans <- cl$service$create(name = "redis",
+                           image = "redis",
+                           configs = name,
+                           timeout = 20,
+                           time_wait_stable = 0,
+                           stream = NULL)
 
   tasks <- ans$tasks(list("desired-state" = "running"))
   expect_equal(length(tasks), 1L)

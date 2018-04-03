@@ -12,17 +12,17 @@ test_that("create and delete", {
     cl_v <- test_docker_client(api_version = v)
 
     key <- rand_str()
-    id <- cl$secrets$create(key, "secret!")
+    id <- cl$secret$create(key, "secret!")
     expect_is(id, "character")
-    expect_true(id %in% cl$secrets$list()$id)
-    expect_true(key %in% cl$secrets$list()$name)
+    expect_true(id %in% cl$secret$list()$id)
+    expect_true(key %in% cl$secret$list()$name)
 
-    dat <- cl$secrets$inspect(id)
-    expect_identical(cl$secrets$inspect(key), dat)
+    dat <- cl$secret$inspect(id)
+    expect_identical(cl$secret$inspect(key), dat)
 
-    expect_null(cl$secrets$remove(key))
-    expect_false(id %in% cl$secrets$list()$id)
-    expect_false(key %in% cl$secrets$list()$name)
+    expect_null(cl$secret$remove(key))
+    expect_false(id %in% cl$secret$list()$id)
+    expect_false(key %in% cl$secret$list()$name)
   }
 })
 
@@ -35,14 +35,14 @@ test_that("add to container", {
 
   name <- "mysecret"
   data <- "secret!"
-  id <- cl$secrets$create(name, data)
+  id <- cl$secret$create(name, data)
 
-  ans <- cl$services$create(name = "redis",
-                            image = "redis",
-                            secrets = name,
-                            timeout = 20,
-                            time_wait_stable = 0,
-                            stream = NULL)
+  ans <- cl$service$create(name = "redis",
+                           image = "redis",
+                           secrets = name,
+                           timeout = 20,
+                           time_wait_stable = 0,
+                           stream = NULL)
 
   tasks <- ans$tasks(list("desired-state" = "running"))
   expect_equal(length(tasks), 1L)

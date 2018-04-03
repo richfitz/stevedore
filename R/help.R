@@ -140,9 +140,9 @@ NULL
 
 
 ##' Methods for managing docker swarm nodes.  This object is
-##'   \code{$nodes} within a \code{\link{docker_client}} object.
+##'   \code{$node} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("nodes")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("node")}
 ##'
 ##' @name docker_node_collection
 ##'
@@ -154,9 +154,9 @@ NULL
 
 
 ##' Methods for working with docker services.  This object is
-##'   \code{$services} within a \code{\link{docker_client}} object.
+##'   \code{$service} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("services")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("service")}
 ##'
 ##' @name docker_service_collection
 ##'
@@ -169,7 +169,7 @@ NULL
 
 ##' Methods for working with a particular docker service.  Service
 ##' objects are returned by creating a docker service, or by using
-##' \code{$services$get} to fetch an existing service by name or id.
+##' \code{$service$get} to fetch an existing service by name or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_service")}
 ##'
@@ -183,9 +183,9 @@ NULL
 
 
 ##' Methods for managing docker swarm secrets.  This object is
-##'   \code{$secrets} within a \code{\link{docker_client}} object.
+##'   \code{$secret} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("secrets")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("secret")}
 ##'
 ##' @name docker_secret_collection
 ##'
@@ -199,9 +199,9 @@ NULL
 
 
 ##' Methods for managing docker swarm configs.  This object is
-##'   \code{$configs} within a \code{\link{docker_client}} object.
+##'   \code{$config} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("configs")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("config")}
 ##'
 ##' @name docker_config_collection
 ##'
@@ -215,9 +215,9 @@ NULL
 
 
 ##' Methods for working with docker plugins.  This object is
-##'   \code{$plugins} within a \code{\link{docker_client}} object.
+##'   \code{$plugin} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("plugins")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("plugin")}
 ##'
 ##' @name docker_plugin_collection
 ##'
@@ -230,7 +230,7 @@ NULL
 
 ##' Methods for working with a particular docker plugin.  Plugin
 ##' objects are returned by installing or building a docker plugin, or
-##' by using \code{$plugins$get} to fetch an existing plugin by name
+##' by using \code{$plugin$get} to fetch an existing plugin by name
 ##' or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_plugin")}

@@ -2,7 +2,7 @@ context("docker client: tasks")
 
 test_that("create (offline)", {
   d <- null_docker_client()
-  s <- d$tasks$get(dummy_id())
+  s <- d$task$get(dummy_id())
   expect_is(s, "docker_task")
   expect_equal(s$id(), dummy_id())
 })
@@ -14,12 +14,12 @@ test_that("task logs", {
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
 
-  ans <- cl$services$create(name = "hello",
-                            image = "richfitz/iterate",
-                            args = c("1000", "1"),
-                            timeout = 20,
-                            time_wait_stable = 2,
-                            stream = NULL)
+  ans <- cl$service$create(name = "hello",
+                           image = "richfitz/iterate",
+                           args = c("1000", "1"),
+                           timeout = 20,
+                           time_wait_stable = 2,
+                           stream = NULL)
   t <- ans$tasks()[[1]]
   expect_is(t, "docker_task")
 

@@ -71,13 +71,13 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$volume <- docker_client_volume_collection(self)
 
   self$swarm <- docker_client_swarm_collection(self)
-  self$nodes <- docker_client_node_collection(self)
-  self$services <- docker_client_service_collection(self)
-  self$tasks <- docker_client_task_collection(self)
-  self$secrets <- docker_client_secret_collection(self)
-  self$configs <- docker_client_config_collection(self)
+  self$node <- docker_client_node_collection(self)
+  self$service <- docker_client_service_collection(self)
+  self$task <- docker_client_task_collection(self)
+  self$secret <- docker_client_secret_collection(self)
+  self$config <- docker_client_config_collection(self)
 
-  self$plugins <- docker_client_plugin_collection(self)
+  self$plugin <- docker_client_plugin_collection(self)
 
   stevedore_object(self, "docker_client")
 }
@@ -622,7 +622,7 @@ docker_client_task <- function(id, parent) {
 
   self$state <- function(reload = TRUE) self$inspect(reload)$status$state
   self$service <- function() {
-    self$.parent$services$get(self$inspect(FALSE)$service_id)
+    self$.parent$service$get(self$inspect(FALSE)$service_id)
   }
 
   stevedore_object(self, "docker_task")

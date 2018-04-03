@@ -937,10 +937,10 @@ docker_client_service_tasks <- function(self, filters) {
     stop("'service' is not a valid filter name for this method")
   }
   filters[["service"]] <- self$id()
-  tasks <- self$.parent$tasks$list(filters)
+  tasks <- self$.parent$task$list(filters)
 
   ret <- lapply(tasks$id, function(id)
-    tryCatch(self$.parent$tasks$get(id), error = function(e) NULL))
+    tryCatch(self$.parent$task$get(id), error = function(e) NULL))
   ret[!vlapply(ret, is.null)]
 }
 
@@ -960,7 +960,7 @@ docker_client_service_ps <- function(self, resolve_names, filters) {
   node_id <- vcapply(d, "[[", "node_id")
 
   if (resolve_names) {
-    nodes <- self$.parent$nodes$list()
+    nodes <- self$.parent$node$list()
     node_name <-
       vcapply(nodes$description, "[[", "hostname")[match(node_id, nodes$id)]
     task_prefix <- self$name(FALSE)

@@ -986,20 +986,20 @@ test_that("after_plugin_install", {
 
   p <- list(query = list(name = dummy_id(), remote = "xxx"),
             disable = TRUE)
-  res <- after_plugin_install(NULL, p, cl$plugins)
+  res <- after_plugin_install(NULL, p, cl$plugin)
   expect_is(res, "docker_plugin")
   expect_equal(res$name(), dummy_id())
 
   p <- list(query = list(name = NULL, remote = dummy_id()),
             disable = TRUE)
 
-  res <- after_plugin_install(NULL, p, cl$plugins)
+  res <- after_plugin_install(NULL, p, cl$plugin)
   expect_is(res, "docker_plugin")
   expect_equal(res$name(), dummy_id())
 
   p <- list(query = list(name = NULL, remote = dummy_id()),
             disable = FALSE)
-  expect_error(after_plugin_install(NULL, p, cl$plugins),
+  expect_error(after_plugin_install(NULL, p, cl$plugin),
                "Can't make requests with the null client")
 })
 
@@ -1015,7 +1015,7 @@ test_that("validate_plugin_configure_body", {
 test_that("after_plugin_create", {
   cl <- null_docker_client()
   params <- list(query = list(name = dummy_id()))
-  res <- after_plugin_create(NULL, params, cl$plugins)
+  res <- after_plugin_create(NULL, params, cl$plugin)
   expect_is(res, "docker_plugin")
   expect_equal(res$name(), dummy_id())
 })

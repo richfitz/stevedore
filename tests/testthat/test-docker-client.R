@@ -57,23 +57,23 @@ test_that("children", {
   expect_is(d$swarm, "docker_swarm_collection")
   expect_is(d$swarm, "stevedore_object")
 
-  expect_is(d$nodes, "docker_node_collection")
-  expect_is(d$nodes, "stevedore_object")
+  expect_is(d$node, "docker_node_collection")
+  expect_is(d$node, "stevedore_object")
 
-  expect_is(d$services, "docker_service_collection")
-  expect_is(d$services, "stevedore_object")
+  expect_is(d$service, "docker_service_collection")
+  expect_is(d$service, "stevedore_object")
 
-  expect_is(d$tasks, "docker_task_collection")
-  expect_is(d$tasks, "stevedore_object")
+  expect_is(d$task, "docker_task_collection")
+  expect_is(d$task, "stevedore_object")
 
-  expect_is(d$secrets, "docker_secret_collection")
-  expect_is(d$secrets, "stevedore_object")
+  expect_is(d$secret, "docker_secret_collection")
+  expect_is(d$secret, "stevedore_object")
 
-  expect_is(d$configs, "docker_config_collection")
-  expect_is(d$configs, "stevedore_object")
+  expect_is(d$config, "docker_config_collection")
+  expect_is(d$config, "stevedore_object")
 
-  expect_is(d$plugins, "docker_plugin_collection")
-  expect_is(d$plugins, "stevedore_object")
+  expect_is(d$plugin, "docker_plugin_collection")
+  expect_is(d$plugin, "stevedore_object")
 })
 
 test_that("Prevent invalid access", {
