@@ -37,18 +37,18 @@ docker
 
 ```
 ## <docker_client>
-##   config: docker_config_collection
-##   container: docker_container_collection
-##   image: docker_image_collection
-##   network: docker_network_collection
-##   node: docker_node_collection
-##   plugin: docker_plugin_collection
-##   secret: docker_secret_collection
-##   service: docker_service_collection
-##   swarm: docker_swarm_collection
-##   task: docker_task_collection
-##   volume: docker_volume_collection
-##   types: docker_types
+##   config: Manage docker swarm configs
+##   container: Work with docker containers
+##   image: Work with docker images
+##   network: Work with docker networks
+##   node: Manage docker swarm nodes
+##   plugin: Work with docker plugins
+##   secret: Manage docker swarm secrets
+##   service: Work with docker services
+##   swarm: Manage the docker swarm
+##   task: Work with docker tasks
+##   volume: Work with docker volumes
+##   types: Methods for building complex docker types
 ##   api_version()
 ##   df()
 ##   events(since = NULL, until = NULL, filters = NULL)
@@ -74,18 +74,27 @@ docker$container$run("alpine:3.1", c("echo", "hello world"))
 ```
 ## Pulling from library/alpine 3.1
 ## Pulling fs layer 61aa778aed31
-## 61aa778aed31: Downloading 32.27 kB/2.3 MB 1%
-## 61aa778aed31: Downloading 687.22 kB/2.3 MB 30%
-## 61aa778aed31: Downloading 1.76 MB/2.3 MB 76%
-## 61aa778aed31: Downloading 1.78 MB/2.3 MB 77%
-## 61aa778aed31: Downloading 1.8 MB/2.3 MB 78%
-## 61aa778aed31: Downloading 1.83 MB/2.3 MB 79%
+## 61aa778aed31: Downloading 32.26 kB/2.3 MB 1%
+## 61aa778aed31: Downloading 163.1 kB/2.3 MB 7%
+## 61aa778aed31: Downloading 261.4 kB/2.3 MB 11%
+## 61aa778aed31: Downloading 392.47 kB/2.3 MB 17%
+## 61aa778aed31: Downloading 523.54 kB/2.3 MB 23%
+## 61aa778aed31: Downloading 654.62 kB/2.3 MB 28%
+## 61aa778aed31: Downloading 785.69 kB/2.3 MB 34%
+## 61aa778aed31: Downloading 883.99 kB/2.3 MB 38%
+## 61aa778aed31: Downloading 1.02 MB/2.3 MB 44%
+## 61aa778aed31: Downloading 1.15 MB/2.3 MB 50%
+## 61aa778aed31: Downloading 1.28 MB/2.3 MB 55%
+## 61aa778aed31: Downloading 1.38 MB/2.3 MB 60%
+## 61aa778aed31: Downloading 1.51 MB/2.3 MB 65%
+## 61aa778aed31: Downloading 1.54 MB/2.3 MB 67%
+## 61aa778aed31: Downloading 1.87 MB/2.3 MB 81%
 ## 61aa778aed31: Downloading 2 MB/2.3 MB 87%
-## 61aa778aed31: Downloading 2.23 MB/2.3 MB 97%
-## Verifying Checksum 61aa778aed31
+## 61aa778aed31: Downloading 2.13 MB/2.3 MB 92%
+## 61aa778aed31: Downloading 2.26 MB/2.3 MB 98%
 ## Download complete 61aa778aed31
 ## 61aa778aed31: Extracting 32.77 kB/2.3 MB 1%
-## 61aa778aed31: Extracting 425.98 kB/2.3 MB 18%
+## 61aa778aed31: Extracting 753.66 kB/2.3 MB 33%
 ## 61aa778aed31: Extracting 2.3 MB/2.3 MB 100%
 ## Pull complete 61aa778aed31
 ## Digest: sha256:10de714727daa45047abdfb81c98dbf45e1cad3b590b5043d0da139bfeacebe5
@@ -97,8 +106,8 @@ docker$container$run("alpine:3.1", c("echo", "hello world"))
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: 4202b4970975966cc74c05c5f90bab8be515927559d2730080830d7a03e2fc19
-##       name: modest_boyd
+##       id: af0e40d48a47190d07eaef080ccc46829cf932d13ed7aca43c94b84e2932c405
+##       name: happy_feynman
 ##
 ##   $logs:
 ##     O> hello world
@@ -178,19 +187,19 @@ docker$container$list()
 
 ```
 ##                                                                 id
-## 1 ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a
+## 1 a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32
 ##          names
-## 1 heuristi....
+## 1 agitated....
 ##                                                                     image
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                                                                  image_id
 ## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
 ##                 command    created        ports size_rw size_root_fs
-## 1 /usr/local/bin/run.sh 1522758457 characte....      NA           NA
+## 1 /usr/local/bin/run.sh 1522783318 characte....      NA           NA
 ##   labels   state                status host_config network_settings
 ## 1        running Up Less than a second     default     list(bri....
-##         mounts              name
-## 1 characte.... heuristic_bardeen
+##         mounts               name
+## 1 characte.... agitated_chaplygin
 ```
 
 ```r
@@ -301,26 +310,26 @@ head(docker$image$list())
 
 ```
 ##                                                                        id
-## 1 sha256:f75cd4ed8904a3736ea82ed7147d93271ea7a494103a3752b824ec8093fc507c
-## 2 sha256:408e9ddc2942aeebd389d904e866628c9dcd89171e3b660dc74562c32d812260
-## 3 sha256:9d505334bd040a2860bd97e9ead4654f5f1402e087c61f6818f987f440f92d6f
-## 4 sha256:dc6f3597b4761fbaa4f5627c5d4676b0cd1bbdcd7dfd5b2771de665f915f6df6
-## 5 sha256:1effd9a7a4f1b32e32c3f87d46e9043dafdf1f23ac7be8a735bcf4931c23b1d9
-## 6 sha256:7b460cb22d8fa0c9f13f5c0c8013a1a8f075754aa8fc6bbb47a3ff1271bd3644
+## 1 sha256:528056938e214045ccf8a31967ab4c6451e45a435de80b7f3cf16a8f48d1b220
+## 2 sha256:c3ca48c7f231a7a9bf8f4cfd53100a2ec21482e370a34ec63e603580353802e7
+## 3 sha256:d9d1b98fc779e44eebcc0a28f10489e2e33a7427ecd899a7631d1db2d6b2cba3
+## 4 sha256:f4d76404bb968481084454902558c9e765e7da37a47cf900fab24f0f471ef92b
+## 5 sha256:f034e1d0a10178e4b747f7f2a96853d1d847992f7a96bff5cb26c0297b4d1237
+## 6 sha256:89b13ebf35843351b8000f1e69f3081932dce3705985998de6d9d6427992bcb7
 ##                                                                 parent_id
-## 1 sha256:04c6ba921e7052402df7f9f2a1b71ce6cbec41c5b613eb21fd6b16fcc846cbf1
-## 2 sha256:14cf779a91a3ea612fc573bf14f10e33428c9a8367c2aaa2f18d198ba4e39816
-## 3 sha256:ede8bb8daee3d08ab80a805ba9c071468d3b15f7576acc1774295c9bee59d815
-## 4 sha256:e39d6710ee9c9394b015b0c51037b445826170d7d003fca0b6ed516a262415dd
-## 5 sha256:6b6e065cc923fa3d085df0ebe5a46a2479923449a3f035d87440d1c24ae406ae
-## 6 sha256:4e88526c21d3bae31cc77c361698c3e3cc468e8b0f3d047c56c93c8854b09b11
+## 1 sha256:9f0a1e6d1e4d681602920032eea400b377cf4a477e0f0e56a2413d347a82cdc0
+## 2 sha256:0eb22207a3519c69e15b43c1e002add8b798b542ba223960c30dad9e4cc2b709
+## 3 sha256:d30ad47eb36a8c8a1de410788ae853b00db4c23a82140801c6893e772bceb050
+## 4 sha256:34a4e9cc34d6690b3836fa55707f85b58cb73767411643e795b8c868ddb34e6d
+## 5 sha256:775a4d9eed63c39e8b5fe8a13c5cdadbc708685337c71378b19de28765b4c56c
+## 6 sha256:4c657cfd7ffda6623f3f6bc16dfedbce1ee7910d661ceaed74ec252bfa7cb928
 ##      repo_tags repo_digests    created    size shared_size virtual_size
-## 1 richfitz....              1522758233 4148087          -1      4148087
-## 2 <none>:<.... <none>@<.... 1522758232 4148087          -1      4148087
-## 3 <none>:<.... <none>@<.... 1522758231 4148087          -1      4148087
-## 4 <none>:<.... <none>@<.... 1522758230 4148087          -1      4148087
-## 5 <none>:<.... <none>@<.... 1522758229 4148087          -1      4148087
-## 6 <none>:<.... <none>@<.... 1522758227 4148087          -1      4148087
+## 1 richfitz....              1522779431 4148087          -1      4148087
+## 2 <none>:<.... <none>@<.... 1522779430 4148087          -1      4148087
+## 3 <none>:<.... <none>@<.... 1522779429 4148087          -1      4148087
+## 4 <none>:<.... <none>@<.... 1522779428 4148087          -1      4148087
+## 5 <none>:<.... <none>@<.... 1522779426 4148087          -1      4148087
+## 6 <none>:<.... <none>@<.... 1522779425 4148087          -1      4148087
 ##   labels containers
 ## 1  0.0.1         -1
 ## 2  0.0.1         -1
@@ -429,10 +438,10 @@ container$inspect(reload = FALSE)
 
 ```
 ## $id
-## [1] "ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a"
+## [1] "a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32"
 ##
 ## $created
-## [1] "2018-04-03T12:27:37.8965375Z"
+## [1] "2018-04-03T19:21:58.130190889Z"
 ##
 ## $path
 ## [1] "/usr/local/bin/run.sh"
@@ -460,7 +469,7 @@ container$inspect(reload = FALSE)
 ## [1] FALSE
 ##
 ## $state$pid
-## [1] 18697
+## [1] 463
 ##
 ## $state$exit_code
 ## [1] 0
@@ -469,7 +478,7 @@ container$inspect(reload = FALSE)
 ## [1] ""
 ##
 ## $state$started_at
-## [1] "2018-04-03T12:27:38.4701217Z"
+## [1] "2018-04-03T19:21:58.705919589Z"
 ##
 ## $state$finished_at
 ## [1] "0001-01-01T00:00:00Z"
@@ -479,22 +488,22 @@ container$inspect(reload = FALSE)
 ## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"
 ##
 ## $resolv_conf_path
-## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/resolv.conf"
+## [1] "/var/lib/docker/containers/a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32/resolv.conf"
 ##
 ## $hostname_path
-## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/hostname"
+## [1] "/var/lib/docker/containers/a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32/hostname"
 ##
 ## $hosts_path
-## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/hosts"
+## [1] "/var/lib/docker/containers/a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32/hosts"
 ##
 ## $log_path
-## [1] "/var/lib/docker/containers/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a/ca1d81ae60d87373cd3b9c410566a34eb64baedd925ad0d14ec8f5af174a1f7a-json.log"
+## [1] "/var/lib/docker/containers/a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32/a37425a56458a8de8ab56f6e3283d981d1d76fbe8dbfea628410e60153e6eb32-json.log"
 ##
 ## $node
 ## NULL
 ##
 ## $name
-## [1] "/heuristic_bardeen"
+## [1] "/agitated_chaplygin"
 ##
 ## $restart_count
 ## [1] 0
@@ -736,13 +745,13 @@ container$inspect(reload = FALSE)
 ##
 ## $graph_driver$data
 ##                                                                                                                                                                                                                                                                                                                                                                                          lower_dir
-## "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b-init/diff:/var/lib/docker/overlay2/7815d9bac55ed4ceb36bd625979dfcd06330e8253b9f71c95795ce5c5b247dd0/diff:/var/lib/docker/overlay2/2b72161d0aefe066769d9334de310b36616ae170f4472a7384324d378dd82cb5/diff:/var/lib/docker/overlay2/d4903c54aa9b839529e6b24e2293abe7cbea0093a5106726c0e93754cb105591/diff"
+## "/var/lib/docker/overlay2/14ee3496569226d7c1b5dc9d10257cf10608c616bd1317544f2a06da2a34ae2c-init/diff:/var/lib/docker/overlay2/7815d9bac55ed4ceb36bd625979dfcd06330e8253b9f71c95795ce5c5b247dd0/diff:/var/lib/docker/overlay2/2b72161d0aefe066769d9334de310b36616ae170f4472a7384324d378dd82cb5/diff:/var/lib/docker/overlay2/d4903c54aa9b839529e6b24e2293abe7cbea0093a5106726c0e93754cb105591/diff"
 ##                                                                                                                                                                                                                                                                                                                                                                                         merged_dir
-##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/merged"
+##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/14ee3496569226d7c1b5dc9d10257cf10608c616bd1317544f2a06da2a34ae2c/merged"
 ##                                                                                                                                                                                                                                                                                                                                                                                          upper_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/diff"
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/14ee3496569226d7c1b5dc9d10257cf10608c616bd1317544f2a06da2a34ae2c/diff"
 ##                                                                                                                                                                                                                                                                                                                                                                                           work_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/f6da47437e59bfcfe5d179b2b862c5d5b27ff22a5e3d35295dcef89f6b87638b/work"
+##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/14ee3496569226d7c1b5dc9d10257cf10608c616bd1317544f2a06da2a34ae2c/work"
 ##
 ##
 ## $size_rw
@@ -758,7 +767,7 @@ container$inspect(reload = FALSE)
 ##
 ## $config
 ## $config$hostname
-## [1] "ca1d81ae60d8"
+## [1] "a37425a56458"
 ##
 ## $config$domainname
 ## [1] ""

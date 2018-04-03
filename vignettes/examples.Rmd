@@ -33,7 +33,7 @@ redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)
 ```
 
-We now have a redis server running on 32788
+We now have a redis server running on 32777
 
 ```r
 redis$ports()
@@ -41,7 +41,7 @@ redis$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1           6379      tcp 0.0.0.0     32788
+## 1           6379      tcp 0.0.0.0     32777
 ```
 
 Make a connection to the Redis server:
@@ -300,8 +300,8 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ```
 
 ```
-## E> Cloning into '/tmp/tmp.SQDEr88uZE'...
-## O> * checking for file ‘/tmp/tmp.SQDEr88uZE/DESCRIPTION’ ... OK
+## E> Cloning into '/tmp/tmp.s8q1Sso1PR'...
+## O> * checking for file ‘/tmp/tmp.s8q1Sso1PR/DESCRIPTION’ ... OK
 ## O> * preparing ‘ids’:
 ## O> * checking DESCRIPTION meta-information ... OK
 ## O> * installing the package to build vignettes
@@ -312,7 +312,7 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ## O> * building ‘ids_1.0.1.tar.gz’
 ## E>
 ## O> ────────────────────────────────────────────────────────────────────────────────
-## O> ─  using log directory ‘/tmp/RtmpWDp5UT/file3d1ccf4aa2/ids.Rcheck’
+## O> ─  using log directory ‘/tmp/Rtmp26buQq/file3c2159c2c5/ids.Rcheck’
 ## O> ─  using R version 3.4.3 (2017-11-30)
 ## O> ─  using platform: x86_64-pc-linux-gnu (64-bit)
 ## O> ─  using session charset: UTF-8
