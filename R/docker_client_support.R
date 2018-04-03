@@ -343,6 +343,11 @@ after_plugin_install <- function(response, params, self) {
 }
 
 
+after_plugin_create <- function(response, params, self) {
+  self$get(params$query$name)
+}
+
+
 invisible_self <- function(response, params, self) {
   invisible(self)
 }
@@ -420,7 +425,7 @@ validate_stream <- function(stream, mode = "wb",
 }
 
 
-validate_tar_directory <- function(path, dockerfile,
+validate_tar_directory <- function(path, dockerfile = NULL,
                                    name = deparse(substitute(path))) {
   if (is.character(path)) {
     assert_directory(path, name = name)

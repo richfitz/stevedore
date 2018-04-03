@@ -54,3 +54,15 @@ test_that("get (offline)", {
   expect_is(x, "docker_plugin")
   expect_equal(x$name(), dummy_id())
 })
+
+
+test_that("build", {
+  cl <- test_docker_client()
+  key <- rand_str()
+  res <- cl$plugins$create(key, "plugin-example")
+  on.exit(res$remove())
+
+  expect_is(res, "docker_plugin")
+  expect_equal(res$name(), paste0(key, ":latest"))
+  expect_false(res$is_enabled())
+})

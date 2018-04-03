@@ -710,6 +710,14 @@ docker_client_plugin_collection <- function(parent) {
 
   self$get <- docker_client_getter(docker_client_plugin, parent, "name")
 
+  self$create <- docker_client_method(
+    "plugin_create", self,
+    rename = c(plugin_data_dir = "tar_context"),
+    defaults = alist(plugin_data_dir =),
+    process = list(
+      quote(plugin_data_dir <- validate_tar_directory(plugin_data_dir))),
+    after = after_plugin_create)
+
   stevedore_object(self, "docker_plugin_collection")
 }
 

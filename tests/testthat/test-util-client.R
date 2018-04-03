@@ -1010,3 +1010,12 @@ test_that("validate_plugin_configure_body", {
     validate_plugin_configure_body(c(foo = "xxx")),
     as.character(jsonlite::toJSON(list(foo = "xxx"), auto_unbox = TRUE)))
 })
+
+
+test_that("after_plugin_create", {
+  cl <- null_docker_client()
+  params <- list(query = list(name = dummy_id()))
+  res <- after_plugin_create(NULL, params, cl$plugins)
+  expect_is(res, "docker_plugin")
+  expect_equal(res$name(), dummy_id())
+})
