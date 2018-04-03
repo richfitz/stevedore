@@ -29,7 +29,7 @@ test_that("validate", {
 
   withr::with_options(
     list(stevedore.spec.path = tmp),
-    expect_error(swagger_spec_read(version, TRUE),
+    expect_error(swagger_spec_read(version, refresh = TRUE),
                  "Spec for 1.29 had different md5 than expected"))
 })
 

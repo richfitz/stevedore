@@ -9,7 +9,7 @@ swagger_spec_index <- function(refresh = FALSE) {
 }
 
 
-swagger_spec_read <- function(version, refresh = FALSE) {
+swagger_spec_read <- function(version, quiet = FALSE, refresh = FALSE) {
   if (!refresh && version %in% names(.stevedore$spec)) {
     return(.stevedore$spec[[version]])
   }
@@ -19,7 +19,7 @@ swagger_spec_read <- function(version, refresh = FALSE) {
   ## get all of that right though.  That should be dealt with at a
   ## higher level than this function though, which should just read a
   ## spec.
-  path <- swagger_spec_path()
+  path <- swagger_spec_path(quiet)
   spec_index <- swagger_spec_index()
 
   pos <- names(spec_index)
@@ -27,7 +27,7 @@ swagger_spec_read <- function(version, refresh = FALSE) {
     stop(sprintf("Invalid version %s; try one of %s",
                  version, paste(pos, collapse = ", ")))
   }
-  path_yml <- swagger_spec_fetch(version, path)
+  path_yml <- swagger_spec_fetch(version, path, quiet)
   md5_found <- hash_file(path_yml)
   md5_expected <- spec_index[[version]]
   if (md5_found != md5_expected) {
@@ -44,18 +44,17 @@ swagger_spec_read <- function(version, refresh = FALSE) {
 }
 
 
-swagger_spec_fetch <- function(version, path) {
+swagger_spec_fetch <- function(version, path, quiet = FALSE) {
   url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
   dest <- file.path(path, sprintf("v%s.yaml", version))
-  quiet <- getOption("stevedore.silent", FALSE)
   download_file(url, dest, quiet)
 }
 
 
-swagger_spec_path <- function() {
+swagger_spec_path <- function(quiet = FALSE) {
   path <- getOption("stevedore.spec.path", NULL)
   if (is.null(path)) {
-    if (!getOption("stevedore.silent", FALSE)) {
+    if (!quiet) {
       message("The option 'stevedore.spec.path' not set - using temporary dir")
     }
     path <- tempfile()

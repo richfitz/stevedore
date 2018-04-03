@@ -37,15 +37,17 @@
 ##'   (forcing the \code{httppipe} client where the \code{curl} client
 ##'   would ordinarily be preferred).
 ##'
+##' @param quiet Suppress informational messages.
 ##' @export
 docker_client <- function(api_version = NULL, url = NULL, ...,
-                          http_client_type = NULL) {
+                          http_client_type = NULL, quiet = FALSE) {
   assert_empty_dots(..., name = "docker_client")
+  assert_scalar_logical(quiet)
 
   self <- new_stevedore_object(NULL)
   self$.api_client <-
     docker_api_client(base_url = url, api_version = api_version,
-                      type = http_client_type, ...)
+                      type = http_client_type, quiet = quiet, ...)
   self$types <- docker_client_types(self)
 
   self$events <- docker_client_method(

@@ -1,9 +1,9 @@
 docker_api_client <- function(base_url = NULL, api_version = NULL,
-                              type = NULL) {
+                              type = NULL, quiet = FALSE) {
   self <- new.env(parent = parent.env(environment()))
   self$http_client <- http_client(base_url, api_version, type)
 
-  data <- docker_api_client_data(self$http_client$api_version)
+  data <- docker_api_client_data(self$http_client$api_version, quiet)
   self$endpoints <- data$endpoints
   self$types <- data$types
 
@@ -14,9 +14,9 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
 }
 
 
-docker_api_client_data <- function(version) {
+docker_api_client_data <- function(version, quiet) {
   if (!(version %in% names(.stevedore$client_data))) {
-    spec <- swagger_spec_read(version)
+    spec <- swagger_spec_read(version, quiet)
     endpoints <- docker_api_client_endpoints()
     docker_api_client_data_check(spec, endpoints)
 

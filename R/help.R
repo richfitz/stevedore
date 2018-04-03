@@ -288,8 +288,6 @@ NULL
 
 
 generate_help <- function(sub = NULL, api_version = NULL) {
-  oo <- options(stevedore.silent = TRUE)
-  on.exit(options(oo))
   tryCatch(generate_help_string(sub, api_version),
            error = function(e) "(automatic help generation has failed)")
 }
@@ -297,7 +295,7 @@ generate_help <- function(sub = NULL, api_version = NULL) {
 
 generate_help_string <- function(sub = NULL, api_version = NULL) {
   ## We should store the last used version in a cache I think?
-  x <- docker_client(api_version, http_client_type = "null")
+  x <- docker_client(api_version, http_client_type = "null", quiet = TRUE)
   api_version <- x$api_version()
   if (!is.null(sub)) {
     if (sub %in% names(x)) {

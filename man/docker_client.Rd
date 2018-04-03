@@ -5,7 +5,7 @@
 \title{Create docker client}
 \usage{
 docker_client(api_version = NULL, url = NULL, ...,
-  http_client_type = NULL)
+  http_client_type = NULL, quiet = FALSE)
 }
 \arguments{
 \item{api_version}{Version of the API request from the api.
@@ -40,6 +40,8 @@ into the \code{...} argument as is not intended for end-user
 use; it is primarily intended for debugging in development
 (forcing the \code{httppipe} client where the \code{curl} client
 would ordinarily be preferred).}
+
+\item{quiet}{Suppress informational messages.}
 }
 \description{
 Create a docker client object
