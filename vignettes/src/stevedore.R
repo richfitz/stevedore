@@ -391,11 +391,11 @@ img$remove()
 ## Docker volumes provide a useful abstraction for interacting with
 ## (possibly persistent) file volumes across containers.  To create a
 ## volume using `stevedore` (equivalent to `docker volume create`) use
-## `$volumes$create()`:
-vol <- docker$volumes$create("myvolume")
+## `$volume$create()`:
+vol <- docker$volume$create("myvolume")
 
 ## Volumes can be listed:
-docker$volumes$list()
+docker$volume$list()
 
 ## ### Working with volume objects
 
@@ -421,7 +421,7 @@ vol$remove()
 ## the volume name on the host side, so saying `<myvolume>:/myvolume`
 ## mounts our volume at `/myvolume` within the container.  This can be
 ## done easily with the `$map()` method.
-vol <- docker$volumes$create("myvolume")
+vol <- docker$volume$create("myvolume")
 docker$container$run(
   "alpine:latest",
   c("sh", "-c", "echo hello world > /myvolume/output"),
@@ -450,10 +450,10 @@ vol$remove()
 ## creates a docker network, then create containers attached to that
 ## network (containers can also be attached to networks after
 ## creation).
-nw <- docker$networks$create("mynetwork")
+nw <- docker$network$create("mynetwork")
 
 ## Networks can be listed:
-docker$networks$list()
+docker$network$list()
 
 ## The networks `bridge`, `host` and `none` always exist - they are
 ## special to docker.
@@ -483,7 +483,7 @@ nw$remove()
 ## argument to `$container$run()` to attach a container to that
 ## network.  Once established, containers on the same network can use
 ## another docker container's name as the hostname and communicate!
-nw <- docker$networks$create("mynetwork")
+nw <- docker$network$create("mynetwork")
 server <- docker$container$run("nginx", network = nw, name = "server",
                                detach = TRUE, rm = TRUE)
 server$status()

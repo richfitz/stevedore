@@ -48,11 +48,11 @@ test_that("children", {
   expect_is(d$image, "docker_image_collection")
   expect_is(d$image, "stevedore_object")
 
-  expect_is(d$networks, "docker_network_collection")
-  expect_is(d$networks, "stevedore_object")
+  expect_is(d$network, "docker_network_collection")
+  expect_is(d$network, "stevedore_object")
 
-  expect_is(d$volumes, "docker_volume_collection")
-  expect_is(d$volumes, "stevedore_object")
+  expect_is(d$volume, "docker_volume_collection")
+  expect_is(d$volume, "stevedore_object")
 
   expect_is(d$swarm, "docker_swarm_collection")
   expect_is(d$swarm, "stevedore_object")

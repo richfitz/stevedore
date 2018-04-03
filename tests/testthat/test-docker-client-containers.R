@@ -700,7 +700,7 @@ test_that("volume map", {
 test_that("volume map: docker volume", {
   skip_on_travis() # FIXME
   d <- test_docker_client()
-  volume <- d$volumes$create("myvolume")
+  volume <- d$volume$create("myvolume")
 
   nm <- rand_str(10, "stevedore_")
   v <- sprintf("%s:%s", volume$name(), "/host")
@@ -730,7 +730,7 @@ test_that("volume map: docker volume", {
 test_that("volume map: readonly", {
   skip_on_travis() # FIXME
   d <- test_docker_client()
-  volume <- d$volumes$create("avolume")
+  volume <- d$volume$create("avolume")
   nm <- rand_str(10, "stevedore_")
   dest <- "/host"
   x <- d$container$create("richfitz/iterate",
@@ -872,7 +872,7 @@ test_that("network: custom", {
   url <- paste0("http://", server)
 
   d <- test_docker_client()
-  nw <- d$networks$create(network)
+  nw <- d$network$create(network)
   on.exit({
     if (exists("x")) {
       x$remove(force = TRUE)

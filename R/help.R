@@ -58,9 +58,9 @@ NULL
 
 
 ##' Methods for working with docker networks.  This object is
-##'   \code{$networks} within a \code{\link{docker_client}} object.
+##'   \code{$network} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("networks")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("network")}
 ##'
 ##' @name docker_network_collection
 ##'
@@ -73,7 +73,7 @@ NULL
 
 ##' Methods for working with a particular docker network.  Network
 ##' objects are returned by creating a docker network, or by using
-##' \code{$networks$get} to fetch an existing network by name or id.
+##' \code{$network$get} to fetch an existing network by name or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_network")}
 ##'
@@ -87,9 +87,9 @@ NULL
 
 
 ##' Methods for working with docker volumes.  This object is
-##'   \code{$volumes} within a \code{\link{docker_client}} object.
+##'   \code{$volume} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("volumes")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("volume")}
 ##'
 ##' @name docker_volume_collection
 ##'
@@ -102,7 +102,7 @@ NULL
 
 ##' Methods for working with a particular docker volume.  Volume
 ##' objects are returned by creating a docker volume, or by using
-##' \code{$volumes$get} to fetch an existing volume by name or id.
+##' \code{$volume$get} to fetch an existing volume by name or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_volume")}
 ##'
