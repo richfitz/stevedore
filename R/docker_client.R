@@ -528,7 +528,7 @@ docker_client_node_collection <- function(parent) {
   ## automate the index but also allow for *partial* updates, perhaps.
   self$update <- docker_client_method("node_update", self)
 
-  stevedore_object(self, "docker_swarm_collection")
+  stevedore_object(self, "docker_node_collection")
 }
 
 
