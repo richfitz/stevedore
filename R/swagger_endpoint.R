@@ -23,31 +23,29 @@
 ## But for the simple cases this is going to save a lot of repetitive
 ## code and automatically allow for differences in the schema over
 ## time.
-swagger_endpoint <- function(name, method, path, cli, v_from, handlers,
-                             types, spec) {
-  if (!is.null(v_from) && !version_at_least(spec$info$version, v_from)) {
-    return(swagger_endpoint_unsupported(name, method, path, v_from,
-                                        spec$info$version))
+swagger_endpoint <- function(x, types, spec) {
+  if (!is.null(x$from) && !version_at_least(spec$info$version, x$from)) {
+    return(swagger_endpoint_unsupported(x, spec$info$version))
   }
-  path_data <- swagger_path_parse(path)
-  x <- spec$paths[[path]][[method]]
-  produces <- get_response_type(method, path, x)
+  path_data <- swagger_path_parse(x$path)
+  d <- spec$paths[[x$path]][[x$method]]
+  produces <- get_response_type(x$method, x$path, d)
 
-  response_handlers <- swagger_response_handlers(x$responses, spec, produces)
-  header_handlers <- swagger_header_handlers(x$responses, spec)
+  response_handlers <- swagger_response_handlers(d$responses, spec, produces)
+  header_handlers <- swagger_header_handlers(d$responses, spec)
 
-  response_description <- lapply(x$responses, "[[", "description")
+  response_description <- lapply(d$responses, "[[", "description")
 
-  args <- swagger_args(method, path, x, handlers, types, spec)
+  args <- swagger_args(x$method, x$path, d, x$handlers, types, spec)
   argument_handler <- args$handler
   help <- args$help
-  help$cli <- cli
+  help$cli <- x$cli
 
   list(
-    name = name,
-    path = path,
+    name = x$name,
+    path = x$path,
     path_fmt = path_data$fmt,
-    method = toupper(method),
+    method = toupper(x$method),
     argument_handler = argument_handler,
     response_handlers = response_handlers,
     header_handlers = header_handlers,
@@ -80,12 +78,11 @@ get_response_type <- function(method, path, data) {
 }
 
 
-swagger_endpoint_unsupported <- function(name, method, path,
-                                         version_required, version_used) {
-  list(name = name,
-       path = path,
-       method = toupper(method),
-       version_required = version_required,
+swagger_endpoint_unsupported <- function(x, version_used) {
+  list(name = x$name,
+       path = x$path,
+       method = toupper(x$method),
+       version_required = x$from,
        version_used = version_used,
        unsupported = TRUE)
 }
