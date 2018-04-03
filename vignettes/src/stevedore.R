@@ -42,7 +42,7 @@ plain_output <- function(x) lang_output(x, "plain")
 local({
   p <- system.file("images/iterate", package = "stevedore", mustWork = TRUE)
   stopifnot(file.copy(p, ".", recursive = TRUE))
-  stevedore::docker_client()$images$build("iterate", tag = "richfitz/iterate")
+  stevedore::docker_client()$image$build("iterate", tag = "richfitz/iterate")
 })
 nginx_ready <- function(port, attempts = 10) {
 
@@ -291,17 +291,17 @@ nginx$stop(t = 0)
 ## ### Pulling
 
 ##+ include = FALSE, error = FALSE
-docker$images$remove("bash:latest")
+docker$image$remove("bash:latest")
 
-## Images can be directly pulled with `docker$images$pull` providing
+## Images can be directly pulled with `docker$image$pull` providing
 ## an image name (as either `<repo>` or `<repo>:<tag>`.  If the image
 ## exists already this will be quick, and if the network connection is
 ## down then this will fail.
-docker$images$pull("bash:latest")
+docker$image$pull("bash:latest")
 
 ## ### The object returned by pull is an image object - that can be
 ## ### created by using `$get`
-img <- docker$images$get("bash:latest")
+img <- docker$image$get("bash:latest")
 
 ## ### Building
 
@@ -319,7 +319,7 @@ plain_output(readLines("iterate/Dockerfile"))
 lang_output(readLines("iterate/iterate"), "shell")
 
 ## We can build this image using:
-img <- docker$images$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
+img <- docker$image$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
 img
 
 ## The newly created image is returned as an image object and can be
@@ -334,12 +334,12 @@ unlink("iterate", recursive = TRUE)
 
 ## There is a third way of creating an image, which is to import it
 ## from a tar archive.  This is not yet documented (**TODO**) but can
-## be done via `$images$import()`
+## be done via `$image$import()`
 
 ## ### Working with image objects
 
 ## Eachimage object has a number of methods.
-img <- docker$images$get("richfitz/iterate")
+img <- docker$image$get("richfitz/iterate")
 img
 
 ## The `$id()`, `$short_id()`, `$labels()`, `$name()` and `$tags()`

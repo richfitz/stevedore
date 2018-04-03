@@ -14,7 +14,7 @@ has_internet <- function() {
 }
 if (has_internet()) {
   d <- stevedore::docker_client()
-  try(d$images$remove("alpine:3.1"), silent = TRUE)
+  try(d$image$remove("alpine:3.1"), silent = TRUE)
 }
 ```
 
@@ -76,7 +76,7 @@ container$remove()
 And manage images
 
 ```{r, images}
-head(docker$images$list())
+head(docker$image$list())
 ```
 
 Some of these functions have many arguments, but `stevedore` includes help inline:

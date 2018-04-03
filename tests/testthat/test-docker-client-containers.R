@@ -24,7 +24,7 @@ test_that("create", {
 test_that("create, using image", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  img <- d$images$get("hello-world")
+  img <- d$image$get("hello-world")
   x <- d$container$create(img, name = nm)
   expect_equal(x$image()$id(), img$id())
   x$remove()
@@ -396,7 +396,7 @@ test_that("image", {
   nm <- rand_str(10, "stevedore_")
   x <- d$container$create("hello-world", name = nm)
   img <- x$image()
-  cmp <- d$images$get("hello-world")
+  cmp <- d$image$get("hello-world")
   expect_equal(cmp$inspect(), img$inspect())
   x$remove()
 })
@@ -532,7 +532,7 @@ test_that("run: error", {
   expect_is(e$container, "docker_container")
   expect_equal(e$exit_status, 4L)
   expect_equal(e$cmd, "4")
-  expect_equal(e$image$id(), d$images$get("richfitz/error")$id())
+  expect_equal(e$image$id(), d$image$get("richfitz/error")$id())
   expect_is(e$out, "docker_stream")
   expect_equal(e$out, docker_stream("throwing error 4\n", 1L))
 })
@@ -551,7 +551,7 @@ test_that("run: error to stderr", {
 
 test_that("run with image", {
   d <- test_docker_client()
-  img <- d$images$get("hello-world")
+  img <- d$image$get("hello-world")
   ans <- d$container$run(img, rm = TRUE, stream = FALSE)
   expect_is(ans$logs, "docker_stream")
 })

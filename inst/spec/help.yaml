@@ -33,7 +33,7 @@ docker_container_collection:
       line tool.  It will:
 
       - Try to pull a container if it does not yet exist (see
-        `$images$pull`; `docker_image_collection`)
+        `$image$pull`; `docker_image_collection`)
       - Create the container (see `$container$create`;
         `docker_container_collection`)
       - Start the container (see `$start`; `docker_container`)
@@ -204,7 +204,7 @@ docker_image:
   untag:
     summary: >-
       Remove tags from the image.  This is a lot like
-      `images$remove` (see `docker_image_collection`)
+      `image$remove` (see `docker_image_collection`)
       but with `noprune = TRUE`.
     args:
       repo_tag: >

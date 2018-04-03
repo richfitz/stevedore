@@ -141,7 +141,7 @@ plain_output(readLines("tester/Dockerfile"))
 ## which contains:
 lang_output(readLines("tester/tester.sh"), "shell")
 
-img <- docker$images$build("tester", tag = "richfitz/tester")
+img <- docker$image$build("tester", tag = "richfitz/tester")
 
 ## With this image we can then test packages off github:
 invisible(docker$container$run(img, "https://github.com/richfitz/ids",

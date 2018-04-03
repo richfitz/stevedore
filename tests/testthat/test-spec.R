@@ -51,7 +51,7 @@ test_that("spec check", {
 test_that("image build clean in old versions", {
   cl <- test_docker_client(api_version = "1.29")
   expect_error(
-    cl$images$build_clean(),
+    cl$image$build_clean(),
     "'image_build_clean' (POST /build/prune) requires docker API version at least 1.31 (version 1.29 used)",
     fixed = TRUE)
 })

@@ -71,11 +71,11 @@ docker_get_image <- function(image, client, name = deparse(substitute(image))) {
   } else {
     image <- image_name_with_tag(image, name)
     tryCatch(
-      client$images$get(image),
+      client$image$get(image),
       docker_error = function(e) {
         if (is_docker_error_not_found(e)) {
           message(sprintf("Unable to find image '%s' locally", image))
-          client$images$pull(image)
+          client$image$pull(image)
         } else {
           stop(e)
         }

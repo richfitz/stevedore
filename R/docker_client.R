@@ -66,7 +66,7 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
   self$api_version <- function() self$.api_client$http_client$api_version
 
   self$container <- docker_client_container_collection(self)
-  self$images <- docker_client_image_collection(self)
+  self$image <- docker_client_image_collection(self)
   self$networks <- docker_client_network_collection(self)
   self$volumes <- docker_client_volume_collection(self)
 

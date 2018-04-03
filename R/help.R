@@ -29,9 +29,9 @@ NULL
 
 
 ##' Methods for working with docker images.  This object is
-##'   \code{$images} within a \code{\link{docker_client}} object.
+##'   \code{$image} within a \code{\link{docker_client}} object.
 ##'
-##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("images")}
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("image")}
 ##'
 ##' @name docker_image_collection
 ##'
@@ -44,7 +44,7 @@ NULL
 
 ##' Methods for working with a particular docker image.  Image objects
 ##' are returned by building or pulling a docker image, or by using
-##' \code{$images$get} to fetch an existing image by name or id.
+##' \code{$image$get} to fetch an existing image by name or id.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_image")}
 ##'

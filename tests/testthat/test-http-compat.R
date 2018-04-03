@@ -19,32 +19,32 @@ test_that("streaming raw", {
 test_that("build", {
   dc <- test_docker_client()
   context <- tar_directory("images/iterate")
-  expect_output(dc$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = stdout(),
-                                tag = "richfitz/iterate:testing"),
+  expect_output(dc$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = stdout(),
+                               tag = "richfitz/iterate:testing"),
                 "FROM alpine:latest")
-  expect_silent(dc$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = NULL,
-                                tag = "richfitz/iterate:testing"))
+  expect_silent(dc$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = NULL,
+                               tag = "richfitz/iterate:testing"))
   p <- tempfile()
-  expect_silent(dc$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = p,
-                                tag = "richfitz/iterate:testing"))
+  expect_silent(dc$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = p,
+                               tag = "richfitz/iterate:testing"))
   expect_match(readLines(p), "FROM alpine:latest", all = FALSE)
 
   dh <- test_docker_client(http_client_type = "httppipe")
 
-  expect_output(dh$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = stdout(),
-                                tag = "richfitz/iterate:testing"),
+  expect_output(dh$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = stdout(),
+                               tag = "richfitz/iterate:testing"),
                 "FROM alpine:latest")
-  expect_silent(dh$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = NULL,
-                                tag = "richfitz/iterate:testing"))
+  expect_silent(dh$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = NULL,
+                               tag = "richfitz/iterate:testing"))
   p <- tempfile()
-  expect_silent(dh$images$build(context, nocache = TRUE, rm = TRUE,
-                                stream = p,
-                                tag = "richfitz/iterate:testing"))
+  expect_silent(dh$image$build(context, nocache = TRUE, rm = TRUE,
+                               stream = p,
+                               tag = "richfitz/iterate:testing"))
   expect_match(readLines(p), "FROM alpine:latest", all = FALSE)
 })
 
@@ -99,19 +99,19 @@ test_that("pull", {
   dc <- test_docker_client(http_client_type = "curl")
   dh <- test_docker_client(http_client_type = "httppipe")
 
-  txt0 <- capture.output(img0 <- dc$images$pull("alpine:latest"))
+  txt0 <- capture.output(img0 <- dc$image$pull("alpine:latest"))
   str <- "Pulling from library/alpine latest"
   if (!any(grepl(str, txt0, fixed = TRUE))) {
     skip("Docker has changed pull text")
   }
 
-  txt1 <- capture.output(img1 <- dh$images$pull("alpine:latest"))
+  txt1 <- capture.output(img1 <- dh$image$pull("alpine:latest"))
   expect_match(txt1, str, fixed = TRUE, all = FALSE)
 
-  expect_silent(img2 <- dh$images$pull("alpine:latest", stream = NULL))
+  expect_silent(img2 <- dh$image$pull("alpine:latest", stream = NULL))
 
   tmp <- tempfile()
-  expect_silent(img3 <- dh$images$pull("alpine:latest", stream = tmp))
+  expect_silent(img3 <- dh$image$pull("alpine:latest", stream = tmp))
   expect_match(readLines(tmp), str, fixed = TRUE, all = FALSE)
 })
 

@@ -45,8 +45,8 @@ test_that("children", {
   expect_is(d$container, "docker_container_collection")
   expect_is(d$container, "stevedore_object")
 
-  expect_is(d$images, "docker_image_collection")
-  expect_is(d$images, "stevedore_object")
+  expect_is(d$image, "docker_image_collection")
+  expect_is(d$image, "stevedore_object")
 
   expect_is(d$networks, "docker_network_collection")
   expect_is(d$networks, "stevedore_object")

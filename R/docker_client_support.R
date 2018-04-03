@@ -903,7 +903,7 @@ docker_client_image_untag <- function(repo_tag, image) {
     stop(sprintf("Invalid repo_tag '%s' for image '%s'",
                  repo_tag, image$id()))
   }
-  image$.parent$images$remove(repo_tag, noprune = TRUE)
+  image$.parent$image$remove(repo_tag, noprune = TRUE)
   image$reload()
 }
 
