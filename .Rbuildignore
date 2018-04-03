@@ -8,4 +8,4 @@
 \.pyc$
 __pycache__
 ^demo$
-^design\.md$
+^development\.md$
