@@ -963,7 +963,7 @@ test_that("validate_plugin_privileges", {
          Description = jsonlite::unbox(dat$description[[i]]),
          Value = dat$value[[i]])
   }
-  cmp <- lapply(seq_len(nrow(dat)), f)
+  cmp <- as.character(jsonlite::toJSON(lapply(seq_len(nrow(dat)), f)))
 
   expect_message(
     res <- validate_plugin_privileges(NULL, "vieux/sshfs:latest", TRUE, dat),

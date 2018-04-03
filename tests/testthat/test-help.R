@@ -12,12 +12,14 @@ test_that("all help generates", {
                  "tasks",
                  "secrets",
                  "configs",
+                 "plugins",
                  "docker_container",
                  "docker_image",
                  "docker_network",
                  "docker_volume",
                  "docker_service",
                  "docker_task",
+                 "docker_plugin",
                  "docker_exec")
 
   stevedore_reset()

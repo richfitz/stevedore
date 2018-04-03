@@ -214,6 +214,36 @@ NULL
 NULL
 
 
+##' Methods for working with docker plugins.  This object is
+##'   \code{$plugins} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("plugins")}
+##'
+##' @name docker_plugin_collection
+##'
+##' @title Management commands for working with docker plugins
+##'
+##' @seealso \code{\link{docker_plugin}} for information on
+##'   plugin objects.
+NULL
+
+
+##' Methods for working with a particular docker plugin.  Plugin
+##' objects are returned by installing or building a docker plugin, or
+##' by using \code{$plugins$get} to fetch an existing plugin by name
+##' or id.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_plugin")}
+##'
+##' @name docker_plugin
+##'
+##' @title Management commands for working with a particular docker plugin
+##'
+##' @seealso \code{\link{docker_plugin_collection}} for other
+##'   plugin management methods.
+NULL
+
+
 ##' Methods for building complex docker types.  This is most objects
 ##' more complicated than R's atomic types.  Most functions will
 ##' indicate if they require one of these objects in their help.  None
@@ -266,6 +296,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
                   docker_exec = docker_client_exec,
                   docker_service = docker_client_service,
                   docker_task = docker_client_task,
+                  docker_plugin = docker_client_plugin,
                   stop("impossible!"))
       x <- f(dummy_id(), x)
     }
