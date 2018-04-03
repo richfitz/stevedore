@@ -1,6 +1,6 @@
 Package: stevedore
 Title: Docker Client
-Version: 0.0.1
+Version: 0.0.2
 Description: Work with containers over the Docker 'API'.  Rather than
     using system calls to interact with a docker client, using the
     'API' directly means that we can recieve richer information from

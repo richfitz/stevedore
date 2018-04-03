@@ -589,12 +589,12 @@ validate_secret_data <- function(data) {
 validate_service_secrets <- function(task_template, client, config = FALSE) {
   if (config) {
     key_spec <- "Configs"
-    key_obj <- "configs"
+    key_obj <- "config"
     data_prefix <- "Config"
     data_name <- c("config", "configs")
   } else {
     key_spec <- "Secrets"
-    key_obj <- "secrets"
+    key_obj <- "secret"
     data_prefix <- "Secret"
     data_name <- c("secret", "secrets")
   }
