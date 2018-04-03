@@ -297,6 +297,59 @@ docker_swarm_collection:
 
 docker_node_collection:
   help: *help
+  get:
+    summary: >-
+      Get a service by name or id
+    args:
+      id: >-
+        A scalar character with the network's name or id
+        (abbreviations of the id are allowed and will be resolved by
+        the docker daemon).
+
+docker_node:
+  help: *help
+  id:
+    summary: >-
+      Return the node's id
+  inspect:
+    summary: >-
+      Return detailed information about this node
+    args:
+      reload: &reload-node >-
+        Logical scalar, indicating if the information should be
+        refreshed from the daemon.  This is useful to set to
+        `FALSE` after a node has been removed.
+    cli: "node inspect"
+  hostname:
+    summary: >-
+      Return the node's hostname
+    args:
+      reload: *reload-node
+  status:
+    summary: >-
+      Return the node's status (
+    args:
+      reload: *reload-node
+  role:
+    summary: >-
+      Return the node's role (worker, manager))
+    args:
+      reload: *reload-node
+  availability:
+    summary: >-
+      Return the node's availability (active, pause, drain)
+    args:
+      reload: *reload-node
+  version:
+    summary: >-
+      Return the node's version.  This is used by some other
+      methods to avoid conflicting writes.
+    args:
+      reload: *reload-node
+  reload:
+    summary: >-
+      Refresh infomation on the node from the server, returning
+      `$inspect()` invisibly.
 
 docker_service_collection:
   help: *help

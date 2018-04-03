@@ -31,4 +31,12 @@ data_frame(
       plugins = data.frame(
         type = c("Volume", "Network", "Network", "Network"),
         name = c("local",  "bridge",  "null",    "overlay"),
-        stringsAsFactors = FALSE))))))
+        stringsAsFactors = FALSE))))),
+  status = I(list(list(
+    state = "ready",
+    message = NA_character_,
+    addr = "172.17.0.2"))),
+  manager_status = I(list(list(
+    leader = TRUE,
+    reachability = "reachable",
+    addr = "172.17.0.2:2377"))))

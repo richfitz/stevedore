@@ -17,6 +17,7 @@ test_that("all help generates", {
                  "docker_image",
                  "docker_network",
                  "docker_volume",
+                 "docker_node",
                  "docker_service",
                  "docker_task",
                  "docker_plugin",

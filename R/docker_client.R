@@ -518,17 +518,39 @@ docker_client_swarm_collection <- function(parent) {
 docker_client_node_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
-  self$inspect <- docker_client_method("node_inspect", self)
+  self$get <- docker_client_getter(docker_client_node, parent, "id")
+
   self$list <- docker_client_method(
     "node_list", self,
     process = list(quote(filters <- as_docker_filter(filters))))
   self$delete <- docker_client_method("node_delete", self)
 
+  stevedore_object(self, "docker_node_collection")
+}
+
+
+docker_client_node <- function(id, parent) {
+  self <- new_stevedore_object(parent)
+
+  fix_id <- docker_client_add_inspect(id, "id", "node_inspect", self)
+
   ## TODO: this one here needs a bunch of work actually - we need to
   ## automate the index but also allow for *partial* updates, perhaps.
-  self$update <- docker_client_method("node_update", self)
+  self$update <- docker_client_method(
+    "node_update", self,
+    fix = fix_id)
 
-  stevedore_object(self, "docker_node_collection")
+  self$hostname <- function(reload = TRUE) {
+    self$inspect(reload)$description$hostname
+  }
+  self$version <- function(reload = TRUE) self$inspect(reload)$version$index
+  self$status <- function(reload = TRUE) self$inspect(reload)$status$state
+  self$role <- function(reload = TRUE) self$inspect(reload)$spec$role
+  self$availability <- function(reload = TRUE) {
+    self$inspect(reload)$spec$availability
+  }
+
+  stevedore_object(self, "docker_node")
 }
 
 

@@ -153,6 +153,21 @@ NULL
 NULL
 
 
+##' Methods for working with a particular docker node.  Node objects
+##' are by using \code{$node$get} to fetch an existing node by name or
+##' id.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_node")}
+##'
+##' @name docker_node
+##'
+##' @title Management commands for working with a particular docker node
+##'
+##' @seealso \code{\link{docker_node_collection}} for other
+##'   node management methods.
+NULL
+
+
 ##' Methods for working with docker services.  This object is
 ##'   \code{$service} within a \code{\link{docker_client}} object.
 ##'
@@ -294,6 +309,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
                   docker_network = docker_client_network,
                   docker_volume = docker_client_volume,
                   docker_exec = docker_client_exec,
+                  docker_node = docker_client_node,
                   docker_service = docker_client_service,
                   docker_task = docker_client_task,
                   docker_plugin = docker_client_plugin,
