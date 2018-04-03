@@ -1,5 +1,5 @@
 ## ** stevedore_object support **
-stevedore_object <- function(env, class) {
+stevedore_object <- function(env, class, title) {
   api_version <- env$.parent$.api_client$api_version
   env$help <- function(help_type = getOption("help_type")) {
     stevedore_object_help(class, api_version, help_type) # nocov
@@ -14,6 +14,7 @@ stevedore_object <- function(env, class) {
   }
 
   class(env) <- c(class, "stevedore_object")
+  attr(env, "title") <- title
   lock_environment(env)
   env
 }

@@ -68,11 +68,13 @@ format.docker_stream <- function(x, ..., style = "auto",
   x
 }
 
+
 ##' @export
 print.docker_stream <- function(x, ...) {
   cat(format(x, ...), sep = "")
   invisible(x)
 }
+
 
 ##' @export
 format.docker_container <- function(x, ..., summary = FALSE) {
@@ -80,6 +82,7 @@ format.docker_container <- function(x, ..., summary = FALSE) {
     sprintf("  id: %s", x$id()),
     sprintf("  name: %s", x$name()))
 }
+
 
 ##' @export
 format.docker_run_output <- function(x, ..., max_lines = 12) {
@@ -91,11 +94,13 @@ format.docker_run_output <- function(x, ..., max_lines = 12) {
     indent(format(x$logs, ..., max_lines = max_lines, strip_newline = TRUE), 4))
 }
 
+
 ##' @export
 print.docker_run_output <- function(x, ...) {
   cat(paste0(format(x, ...), "\n"), sep = "")
   invisible(x)
 }
+
 
 ##' @export
 print.stevedore_object <- function(x, ..., indent = 2L) {
@@ -106,9 +111,10 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
   cat(sprintf("<%s>\n", class(x)[[1]]))
 
   if (any(!is_fn)) {
+    title <- vcapply(nms[!is_fn], function(el) attr(x[[el]], "title"))
     cl <- vcapply(nms[!is_fn], function(el) class(x[[el]])[[1]])
     i <- order(cl == "docker_types")
-    cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn][i], cl[i]),
+    cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn][i], title[i]),
         sep = "")
   }
 

@@ -79,7 +79,8 @@ docker_client <- function(api_version = NULL, url = NULL, ...,
 
   self$plugin <- docker_client_plugin_collection(self)
 
-  stevedore_object(self, "docker_client")
+  stevedore_object(self, "docker_client",
+                   "Control the docker daemon")
 }
 
 docker_client_container_collection <- function(parent) {
@@ -119,7 +120,8 @@ docker_client_container_collection <- function(parent) {
     "container_prune", self,
     process = list(quote(filters <- as_docker_filter(filters))))
 
-  stevedore_object(self, "docker_container_collection")
+  stevedore_object(self, "docker_container_collection",
+                   "Work with docker containers")
 }
 
 docker_client_container <- function(id, parent) {
@@ -268,7 +270,8 @@ docker_client_container <- function(id, parent) {
     "container_wait", self,
     fix = fix_id)
 
-  stevedore_object(self, "docker_container")
+  stevedore_object(self, "docker_container",
+                   "Work with a particular docker container")
 }
 
 
@@ -337,7 +340,8 @@ docker_client_image_collection <- function(parent) {
   self$build_clean <- docker_client_method(
     "image_build_clean", self)
 
-  stevedore_object(self, "docker_image_collection")
+  stevedore_object(self, "docker_image_collection",
+                   "Work with docker images")
 }
 
 docker_client_image <- function(id, parent) {
@@ -383,7 +387,8 @@ docker_client_image <- function(id, parent) {
     "image_delete", self,
     fix = fix_id_as_name)
 
-  stevedore_object(self, "docker_image")
+  stevedore_object(self, "docker_image",
+                   "Work with a particular docker image")
 }
 
 docker_client_network_collection <- function(parent) {
@@ -406,7 +411,8 @@ docker_client_network_collection <- function(parent) {
     "network_prune", self,
     process = list(quote(filters <- as_docker_filter(filters))))
 
-  stevedore_object(self, "docker_network_collection")
+  stevedore_object(self, "docker_network_collection",
+                   "Work with docker networks")
 }
 
 docker_client_network <- function(id, parent) {
@@ -432,7 +438,8 @@ docker_client_network <- function(id, parent) {
     "network_delete", self,
     fix = fix_id)
 
-  stevedore_object(self, "docker_network")
+  stevedore_object(self, "docker_network",
+                   "Work with a particular docker network")
 }
 
 docker_client_volume_collection <- function(parent) {
@@ -454,7 +461,8 @@ docker_client_volume_collection <- function(parent) {
   self$prune <- docker_client_method(
     "volume_prune", self,
     process = list(quote(filters <- as_docker_filter(filters))))
-  stevedore_object(self, "docker_volume_collection")
+  stevedore_object(self, "docker_volume_collection",
+                   "Work with docker volumes")
 }
 
 docker_client_volume <- function(name, parent) {
@@ -469,7 +477,8 @@ docker_client_volume <- function(name, parent) {
     "volume_delete", self,
     fix = fix_name)
 
-  stevedore_object(self, "docker_volume")
+  stevedore_object(self, "docker_volume",
+                   "Work with a particular docker volume")
 }
 
 docker_client_exec <- function(id, parent) {
@@ -494,7 +503,8 @@ docker_client_exec <- function(id, parent) {
     "exec_resize", self,
     fix = fix_id)
 
-  stevedore_object(self, "docker_exec")
+  stevedore_object(self, "docker_exec",
+                   "Work with an 'exec' instance")
 }
 
 
@@ -511,7 +521,8 @@ docker_client_swarm_collection <- function(parent) {
   self$unlock_key <- docker_client_method("swarm_unlock_key", self)
   self$unlock <- docker_client_method("swarm_unlock", self)
 
-  stevedore_object(self, "docker_swarm_collection")
+  stevedore_object(self, "docker_swarm_collection",
+                   "Manage the docker swarm")
 }
 
 
@@ -525,7 +536,8 @@ docker_client_node_collection <- function(parent) {
     process = list(quote(filters <- as_docker_filter(filters))))
   self$delete <- docker_client_method("node_delete", self)
 
-  stevedore_object(self, "docker_node_collection")
+  stevedore_object(self, "docker_node_collection",
+                   "Manage docker swarm nodes")
 }
 
 
@@ -550,7 +562,8 @@ docker_client_node <- function(id, parent) {
     self$inspect(reload)$spec$availability
   }
 
-  stevedore_object(self, "docker_node")
+  stevedore_object(self, "docker_node",
+                   "Work with a particular docker node")
 }
 
 
@@ -588,7 +601,8 @@ docker_client_service_collection <- function(parent) {
   self$remove <- docker_client_method(
     "service_delete", self)
 
-  stevedore_object(self, "docker_service_collection")
+  stevedore_object(self, "docker_service_collection",
+                   "Work with docker services")
 }
 
 
@@ -609,7 +623,8 @@ docker_client_service <- function(id, parent) {
     docker_client_service_ps(self, resolve_names, filters)
   }
 
-  stevedore_object(self, "docker_service")
+  stevedore_object(self, "docker_service",
+                   "Work with a particular docker service")
 }
 
 
@@ -621,7 +636,8 @@ docker_client_task_collection <- function(parent) {
     process = list(quote(filters <- as_docker_filter(filters))))
   self$get <- docker_client_getter(docker_client_task, parent, "id")
 
-  stevedore_object(self, "docker_task_collection")
+  stevedore_object(self, "docker_task_collection",
+                   "Work with docker tasks")
 }
 
 docker_client_task <- function(id, parent) {
@@ -647,7 +663,8 @@ docker_client_task <- function(id, parent) {
     self$.parent$service$get(self$inspect(FALSE)$service_id)
   }
 
-  stevedore_object(self, "docker_task")
+  stevedore_object(self, "docker_task",
+                   "Work with a particular docker task")
 }
 
 
@@ -675,7 +692,8 @@ docker_client_secret_collection <- function(parent) {
   self$update <- docker_client_method(
     "secret_update", self)
 
-  stevedore_object(self, "docker_secret_collection")
+  stevedore_object(self, "docker_secret_collection",
+                   "Manage docker swarm secrets")
 }
 
 
@@ -703,7 +721,8 @@ docker_client_config_collection <- function(parent) {
   self$update <- docker_client_method(
     "config_update", self)
 
-  stevedore_object(self, "docker_config_collection")
+  stevedore_object(self, "docker_config_collection",
+                   "Manage docker swarm configs")
 }
 
 
@@ -740,7 +759,8 @@ docker_client_plugin_collection <- function(parent) {
       quote(plugin_data_dir <- validate_tar_directory(plugin_data_dir))),
     after = after_plugin_create)
 
-  stevedore_object(self, "docker_plugin_collection")
+  stevedore_object(self, "docker_plugin_collection",
+                   "Work with docker plugins")
 }
 
 
@@ -772,7 +792,8 @@ docker_client_plugin <- function(name, parent) {
     process = list(
       quote(body <- validate_plugin_configure_body(body))))
 
-  stevedore_object(self, "docker_plugin")
+  stevedore_object(self, "docker_plugin",
+                   "Work with a particular docker plugin")
 }
 
 
@@ -780,5 +801,6 @@ docker_client_types <- function(parent) {
   self <- new_stevedore_object(parent)
   types <- lapply(parent$.api_client$types, "[[", "reciever")
   list2env(types, self)
-  stevedore_object(self, "docker_types")
+  stevedore_object(self, "docker_types",
+                   "Methods for building complex docker types")
 }
