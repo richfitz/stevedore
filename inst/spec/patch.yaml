@@ -209,3 +209,72 @@
   path: ["paths", "/plugins/{name}", "delete", "produces"]
   value: ~
   replace: true
+
+# This is duplicated from the 1.32 spec
+- version: ["1.25", "1.31"]
+  path: ["definitions"]
+  value:
+    NodeStatus:
+      description: |
+        NodeStatus represents the status of a node.
+
+        It provides the current status of the node, as seen by the manager.
+      type: "object"
+      properties:
+        State:
+          $ref: "#/definitions/NodeState"
+        Message:
+          type: "string"
+          example: ""
+        Addr:
+          description: "IP address of the node."
+          type: "string"
+          example: "172.17.0.2"
+
+    NodeState:
+      description: "NodeState represents the state of a node."
+      type: "string"
+      enum:
+        - "unknown"
+        - "down"
+        - "ready"
+        - "disconnected"
+      example: "ready"
+
+    ManagerStatus:
+      description: |
+        ManagerStatus represents the status of a manager.
+
+        It provides the current status of a node's manager component, if the
+        node is a manager.
+      x-nullable: true
+      type: "object"
+      properties:
+        Leader:
+          type: "boolean"
+          default: false
+          example: true
+        Reachability:
+          $ref: "#/definitions/Reachability"
+        Addr:
+          description: |
+            The IP address and port at which the manager is reachable.
+          type: "string"
+          example: "10.0.0.46:2377"
+
+    Reachability:
+      description: "Reachability represents the reachability of a node."
+      type: "string"
+      enum:
+        - "unknown"
+        - "unreachable"
+        - "reachable"
+      example: "reachable"
+
+- version: ["1.25", "1.31"]
+  path: ["definitions", "Node", "properties"]
+  value:
+    Status:
+      $ref: "#/definitions/NodeStatus"
+    ManagerStatus:
+      $ref: "#/definitions/ManagerStatus"
