@@ -197,6 +197,36 @@ NULL
 NULL
 
 
+##' Methods for working with docker tasks.  This object is
+##'   \code{$task} within a \code{\link{docker_client}} object.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("task")}
+##'
+##' @name docker_task_collection
+##'
+##' @title Management commands for working with docker tasks
+##'
+##' @seealso \code{\link{docker_task}} for information on
+##'   task objects.
+NULL
+
+
+##' Methods for working with a particular docker task.  Task objects
+##' are returned by using \code{$task$get} to fetch an existing task
+##' by name or id, or \code{$tasks} from a
+##' \code{\link{docker_service}} object representing a docker service.
+##'
+##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_task")}
+##'
+##' @name docker_task
+##'
+##' @title Management commands for working with a particular docker task
+##'
+##' @seealso \code{\link{docker_task_collection}} for other
+##'   task management methods.
+NULL
+
+
 ##' Methods for managing docker swarm secrets.  This object is
 ##'   \code{$secret} within a \code{\link{docker_client}} object.
 ##'
