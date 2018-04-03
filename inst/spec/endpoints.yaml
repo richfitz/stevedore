@@ -452,21 +452,25 @@ config_list:
   method: get
   path: "/configs"
   from: "1.30"
+  cli: "config ls"
 
 config_create:
   method: post
   path: "/configs/create"
   from: "1.30"
+  cli: "config create"
 
 config_inspect:
   method: get
   path: "/configs/{id}"
   from: "1.30"
+  cli: "config inspect"
 
 config_delete:
   method: delete
   path: "/configs/{id}"
   from: "1.30"
+  cli: "config rm"
 
 config_update:
   method: post
@@ -522,8 +526,10 @@ plugin_push:
 plugin_configure:
   method: post
   path: "/plugins/{name}/set"
+  cli: "plugin set"
 
 plugin_upgrade:
   method: post
   path: "/plugins/{name}/upgrade"
   from: "1.26"
+  cli: "plugin upgrade"
