@@ -36,21 +36,18 @@ README.md: README.Rmd
 ## We can't build vignettes on CRAN and systems without docker (and
 ## even when they do, it's not a great idea because we build and
 ## remove a bunch of containers etc.
-# vignettes/%.Rmd: vignettes/src/%.R
-# 	${RSCRIPT} -e 'library(sowsear); sowsear("$<", output="$@")'
-
-vignettes/src/%.Rmd: vignettes/src/%.R
+vignettes_src/%.Rmd: vignettes_src/%.R
 	${RSCRIPT} -e 'library(sowsear); sowsear("$<", output="$@")'
 
-vignettes/stevedore.Rmd: vignettes/src/stevedore.Rmd
-	cd vignettes/src && ${RSCRIPT} -e 'knitr::knit("stevedore.Rmd")'
-	mv vignettes/src/stevedore.md $@
+vignettes/stevedore.Rmd: vignettes_src/stevedore.Rmd
+	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("_stevedore.Rmd")'
+	mv vignettes_src/stevedore.md $@
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
 
-vignettes/examples.Rmd: vignettes/src/examples.Rmd
-	cd vignettes/src && ${RSCRIPT} -e 'knitr::knit("examples.Rmd")'
-	mv vignettes/src/examples.md $@
+vignettes/examples.Rmd: vignettes_src/examples.Rmd
+	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("_examples.Rmd")'
+	mv vignettes_src/examples.md $@
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
 

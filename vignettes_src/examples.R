@@ -147,12 +147,12 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 invisible(docker$container$run(img, "https://github.com/richfitz/ids",
                                rm = TRUE, stream = stdout()))
 
+##+ echo = FALSE
+unlink("tester", recursive = TRUE)
+
 ## (I have cheated here and put all of the dependencies of `ids` into
 ## the docker image via the Dockerfile).
 
 ## The same approach would work by mounting the package source
 ## directory into the container and passing the path (within the
 ## container) to `$run()`.
-
-##+ echo = FALSE
-unlink("tester", recursive = TRUE)
