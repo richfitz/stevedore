@@ -33,14 +33,14 @@ docker_container_collection:
       line tool.  It will:
 
       - Try to pull a container if it does not yet exist (see
-        `$image$pull`; `docker_image_collection`)
-      - Create the container (see `$container$create`;
-        `docker_container_collection`)
-      - Start the container (see `$start`; `docker_container`)
+        `$pull` in `?docker_image_collection`)
+      - Create the container (see `$create` in
+        `?docker_container_collection`)
+      - Start the container (see `$start` in `?docker_container`)
       - Optionally stream the logs, if not detached (see
-        `$logs`, `docker_container`
-      - Wait for the container to finish (see `$wait`;
-        `docker_container`)
+        `$logs` in `?docker_container`
+      - Wait for the container to finish (see `$wait` in
+        `?docker_container`)
 
       It returns a list with a container object as
       `"container"` and a `"docker_stream"` object
@@ -61,7 +61,7 @@ docker_container_collection:
     args:
       image: >-
         Image to run.  Can be a name, id, or a
-        `docker_image` object.
+        `?docker_image` object.
       cmd: >-
         Command to run in the container.  Must be a character
         vector.  If not specified then the default `ENTRYPOINT`
@@ -69,13 +69,13 @@ docker_container_collection:
         for details)
       "...": >-
         Additional arguments passed through to `$create` (see
-        `docker_container_collection`.  There are many
+        `?docker_container_collection`.  There are many
         possible arguments here.
       detach: >-
         Detach the container as soon as it has started and return
         control to R.  The container will run in the background.
         The returned object can be used to interrogate the container
-        afterwards (see `docker_container`).
+        afterwards (see `?docker_container`).
       rm: >-
         Remove the container on exit.
       stream: >-
@@ -126,7 +126,7 @@ docker_container:
   image:
     summary: >-
       Return the image for this container, as a
-      `docker_image` object.
+      `?docker_image` object.
   inspect:
     summary: >-
       Return detailed information about this container
@@ -204,7 +204,7 @@ docker_image:
   untag:
     summary: >-
       Remove tags from the image.  This is a lot like
-      `image$remove` (see `docker_image_collection`)
+      `image$remove` (see `?docker_image_collection`)
       but with `noprune = TRUE`.
     args:
       repo_tag: >
@@ -394,7 +394,7 @@ docker_service:
   tasks:
     summary: >-
       Fetch tasks associated with this service.  Returns a list of
-      `docker_task` objects
+      `?docker_task` objects
     args:
       filters: &service-task-filters >-
         A named character vector of filters to process on the tasks

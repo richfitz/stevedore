@@ -416,6 +416,7 @@ markdown_to_rd <- function(str) {
   }
 
   str <- gsub("```([^`]+)```", "\\\\preformatted{\\1}", str)
+  str <- gsub("`\\?([^`]+)`", "\\\\code{\\\\link{\\1}}", str)
   str <- gsub("`([^`]+)`", "\\\\code{\\1}", str)
   str
 }
