@@ -5,10 +5,10 @@
 \title{Management commands for working with docker plugins}
 \description{
 Methods for working with docker plugins.  This object is
-  \code{$plugins} within a \code{\link{docker_client}} object.
+  \code{$plugin} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("plugins")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("plugin")}
 }
 \seealso{
 \code{\link{docker_plugin}} for information on

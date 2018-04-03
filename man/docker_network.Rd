@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker network.  Network
 objects are returned by creating a docker network, or by using
-\code{$networks$get} to fetch an existing network by name or id.
+\code{$network$get} to fetch an existing network by name or id.
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_network")}

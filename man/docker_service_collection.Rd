@@ -5,10 +5,10 @@
 \title{Management commands for working with docker services}
 \description{
 Methods for working with docker services.  This object is
-  \code{$services} within a \code{\link{docker_client}} object.
+  \code{$service} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("services")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("service")}
 }
 \seealso{
 \code{\link{docker_service}} for information on

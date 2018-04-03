@@ -5,10 +5,10 @@
 \title{Management commands for working with docker networks}
 \description{
 Methods for working with docker networks.  This object is
-  \code{$networks} within a \code{\link{docker_client}} object.
+  \code{$network} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("networks")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("network")}
 }
 \seealso{
 \code{\link{docker_network}} for information on

@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker volume.  Volume
 objects are returned by creating a docker volume, or by using
-\code{$volumes$get} to fetch an existing volume by name or id.
+\code{$volume$get} to fetch an existing volume by name or id.
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_volume")}

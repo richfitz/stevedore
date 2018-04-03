@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker plugin.  Plugin
 objects are returned by installing or building a docker plugin, or
-by using \code{$plugins$get} to fetch an existing plugin by name
+by using \code{$plugin$get} to fetch an existing plugin by name
 or id.
 }
 \details{

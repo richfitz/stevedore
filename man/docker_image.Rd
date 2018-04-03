@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker image.  Image objects
 are returned by building or pulling a docker image, or by using
-\code{$images$get} to fetch an existing image by name or id.
+\code{$image$get} to fetch an existing image by name or id.
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_image")}

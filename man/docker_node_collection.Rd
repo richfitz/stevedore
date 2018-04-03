@@ -5,10 +5,10 @@
 \title{Management commands for working with swarm nodes}
 \description{
 Methods for managing docker swarm nodes.  This object is
-  \code{$nodes} within a \code{\link{docker_client}} object.
+  \code{$node} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("nodes")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("node")}
 }
 \seealso{
 \code{\link{docker_swarm_collection}} for management

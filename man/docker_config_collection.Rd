@@ -5,10 +5,10 @@
 \title{Management commands for working with swarm configs}
 \description{
 Methods for managing docker swarm configs.  This object is
-  \code{$configs} within a \code{\link{docker_client}} object.
+  \code{$config} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("configs")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("config")}
 }
 \seealso{
 \code{\link{docker_swarm_collection}} for management

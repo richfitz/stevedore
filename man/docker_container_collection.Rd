@@ -5,10 +5,10 @@
 \title{Management commands for working with docker containers}
 \description{
 Methods for working with docker containers.  This object is
-  \code{$containers} within a \code{\link{docker_client}} object.
+  \code{$container} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("containers")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("container")}
 }
 \seealso{
 \code{\link{docker_container}} for information on

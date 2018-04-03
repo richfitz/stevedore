@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker container.  Container
 objects are returned by creating or running a docker container, or
-by using \code{$containers$get} to fetch an existing container by
+by using \code{$container$get} to fetch an existing container by
 name or id.
 }
 \details{

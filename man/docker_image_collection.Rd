@@ -5,10 +5,10 @@
 \title{Management commands for working with docker images}
 \description{
 Methods for working with docker images.  This object is
-  \code{$images} within a \code{\link{docker_client}} object.
+  \code{$image} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("images")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("image")}
 }
 \seealso{
 \code{\link{docker_image}} for information on

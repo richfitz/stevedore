@@ -19,7 +19,7 @@ These functions are needed because \code{stevedore} aims to be a
 fairly direct wrapping aroud the docker API.  For most of the
 single host methods the types here are not really used (with the
 notable exception of \code{host_config} which is used by
-\code{$containers$create} and \code{$containers$update}).  But for
+\code{$container$create} and \code{$container$update}).  But for
 the swarm endpoints the function definitions would be impossibly
 complex if we did not reflect the types.  So rather than one
 function call with a hundred arguments, we can build up the

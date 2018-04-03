@@ -5,10 +5,10 @@
 \title{Management commands for working with docker volumes}
 \description{
 Methods for working with docker volumes.  This object is
-  \code{$volumes} within a \code{\link{docker_client}} object.
+  \code{$volume} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("volumes")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("volume")}
 }
 \seealso{
 \code{\link{docker_volume}} for information on

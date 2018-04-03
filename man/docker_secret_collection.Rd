@@ -5,10 +5,10 @@
 \title{Management commands for working with swarm secrets}
 \description{
 Methods for managing docker swarm secrets.  This object is
-  \code{$secrets} within a \code{\link{docker_client}} object.
+  \code{$secret} within a \code{\link{docker_client}} object.
 }
 \details{
-\Sexpr[results=rd,stage=render]{stevedore:::generate_help("secrets")}
+\Sexpr[results=rd,stage=render]{stevedore:::generate_help("secret")}
 }
 \seealso{
 \code{\link{docker_swarm_collection}} for management

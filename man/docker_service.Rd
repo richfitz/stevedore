@@ -6,7 +6,7 @@
 \description{
 Methods for working with a particular docker service.  Service
 objects are returned by creating a docker service, or by using
-\code{$services$get} to fetch an existing service by name or id.
+\code{$service$get} to fetch an existing service by name or id.
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help("docker_service")}
