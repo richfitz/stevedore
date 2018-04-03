@@ -40,13 +40,13 @@ vignettes_src/%.Rmd: vignettes_src/%.R
 	${RSCRIPT} -e 'library(sowsear); sowsear("$<", output="$@")'
 
 vignettes/stevedore.Rmd: vignettes_src/stevedore.Rmd
-	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("_stevedore.Rmd")'
+	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("stevedore.Rmd")'
 	mv vignettes_src/stevedore.md $@
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
 
 vignettes/examples.Rmd: vignettes_src/examples.Rmd
-	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("_examples.Rmd")'
+	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("examples.Rmd")'
 	mv vignettes_src/examples.md $@
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
