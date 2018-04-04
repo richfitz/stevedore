@@ -1,7 +1,7 @@
 http_client_null <- function(base_url, api_version, min_version, max_version) {
   ping <- function() {
     list(status_code = 200,
-         headers = charToRaw(paste("Api-Version:", DEFAULT_DOCKER_API_VERSION)),
+         headers = charToRaw(paste("Api-Version:", DOCKER_API_VERSION_DEFAULT)),
          content = charToRaw("OK"))
   }
   api_version <- http_client_api_version(api_version, ping,

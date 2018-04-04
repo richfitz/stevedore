@@ -7,7 +7,7 @@ http_client_httppipe <- function(base_url = NULL, api_version = NULL,
   headers_agent <- list("User-Agent" = DEFAULT_USER_AGENT)
 
   ping <- function() {
-    url <- build_url("", MIN_DOCKER_API_VERSION, "/_ping")
+    url <- build_url("", DOCKER_API_VERSION_MIN, "/_ping")
     client("GET", url, NULL, headers_agent)
   }
   api_version <- http_client_api_version(api_version, ping,

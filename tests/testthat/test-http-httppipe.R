@@ -7,7 +7,7 @@ test_that("construction", {
   expect_is(x, "list")
   expect_equal(x$type, "httppipe")
   expect_is(x$request, "function")
-  expect_equal(x$api_version, DEFAULT_DOCKER_API_VERSION)
+  expect_equal(x$api_version, DOCKER_API_VERSION_DEFAULT)
   expect_false(x$can_stream)
   expect_is(x$ping, "function")
 })

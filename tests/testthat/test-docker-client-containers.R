@@ -983,7 +983,7 @@ test_that("versioned responses", {
   ## the spec (and responses) are wrong or if it's because new clients
   ## do not return the correct information.  This is a bit of a faff
   ## really.
-  d1 <- test_docker_client(api_version = MIN_DOCKER_API_VERSION)
+  d1 <- test_docker_client(api_version = test_docker_versions[[1]])
   nm <- rand_str(10, "stevedore_")
   ## options(error = recover)
   x <- d1$container$create("nginx", ports = TRUE, name = nm)
@@ -991,8 +991,7 @@ test_that("versioned responses", {
   ## Error is with data: named empty list (json: {})
   ## From 'Ports'
 
-  ## d1 <- test_docker_client(api_version = "1.29")
-  d2 <- test_docker_client(api_version = MAX_DOCKER_API_VERSION)
+  d2 <- test_docker_client(api_version = tail(test_docker_versions, 1))
   x <- d2$container$create("nginx", ports = TRUE)
   ## on.exit(x$remove(force = TRUE))
   x$start()

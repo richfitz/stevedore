@@ -6,12 +6,12 @@ test_that("version", {
          status_code = 200)
   }
 
-  min <- MIN_DOCKER_API_VERSION
-  max <- MAX_DOCKER_API_VERSION
-  def <- DEFAULT_DOCKER_API_VERSION
+  min <- DOCKER_API_VERSION_MIN
+  max <- DOCKER_API_VERSION_MAX
+  def <- DOCKER_API_VERSION_DEFAULT
 
   expect_identical(http_client_api_version(NULL, ping, min, max),
-                   DEFAULT_DOCKER_API_VERSION)
+                   DOCKER_API_VERSION_DEFAULT)
   expect_identical(
     http_client_api_version(numeric_version("1.28"), ping, min, max),
     "1.28")

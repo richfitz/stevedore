@@ -15,7 +15,7 @@ test_that("construction", {
   expect_is(cl, "list")
   expect_equal(cl$type, "curl")
   expect_is(cl$request, "function")
-  expect_equal(cl$api_version, DEFAULT_DOCKER_API_VERSION)
+  expect_equal(cl$api_version, DOCKER_API_VERSION_DEFAULT)
   expect_true(cl$can_stream)
   expect_is(cl$ping, "function")
 })

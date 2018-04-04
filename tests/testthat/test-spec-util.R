@@ -16,7 +16,7 @@ test_that("validate", {
   dir.create(tmp)
   file.copy(dir(swagger_spec_path(), full.names = TRUE), tmp)
 
-  version <- DEFAULT_DOCKER_API_VERSION
+  version <- DOCKER_API_VERSION_DEFAULT
 
   cmp <- swagger_spec_read(version)
 

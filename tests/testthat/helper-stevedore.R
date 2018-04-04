@@ -412,9 +412,9 @@ test_docker_versions <- function() {
     cl <- test_docker_client()
     v <- cl$version()
     v_min <- max(numeric_version(v$min_api_version),
-                 numeric_version(MIN_DOCKER_API_VERSION))
+                 numeric_version(DOCKER_API_VERSION_MIN))
     v_max <- min(numeric_version(v$api_version),
-                 numeric_version(MAX_DOCKER_API_VERSION))
+                 numeric_version(DOCKER_API_VERSION_MAX))
     TEST_DOCKER_VERSIONS <<- version_range(v_min, v_max)
   }
   TEST_DOCKER_VERSIONS

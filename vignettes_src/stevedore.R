@@ -519,8 +519,8 @@ nw$remove()
 docker$ping()
 
 ## `$api_version()` reports the API version that the *client* is using
-## (this can be varied from `r stevedore:::MIN_DOCKER_API_VERSION` to
-## `r stevedore:::MAX_DOCKER_API_VERSION`)
+## (this can be varied from `r stevedore:::DOCKER_API_VERSION_MIN` to
+## `r stevedore:::DOCKER_API_VERSION_MAX`)
 docker$api_version()
 
 ## `$version()` reports detailed version information from the server:

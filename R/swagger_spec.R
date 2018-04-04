@@ -101,7 +101,7 @@ swagger_spec_patch <- function(dat, patch_file) {
 
 
 swagger_spec_versions <- function() {
-  version_range(MIN_DOCKER_API_VERSION, MAX_DOCKER_API_VERSION)
+  version_range(DOCKER_API_VERSION_MIN, DOCKER_API_VERSION_MAX)
 }
 
 

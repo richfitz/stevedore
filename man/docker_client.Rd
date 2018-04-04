@@ -11,13 +11,13 @@ docker_client(api_version = NULL, url = NULL, ...,
 \item{api_version}{Version of the API request from the api.
 Options are \code{NULL} (the default) - use the package's
 default version (currently
-\Sexpr{stevedore:::DEFAULT_DOCKER_API_VERSION}), a version as a
+\Sexpr{stevedore:::DOCKER_API_VERSION_DEFAULT}), a version as a
 string or \code{\link{numeric_version}} object (supported
-between \Sexpr{stevedore:::MIN_DOCKER_API_VERSION} and
-\Sexpr{stevedore:::MAX_DOCKER_API_VERSION}), or the string
+between \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
+\Sexpr{stevedore:::DOCKER_API_VERSION_MAX}), or the string
 \code{detect} which will use the highest version out of the
 version reported by the api and
-\Sexpr{stevedore:::MAX_DOCKER_API_VERSION}.}
+\Sexpr{stevedore:::DOCKER_API_VERSION_MAX}.}
 
 \item{url}{The URL for the docker daemon.  This can be an absolute
 file path (for a unix socket on macOS/Linux), a named pipe

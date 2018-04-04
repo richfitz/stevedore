@@ -108,11 +108,11 @@ parse_headers <- function(headers) {
 ## * what is our floor version number
 http_client_api_version <- function(api_version, ping,
                                     min_version = NULL, max_version = NULL) {
-  min_version <- min_version %||% MIN_DOCKER_API_VERSION
-  max_version <- max_version %||% MAX_DOCKER_API_VERSION
+  min_version <- min_version %||% DOCKER_API_VERSION_MIN
+  max_version <- max_version %||% DOCKER_API_VERSION_MAX
   version_type <- "Requested"
   if (is.null(api_version)) {
-    api_version <- DEFAULT_DOCKER_API_VERSION
+    api_version <- DOCKER_API_VERSION_DEFAULT
   } else if (inherits(api_version, "numeric_version")) {
     assert_scalar(api_version)
     api_version <- as.character(api_version)

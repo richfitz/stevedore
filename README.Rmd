@@ -89,7 +89,7 @@ as well as via an `help()` method on each object (e.g., `docker$help()`, `docker
 
 ## Approach
 
-Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions `r stevedore:::MIN_DOCKER_API_VERSION` to `r stevedore:::MAX_DOCKER_API_VERSION` (defaulting to `r stevedore:::DEFAULT_DOCKER_API_VERSION`).
+Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions `r stevedore:::DOCKER_API_VERSION_MIN` to `r stevedore:::DOCKER_API_VERSION_MAX` (defaulting to `r stevedore:::DOCKER_API_VERSION_DEFAULT`).
 
 This approach means that the output will be type-stable - there is no inference on what to return based on what the server chooses to return.  With a given API version, the same fields will always be returned.  Some of this information is very rich, for example, for the backgrounded container above:
 

@@ -16,7 +16,7 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
   }
 
   ping <- function() {
-    url <- build_url(base_url, MIN_DOCKER_API_VERSION, "/_ping")
+    url <- build_url(base_url, DOCKER_API_VERSION_MIN, "/_ping")
     curl::curl_fetch_memory(url, handle())
   }
 

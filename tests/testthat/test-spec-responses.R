@@ -396,7 +396,7 @@ test_that("system_df is a problem for unpacking of lists", {
 
 
 test_that("header handler", {
-  spec <- swagger_spec_read(DEFAULT_DOCKER_API_VERSION)
+  spec <- swagger_spec_read(DOCKER_API_VERSION_DEFAULT)
   response <- spec$paths[["/_ping"]][["get"]]$responses[["200"]]
   handler <- swagger_header_handler(response, spec)
 
