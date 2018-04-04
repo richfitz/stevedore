@@ -349,7 +349,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
   nms <- ls(x)
   is_fn <- vlapply(nms, function(el) is.function(x[[el]]))
   fns <- vcapply(nms[is_fn], function(nm)
-    format_docker_client_method_rd(x[[nm]]),
+    format_docker_client_method_rd(x[[nm]], api_version),
     USE.NAMES = FALSE)
 
   if (all(is_fn)) {
@@ -389,7 +389,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
 }
 
 
-markdown_to_rd <- function(str) {
+markdown_to_rd <- function(str, api_version) {
   if (grepl("\n+(\\s*-\\s+)", str)) {
     ## Simplest thing that might work - keep going until the next
     ## blank line or the end. Otherwise assume only one group of
@@ -413,6 +413,20 @@ markdown_to_rd <- function(str) {
     tmp[blank] <- "\\itemize{"
     tmp[end] <- "}"
     str <- paste0(tmp, "\n", collapse = "")
+  }
+
+  re_link_internal <- "\\[([^\\]+)\\]\\(#([^)]+)\\)"
+  re_link_external <- "\\[([^\\]+)\\]\\(http([^)]+)\\)"
+  if (grepl("](", str, fixed = TRUE)) {
+    if (grepl(re_link_external, str)) {
+      str <- gsub(re_link_external, "\\\\href{http\\2}{\\1}", str)
+    }
+    if (grepl(re_link_internal, str)) {
+      repl <- sprintf(
+        "\\href{https://docs.docker.com/engine/api/%s/#\\2}{\\1}",
+        api_version %||% DOCKER_API_VERSION_DEFAULT)
+      str <- gsub(re_link_internal, repl, str)
+    }
   }
 
   str <- gsub("```([^`]+)```", "\\\\preformatted{\\1}", str)
@@ -463,20 +477,20 @@ format_docker_client_method_text <- function(x, indent = 2, exdent = 8,
 }
 
 
-format_docker_client_method_rd <- function(x, ...) {
+format_docker_client_method_rd <- function(x, api_version, ...) {
   h <- attr(x, "help")
   ## stopifnot(!is.null(h$name))
   name <- h$name
   call <- capture_args(x, name, 2L, getOption("width") - 13L)
   summary <- help_summary(h)
-  summary <- markdown_to_rd(summary)
+  summary <- markdown_to_rd(summary, api_version)
 
   if (length(h$args) == 0L) {
     args <- NULL
   } else {
     f <- function(nm, txt) {
       sprintf("\\item \\code{%s}: %s",
-              nm, markdown_to_rd(txt))
+              nm, markdown_to_rd(txt, api_version))
     }
     txt <- mapply(f, names(h$args), unname(h$args),
                   SIMPLIFY = FALSE, USE.NAMES = FALSE)
