@@ -299,7 +299,7 @@ test_sample_responses <- function(v, skip = NULL) {
 create_sample_responses <- function(target, base) {
   path_base <- file.path("sample_responses", paste0("v", base))
   path_target <- file.path("sample_responses", paste0("v", target))
-  spec <- swagger_spec_index(target)
+  spec <- swagger_spec_read(target)
 
   files <- dir(path_base, full.names = TRUE)
 
