@@ -72,7 +72,24 @@ describe_api <- function(x) {
   invisible(info)
 }
 
+
 read_sample_response <- function(path) {
+  ret <- read_sample_response_header(path)
+  spec <- swagger_spec_read(ret$version)
+
+  endpoint <- spec$paths[[ret$path]][[ret$method]]
+  ret$schema <- endpoint$responses[[ret$code]]
+
+  ret$produces <- get_response_type(ret$method, ret$path, endpoint)
+
+  ret$handler <- swagger_response_handler(ret$schema, spec, ret$produces)
+  ret$reference <- eval(parse(text = ret$txt))
+
+  ret
+}
+
+
+read_sample_response_header <- function(path) {
   txt <- readLines(path)
 
   response_json <- sub("\\.R$", ".json", path)
@@ -89,18 +106,11 @@ read_sample_response <- function(path) {
     ret$response <- charToRaw(ret$response)
   }
 
-  spec <- swagger_spec_read(ret$version)
-
-  endpoint <- spec$paths[[ret$path]][[ret$method]]
-  ret$schema <- endpoint$responses[[ret$code]]
-
-  ret$produces <- get_response_type(ret$method, ret$path, endpoint)
-
-  ret$handler <- swagger_response_handler(ret$schema, spec, ret$produces)
-  ret$reference <- eval(parse(text = txt))
+  ret$txt <- txt
 
   ret
 }
+
 
 parse_sample_response <- function(txt, response) {
   i <- grep("^[^#]", txt)[[1]]
@@ -122,6 +132,7 @@ parse_sample_response <- function(txt, response) {
   ret$method <- tolower(ret$method)
   ret
 }
+
 
 read_sample_response_str <- function(method, path, code, spec, error = TRUE) {
   r <- spec$paths[[path]][[tolower(method)]]$responses[[as.character(code)]]
