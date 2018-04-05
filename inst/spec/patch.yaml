@@ -278,3 +278,9 @@
       $ref: "#/definitions/NodeStatus"
     ManagerStatus:
       $ref: "#/definitions/ManagerStatus"
+
+
+- version: ["1.25", "1.36"]
+  path: ["paths", "/swarm/unlock", "post", "produces"]
+  value: ~
+  replace: true
