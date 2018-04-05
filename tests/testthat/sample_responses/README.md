@@ -33,7 +33,7 @@ Or generate whole files with
 
 ``` r
 add_sample_response("sample_responses/system_df.R", "get", "/system/df",
-                    "200", "v1.29")
+                    "200", "1.29")
 ```
 
 When porting to a new version of the spec, the simplest thing to is to run:
