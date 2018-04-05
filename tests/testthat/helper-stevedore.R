@@ -449,3 +449,40 @@ update_name_cache <- function(root) {
 
   invisible(names)
 }
+
+
+audit_spec_response <- function(v) {
+  endpoints <- docker_api_client_endpoints()
+  produces <- function(x, spec) {
+    path_data <- swagger_path_parse(x$path)
+    d <- spec$paths[[x$path]][[x$method]]
+    get_response_type(x$method, x$path, d)
+  }
+  spec <- swagger_spec_read(DOCKER_API_VERSION_MAX)
+  produces <- vcapply(endpoints, produces, spec)
+
+  files <- dir(sprintf("sample_responses/v%s", v), pattern = "\\.R$",
+               full.names = TRUE)
+
+  tmp <- lapply(files, read_sample_response_header)
+  p1 <- vcapply(endpoints, function(x) paste(tolower(x$method), x$path))
+  p2 <- vcapply(tmp, function(x) paste(tolower(x$method), x$path))
+  tested <- p1 %in% p2
+
+  supported <-
+    numeric_version(vcapply(endpoints, function(x) x$from %||% "0.0.0")) <= v
+
+  ret <- data_frame(method = vcapply(endpoints, "[[", "method"),
+                    path = vcapply(endpoints, "[[", "path"),
+                    supported = supported,
+                    produces = produces,
+                    tested = tested)
+
+  exclude <- c("post /build", "post /images/create", "post /images/load",
+               "post /plugins/pull")
+  ret$missing <-
+    ret$supported & ret$produces == "application/json" & !ret$tested &
+    !(paste(ret$method, ret$path) %in% exclude)
+
+  ret
+}
