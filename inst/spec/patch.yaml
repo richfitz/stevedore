@@ -295,3 +295,8 @@
       type: "array"
       items:
         type: "string"
+
+- version: ["1.25", "1.27"]
+  path: ["paths", "/services/{id}/update", "post", "responses", "200", "schema"]
+  value:
+    $ref: "#/definitions/ServiceUpdateResponse"
