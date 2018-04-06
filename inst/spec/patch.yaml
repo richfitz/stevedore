@@ -284,3 +284,14 @@
   path: ["paths", "/swarm/unlock", "post", "produces"]
   value: ~
   replace: true
+
+- version: "1.25"
+  path: ["paths", "/networks/prune", "post", "responses", "200", "schema",
+  "properties"]
+  replace: true
+  value:
+    NetworksDeleted:
+      description: "Networks that were deleted"
+      type: "array"
+      items:
+        type: "string"
