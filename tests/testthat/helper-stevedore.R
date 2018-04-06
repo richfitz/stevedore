@@ -324,8 +324,7 @@ create_sample_responses <- function(target, base) {
       if (d$response == "~") {
         response <- "~"
       } else {
-        message("No response for ", basename(filename))
-        return(NULL)
+        response <- "<fill me in>"
       }
     }
     ## Special casing required for ping which is the only tested plain
