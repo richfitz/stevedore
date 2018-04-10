@@ -11,12 +11,5 @@ data.frame(
   spec = I(list(list(
     name = "app-dev.crt",
     labels = NULL,
-    task_template = NULL,
-    mode = NULL,
-    update_config = NULL,
-    rollback_config = NULL,
-    networks = data.frame(target = character(0),
-                          aliases = I(list()),
-                          stringsAsFactors = FALSE),
-    endpoint_spec = NULL))),
+    data = NA_character_))),
   stringsAsFactors = FALSE)

@@ -310,3 +310,8 @@
   path: ["definitions", "PeerNode"]
   value:
     type: "object"
+
+- version: ["1.25", "1.39"]
+  path: ["definitions", "Secret", "properties", "Spec",]
+  value:
+    $ref: "#/definitions/SecretSpec"
