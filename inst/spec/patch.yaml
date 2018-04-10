@@ -5,7 +5,7 @@
   value:
     type: "string"
 
-- version: ["1.25", "1.36"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/system/df", "get", "responses", "200", "schema", "properties", "Containers"]
   replace: true
   value:
@@ -43,12 +43,12 @@
   value:
     type: "object"
 
-- version: ["1.25", "1.36"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/system/df", "get"]
   value:
     produces: "application/json"
 
-- version: ["1.25", "1.36"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/containers/{id}/top", "get"]
   value:
     produces: "application/json"
@@ -182,7 +182,7 @@
   value:
     produces: "application/chunked-string"
 
-- version: ["1.29", "1.36"]
+- version: ["1.29", "1.37"]
   path: ["paths", "/tasks/{id}/logs", "get"]
   value:
     produces: "application/chunked-string"
@@ -200,12 +200,12 @@
     200:
       description: "no error"
 
-- version: ["1.25", "1.36"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/plugins/{name}", "delete", "responses", "200", "schema"]
   value: ~
   replace: true
 
-- version: ["1.25", "1.36"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/plugins/{name}", "delete", "produces"]
   value: ~
   replace: true
@@ -305,3 +305,8 @@
   path: ["definitions", "Node", "properties", "Description", "properties", "TLSInfo"]
   value:
     $ref: "#/definitions/TLSInfo"
+
+- version: ["1.37", "1.37"]
+  path: ["definitions", "PeerNode"]
+  value:
+    type: "object"

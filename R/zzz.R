@@ -1,7 +1,7 @@
 ## NOTE: When updating versions here, update them throughout the
 ## package - in R/docker_client.R in particular (see the help strings)
 DOCKER_API_VERSION_MIN <- "1.25"
-DOCKER_API_VERSION_MAX <- "1.36"
+DOCKER_API_VERSION_MAX <- "1.37"
 DOCKER_API_VERSION_DEFAULT <- "1.29"
 
 DEFAULT_DOCKER_UNIX_SOCKET <- "/var/run/docker.sock"
