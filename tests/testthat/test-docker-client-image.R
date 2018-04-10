@@ -101,9 +101,6 @@ test_that("import", {
   expect_equal(img3$export(), tar)
 })
 
-test_that("prune", {
-  skip("Not yet testable")
-})
 
 test_that("build: success", {
   cl <- test_docker_client()
@@ -227,6 +224,28 @@ test_that("build: dockerignore", {
                sort(setdiff(c(".dockerignore", files1),
                             grep("\\.md$", files1, value = TRUE))))
 })
+
+
+test_that("prune", {
+  cl <- test_docker_client()
+  cl$image$prune()
+
+  ans <- cl$image$build("images/iterate", nocache = TRUE, rm = TRUE,
+                        stream = FALSE, tag = "richfitz/iterate:testing")
+  cl$image$remove("richfitz/iterate:testing", noprune = TRUE)
+
+  res <- cl$image$prune()
+  expect_is(res$images_deleted, "data.frame")
+  expect_true(nrow(res$images_deleted) > 0L)
+  expect_true(all(is.na(res$images_deleted$untagged)))
+  expect_false(any(is.na(res$images_deleted$deleted)))
+
+  res <- cl$image$prune()
+  expect_is(res$images_deleted, "data.frame")
+  expect_equal(nrow(res$images_deleted), 0L)
+  expect_equal(res$space_reclaimed, 0L)
+})
+
 
 test_that("pull", {
   skip_if_no_internet()
