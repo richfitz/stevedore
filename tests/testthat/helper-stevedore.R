@@ -301,24 +301,25 @@ create_sample_responses <- function(target, base) {
   path_target <- file.path("sample_responses", paste0("v", target))
   spec <- swagger_spec_read(target)
 
-  files <- dir(path_base, full.names = TRUE)
+  files <- dir(path_base, "\\.R$", full.names = TRUE)
 
   re_fmt <- "^(#+ %s:\\s*)(.+)\\s*$"
 
-  f <- function(x) {
+  f <- function(filename) {
     x <- readLines(filename)
     re_version <- sprintf(re_fmt, "version")
     i <- grep(re_version, x)
     stopifnot(length(i) == 1L)
     x[[i]] <- paste0(sub(re_version, "\\1", x[[i]]), target)
 
-    ## Then the response itself
-    re_response <- sprintf(re_fmt, "response")
-    i <- grep(re_response, x)
-    stopifnot(length(i) == 1L)
-    prev <- sub(re_response, "\\2", x[[i]])
+    response_json <- sub("\\.R$", ".json", filename)
+    if (file.exists(response_json)) {
+      response_prev <- readChar(response_json, file.size(response_json))
+    } else {
+      response_prev <- NULL
+    }
+    d <- parse_sample_response(x, response_prev)
 
-    d <- parse_sample_response(x, NULL)
     response <- read_sample_response_str(d$method, d$path, d$code, spec, FALSE)
     if (is.null(response)) {
       if (d$response == "~") {
@@ -333,7 +334,17 @@ create_sample_responses <- function(target, base) {
       response <- from_json(response)
     }
 
-    x[[i]] <- paste0(sub(re_response, "\\1", x[[i]]), response)
+    re_response <- sprintf(re_fmt, "response")
+    i <- grep(re_response, x)
+    if (length(i) > 0L) {
+      stopifnot(length(i) == 1L)
+      x[[i]] <- paste0(sub(re_response, "\\1", x[[i]]), response)
+    } else {
+      re_code <- sprintf(re_fmt, "code")
+      i <- grep(re_code, x)
+      stopifnot(length(i) == 1L)
+      x <- append(x, paste("## response:", response), i)
+    }
 
     x
   }
