@@ -14,7 +14,7 @@ docker_api_client <- function(base_url = NULL, api_version = NULL,
 }
 
 
-docker_api_client_data <- function(version, quiet) {
+docker_api_client_data <- function(version, quiet = FALSE) {
   if (!(version %in% names(.stevedore$client_data))) {
     spec <- swagger_spec_read(version, quiet)
     endpoints <- docker_api_client_endpoints()
