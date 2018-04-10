@@ -1,7 +1,7 @@
 context("configs")
 
 test_that("create and delete", {
-  cl <- docker_client()
+  cl <- test_docker_client()
 
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
