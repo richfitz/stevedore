@@ -7,7 +7,7 @@ index:
 	${RSCRIPT} -e 'stevedore:::swagger_spec_index_write("inst/spec")'
 
 test:
-	${RSCRIPT} -e 'library(methods); devtools::test()'
+	Rscript -e 'library(methods); devtools::test()'
 
 test_all:
 	REMAKE_TEST_INSTALL_PACKAGES=true make test
