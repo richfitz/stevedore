@@ -466,7 +466,14 @@ audit_spec_response <- function(v) {
   produces <- function(x, spec) {
     path_data <- swagger_path_parse(x$path)
     d <- spec$paths[[x$path]][[x$method]]
-    get_response_type(x$method, x$path, d)
+    type <- get_response_type(x$method, x$path, d)
+    if (type == "application/json") {
+      response <- d$responses[as.integer(names(d$responses)) < 300][[1]]
+      if (is.null(resolve_schema_ref(response$schema, spec))) {
+        type <- "null"
+      }
+    }
+    type
   }
   spec <- swagger_spec_read(DOCKER_API_VERSION_MAX)
   produces <- vcapply(endpoints, produces, spec)
