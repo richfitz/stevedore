@@ -16,9 +16,14 @@ test_that("get", {
 
 test_that("get by reference", {
   sha <- "sha256:f2a9173236"
-  img <- test_docker_client()$image$get(sha)
-  expect_true("hello-world:latest" %in% img$tags())
-  expect_equal(img$name(), sha)
+  cl <- test_docker_client()
+  img1 <- cl$image$get("hello-world:latest")
+
+  sha <- img1$short_id()
+  img2 <- test_docker_client()$image$get(sha)
+  expect_true("hello-world:latest" %in% img1$tags())
+  expect_equal(img2$name(), sha)
+  expect_equal(img2$id(), img1$id())
 })
 
 test_that("id/short_id", {
