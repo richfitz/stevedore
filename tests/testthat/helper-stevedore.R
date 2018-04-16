@@ -482,6 +482,12 @@ audit_spec_response <- function(v) {
                full.names = TRUE)
 
   tmp <- lapply(files, read_sample_response_header)
+  ok <- vcapply(tmp, "[[", "version") == v
+  if (!all(ok)) {
+    stop(sprintf("Response has wrong version: %s",
+                 paste(files[!ok], collapse = ", ")))
+  }
+
   p1 <- vcapply(endpoints, function(x) paste(tolower(x$method), x$path))
   p2 <- vcapply(tmp, function(x) paste(tolower(x$method), x$path))
   tested <- p1 %in% p2
