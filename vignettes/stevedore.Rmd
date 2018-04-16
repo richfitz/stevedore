@@ -1,7 +1,7 @@
 ---
 title: "Using docker with stevedore"
 author: "Rich FitzJohn"
-date: "2018-04-03"
+date: "2018-04-16"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using docker with stevedore}
@@ -160,7 +160,7 @@ res <- docker$container$run("hello-world")
 ## O>  $ docker run -it ubuntu bash
 ## O>
 ## O> Share images, automate workflows, and more with a free Docker ID:
-## O>  https://cloud.docker.com/
+## O>  https://hub.docker.com/
 ## O>
 ## O> For more examples and ideas, visit:
 ## O>  https://docs.docker.com/engine/userguide/
@@ -201,7 +201,7 @@ res$logs
 ## O>  $ docker run -it ubuntu bash
 ## O>
 ## O> Share images, automate workflows, and more with a free Docker ID:
-## O>  https://cloud.docker.com/
+## O>  https://hub.docker.com/
 ## O>
 ## O> For more examples and ideas, visit:
 ## O>  https://docs.docker.com/engine/userguide/
@@ -295,7 +295,7 @@ res$container$path_stat("hello")
 ## [1] 509
 ##
 ## $mtime
-## [1] "2017-11-21T00:23:14Z"
+## [1] "2018-04-11T18:11:31Z"
 ##
 ## $linkTarget
 ## [1] ""
@@ -334,14 +334,14 @@ img$history()
 
 ```
 ##                                                                        id
-## 1 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
+## 1 sha256:e38bc07ac18ee64e6d59cf2eafcdddf9cec2364dfe129fe0af75f1b0194e0c96
 ## 2                                                               <missing>
 ##      created
-## 1 1511223798
-## 2 1511223798
+## 1 1523470309
+## 2 1523470309
 ##                                                                                           created_by
 ## 1                                                                  /bin/sh -c #(nop)  CMD ["/hello"]
-## 2 /bin/sh -c #(nop) COPY file:f3dac9d5b1b0307ffe8d1993680eae814f1c9ca2c0f45f6d3dc3d6b38f17a7f8 in /
+## 2 /bin/sh -c #(nop) COPY file:3c3ca82dfdb40d30f91a91e2ee953fc0193dc455289fe87fd85219a2c19edcea in /
 ##           tags size comment
 ## 1 hello-wo....    0
 ## 2              1848
@@ -451,7 +451,7 @@ x$id()
 ```
 
 ```
-## [1] "2ffbbc17c9ea961a917f06a03c41722015e87433e5acd070b8b12a80e4f88125"
+## [1] "18b05e101d69c42fe0e9a8345bfaa2e868b3abc027345655e9d4a8ad5eae242c"
 ```
 
 ```r
@@ -459,7 +459,7 @@ y$id()
 ```
 
 ```
-## [1] "2ffbbc17c9ea961a917f06a03c41722015e87433e5acd070b8b12a80e4f88125"
+## [1] "18b05e101d69c42fe0e9a8345bfaa2e868b3abc027345655e9d4a8ad5eae242c"
 ```
 
 `$list()` lists containers (like `docker list` on the command line)
@@ -483,26 +483,26 @@ docker$container$list(all = TRUE, limit = 2)
 
 ```
 ##                                                                 id
-## 1 2ffbbc17c9ea961a917f06a03c41722015e87433e5acd070b8b12a80e4f88125
-## 2 514fa290cc50755eb5dfc9abd237d2fd690d392ceb0105fba136b217d3e4bebf
+## 1 18b05e101d69c42fe0e9a8345bfaa2e868b3abc027345655e9d4a8ad5eae242c
+## 2 a5092487e191a7fb66c1b822dea44ccaf12ca29e13a50d9252527e68cb71d408
 ##          names
 ## 1 hello-st....
-## 2 friendly....
+## 2 inspirin....
 ##                                                                     image
 ## 1                                                             hello-world
-## 2 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
+## 2 sha256:e38bc07ac18ee64e6d59cf2eafcdddf9cec2364dfe129fe0af75f1b0194e0c96
 ##                                                                  image_id
-## 1 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
-## 2 sha256:f2a91732366c0332ccd7afd2a5c4ff2b9af81f549370f7a19acd460f87686bc7
+## 1 sha256:e38bc07ac18ee64e6d59cf2eafcdddf9cec2364dfe129fe0af75f1b0194e0c96
+## 2 sha256:e38bc07ac18ee64e6d59cf2eafcdddf9cec2364dfe129fe0af75f1b0194e0c96
 ##   command    created        ports size_rw size_root_fs labels   state
-## 1  /hello 1522783238 characte....      NA           NA        created
-## 2  /hello 1522783236 characte....      NA           NA         exited
+## 1  /hello 1523909242 characte....      NA           NA        created
+## 2  /hello 1523909241 characte....      NA           NA         exited
 ##                    status host_config network_settings       mounts
 ## 1                 Created     default     list(bri.... characte....
 ## 2 Exited (0) 1 second ago     default     list(bri.... characte....
-##                   name
-## 1      hello-stevedore
-## 2 friendly_nightingale
+##                  name
+## 1     hello-stevedore
+## 2 inspiring_blackwell
 ```
 
 `$remove()` removes a container by name or id:
@@ -525,11 +525,8 @@ docker$container$prune()
 
 ```
 ## $containers_deleted
-## [1] "514fa290cc50755eb5dfc9abd237d2fd690d392ceb0105fba136b217d3e4bebf"
-## [2] "ee6f37ceeb133e20cf0c24fac4f03bedbab656dd254332d2596d091288ec61ee"
-## [3] "dd4d9e5b0d8537cd2391b5e124a6cdaf35dfc948c61a10371ff7727f5464c0e9"
-## [4] "ad277559e3bf53356a331de22913835d856e07b7b2b090a81247b3e55bf858a8"
-## [5] "690fe38356978ba656c4c7b23b86f8f9809a53f010b8ee187327bfae0789fe19"
+## [1] "a5092487e191a7fb66c1b822dea44ccaf12ca29e13a50d9252527e68cb71d408"
+## [2] "6ed546e54baa8e8c469e7262f6f0fdbb127a79fc0c572dc09b52f57f311605c0"
 ##
 ## $space_reclaimed
 ## [1] 0
@@ -555,7 +552,7 @@ x$id()
 ```
 
 ```
-## [1] "c7ef7f8c4d9d5fdac4e20c43d7af5cbfbbd9c58363fca26933b7534fcfbff832"
+## [1] "da6c95dba4aedc7e9789846ab30198fbcfb162386947d520257bda21e5cce9d2"
 ```
 
 ```r
@@ -563,7 +560,7 @@ x$name()
 ```
 
 ```
-## [1] "amazing_torvalds"
+## [1] "pensive_johnson"
 ```
 
 ```r
@@ -584,10 +581,10 @@ x$inspect()
 
 ```
 ## $id
-## [1] "c7ef7f8c4d9d5fdac4e20c43d7af5cbfbbd9c58363fca26933b7534fcfbff832"
+## [1] "da6c95dba4aedc7e9789846ab30198fbcfb162386947d520257bda21e5cce9d2"
 ##
 ## $created
-## [1] "2018-04-03T19:20:38.549770189Z"
+## [1] "2018-04-16T20:07:23.2055035Z"
 ##
 ## $path
 ## [1] "/usr/local/bin/iterate"
@@ -631,7 +628,7 @@ x$inspect()
 ##
 ##
 ## $image
-## [1] "sha256:528056938e214045ccf8a31967ab4c6451e45a435de80b7f3cf16a8f48d1b220"
+## [1] "sha256:50f3ab513c06ee645398374b9b3624d49273868519d29524d709b6715d38ad7a"
 ##
 ## $resolv_conf_path
 ## [1] ""
@@ -649,7 +646,7 @@ x$inspect()
 ## NULL
 ##
 ## $name
-## [1] "/amazing_torvalds"
+## [1] "/pensive_johnson"
 ##
 ## $restart_count
 ## [1] 0
@@ -891,13 +888,13 @@ x$inspect()
 ##
 ## $graph_driver$data
 ##                                                                                                                                                                                                                                                                                           lower_dir
-## "/var/lib/docker/overlay2/9f68d3989e1584a377808af1c1714eeab03974b543afde77d8cd736008928c09-init/diff:/var/lib/docker/overlay2/7646442d3bb8e3a876c8b6fb7934cbe4ce7bb0f77945a71ffe2096a56c0452bb/diff:/var/lib/docker/overlay2/230714ad111869ebfb07688b547b1b23992cac8971b6a40f79b1753eb07335c2/diff"
+## "/var/lib/docker/overlay2/67bf0b07cd5a047e3824eae17f5dfcdccf0d4ea9b747fa98e9e1c59c91fd6cd0-init/diff:/var/lib/docker/overlay2/7e094570d98a9db0192c4b486230d480bd4607e3302ba3b3f1add765a1a41652/diff:/var/lib/docker/overlay2/a5ef0a95e9164f9b6f05e0a961f1f2e7e9167020ed3cb3eabab66e4349c5704d/diff"
 ##                                                                                                                                                                                                                                                                                          merged_dir
-##                                                                                                                                                                                                  "/var/lib/docker/overlay2/9f68d3989e1584a377808af1c1714eeab03974b543afde77d8cd736008928c09/merged"
+##                                                                                                                                                                                                  "/var/lib/docker/overlay2/67bf0b07cd5a047e3824eae17f5dfcdccf0d4ea9b747fa98e9e1c59c91fd6cd0/merged"
 ##                                                                                                                                                                                                                                                                                           upper_dir
-##                                                                                                                                                                                                    "/var/lib/docker/overlay2/9f68d3989e1584a377808af1c1714eeab03974b543afde77d8cd736008928c09/diff"
+##                                                                                                                                                                                                    "/var/lib/docker/overlay2/67bf0b07cd5a047e3824eae17f5dfcdccf0d4ea9b747fa98e9e1c59c91fd6cd0/diff"
 ##                                                                                                                                                                                                                                                                                            work_dir
-##                                                                                                                                                                                                    "/var/lib/docker/overlay2/9f68d3989e1584a377808af1c1714eeab03974b543afde77d8cd736008928c09/work"
+##                                                                                                                                                                                                    "/var/lib/docker/overlay2/67bf0b07cd5a047e3824eae17f5dfcdccf0d4ea9b747fa98e9e1c59c91fd6cd0/work"
 ##
 ##
 ## $size_rw
@@ -913,7 +910,7 @@ x$inspect()
 ##
 ## $config
 ## $config$hostname
-## [1] "c7ef7f8c4d9d"
+## [1] "da6c95dba4ae"
 ##
 ## $config$domainname
 ## [1] ""
@@ -1070,8 +1067,8 @@ x$top()
 
 ```
 ##     PID USER TIME                                         COMMAND
-## 1 29581 root 0:00 {iterate} /bin/sh /usr/local/bin/iterate 1000 1
-## 2 29610 root 0:00                                         sleep 1
+## 1 29465 root 0:00 {iterate} /bin/sh /usr/local/bin/iterate 1000 1
+## 2 29492 root 0:00                                         sleep 1
 ```
 
 We can also get the logs:
@@ -1265,7 +1262,7 @@ x$status()
 ```
 
 ```
-## Error: No such container: c7ef7f8c4d9d5fdac4e20c43d7af5cbfbbd9c58363fca26933b7534fcfbff832
+## Error: No such container: da6c95dba4aedc7e9789846ab30198fbcfb162386947d520257bda21e5cce9d2
 ```
 
 Information about ports (for containers that expose them) can be
@@ -1302,13 +1299,13 @@ curl::parse_headers(curl::curl_fetch_memory(url)$headers)
 
 ```
 ## [1] "HTTP/1.1 200 OK"
-## [2] "Server: nginx/1.13.8"
-## [3] "Date: Tue, 03 Apr 2018 19:20:46 GMT"
+## [2] "Server: nginx/1.13.12"
+## [3] "Date: Mon, 16 Apr 2018 20:07:30 GMT"
 ## [4] "Content-Type: text/html"
 ## [5] "Content-Length: 612"
-## [6] "Last-Modified: Tue, 26 Dec 2017 11:11:22 GMT"
+## [6] "Last-Modified: Mon, 09 Apr 2018 16:01:09 GMT"
 ## [7] "Connection: keep-alive"
-## [8] "ETag: \"5a422e5a-264\""
+## [8] "ETag: \"5acb8e45-264\""
 ## [9] "Accept-Ranges: bytes"
 ```
 
@@ -1338,58 +1335,101 @@ docker$image$pull("bash:latest")
 
 ```
 ## Pulling from library/bash latest
-## Already exists 605ce1bd3f31
+## Pulling fs layer 605ce1bd3f31
 ## Pulling fs layer f691ab0a0436
 ## Pulling fs layer 3d7d3f4179eb
-## f691ab0a0436: Downloading 32.77 kB/2.71 MB 1%
+## 605ce1bd3f31: Downloading 26.52 kB/1.99 MB 1%
 ## Download complete 3d7d3f4179eb
+## 605ce1bd3f31: Downloading 124.82 kB/1.99 MB 6%
+## f691ab0a0436: Downloading 36.66 kB/2.71 MB 1%
 ## f691ab0a0436: Downloading 97.39 kB/2.71 MB 4%
-## f691ab0a0436: Downloading 153.54 kB/2.71 MB 6%
-## f691ab0a0436: Downloading 219.82 kB/2.71 MB 8%
-## f691ab0a0436: Downloading 281.71 kB/2.71 MB 10%
-## f691ab0a0436: Downloading 347.25 kB/2.71 MB 13%
-## f691ab0a0436: Downloading 412.79 kB/2.71 MB 15%
-## f691ab0a0436: Downloading 478.32 kB/2.71 MB 18%
-## f691ab0a0436: Downloading 534.47 kB/2.71 MB 20%
-## f691ab0a0436: Downloading 595.91 kB/2.71 MB 22%
-## f691ab0a0436: Downloading 665.54 kB/2.71 MB 25%
-## f691ab0a0436: Downloading 728.18 kB/2.71 MB 27%
-## f691ab0a0436: Downloading 788.42 kB/2.71 MB 29%
-## f691ab0a0436: Downloading 859.25 kB/2.71 MB 32%
-## f691ab0a0436: Downloading 924.79 kB/2.71 MB 34%
-## f691ab0a0436: Downloading 980.93 kB/2.71 MB 36%
-## f691ab0a0436: Downloading 1.04 MB/2.71 MB 38%
-## f691ab0a0436: Downloading 1.1 MB/2.71 MB 41%
-## f691ab0a0436: Downloading 1.15 MB/2.71 MB 42%
-## f691ab0a0436: Downloading 1.21 MB/2.71 MB 45%
+## 605ce1bd3f31: Downloading 190.36 kB/1.99 MB 10%
+## f691ab0a0436: Downloading 162.93 kB/2.71 MB 6%
+## 605ce1bd3f31: Downloading 255.9 kB/1.99 MB 13%
+## f691ab0a0436: Downloading 228.47 kB/2.71 MB 8%
+## 605ce1bd3f31: Downloading 321.43 kB/1.99 MB 16%
+## f691ab0a0436: Downloading 294 kB/2.71 MB 11%
+## f691ab0a0436: Downloading 359.54 kB/2.71 MB 13%
+## 605ce1bd3f31: Downloading 386.97 kB/1.99 MB 19%
+## f691ab0a0436: Downloading 425.07 kB/2.71 MB 16%
+## 605ce1bd3f31: Downloading 452.5 kB/1.99 MB 23%
+## f691ab0a0436: Downloading 490.61 kB/2.71 MB 18%
+## 605ce1bd3f31: Downloading 518.04 kB/1.99 MB 26%
+## f691ab0a0436: Downloading 556.15 kB/2.71 MB 21%
+## 605ce1bd3f31: Downloading 583.58 kB/1.99 MB 29%
+## f691ab0a0436: Downloading 621.68 kB/2.71 MB 23%
+## 605ce1bd3f31: Downloading 649.11 kB/1.99 MB 33%
+## f691ab0a0436: Downloading 687.22 kB/2.71 MB 25%
+## 605ce1bd3f31: Downloading 714.65 kB/1.99 MB 36%
+## f691ab0a0436: Downloading 752.75 kB/2.71 MB 28%
+## 605ce1bd3f31: Downloading 780.18 kB/1.99 MB 39%
+## 605ce1bd3f31: Downloading 845.72 kB/1.99 MB 42%
+## f691ab0a0436: Downloading 818.29 kB/2.71 MB 30%
+## 605ce1bd3f31: Downloading 911.26 kB/1.99 MB 46%
+## f691ab0a0436: Downloading 883.83 kB/2.71 MB 33%
+## 605ce1bd3f31: Downloading 976.79 kB/1.99 MB 49%
+## f691ab0a0436: Downloading 949.36 kB/2.71 MB 35%
+## 605ce1bd3f31: Downloading 1.04 MB/1.99 MB 52%
+## f691ab0a0436: Downloading 1.01 MB/2.71 MB 37%
+## 605ce1bd3f31: Downloading 1.11 MB/1.99 MB 56%
+## f691ab0a0436: Downloading 1.05 MB/2.71 MB 39%
+## 605ce1bd3f31: Downloading 1.14 MB/1.99 MB 57%
+## 605ce1bd3f31: Downloading 1.24 MB/1.99 MB 62%
+## f691ab0a0436: Downloading 1.11 MB/2.71 MB 41%
+## 605ce1bd3f31: Downloading 1.34 MB/1.99 MB 67%
+## f691ab0a0436: Downloading 1.18 MB/2.71 MB 43%
+## 605ce1bd3f31: Downloading 1.4 MB/1.99 MB 70%
+## f691ab0a0436: Downloading 1.24 MB/2.71 MB 46%
+## 605ce1bd3f31: Downloading 1.5 MB/1.99 MB 75%
 ## f691ab0a0436: Downloading 1.28 MB/2.71 MB 47%
+## 605ce1bd3f31: Downloading 1.6 MB/1.99 MB 80%
+## 605ce1bd3f31: Downloading 1.66 MB/1.99 MB 84%
 ## f691ab0a0436: Downloading 1.34 MB/2.71 MB 49%
-## f691ab0a0436: Downloading 1.41 MB/2.71 MB 52%
-## f691ab0a0436: Downloading 1.47 MB/2.71 MB 54%
+## 605ce1bd3f31: Downloading 1.73 MB/1.99 MB 87%
+## f691ab0a0436: Downloading 1.38 MB/2.71 MB 51%
+## 605ce1bd3f31: Downloading 1.86 MB/1.99 MB 93%
+## f691ab0a0436: Downloading 1.44 MB/2.71 MB 53%
+## 605ce1bd3f31: Downloading 1.96 MB/1.99 MB 98%
+## 605ce1bd3f31: Downloading 1.99 MB/1.99 MB 100%
+## Download complete 605ce1bd3f31
+## f691ab0a0436: Downloading 1.51 MB/2.71 MB 56%
+## 605ce1bd3f31: Extracting 32.77 kB/1.99 MB 2%
+## 605ce1bd3f31: Extracting 753.66 kB/1.99 MB 38%
+## 605ce1bd3f31: Extracting 1.99 MB/1.99 MB 100%
+## 605ce1bd3f31: Extracting 1.99 MB/1.99 MB 100%
+## Pull complete 605ce1bd3f31
 ## f691ab0a0436: Downloading 1.54 MB/2.71 MB 57%
+## f691ab0a0436: Downloading 1.57 MB/2.71 MB 58%
 ## f691ab0a0436: Downloading 1.6 MB/2.71 MB 59%
-## f691ab0a0436: Downloading 1.67 MB/2.71 MB 62%
+## f691ab0a0436: Downloading 1.64 MB/2.71 MB 60%
+## f691ab0a0436: Downloading 1.7 MB/2.71 MB 63%
 ## f691ab0a0436: Downloading 1.74 MB/2.71 MB 64%
-## f691ab0a0436: Downloading 1.8 MB/2.71 MB 66%
+## f691ab0a0436: Downloading 1.77 MB/2.71 MB 65%
+## f691ab0a0436: Downloading 1.83 MB/2.71 MB 68%
 ## f691ab0a0436: Downloading 1.87 MB/2.71 MB 69%
+## f691ab0a0436: Downloading 1.9 MB/2.71 MB 70%
 ## f691ab0a0436: Downloading 1.93 MB/2.71 MB 71%
 ## f691ab0a0436: Downloading 2 MB/2.71 MB 74%
+## f691ab0a0436: Downloading 2.03 MB/2.71 MB 75%
 ## f691ab0a0436: Downloading 2.06 MB/2.71 MB 76%
 ## f691ab0a0436: Downloading 2.13 MB/2.71 MB 78%
+## f691ab0a0436: Downloading 2.16 MB/2.71 MB 80%
 ## f691ab0a0436: Downloading 2.19 MB/2.71 MB 81%
-## f691ab0a0436: Downloading 2.25 MB/2.71 MB 83%
-## f691ab0a0436: Downloading 2.31 MB/2.71 MB 85%
-## f691ab0a0436: Downloading 2.38 MB/2.71 MB 88%
-## f691ab0a0436: Downloading 2.45 MB/2.71 MB 90%
-## f691ab0a0436: Downloading 2.51 MB/2.71 MB 93%
-## f691ab0a0436: Downloading 2.58 MB/2.71 MB 95%
-## f691ab0a0436: Downloading 2.64 MB/2.71 MB 97%
-## f691ab0a0436: Downloading 2.71 MB/2.71 MB 100%
+## f691ab0a0436: Downloading 2.23 MB/2.71 MB 82%
+## f691ab0a0436: Downloading 2.26 MB/2.71 MB 83%
+## f691ab0a0436: Downloading 2.29 MB/2.71 MB 85%
+## f691ab0a0436: Downloading 2.36 MB/2.71 MB 87%
+## f691ab0a0436: Downloading 2.39 MB/2.71 MB 88%
+## f691ab0a0436: Downloading 2.46 MB/2.71 MB 91%
+## f691ab0a0436: Downloading 2.49 MB/2.71 MB 92%
+## f691ab0a0436: Downloading 2.55 MB/2.71 MB 94%
+## f691ab0a0436: Downloading 2.62 MB/2.71 MB 97%
+## f691ab0a0436: Downloading 2.69 MB/2.71 MB 99%
 ## Verifying Checksum f691ab0a0436
 ## Download complete f691ab0a0436
 ## f691ab0a0436: Extracting 32.77 kB/2.71 MB 1%
-## f691ab0a0436: Extracting 1.67 MB/2.71 MB 62%
-## f691ab0a0436: Extracting 2.62 MB/2.71 MB 97%
+## f691ab0a0436: Extracting 983.04 kB/2.71 MB 36%
+## f691ab0a0436: Extracting 2.59 MB/2.71 MB 95%
 ## f691ab0a0436: Extracting 2.71 MB/2.71 MB 100%
 ## Pull complete f691ab0a0436
 ## 3d7d3f4179eb: Extracting 342 B/342 B 100%
@@ -1483,20 +1523,20 @@ img <- docker$image$build("iterate", tag = "richfitz/iterate", nocache = TRUE)
 ## Step 1/5 : FROM alpine:latest
 ##  ---> 3fd9065eaf02
 ## Step 2/5 : COPY iterate /usr/local/bin/iterate
-##  ---> 8b5deacdc081
+##  ---> e588d8e35a24
 ## Step 3/5 : CMD chmod +x /usr/local/bin/iterate
-##  ---> Running in 56e8f6f19bb0
-## Removing intermediate container 56e8f6f19bb0
-##  ---> ee4cabc17e2e
+##  ---> Running in 5537e9fd8872
+## Removing intermediate container 5537e9fd8872
+##  ---> 3abc9f53d8d8
 ## Step 4/5 : LABEL stevedore_version 0.0.1
-##  ---> Running in a969dce0538a
-## Removing intermediate container a969dce0538a
-##  ---> 0f477fb05633
+##  ---> Running in c84487ec27f5
+## Removing intermediate container c84487ec27f5
+##  ---> cb81cba87b88
 ## Step 5/5 : ENTRYPOINT ["/usr/local/bin/iterate"]
-##  ---> Running in 76d6fe7ecbcb
-## Removing intermediate container 76d6fe7ecbcb
-##  ---> 97fa0070b326
-## Successfully built 97fa0070b326
+##  ---> Running in 1ee102a4e1ad
+## Removing intermediate container 1ee102a4e1ad
+##  ---> 86f15ec2e15f
+## Successfully built 86f15ec2e15f
 ## Successfully tagged richfitz/iterate:latest
 ```
 
@@ -1586,7 +1626,7 @@ img$id()
 ```
 
 ```
-## [1] "sha256:97fa0070b3260df7b7db2ad4e8e9c34301bb6cd2c31b4f2460682dcc89b2cf53"
+## [1] "sha256:86f15ec2e15f7d505bb013d1b88bf5ba9ec82ed98f29e1bd27f455f957467e67"
 ```
 
 ```r
@@ -1594,7 +1634,7 @@ img$short_id()
 ```
 
 ```
-## [1] "sha256:97fa0070b3"
+## [1] "sha256:86f15ec2e1"
 ```
 
 ```r
@@ -1633,7 +1673,7 @@ img$inspect()
 
 ```
 ## $id
-## [1] "sha256:97fa0070b3260df7b7db2ad4e8e9c34301bb6cd2c31b4f2460682dcc89b2cf53"
+## [1] "sha256:86f15ec2e15f7d505bb013d1b88bf5ba9ec82ed98f29e1bd27f455f957467e67"
 ##
 ## $repo_tags
 ## [1] "richfitz/iterate:latest"
@@ -1642,20 +1682,20 @@ img$inspect()
 ## character(0)
 ##
 ## $parent
-## [1] "sha256:0f477fb05633562d6b8d7b6c273a73230906752ac0d8a648f57c2bbc81469aa0"
+## [1] "sha256:cb81cba87b88aa00c8acba3588fbe5034e74104c80499de8d329283744d688a6"
 ##
 ## $comment
 ## [1] ""
 ##
 ## $created
-## [1] "2018-04-03T19:20:57.746210189Z"
+## [1] "2018-04-16T20:07:44.5452845Z"
 ##
 ## $container
-## [1] "76d6fe7ecbcb741c409fb8c44ceb0b6bce9eb3c50c3cae980d8c8b7e7dff59f6"
+## [1] "1ee102a4e1ad0bd204c55d4ac1d5234f0c9ca680b98bc4c50bc108037b295dba"
 ##
 ## $container_config
 ## $container_config$hostname
-## [1] "76d6fe7ecbcb"
+## [1] "1ee102a4e1ad"
 ##
 ## $container_config$domainname
 ## [1] ""
@@ -1700,7 +1740,7 @@ img$inspect()
 ## [1] TRUE
 ##
 ## $container_config$image
-## [1] "sha256:0f477fb05633562d6b8d7b6c273a73230906752ac0d8a648f57c2bbc81469aa0"
+## [1] "sha256:cb81cba87b88aa00c8acba3588fbe5034e74104c80499de8d329283744d688a6"
 ##
 ## $container_config$volumes
 ## NULL
@@ -1735,7 +1775,7 @@ img$inspect()
 ##
 ##
 ## $docker_version
-## [1] "18.03.0-ce"
+## [1] "18.04.0-ce"
 ##
 ## $author
 ## [1] ""
@@ -1785,7 +1825,7 @@ img$inspect()
 ## [1] TRUE
 ##
 ## $config$image
-## [1] "sha256:0f477fb05633562d6b8d7b6c273a73230906752ac0d8a648f57c2bbc81469aa0"
+## [1] "sha256:cb81cba87b88aa00c8acba3588fbe5034e74104c80499de8d329283744d688a6"
 ##
 ## $config$volumes
 ## NULL
@@ -1840,13 +1880,13 @@ img$inspect()
 ##
 ## $graph_driver$data
 ##                                                                                          lower_dir
-##   "/var/lib/docker/overlay2/230714ad111869ebfb07688b547b1b23992cac8971b6a40f79b1753eb07335c2/diff"
+##   "/var/lib/docker/overlay2/a5ef0a95e9164f9b6f05e0a961f1f2e7e9167020ed3cb3eabab66e4349c5704d/diff"
 ##                                                                                         merged_dir
-## "/var/lib/docker/overlay2/61780fa86151d6e53f445668c93cb985f489d885d23f48b8dba4a657e1860b64/merged"
+## "/var/lib/docker/overlay2/62820325cc7a03fbe0061b21e614b0b403f59db38844c997482512ea407a4228/merged"
 ##                                                                                          upper_dir
-##   "/var/lib/docker/overlay2/61780fa86151d6e53f445668c93cb985f489d885d23f48b8dba4a657e1860b64/diff"
+##   "/var/lib/docker/overlay2/62820325cc7a03fbe0061b21e614b0b403f59db38844c997482512ea407a4228/diff"
 ##                                                                                           work_dir
-##   "/var/lib/docker/overlay2/61780fa86151d6e53f445668c93cb985f489d885d23f48b8dba4a657e1860b64/work"
+##   "/var/lib/docker/overlay2/62820325cc7a03fbe0061b21e614b0b403f59db38844c997482512ea407a4228/work"
 ##
 ##
 ## $root_fs
@@ -1855,7 +1895,7 @@ img$inspect()
 ##
 ## $root_fs$layers
 ## [1] "sha256:cd7100a72410606589a54b932cabd804a17f9ae5b42a1882bd56d263e02b6215"
-## [2] "sha256:94dcfa9c9f4b075feb98a6e6ba07353acde1b73281ac15178ecd692a22af0ff7"
+## [2] "sha256:f1a81836ef03fd8e5051cb4ca3a26e2cd62a4196f4cad14bfcc05719da5beb16"
 ##
 ## $root_fs$base_layer
 ## [1] NA
@@ -1874,17 +1914,17 @@ img$history()
 
 ```
 ##                                                                        id
-## 1 sha256:97fa0070b3260df7b7db2ad4e8e9c34301bb6cd2c31b4f2460682dcc89b2cf53
-## 2 sha256:0f477fb05633562d6b8d7b6c273a73230906752ac0d8a648f57c2bbc81469aa0
-## 3 sha256:ee4cabc17e2e432306f460622a008e4f3a448a16458375d55923f2f0165ed34a
-## 4 sha256:8b5deacdc0815a35fe078db22449e13470b1a5acbbd1ca710f9df68c43a702c0
+## 1 sha256:86f15ec2e15f7d505bb013d1b88bf5ba9ec82ed98f29e1bd27f455f957467e67
+## 2 sha256:cb81cba87b88aa00c8acba3588fbe5034e74104c80499de8d329283744d688a6
+## 3 sha256:3abc9f53d8d8672b195eb4d193f219efe10e8117892925d6cee49261dfe36c19
+## 4 sha256:e588d8e35a243f20b5e775d31d86eebf4338bb5ca312f6e99625d16edd534ee5
 ## 5 sha256:3fd9065eaf02feaf94d68376da52541925650b81698c53c6824d92ff63f98353
 ## 6                                                               <missing>
 ##      created
-## 1 1522783257
-## 2 1522783257
-## 3 1522783257
-## 4 1522783256
+## 1 1523909264
+## 2 1523909264
+## 3 1523909263
+## 4 1523909263
 ## 5 1515532258
 ## 6 1515532258
 ##                                                                                                                created_by
@@ -1948,11 +1988,11 @@ img$remove()
 ## 6                    <NA>
 ##                                                                   deleted
 ## 1                                                                    <NA>
-## 2 sha256:97fa0070b3260df7b7db2ad4e8e9c34301bb6cd2c31b4f2460682dcc89b2cf53
-## 3 sha256:0f477fb05633562d6b8d7b6c273a73230906752ac0d8a648f57c2bbc81469aa0
-## 4 sha256:ee4cabc17e2e432306f460622a008e4f3a448a16458375d55923f2f0165ed34a
-## 5 sha256:8b5deacdc0815a35fe078db22449e13470b1a5acbbd1ca710f9df68c43a702c0
-## 6 sha256:a8f517e021879b21281b5cb5c405dca9cec71616da11a020914e24c0b57f7702
+## 2 sha256:86f15ec2e15f7d505bb013d1b88bf5ba9ec82ed98f29e1bd27f455f957467e67
+## 3 sha256:cb81cba87b88aa00c8acba3588fbe5034e74104c80499de8d329283744d688a6
+## 4 sha256:3abc9f53d8d8672b195eb4d193f219efe10e8117892925d6cee49261dfe36c19
+## 5 sha256:e588d8e35a243f20b5e775d31d86eebf4338bb5ca312f6e99625d16edd534ee5
+## 6 sha256:b8c070c1be8e3298caa1c8a5f87f8b23bea72d7fe24f1a8837ba71ff5c1cf713
 ```
 
 ## Volumes
@@ -1974,14 +2014,14 @@ docker$volume$list()
 
 ```
 ##                                                               name driver
-## 1                                                         myvolume  local
-## 2 3dd372c14014ea37354d29a064e7405329c310d77f7f0a1de9e82c9904ff0206  local
+## 1 32b935bb7b331482e45deb1be7ec0d57aaa1f6de1d4ad89049daa69f5e0ae0bf  local
+## 2                                                         myvolume  local
 ##                                                                                       mountpoint
-## 1                                                         /var/lib/docker/volumes/myvolume/_data
-## 2 /var/lib/docker/volumes/3dd372c14014ea37354d29a064e7405329c310d77f7f0a1de9e82c9904ff0206/_data
+## 1 /var/lib/docker/volumes/32b935bb7b331482e45deb1be7ec0d57aaa1f6de1d4ad89049daa69f5e0ae0bf/_data
+## 2                                                         /var/lib/docker/volumes/myvolume/_data
 ##   status labels scope options usage_data
-## 1               local             NA, NA
-## 2           bar local             NA, NA
+## 1           bar local             NA, NA
+## 2               local             NA, NA
 ```
 
 ### Working with volume objects
@@ -2038,7 +2078,7 @@ vol$inspect()
 ## [1] "local"
 ##
 ## $options
-## character(0)
+## NULL
 ##
 ## $usage_data
 ## NULL
@@ -2085,8 +2125,8 @@ docker$container$run(
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: 60a58c88ddda98656dbb57eaddced8db3f82e99dffa59359f0b3457f71caeb5c
-##       name: kind_bose
+##       id: a1b2fbf85fbc023b54990d4dc8de0cb6c3d7d5df20dde338ab4c3dec2d90c892
+##       name: competent_albattani
 ##
 ##   $logs:
 ##
@@ -2137,27 +2177,27 @@ docker$network$list()
 
 ```
 ##              name
-## 1          bridge
-## 2            none
-## 3 docker_gwbridge
-## 4       mynetwork
-## 5            host
+## 1 docker_gwbridge
+## 2            host
+## 3          bridge
+## 4            none
+## 5       mynetwork
 ##                                                                 id
-## 1 53432b92e4394b0e1401d2b8c4d2f2b06f0f0439b51264a190b3cae6a78a78d0
-## 2 9bad2ae5c810c2d3fb9e2c73db5b733338189010b3e19803003051758a3962ba
-## 3 6d165f6c016347f9af798b37a0b9adfadca3e2e28ddd76e3e63de8181b04fda8
-## 4 7b020165859564dd2d90207d7e2a5c26ee10afe499d095b7da1b7004bbcf8129
-## 5 2f80d37c9c534b35f1dfff0896f5391243432ad720dc6df371279dfb78fea0a3
+## 1 5700a9c4d2908eea208cd9f5fe8c1a6d1864e51043ad73cc718b7eb2060ab4e9
+## 2 2f80d37c9c534b35f1dfff0896f5391243432ad720dc6df371279dfb78fea0a3
+## 3 676cc00e8893f7836dc7e8e4ecc06feb245b87200d9b3ac1ffa237f0148b380b
+## 4 9bad2ae5c810c2d3fb9e2c73db5b733338189010b3e19803003051758a3962ba
+## 5 959ce8cb240a2bcd6abca33f5fe4b1ea530de305d15f3bd76fb0e46a82d0bde2
 ##                          created scope driver enable_ipv6         ipam
-## 1 2018-04-03T17:56:23.729617738Z local bridge       FALSE default,....
-## 2           0001-01-01T00:00:00Z local   null       FALSE default,....
-## 3 2018-04-03T18:15:21.428857001Z local bridge       FALSE default,....
-## 4 2018-04-03T19:21:02.404376089Z local bridge       FALSE default,....
-## 5           0001-01-01T00:00:00Z local   host       FALSE default,....
+## 1   2018-04-16T18:12:50.9705499Z local bridge       FALSE default,....
+## 2           0001-01-01T00:00:00Z local   host       FALSE default,....
+## 3 2018-04-15T21:28:23.685694069Z local bridge       FALSE default,....
+## 4           0001-01-01T00:00:00Z local   null       FALSE default,....
+## 5   2018-04-16T20:07:49.1996514Z local bridge       FALSE default,....
 ##   internal attachable ingress containers      options labels
-## 1    FALSE      FALSE   FALSE            true, tr....
+## 1    FALSE      FALSE   FALSE            false, t....
 ## 2    FALSE      FALSE   FALSE
-## 3    FALSE      FALSE   FALSE            false, t....
+## 3    FALSE      FALSE   FALSE            true, tr....
 ## 4    FALSE      FALSE   FALSE
 ## 5    FALSE      FALSE   FALSE
 ```
@@ -2201,7 +2241,7 @@ nw$id()
 ```
 
 ```
-## [1] "7b020165859564dd2d90207d7e2a5c26ee10afe499d095b7da1b7004bbcf8129"
+## [1] "959ce8cb240a2bcd6abca33f5fe4b1ea530de305d15f3bd76fb0e46a82d0bde2"
 ```
 
 `$inspect()` gets detailed metadata
@@ -2215,10 +2255,10 @@ nw$inspect()
 ## [1] "mynetwork"
 ##
 ## $id
-## [1] "7b020165859564dd2d90207d7e2a5c26ee10afe499d095b7da1b7004bbcf8129"
+## [1] "959ce8cb240a2bcd6abca33f5fe4b1ea530de305d15f3bd76fb0e46a82d0bde2"
 ##
 ## $created
-## [1] "2018-04-03T19:21:02.404376089Z"
+## [1] "2018-04-16T20:07:49.1996514Z"
 ##
 ## $scope
 ## [1] "local"
@@ -2311,31 +2351,31 @@ docker$container$run("alpine:latest", c("ping", "server", "-c", "3"),
 
 ```
 ## O> PING server (172.19.0.2): 56 data bytes
-## O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.097 ms
-## O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.138 ms
-## O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.136 ms
+## O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.146 ms
+## O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.156 ms
+## O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.212 ms
 ## O>
 ## O> --- server ping statistics ---
 ## O> 3 packets transmitted, 3 packets received, 0% packet loss
-## O> round-trip min/avg/max = 0.097/0.123/0.138 ms
+## O> round-trip min/avg/max = 0.146/0.171/0.212 ms
 ```
 
 ```
 ## <docker_run_output>
 ##   $container:
 ##     <docker_container>
-##       id: f290e2d430ca887d6fff2e1132e531b9ea51ead8dbd30c0064684a4fba67bfb7
-##       name: adoring_varahamihira
+##       id: 43c1a36a3f5f7f5dd6f64ea73bb8b5eafcb2ca8a26415d57a816b3d4e0f721d1
+##       name: nostalgic_stallman
 ##
 ##   $logs:
 ##     O> PING server (172.19.0.2): 56 data bytes
-##     O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.097 ms
-##     O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.138 ms
-##     O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.136 ms
+##     O> 64 bytes from 172.19.0.2: seq=0 ttl=64 time=0.146 ms
+##     O> 64 bytes from 172.19.0.2: seq=1 ttl=64 time=0.156 ms
+##     O> 64 bytes from 172.19.0.2: seq=2 ttl=64 time=0.212 ms
 ##     O>
 ##     O> --- server ping statistics ---
 ##     O> 3 packets transmitted, 3 packets received, 0% packet loss
-##     O> round-trip min/avg/max = 0.097/0.123/0.138 ms
+##     O> round-trip min/avg/max = 0.146/0.171/0.212 ms
 ```
 
 Omitting the `network` argument, the second container can't find
@@ -2447,7 +2487,7 @@ docker$ping()
 
 `$api_version()` reports the API version that the *client* is using
 (this can be varied from 1.25 to
-1.36)
+1.37)
 
 ```r
 docker$api_version()
@@ -2465,7 +2505,7 @@ docker$version()
 
 ```
 ## $version
-## [1] "18.03.0-ce"
+## [1] "18.04.0-ce"
 ##
 ## $api_version
 ## [1] "1.37"
@@ -2474,7 +2514,7 @@ docker$version()
 ## [1] "1.12"
 ##
 ## $git_commit
-## [1] "0520e24"
+## [1] "3d479c0"
 ##
 ## $go_version
 ## [1] "go1.9.4"
@@ -2492,7 +2532,7 @@ docker$version()
 ## [1] TRUE
 ##
 ## $build_time
-## [1] "2018-03-21T23:14:32.000000000+00:00"
+## [1] "2018-04-10T18:23:05.000000000+00:00"
 ```
 
 `$info()` reports a bunch of other information about the state of
@@ -2563,19 +2603,19 @@ docker$info()
 ## [1] TRUE
 ##
 ## $http_proxy
-## [1] "docker.for.mac.http.internal:3128"
+## [1] "gateway.docker.internal:3128"
 ##
 ## $https_proxy
-## [1] "docker.for.mac.http.internal:3129"
+## [1] "gateway.docker.internal:3129"
 ##
 ## $id
-## [1] "52RU:FXND:DPVM:VXXI:LZRR:6S22:F6IF:DAY2:XWLE:F6EF:O4C5:D65T"
+## [1] "X26Q:EYEC:M7AZ:IWRA:BTYD:ZJ4X:SJLK:OY4O:E376:4WMJ:ZEII:7AHU"
 ##
 ## $ipv4_forwarding
 ## [1] TRUE
 ##
 ## $images
-## [1] 413
+## [1] 24
 ##
 ## $index_server_address
 ## [1] "https://index.docker.io/v1/"
@@ -2605,7 +2645,7 @@ docker$info()
 ## [1] 2
 ##
 ## $n_fd
-## [1] 23
+## [1] 25
 ##
 ## $n_goroutines
 ## [1] 42
@@ -2653,10 +2693,10 @@ docker$info()
 ## [1] TRUE
 ##
 ## $system_time
-## [1] "2018-04-03T19:21:10.595131689Z"
+## [1] "2018-04-16T20:07:56.7483986Z"
 ##
 ## $server_version
-## [1] "18.03.0-ce"
+## [1] "18.04.0-ce"
 ```
 
 Finally, `$df()` will return information about resource and data
