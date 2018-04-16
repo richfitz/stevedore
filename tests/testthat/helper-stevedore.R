@@ -294,6 +294,9 @@ test_sample_responses <- function(v, skip = NULL) {
       testthat::expect_equal(ans2, dat$reference, check.attributes = FALSE)
     })
   }
+
+  res <- audit_spec_response(v)
+  testthat::expect_false(any(res$missing))
 }
 
 create_sample_responses <- function(target, base) {
