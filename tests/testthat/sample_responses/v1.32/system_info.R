@@ -1,4 +1,4 @@
-## version: 1.36
+## version: 1.32
 ## method: get
 ## path: /info
 ## code: 200
