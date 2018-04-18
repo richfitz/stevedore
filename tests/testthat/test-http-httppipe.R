@@ -2,7 +2,9 @@ context("http with httppipe")
 
 test_that("construction", {
   skip_if_not_installed("httppipe")
-  x <- http_client_httppipe(http_default_url(is_windows()))
+  config <- docker_config(ignore_environment = TRUE,
+                          http_client_type = "httppipe")
+  x <- http_client_httppipe(config)
 
   expect_is(x, "list")
   expect_equal(x$type, "httppipe")
@@ -36,12 +38,12 @@ test_that("binary output", {
   x$remove()
 })
 
-test_that("detect", {
+test_that("version detect", {
   invisible(test_docker_client()) # skips if not present
-  cl <- http_client(api_version = "detect",
-                    type = "httppipe",
-                    min_version = "0.0.1",
-                    max_version = "9.9.9")
+
+  config <- docker_config(api_version = "detect", http_client_type = "httppipe",
+                          ignore_environment = TRUE)
+  cl <- http_client(config, min_version = "0.0.1", max_version = "9.9.9")
   expect_equal(cl$api_version,
                raw_to_json(cl$request("GET", "/version")$content)$ApiVersion)
 })

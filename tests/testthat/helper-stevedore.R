@@ -4,6 +4,7 @@ run_sample_responses <- function(obj) {
   }
 }
 
+
 run_sample_response <- function(x, spec) {
   responses <- spec$paths[[x$path]][[tolower(x$method)]]$responses
   message(sprintf("%s %s", toupper(x$method), x$path))
@@ -37,6 +38,7 @@ run_sample_response <- function(x, spec) {
   }
   invisible(ret)
 }
+
 
 describe_api <- function(x) {
   endpoints <- lapply(x$spec$paths, names)
@@ -167,9 +169,11 @@ read_sample_response_str <- function(method, path, code, spec, error = TRUE) {
   NULL
 }
 
+
 dput2 <- function(x) {
   paste(capture.output(dput(x)), collapse = "\n")
 }
+
 
 dput_list <- function(obj) {
   tmp <- vcapply(obj, dput2)
@@ -177,10 +181,12 @@ dput_list <- function(obj) {
   sprintf("list(\n%s\n  )", els)
 }
 
+
 dput_cvec <- function(x) {
   els <- paste(sprintf('  %s = "%s"', names(x), unname(x)), collapse = ",\n")
   sprintf("c(\n%s\n  )", els)
 }
+
 
 add_sample_response <- function(filename, method, path, code, version,
                                 error = FALSE) {
@@ -199,6 +205,7 @@ add_sample_response <- function(filename, method, path, code, version,
   txt <- c(sprintf("## %s: %s", names(dat), unname(dat)), "NULL")
   writeLines(txt, filename)
 }
+
 
 rand_str <- function(n, prefix = "") {
   paste0(prefix, paste0(sample(letters, n, replace = TRUE), collapse = ""))
@@ -244,8 +251,7 @@ test_docker_client <- function(...) {
     testthat::skip("docker not available?")
   }
 
-  ## TODO: stop here if connection fails too
-  docker_client(...)
+  docker_client(..., ignore_environment = TRUE)
 }
 
 
@@ -254,14 +260,10 @@ null_docker_client <- function(...) {
 }
 
 
-test_docker_client_httppipe <- function(...) {
-  skip_if_no_httppipe_support()
-  docker_client(..., type = "httppipe")
-}
-
 has_internet <- function() {
   !is.null(suppressWarnings(utils::nsl("www.google.com")))
 }
+
 
 skip_if_no_internet <- function() {
   if (has_internet()) {
@@ -270,12 +272,14 @@ skip_if_no_internet <- function() {
   testthat::skip("no internet")
 }
 
+
 skip_if_no_httppipe_support <- function() {
   testthat::skip_if_not_installed("httppipe")
   if (!httppipe::httppipe_available()) {
     testthat::skip("httppipe support not possible")
   }
 }
+
 
 test_sample_responses <- function(v, skip = NULL) {
   files <- dir(file.path("sample_responses", paste0("v", v)),
@@ -298,6 +302,7 @@ test_sample_responses <- function(v, skip = NULL) {
   res <- audit_spec_response(v)
   testthat::expect_false(any(res$missing))
 }
+
 
 create_sample_responses <- function(target, base) {
   path_base <- file.path("sample_responses", paste0("v", base))
@@ -365,6 +370,7 @@ create_sample_responses <- function(target, base) {
     }
   }
 }
+
 
 repeat_until_error <- function(fn, times = 10L, interval = 0.1) {
   for (i in seq_len(times)) {

@@ -4,10 +4,14 @@
 \alias{docker_client}
 \title{Create docker client}
 \usage{
-docker_client(api_version = NULL, ..., host = NULL, cert_path = NULL,
+docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
   tls_verify = NULL, http_client_type = NULL, quiet = FALSE)
 }
 \arguments{
+\item{...}{Reserved for future use.  Passing in any unrecognised
+argument will throw an error.  Part of the role of this argument
+is to force use of named arguments until the API is stabilised.}
+
 \item{api_version}{Version of the API request from the api.
 Options are \code{NULL} (the default) - use the package's
 default version (currently
@@ -17,11 +21,10 @@ between \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
 \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}), or the string
 \code{detect} which will use the highest version out of the
 version reported by the api and
-\Sexpr{stevedore:::DOCKER_API_VERSION_MAX}.}
-
-\item{...}{Reserved for future use.  Passing in any unrecognised
-argument will throw an error.  Part of the role of this argument
-is to force use of named arguments until the API is stabilised.}
+\Sexpr{stevedore:::DOCKER_API_VERSION_MAX}.  If the environment
+variable \code{DOCKER_API_VERSION} is set then this will be used
+as the version (this is the same behaviour as the command line
+client).}
 
 \item{host}{The URL for the docker daemon.  This can be a unix
 socket (e.g., unix:///var/run/docker.sock) on macOS/Linux, a
@@ -35,7 +38,7 @@ respectively).}
 \item{cert_path}{The path to a directory containing certificate
 files.  If using an \code{https} url this is required.  If not
 given, we use the environment variable \code{DOCKER_CERT_PATH}.
-It is an error to provide this while using a socket or named
+This is ignored without warning if used with a socket or named
 pipe connection.}
 
 \item{tls_verify}{Logical, indicating if TLS should be verified.
@@ -55,6 +58,11 @@ for debugging in development (forcing the \code{httppipe} client
 where the \code{curl} client would ordinarily be preferred).}
 
 \item{quiet}{Suppress informational messages.}
+
+\item{ignore_environment}{Logical, indicating if environment
+variables (\code{DOCKER_HOST}, \code{DOCKER_CERT_PATH},
+\code{DOCKER_TLS_VERIFY} and \code{DOCKER_API_VERSION}) should
+be ignored.}
 }
 \description{
 Create a docker client object

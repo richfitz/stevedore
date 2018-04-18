@@ -18,10 +18,14 @@
 
 docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
                           tls_verify = NULL, http_client_type = NULL,
-                          is_windows = NULL, quiet = FALSE) {
-  api_version <- api_version %||% Sys_getenv1("DOCKER_API_VERSION")
-  host <- host %||% Sys_getenv1("DOCKER_HOST")
-  cert_path <- cert_path %||% Sys_getenv1("DOCKER_CERT_PATH")
+                          is_windows = NULL, quiet = FALSE,
+                          ignore_environment = FALSE) {
+  if (!ignore_environment) {
+    api_version <- api_version %||% Sys_getenv1("DOCKER_API_VERSION")
+    host <- host %||% Sys_getenv1("DOCKER_HOST")
+    cert_path <- cert_path %||% Sys_getenv1("DOCKER_CERT_PATH")
+    tls_verify <- !is.null(Sys_getenv1("DOCKER_TLS_VERIFY"))
+  }
 
   docker_config_validate(api_version, host, cert_path, tls_verify,
                          http_client_type, is_windows, quiet)
@@ -30,9 +34,8 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
 docker_config_validate <- function(api_version, host, cert_path, tls_verify,
                                    http_client_type, is_windows, quiet) {
   assert_scalar_logical(quiet)
-  if (!is.null(api_version)) {
-    ## validate version here?
-  }
+
+  ## NOTE: api_version is validated later: see http_client_api_version
 
   is_windows <- is_windows %||% is_windows()
   if (is.null(host)) {
@@ -41,9 +44,11 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
     } else {
       host <- DEFAULT_DOCKER_UNIX_SOCKET
     }
+  } else {
+    assert_scalar_character(host)
+    host <- trimws(host)
   }
 
-  host <- trimws(host)
   re <- "^(.+)://(.+)$"
   if (grepl(re, host)) {
     protocol <- sub(re, "\\1", host)
@@ -52,40 +57,31 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
     protocol <- "unix"
     addr <- host
   } else {
-    stop(sprintf("Invalid address '%s'- must match '<protocol>://<addr>'",
+    stop(sprintf("Invalid address '%s' - must match '<protocol>://<addr>'",
                  host), call. = FALSE)
   }
 
   if (protocol %in% c("http+unix", "unix")) {
     protocol <- "socket"
-    if (is_windows) {
-      stop("Socket connections are not possible on windows", call. = FALSE)
-    }
     use_tls <- tls_verify <- FALSE
     base_url <- "http://localhost"
   } else if (protocol == "npipe") {
     protocol <- "npipe"
-    if (!is_windows) {
-      stop("Named pipe connections are only possible on windows",
-           call. = FALSE)
-    }
     use_tls <- tls_verify <- FALSE
-    addr <- sprintf("npipe://%s", addr)
-    base_url <- ""
+    addr <- host
+    base_url <- "http://localhost"
   } else {
     if (protocol == "https") {
       protocol <- "https"
       use_tls <- TRUE
-      if (is.null(cert_path)) {
-        cert_path <- file.path(path.expand("~"), ".docker")
-      }
       tls_verify <- !is.null(tls_verify) && tls_verify
     } else if (protocol %in% c("tcp", "http")) {
       tls_verify <- !is.null(tls_verify) && tls_verify
       use_tls <- tls_verify || !is.null(cert_path)
       protocol <- if (use_tls) "https" else "http"
     } else {
-      stop(sprintf("Unknown protocol '%s'", protocol), call. = FALSE)
+      stop(sprintf("Unknown protocol '%s' for host '%s'", protocol, host),
+           call. = FALSE)
     }
     base_url <- sprintf("%s://%s", protocol, addr)
   }
@@ -98,7 +94,7 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
   }
 
   if (protocol == "npipe") {
-    if (is_windows) {
+    if (!is_windows) {
       stop("Named pipe connections are only available on windows")
     }
     if (http_client_type == "curl") {
@@ -112,27 +108,22 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
     stop("The 'httppipe' http driver cannot connect to http servers")
   }
 
-  if (!is.null(cert_path)) {
-    if (protocol %in% c("socket", "npipe")) {
-      stop(sprintf("TLS is not supported over '%s' connections", protocol),
-           call. = FALSE)
-    }
+  if (use_tls && !is.null(cert_path)) {
     assert_directory(cert_path)
     req <- c("key.pem", "ca.pem", "cert.pem")
     msg <- req[!file.exists(file.path(cert_path, req))]
     if (length(msg) > 0L) {
       stop(sprintf("Certificate %s missing within directory %s: %s",
                    ngettext(length(msg), "file", "files"),
-                   cert_path,
+                   squote(cert_path),
                    paste(squote(msg), collapse = ", ")))
     }
     cert <- list(key = file.path(cert_path, "key.pem"),
                  ca = file.path(cert_path, "ca.pem"),
                  cert = file.path(cert_path, "cert.pem"))
+  } else if (use_tls && is.null(cert_path)) {
+    stop("cert_path not given, but tls_verify requested")
   } else {
-    if (tls_verify) {
-      stop("cert_path not given, but tls_verify requested")
-    }
     cert <- NULL
   }
 

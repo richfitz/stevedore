@@ -38,7 +38,7 @@ docker_available <- function(..., verbose = FALSE) {
   ## http_client, which is way faster and does not require internet
   ## access to get the spec.
   res <- tryCatch({
-    cl <- http_client(...)
+    cl <- http_client(docker_config(...))
     cl$ping()
   }, error = identity)
 
