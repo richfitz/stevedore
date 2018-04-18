@@ -18,6 +18,7 @@ Imports:
 Suggests:
     httppipe,
     knitr,
+    openssl,
     rmarkdown,
     testthat,
     withr

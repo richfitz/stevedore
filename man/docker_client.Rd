@@ -4,8 +4,8 @@
 \alias{docker_client}
 \title{Create docker client}
 \usage{
-docker_client(api_version = NULL, url = NULL, ...,
-  http_client_type = NULL, quiet = FALSE)
+docker_client(api_version = NULL, ..., host = NULL, cert_path = NULL,
+  tls_verify = NULL, http_client_type = NULL, quiet = FALSE)
 }
 \arguments{
 \item{api_version}{Version of the API request from the api.
@@ -19,27 +19,40 @@ between \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
 version reported by the api and
 \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}.}
 
-\item{url}{The URL for the docker daemon.  This can be an absolute
-file path (for a unix socket on macOS/Linux), a named pipe
-(e.g., \code{npipe:////./pipe/docker_engine}) on Windows, or
-(eventually) an http or https url (e.g.,
-\code{https://localhost:8888}), though this is not yet
-supported.}
-
 \item{...}{Reserved for future use.  Passing in any unrecognised
-argument will throw an error.}
+argument will throw an error.  Part of the role of this argument
+is to force use of named arguments until the API is stabilised.}
+
+\item{host}{The URL for the docker daemon.  This can be a unix
+socket (e.g., unix:///var/run/docker.sock) on macOS/Linux, a
+named pipe (e.g., \code{npipe:////./pipe/docker_engine}) on
+Windows, or an http or https url (e.g.,
+\code{https://localhost:2376}).  If not given, we use the
+environment variable \code{DOCKER_HOST}, falling back on the
+default socket or named pipe (for macOS/unix and windows
+respectively).}
+
+\item{cert_path}{The path to a directory containing certificate
+files.  If using an \code{https} url this is required.  If not
+given, we use the environment variable \code{DOCKER_CERT_PATH}.
+It is an error to provide this while using a socket or named
+pipe connection.}
+
+\item{tls_verify}{Logical, indicating if TLS should be verified.
+This is only used if using an https connction (i.e., host is a
+tcp/http/https url and\code{cert_path} is given).  If not given,
+we use the environment variable \code{DOCKER_TLS_VERIFY}.}
 
 \item{http_client_type}{HTTP client type to use.  The options are
 (currently) "curl", which uses the \code{curl} package (works
-over unix sockets and eventually over TCP) and \code{httppipe}
-which works over unix sockets and eventually windows named
-pipes, using the Docker SDK's pipe code via the \code{httppipe}
-package.  Not all functionality is supported with the
-\code{httppipe} client.  This option may eventually be moved
-into the \code{...} argument as is not intended for end-user
-use; it is primarily intended for debugging in development
-(forcing the \code{httppipe} client where the \code{curl} client
-would ordinarily be preferred).}
+over unix sockets and over TCP) and \code{httppipe} which works
+over unix sockets and windows named pipes, using the Docker
+SDK's pipe code via the \code{httppipe} package.  Not all
+functionality is supported with the \code{httppipe} client.
+This option may eventually be moved into the \code{...} argument
+as is not intended for end-user use; it is primarily intended
+for debugging in development (forcing the \code{httppipe} client
+where the \code{curl} client would ordinarily be preferred).}
 
 \item{quiet}{Suppress informational messages.}
 }

@@ -1,12 +1,12 @@
-http_client <- function(base_url = NULL, api_version = NULL, type = NULL,
-                        min_version = NULL, max_version = NULL) {
-  data <- http_client_data(base_url, type, is_windows())
-  client_fn <- switch(data$client_type,
+http_client <- function(config, min_version = NULL, max_version = NULL) {
+  client_fn <- switch(config$http_client_type,
                       curl = http_client_curl,
                       httppipe = http_client_httppipe,
                       null = http_client_null,
                       stop("stevedore bug")) # nocov
-  client_fn(data$base_url, api_version, min_version, max_version)
+  ret <- client_fn(config, min_version, max_version)
+  ret$config <- config
+  ret
 }
 
 
@@ -154,60 +154,6 @@ ping_version <- function(res) {
          paste(squote(names(headers)), collapse = ""))
   }
   headers[["api-version"]]
-}
-
-
-http_client_data <- function(base_url = NULL, type = NULL,
-                             windows = is_windows()) {
-  if (is.null(base_url)) {
-    base_url <- http_default_url(windows)
-  } else {
-    assert_scalar_character(base_url)
-  }
-  url_type <- http_url_type(base_url)
-
-  if (is.null(type)) {
-    type <- if (url_type == "npipe") "httppipe" else "curl"
-  } else {
-    type <- match_value(type, c("curl", "httppipe", "null"))
-  }
-
-  if (url_type == "npipe") {
-    if (!windows) {
-      stop("Named pipe connections are only available on windows")
-    }
-    if (type == "curl") {
-      stop("The 'curl' http driver cannot connect to named pipes")
-    }
-  }
-  if (url_type == "socket" && windows) {
-    stop("Socket connections are not available on windows")
-  }
-  if (url_type == "http" && type == "httppipe") {
-    stop("The 'httppipe' http driver cannot connect to http servers")
-  }
-
-  list(client_type = type, url_type = url_type, base_url = base_url)
-}
-
-
-http_url_type <- function(x) {
-  assert_scalar_character(x)
-  if (grepl("^npipe:/", x)) {
-    type <- "npipe"
-  } else if (grepl("^https?://", x)) {
-    type <- "http"
-  } else if (grepl("^/", x)) {
-    type <- "socket"
-  } else {
-    stop("Can't detect url type from ", squote(x))
-  }
-  type
-}
-
-
-http_default_url <- function(windows) {
-  if (windows) DEFAULT_DOCKER_WINDOWS_PIPE else DEFAULT_DOCKER_UNIX_SOCKET
 }
 
 

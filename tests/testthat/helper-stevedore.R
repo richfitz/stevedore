@@ -512,3 +512,14 @@ audit_spec_response <- function(v) {
 
   ret
 }
+
+
+fake_tls_dir <- function() {
+  path <- tempfile()
+  dir.create(path)
+  files <- c("key.pem", "ca.pem", "cert.pem")
+  for (p in files) {
+    file.create(file.path(path, p))
+  }
+  path
+}

@@ -32,16 +32,13 @@
 ##' @examples
 ##' # Is docker available on your system?
 ##' stevedore::docker_available()
-docker_available <- function(api_version = NULL, url = NULL, ...,
-                             http_client_type = NULL, verbose = FALSE) {
+docker_available <- function(..., verbose = FALSE) {
   ## NOTE: Despite what this says above, this does not actually call
   ## `docker_client` because that's quite slow.  Instead we call
   ## http_client, which is way faster and does not require internet
   ## access to get the spec.
   res <- tryCatch({
-    cl <- http_client(base_url = url,
-                      api_version = api_version,
-                      type = http_client_type)
+    cl <- http_client(...)
     cl$ping()
   }, error = identity)
 

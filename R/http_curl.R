@@ -3,27 +3,15 @@
 
 ## The only other curl:: call is in http where we use it's header
 ## parsing.
-http_client_curl <- function(base_url = NULL, api_version = NULL,
-                             min_version = NULL, max_version = NULL) {
-  ## For now hard code up as the domain socket only.  Changing
-  ## this to support working over a port is slightly more work;
-  ## we'll need to change the initialiser and the
-  ## make_handle_socket function and change the base_url
-  ## (currently it is set to http://localhost, which is not what
-  ## would be wanted if we had a proper url).
-  if (http_url_type(base_url) == "http") {
-    stop("Providing docker http/https url is not currently supported")
-  }
+http_client_curl <- function(config, min_version = NULL, max_version = NULL) {
+  handle <- make_curl_handle(config)
+  base_url <- config$base_url
 
   ping <- function() {
     url <- build_url(base_url, DOCKER_API_VERSION_MIN, "/_ping")
     curl::curl_fetch_memory(url, handle())
   }
-
-  base_url <- base_url %||% DEFAULT_DOCKER_UNIX_SOCKET
-  handle <- make_handle_socket(base_url)
-  base_url <- "http://localhost"
-  api_version <- http_client_api_version(api_version, ping,
+  api_version <- http_client_api_version(config$api_version, ping,
                                          min_version, max_version)
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
@@ -64,16 +52,65 @@ http_client_curl <- function(base_url = NULL, api_version = NULL,
        ping = ping)
 }
 
-## Factory function for fresh curl handles.  In theory we could do
-## this from a pool but for now I'm just doing this in the most
-## obvious way I can think of.
-make_handle_socket <- function(base_url) {
-  force(base_url)
+
+make_curl_handle <- function(config) {
+  opts <- curl_handle_opts(config)
   function(headers = NULL) {
     headers <- c("User-Agent" = DEFAULT_USER_AGENT, headers)
     h <- curl::new_handle()
-    curl::handle_setopt(h, UNIX_SOCKET_PATH = base_url)
+    curl::handle_setopt(h, .list = opts)
     curl::handle_setheaders(h, .list = headers)
     h
   }
+}
+
+
+curl_handle_opts <- function(config) {
+  if (config$protocol == "socket") {
+    opts <- list(UNIX_SOCKET_PATH = config$addr)
+  } else if (config$use_tls) {
+    opts <- list(sslkey = config$cert$key,
+                 cainfo = config$cert$ca,
+                 sslcert = config$cert$cert)
+    ## This is only required on MacOS I believe
+    if (curl::curl_version()$ssl_version == "SecureTransport") {
+      opts <- write_p12_cert(opts)
+    }
+    if (!config$tls_verify) {
+      opts$ssl_verifypeer <- FALSE
+    }
+  } else {
+    opts <- NULL
+  }
+  opts
+}
+
+
+write_p12_cert <- function(opts) {
+  loadNamespace("openssl")
+  name <- sprintf("%s-docker-key",
+                  Sys.getenv("DOCKER_MACHINE_NAME", "stevedore"))
+  path <- tempfile(fileext = ".p12")
+  opts$keypasswd <- "mypass"
+  ## The other way of doing this, without the openssl package, and
+  ## probably out of the box happily on mac, is via shell as:
+  ##
+  ## openssl pkcs12 -export \
+  ##         -inkey <cert_path>/key.pem \
+  ##         -in <cert_path>/cert.pem \
+  ##         -CAfile <cert_path>/ca.pem \
+  ##         -chain \
+  ##         -name <name> \
+  ##         -out <path> \
+  ##         -password pass:<keypasswd>
+  ##
+  ## but for now let's avoid that
+  openssl::write_p12(key = opts$sslkey,
+                     cert = opts$sslcert,
+                     ca = openssl::read_cert_bundle(opts$cainfo),
+                     name = name,
+                     password = opts$keypasswd,
+                     path = path)
+  opts$sslcert <- path
+  opts
 }

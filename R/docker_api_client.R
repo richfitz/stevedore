@@ -1,9 +1,8 @@
-docker_api_client <- function(base_url = NULL, api_version = NULL,
-                              type = NULL, quiet = FALSE) {
+docker_api_client <- function(config) {
   self <- new.env(parent = parent.env(environment()))
-  self$http_client <- http_client(base_url, api_version, type)
+  self$http_client <- http_client(config)
 
-  data <- docker_api_client_data(self$http_client$api_version, quiet)
+  data <- docker_api_client_data(self$http_client$api_version, config$quiet)
   self$endpoints <- data$endpoints
   self$types <- data$types
 
@@ -96,9 +95,7 @@ docker_api_client_endpoints <- function() {
     }
     .stevedore$endpoints <- unname(dat)
   }
-
-  endpoints <- .stevedore$endpoints
-  endpoints
+  .stevedore$endpoints
 }
 
 

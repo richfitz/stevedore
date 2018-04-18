@@ -536,3 +536,9 @@ version_range <- function(v_min, v_max) {
 prompt_ask_yes_no <- function(reason) {
   utils::menu(c("no", "yes"), FALSE, title = reason) == 2 # nocov
 }
+
+
+Sys_getenv1 <- function(x) {
+  ret <- Sys.getenv(x, NA_character_)
+  if (is.na(ret)) NULL else ret
+}
