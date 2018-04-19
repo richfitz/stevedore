@@ -132,23 +132,24 @@ test_that("make handle", {
 
 
 test_that("connect over http", {
+  port <- 12375
   cl <- test_docker_client()
   proxy <- cl$container$run(
     "bobrik/socat",
     c("TCP4-LISTEN:2375,fork,reuseaddr", "UNIX-CONNECT:/var/run/docker.sock"),
     volumes = "/var/run/docker.sock:/var/run/docker.sock",
-    ports = "2375:2375",
+    ports = sprintf("%d:2375", port),
     rm = TRUE, detach = TRUE)
   on.exit(proxy$kill())
 
   ## Here we should try and wait:
   f <- function() {
-    res <- curl::curl_fetch_memory("http://localhost:2375/_ping")
+    res <- curl::curl_fetch_memory(sprintf("http://localhost:%s/_ping", port))
     res$status_code == 200 && identical(rawToChar(res$content), "OK")
   }
   wait_until_ready(f)
 
-  cl_http <- docker_client(host = "tcp://localhost:2375",
+  cl_http <- docker_client(host = sprintf("tcp://localhost:%s", port),
                            ignore_environment = TRUE)
   expect_identical(cl_http$ping(), cl$ping())
   expect_is(cl_http$container$list(), "data.frame")
