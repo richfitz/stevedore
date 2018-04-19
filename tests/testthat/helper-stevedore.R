@@ -238,10 +238,7 @@ HAS_DOCKER <- NULL
 
 test_docker_client <- function(...) {
   skip_if_no_curl_socket()
-
-  if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
-    testthat::skip("docker-using tests are not enabled")
-  }
+  skip_if_not_using_docker()
 
   if (is.null(HAS_DOCKER)) {
     HAS_DOCKER <<-
@@ -255,8 +252,15 @@ test_docker_client <- function(...) {
 }
 
 
+skip_if_not_using_docker <- function() {
+  if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
+    testthat::skip("docker-using tests are not enabled")
+  }
+}
+
+
 null_docker_client <- function(...) {
-  docker_client(..., http_client_type = "null")
+  docker_client(..., http_client_type = "null", ignore_environment = TRUE)
 }
 
 

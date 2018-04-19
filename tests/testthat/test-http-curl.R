@@ -88,7 +88,6 @@ test_that("options: https + secure transport", {
   .stevedore$curl_uses_secure_transport <- TRUE
   on.exit(.stevedore$curl_uses_secure_transport <- curl_uses_secure_transport())
 
-  tls_path <- "tls"
   cfg <- docker_config(ignore_environment = TRUE,
                        host = "https://1.2.3.4:5678",
                        cert_path = "tls",
