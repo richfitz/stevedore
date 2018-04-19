@@ -360,6 +360,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
     stopifnot(is.null(sub))
     extra <- nms[!is_fn]
     link <- sprintf("docker_%s_collection", sub("s$", "", extra))
+    link[extra == "types"] <- "docker_types"
     fmt <- "\\item{\\code{%s}}{Manage %s - see \\code{\\link{%s}}}"
     items <- sprintf(fmt, extra, extra, link)
     mgmt <- c("\\subsection{Management commands}{",
