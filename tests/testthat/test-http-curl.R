@@ -72,14 +72,18 @@ test_that("write p12", {
   expect_match(path, "\\.p12$")
   on.exit(unlink(path))
 
+  cmp <- openssl::read_p12("tls/cert.p12", "mypass")
+
   expect_error(openssl::read_p12(path, "anotherpass"))
   expect_silent(dat <- openssl::read_p12(path, "mypass"))
+  expect_equal(dat, cmp)
 
   path2 <- write_p12("tls/key.pem", "tls/ca.pem", "tls/cert.pem",
                      "stevedore-test-p12", "mypass", FALSE)
   expect_error(openssl::read_p12(path2, "anotherpass"))
   expect_silent(dat2 <- openssl::read_p12(path2, "mypass"))
-  expect_equal(dat, dat2)
+  expect_equal(dat2, cmp)
+
   expect_false(identical(read_binary(path), read_binary(path2)))
 })
 
