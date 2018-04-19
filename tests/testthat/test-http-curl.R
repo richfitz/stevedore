@@ -125,3 +125,40 @@ test_that("make handle", {
   expect_is(h, "curl_handle")
   ## no public function for getting current options
 })
+
+
+test_that("connect over http", {
+  cl <- test_docker_client()
+  proxy <- cl$container$run(
+    "bobrik/socat",
+    c("TCP4-LISTEN:2375,fork,reuseaddr", "UNIX-CONNECT:/var/run/docker.sock"),
+    volumes = "/var/run/docker.sock:/var/run/docker.sock",
+    ports = "2375:2375",
+    rm = TRUE, detach = TRUE)
+  on.exit(proxy$kill())
+
+  ## Here we should try and wait:
+  f <- function() {
+    res <- curl::curl_fetch_memory("http://localhost:2375/_ping")
+    res$status_code == 200 && identical(rawToChar(res$content), "OK")
+  }
+  wait_until_ready(f)
+
+  cl_http <- docker_client(host = "tcp://localhost:2375",
+                           ignore_environment = TRUE)
+  expect_identical(cl_http$ping(), cl$ping())
+  expect_is(cl_http$container$list(), "data.frame")
+})
+
+
+test_that("connect over https", {
+  skip_if_not_installed("withr")
+  env <- test_machine_info()
+  cl <- withr::with_envvar(env, docker_client())
+
+  cfg <- cl$.api_client$http_client$config
+  expect_equal(cfg$protocol, "https")
+
+  expect_equivalent(cl$ping(), "OK")
+  expect_is(cl$container$list(), "data.frame")
+})
