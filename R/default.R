@@ -71,7 +71,6 @@ default_client_set <- function(...) {
 
 default_client_get <- function() {
   if (is.null(.stevedore$default_client)) {
-    message("building client")
     .stevedore$default_client <- docker_client()
   }
   .stevedore$default_client
@@ -83,8 +82,8 @@ default_client_del <- function() {
 }
 
 
-f <- function(...) {
-  if (length(list(...)) > 0L) {
-    list(..1)
+default_client_binding <- function(env) {
+  if (!exists("docker", env)) {
+    makeActiveBinding("docker", default_client_get, env)
   }
 }

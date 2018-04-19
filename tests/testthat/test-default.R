@@ -35,6 +35,7 @@ test_that("set default with client", {
 test_that("invalid usage", {
   default_client_del()
   msg <- "If setting a default client directly it must be the only argument"
+  cl <- null_docker_client()
   expect_error(default_client_set(client = cl), msg, fixed = TRUE)
   expect_error(default_client_set(cl, 1), msg, fixed = TRUE)
 })
@@ -43,4 +44,15 @@ test_that("invalid usage", {
 test_that("clear defaults", {
   default_client_del()
   expect_null(.stevedore$default_client)
+})
+
+
+test_that("binding", {
+  e <- new_empty_env()
+  default_client_binding(e)
+  expect_equal(names(e), "docker")
+  expect_true(bindingIsActive("docker", e))
+  lock_environment(e)
+  expect_silent(default_client_binding(e))
+  expect_is(e$docker, "docker_client")
 })
