@@ -10,6 +10,17 @@ http_client <- function(config, min_version = NULL, max_version = NULL) {
 }
 
 
+connection_info <- function(client) {
+  config <- client$config
+  list(api_version = client$api_version,
+       protocol = config$protocol,
+       host = config$addr,
+       http_client_type = config$http_client_type,
+       use_tls = config$use_tls,
+       tls_verify = config$tls_verify,
+       tls_certificates = config$cert)
+}
+
 ## Generate (and possibly throw) S3 errors out of http errors
 ##
 ## This probably belongs in the swagger.R file as it's being called

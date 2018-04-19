@@ -75,6 +75,10 @@ docker_client <- function(..., api_version = NULL,
   self$.api_client <- docker_api_client(config)
   self$types <- docker_types(self)
 
+  self$connection_info <- function() {
+    connection_info(self$.api_client$http_client)
+  }
+
   self$events <- docker_client_method(
     "system_events", self,
     process = list(quote(filters <- as_docker_filter(filters))))

@@ -3,6 +3,9 @@ docker_client:
     summary: >-
       Return the version of the API that the docker client is using to
       communicate with the server, as a string (e.g., "1.29")
+  connection_info:
+    summary: >-
+      Return information about the connection to the server.
   help: &help
     summary: >-
       Display help for this object

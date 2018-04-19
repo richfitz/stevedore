@@ -16,6 +16,18 @@ test_that("ping", {
                c("api_version", "docker_experimental"))
 })
 
+
+test_that("connection_info", {
+  cl <- null_docker_client()
+  res <- cl$connection_info()
+  expect_is(res, "list")
+  expect_equal(names(res), c("api_version", "protocol", "host",
+                             "http_client_type", "use_tls",
+                             "tls_verify", "tls_certificates"))
+  expect_equal(res$http_client_type, "null")
+})
+
+
 test_that("info", {
   d <- test_docker_client()
   info <- d$info()
