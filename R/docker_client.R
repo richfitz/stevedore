@@ -62,12 +62,14 @@
 ##' @export
 docker_client <- function(..., api_version = NULL,
                           host = NULL, cert_path = NULL, tls_verify = NULL,
-                          http_client_type = NULL, quiet = FALSE) {
+                          http_client_type = NULL, quiet = FALSE,
+                          ignore_environment = FALSE) {
   assert_empty_dots(..., name = "docker_client")
 
   config <- docker_config(api_version, host, cert_path, tls_verify,
                           http_client_type = http_client_type,
-                          quiet = quiet)
+                          quiet = quiet,
+                          ignore_environment = ignore_environment)
 
   self <- new_stevedore_object(NULL)
   self$.api_client <- docker_api_client(config)

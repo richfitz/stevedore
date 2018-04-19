@@ -5,7 +5,8 @@
 \title{Create docker client}
 \usage{
 docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
-  tls_verify = NULL, http_client_type = NULL, quiet = FALSE)
+  tls_verify = NULL, http_client_type = NULL, quiet = FALSE,
+  ignore_environment = FALSE)
 }
 \arguments{
 \item{...}{Reserved for future use.  Passing in any unrecognised
