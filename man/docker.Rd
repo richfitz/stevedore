@@ -5,7 +5,6 @@
 \alias{default_client_set}
 \title{Default docker client}
 \usage{
-stevedore::docker
 default_client_set(...)
 }
 \arguments{

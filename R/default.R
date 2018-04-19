@@ -41,9 +41,6 @@
 ##' @export docker
 ##' @name docker
 ##' @rdname docker
-##' @usage
-##' stevedore::docker
-##' default_client_set(...)
 ##' @examples
 ##'
 ##' if (docker_available()) {
