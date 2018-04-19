@@ -18,7 +18,12 @@ stevedore_reset <- function() {
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
   .stevedore$curl_uses_secure_transport <- curl_uses_secure_transport()
+  .stevedore$default_client <- NULL
+  makeActiveBinding(quote(docker),
+                    default_client_get,
+                    asNamespace("stevedore"))
 }
+
 
 .onLoad <- function(...) {
   stevedore_reset()
