@@ -37,11 +37,11 @@ test_that("default windows config", {
 
 
 test_that("machine-compatible tcp", {
-  path <- fake_tls_dir()
+  tls_path <- fake_tls_dir()
 
   cfg <- docker_config_validate(api_version = NULL,
                                 host = "https://1.2.3.4:5678",
-                                cert_path = path,
+                                cert_path = tls_path,
                                 tls_verify = TRUE,
                                 http_client_type = NULL,
                                 is_windows = FALSE, quiet = FALSE)
@@ -54,7 +54,7 @@ test_that("machine-compatible tcp", {
   expect_true(cfg$tls_verify)
   expect_equal(cfg$http_client_type, "curl")
   expect_equal(cfg$cert,
-               set_names(as.list(file.path(path, tls_files)),
+               set_names(as.list(file.path(tls_path, tls_files)),
                          sub(".pem", "", tls_files, fixed = TRUE)))
   expect_equal(cfg$base_url, "https://1.2.3.4:5678")
 })

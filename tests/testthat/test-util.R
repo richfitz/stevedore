@@ -467,3 +467,19 @@ test_that("cat2", {
   expect_output(cat2("hello", file = stdout()), "hello")
   expect_silent(cat2("hello", file = NULL))
 })
+
+
+test_that("Sys_which", {
+  expect_error(Sys_which(rand_str(32)),
+               "Command '.{32}' not found on PATH")
+})
+
+
+test_that("system3", {
+  skip_on_windows()
+
+  expect_silent(res <- system3("id", "-adsfa"))
+  expect_false(res$success)
+  expect_error(system3("id", "-adsfa", check = TRUE),
+               paste(res$output, collapse = "\n"), fixed = TRUE)
+})

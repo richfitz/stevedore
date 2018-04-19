@@ -73,8 +73,8 @@ curl_handle_opts <- function(config) {
                  cainfo = config$cert$ca,
                  sslcert = config$cert$cert)
     ## This is only required on MacOS I believe
-    if (curl::curl_version()$ssl_version == "SecureTransport") {
-      opts <- write_p12_cert(opts)
+    if (.stevedore$curl_uses_secure_transport) {
+      opts <- curl_handle_opts_secure_transport(opts)
     }
     if (!config$tls_verify) {
       opts$ssl_verifypeer <- FALSE
@@ -86,31 +86,36 @@ curl_handle_opts <- function(config) {
 }
 
 
-write_p12_cert <- function(opts) {
-  loadNamespace("openssl")
+curl_handle_opts_secure_transport <- function(opts) {
   name <- sprintf("%s-docker-key",
                   Sys.getenv("DOCKER_MACHINE_NAME", "stevedore"))
-  path <- tempfile(fileext = ".p12")
   opts$keypasswd <- "mypass"
-  ## The other way of doing this, without the openssl package, and
-  ## probably out of the box happily on mac, is via shell as:
-  ##
-  ## openssl pkcs12 -export \
-  ##         -inkey <cert_path>/key.pem \
-  ##         -in <cert_path>/cert.pem \
-  ##         -CAfile <cert_path>/ca.pem \
-  ##         -chain \
-  ##         -name <name> \
-  ##         -out <path> \
-  ##         -password pass:<keypasswd>
-  ##
-  ## but for now let's avoid that
-  openssl::write_p12(key = opts$sslkey,
-                     cert = opts$sslcert,
-                     ca = openssl::read_cert_bundle(opts$cainfo),
-                     name = name,
-                     password = opts$keypasswd,
-                     path = path)
-  opts$sslcert <- path
+  opts$sslcert <-
+    write_p12(opts$sslkey, opts$cainfo, opts$sslcert, name, opts$keypasswd)
   opts
+}
+
+
+curl_uses_secure_transport <- function() {
+  curl::curl_version()$ssl_version == "SecureTransport"
+}
+
+
+## Can do this via either the system or the openssl package:
+write_p12 <- function(key, ca, cert, name, password, openssl_pkg = NULL) {
+  path <- tempfile(fileext = ".p12")
+
+  openssl_pkg <- openssl_pkg %||% requireNamespace("openssl", quietly = TRUE)
+  if (openssl_pkg) {
+    ca <- openssl::read_cert_bundle(ca)
+    openssl::write_p12(key = key, cert = cert, ca = ca,
+                       name = name, password = password, path = path)
+  } else {
+    args <- c("pkcs12", "-export", "-inkey", key, "-in", cert, "-CAfile", ca,
+              "-chain", "-name", name, "-out", path, "-password",
+              paste0("pass:", password))
+    system3(Sys_which("openssl"), args)
+  }
+
+  path
 }

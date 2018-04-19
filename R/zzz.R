@@ -17,6 +17,7 @@ stevedore_reset <- function() {
   pascal_to_snake_cache_reset()
   .stevedore$spec <- list()
   .stevedore$client_data <- list()
+  .stevedore$curl_uses_secure_transport <- curl_uses_secure_transport()
 }
 
 .onLoad <- function(...) {

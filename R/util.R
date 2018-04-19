@@ -362,13 +362,17 @@ sys_which <- function(name) {
 }
 
 ## From orderly:R/util.R
-system3 <- function(command, args) {
+system3 <- function(command, args, check = FALSE) {
   res <- suppressWarnings(system2(command, args, stdout = TRUE, stderr = TRUE))
   code <- attr(res, "status") %||% 0
   attr(res, "status") <- NULL
-  list(success = code == 0,
-       code = code,
-       output = res)
+  ret <- list(success = code == 0,
+              code = code,
+              output = res)
+  if (check && !ret$success) {
+    stop("Command failed: ", paste(ret$output, collapse = "\n"))
+  }
+  ret
 }
 
 is_windows <- function() {
@@ -541,4 +545,13 @@ prompt_ask_yes_no <- function(reason) {
 Sys_getenv1 <- function(x) {
   ret <- Sys.getenv(x, NA_character_)
   if (is.na(ret)) NULL else ret
+}
+
+
+Sys_which <- function(x) {
+  ret <- unname(Sys.which(x))
+  if (!nzchar(ret)) {
+    stop(sprintf("Command '%s' not found on PATH", x))
+  }
+  ret
 }
