@@ -8,6 +8,8 @@ By default, `stevedore` will not run any test that interacts with the docker dae
 
 There are some tests that authenticate to dockerhub to use a private repository.  These tests will just skip if the `STEVEDORE_STEVEDOREBOT_PASS` environment variable is not set to the password.  If this poses a problem, this can be generalised out to use any account.
 
+There are tests that use a `docker-machine` instance.  To enable these, `STEVEDORE_TEST_USE_DOCKER` must be `true` **and** the environment variable `STEVEDORE_TEST_DOCKER_MACHINE_NAME` must be set to the name of a `docker-machine` machine.  That machine must be running (so that `docker-machine env $STEVEDORE_TEST_DOCKER_MACHINE_NAME` works).
+
 ## Design notes
 
 ### `docker_client`

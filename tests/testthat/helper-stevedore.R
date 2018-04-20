@@ -549,10 +549,11 @@ wait_until_ready <- function(f, times = 10, period = 0.5) {
 
 MACHINE_INFO <- NULL
 test_machine_info <- function() {
+  skip_if_not_using_docker()
   if (is.null(MACHINE_INFO)) {
-    name <- Sys_getenv1("STEVEDORE_DOCKER_MACHINE")
+    name <- Sys_getenv1("STEVEDORE_TEST_DOCKER_MACHINE_NAME")
     if (is.null(name)) {
-      stop("STEVEDORE_DOCKER_MACHINE not set")
+      stop("STEVEDORE_TEST_DOCKER_MACHINE_NAME not set")
     }
     env <- tryCatch(get_machine_env(name), error = function(e) NULL)
     MACHINE_INFO <<- list(has_machine = !is.null(env),
