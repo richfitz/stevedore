@@ -95,3 +95,21 @@ tmp <- names[grepl("^[A-Z]{2}", names[, 1L]), ]
 writeLines(sprintf('  expect_equal(pascal_to_snake("%s"), "%s")',
                    tmp[, 1L], tmp[, 2L]))
 ```
+
+### Debugging TLS connections
+
+```r
+library(curl)
+debugfun <- function(type, data){
+  if (type < 5) {
+    cat(rawToChar(data))
+  }
+}
+h <- new_handle(capath = "ca.pem",
+                sslcert = "cert.pem",
+                sslkey = "key.pem",
+                verbose = TRUE,
+                debugfunction = debugfun,
+                ssl_verifystatus = FALSE)
+curl_fetch_memory("https://127.0.0.1:2376/v1.29/version", handle = h)
+```
