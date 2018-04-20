@@ -167,3 +167,15 @@ test_that("connect over https", {
   expect_equivalent(cl$ping(), "OK")
   expect_is(cl$container$list(), "data.frame")
 })
+
+
+test_that("connect to machine", {
+  env <- test_machine_info()
+  cl <- docker_client(machine = env$DOCKER_MACHINE_NAME)
+
+  cfg <- cl$.api_client$http_client$config
+  expect_equal(cfg$protocol, "https")
+
+  expect_equivalent(cl$ping(), "OK")
+  expect_is(cl$container$list(), "data.frame")
+})
