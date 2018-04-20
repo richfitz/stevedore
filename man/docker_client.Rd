@@ -5,8 +5,8 @@
 \title{Create docker client}
 \usage{
 docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
-  tls_verify = NULL, http_client_type = NULL, quiet = FALSE,
-  ignore_environment = FALSE)
+  tls_verify = NULL, machine = NULL, http_client_type = NULL,
+  quiet = FALSE, ignore_environment = FALSE)
 }
 \arguments{
 \item{...}{Reserved for future use.  Passing in any unrecognised
@@ -47,6 +47,21 @@ This is only used if using an https connction (i.e., host is a
 tcp/http/https url and\code{cert_path} is given).  If not given,
 we use the environment variable \code{DOCKER_TLS_VERIFY}.}
 
+\item{machine}{Scalar character (if provided) indicating the name
+of a "docker machine" instance to use.  If this is provided then
+\code{docker-machine} must be installed and the machine must
+exist and be running.  \code{stevedore} will run
+\code{docker-machine env machine} to determine the environment
+variables to contact this machine and use these values for
+\code{host}, \code{cert_path} and \code{tls_verify} (silently
+ignoring any provided values).  Carl Boettiger is working on a
+\href{https://github.com/cboettig/dockermachine}{dockermachine}
+package for R that would make managing docker machines from R
+easier.  As an alternative to this option, one can set
+docker-machine environment variables as described in
+`docker-machine env` before running R and they would be picked
+up as described above.}
+
 \item{http_client_type}{HTTP client type to use.  The options are
 (currently) "curl", which uses the \code{curl} package (works
 over unix sockets and over TCP) and \code{httppipe} which works
@@ -63,7 +78,7 @@ where the \code{curl} client would ordinarily be preferred).}
 \item{ignore_environment}{Logical, indicating if environment
 variables (\code{DOCKER_HOST}, \code{DOCKER_CERT_PATH},
 \code{DOCKER_TLS_VERIFY} and \code{DOCKER_API_VERSION}) should
-be ignored.}
+be ignored (this has no effect if \code{machine} is specified).}
 }
 \description{
 Create a docker client object

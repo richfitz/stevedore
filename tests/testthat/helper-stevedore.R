@@ -550,7 +550,11 @@ wait_until_ready <- function(f, times = 10, period = 0.5) {
 MACHINE_INFO <- NULL
 test_machine_info <- function() {
   if (is.null(MACHINE_INFO)) {
-    env <- tryCatch(get_machine_info(), error = function(e) NULL)
+    name <- Sys_getenv1("STEVEDORE_DOCKER_MACHINE")
+    if (is.null(name)) {
+      stop("STEVEDORE_DOCKER_MACHINE not set")
+    }
+    env <- tryCatch(get_machine_env(name), error = function(e) NULL)
     MACHINE_INFO <<- list(has_machine = !is.null(env),
                           env = env)
   }
@@ -558,26 +562,6 @@ test_machine_info <- function() {
     testthat::skip("docker-machine not enabled")
   }
   MACHINE_INFO$env
-}
-
-get_machine_info <- function() {
-  name <- Sys_getenv1("STEVEDORE_DOCKER_MACHINE")
-  if (is.null(name)) {
-    stop("STEVEDORE_DOCKER_MACHINE not set")
-  }
-  docker_machine <- Sys_which("docker-machine")
-
-  dat <- system3(docker_machine, c("status", name))
-  ok <- dat$success && dat$output == "Running"
-  if (!ok) {
-    stop("machine not running")
-  }
-
-  dat <- system3(docker_machine, c("env", name), check = TRUE)$output
-  re <- '^export ([^ ]+)="([^"]+)"$'
-  dat <- dat[grepl(re, dat)]
-  dat <- set_names(as.list(sub(re, "\\2", dat)), sub(re, "\\1", dat))
-  dat
 }
 
 

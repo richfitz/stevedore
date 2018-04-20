@@ -17,14 +17,19 @@
 ## useful.  For now, just focussing on the main codepaths.
 
 docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
-                          tls_verify = NULL, http_client_type = NULL,
-                          is_windows = NULL, quiet = FALSE,
-                          ignore_environment = FALSE) {
-  if (!ignore_environment) {
+                          tls_verify = NULL, machine = NULL,
+                          http_client_type = NULL, is_windows = NULL,
+                          quiet = FALSE, ignore_environment = FALSE) {
+  if (!is.null(machine)) {
+    info <- get_machine_env(machine)
+    host <- info$DOCKER_HOST
+    cert_path <- info$DOCKER_CERT_PATH
+    tls_verify <- !is.null(info$DOCKER_TLS_VERIFY)
+  } else if (!ignore_environment) {
     api_version <- api_version %||% Sys_getenv1("DOCKER_API_VERSION")
     host <- host %||% Sys_getenv1("DOCKER_HOST")
     cert_path <- cert_path %||% Sys_getenv1("DOCKER_CERT_PATH")
-    tls_verify <- !is.null(Sys_getenv1("DOCKER_TLS_VERIFY"))
+    tls_verify <- tls_verify %||% !is.null(Sys_getenv1("DOCKER_TLS_VERIFY"))
   }
 
   docker_config_validate(api_version, host, cert_path, tls_verify,
@@ -137,4 +142,15 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
        http_client_type = http_client_type,
        is_windows = is_windows,
        quiet = quiet)
+}
+
+
+get_machine_env <- function(machine) {
+  assert_scalar_character(machine)
+  docker_machine <- Sys_which("docker-machine")
+  dat <- system3(docker_machine, c("env", "--shell", "bash", machine),
+                 check = TRUE)$output
+  re <- '^export ([^ ]+)="([^"]+)"$'
+  dat <- dat[grepl(re, dat)]
+  set_names(as.list(sub(re, "\\2", dat)), sub(re, "\\1", dat))
 }

@@ -85,6 +85,15 @@ test_that("from environment", {
 })
 
 
+test_that("from machine", {
+  info <- test_machine_info()
+
+  cfg <- docker_config(machine = info$DOCKER_MACHINE_NAME)
+  expect_equal(cfg$addr, sub("^.+://", "", info$DOCKER_HOST))
+  expect_equal(cfg$tls_verify, !is.null(info$DOCKER_TLS_VERIFY))
+})
+
+
 test_that("error cases", {
   expect_error(
     docker_config(is_windows = TRUE, http_client_type = "curl",
