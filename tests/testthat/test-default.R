@@ -5,7 +5,8 @@ test_that("set default", {
   default_client_set(http_client_type = "null")
   expect_equal(default_client_get()$connection_info()$http_client_type,
                "null")
-  expect_equal(docker$connection_info()$http_client_type,
+
+  expect_equal(force_docker_binding()$connection_info()$http_client_type,
                "null")
 })
 
@@ -15,7 +16,7 @@ test_that("set default with client", {
   cl <- docker_client(http_client_type = "null", host = "tcp://1.2.4.5:5678")
   prev <- default_client_set(cl)
   expect_identical(default_client_get(), cl)
-  expect_identical(docker, cl)
+  expect_identical(force_docker_binding(), cl)
   expect_null(prev)
   ans <- default_client_set(NULL)
   expect_identical(ans, cl)
@@ -28,7 +29,7 @@ test_that("set default with client", {
   cl <- docker_client(http_client_type = "null", host = "tcp://1.2.4.5:5678")
   default_client_set(cl)
   expect_identical(default_client_get(), cl)
-  expect_equal(docker, cl)
+  expect_equal(force_docker_binding(), cl)
 })
 
 

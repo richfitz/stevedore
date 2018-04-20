@@ -579,3 +579,13 @@ get_machine_info <- function() {
   dat <- set_names(as.list(sub(re, "\\2", dat)), sub(re, "\\1", dat))
   dat
 }
+
+
+## There is an (I think) testthat problem where the active binding is
+## being resolved as a function and not as the target of the function.
+## This does not seem to happen outside of testthat on an installed
+## package.
+force_docker_binding <- function() {
+  d <- stevedore::docker
+  d
+}

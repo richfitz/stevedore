@@ -69,7 +69,7 @@ default_client_set <- function(..., quiet = TRUE) {
 
 default_client_get <- function() {
   if (is.null(.stevedore$default_client)) {
-    .stevedore$default_client <- docker_client()
+    default_client_set()
   }
   .stevedore$default_client
 }
