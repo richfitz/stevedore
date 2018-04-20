@@ -224,37 +224,14 @@ get_error <- function(expr) {
 
 ## TODO: at some point a variant of this will move into the main
 ## constructor, with a proper error message advising on solutions.
+## But I think that this is updated with curl version so could just
+## come out surely?
 CURL_HAS_SOCKET_SUPPORT <-
   !inherits(try(curl::curl_options()[["unix_socket_path"]], silent = TRUE),
             "try-error")
 skip_if_no_curl_socket <- function() {
   if (!CURL_HAS_SOCKET_SUPPORT) {
     testthat::skip("libcurl does not have support for unix sockets")
-  }
-}
-
-
-HAS_DOCKER <- NULL
-
-test_docker_client <- function(...) {
-  skip_if_no_curl_socket()
-  skip_if_not_using_docker()
-
-  if (is.null(HAS_DOCKER)) {
-    HAS_DOCKER <<-
-      !is.null(tryCatch(docker_client()$ping(), error = function(e) NULL))
-  }
-  if (!HAS_DOCKER) {
-    testthat::skip("docker not available?")
-  }
-
-  docker_client(..., ignore_environment = TRUE)
-}
-
-
-skip_if_not_using_docker <- function() {
-  if (!identical(Sys.getenv("STEVEDORE_TEST_USE_DOCKER"), "true")) {
-    testthat::skip("docker-using tests are not enabled")
   }
 }
 
@@ -440,21 +417,6 @@ update_dummy_attrs <- function(object, value) {
 }
 
 
-TEST_DOCKER_VERSIONS <- NULL
-test_docker_versions <- function() {
-  if (is.null(TEST_DOCKER_VERSIONS)) {
-    cl <- test_docker_client()
-    v <- cl$version()
-    v_min <- max(numeric_version(v$min_api_version),
-                 numeric_version(DOCKER_API_VERSION_MIN))
-    v_max <- min(numeric_version(v$api_version),
-                 numeric_version(DOCKER_API_VERSION_MAX))
-    TEST_DOCKER_VERSIONS <<- version_range(v_min, v_max)
-  }
-  TEST_DOCKER_VERSIONS
-}
-
-
 update_name_cache <- function(root) {
   testthat::test_file(file.path(root, "tests/testthat/test-help.R"))
 
@@ -544,25 +506,6 @@ wait_until_ready <- function(f, times = 10, period = 0.5) {
     Sys.sleep(period)
   }
   stop("Not ready in time")
-}
-
-
-MACHINE_INFO <- NULL
-test_machine_info <- function() {
-  skip_if_not_using_docker()
-  if (is.null(MACHINE_INFO)) {
-    name <- Sys_getenv1("STEVEDORE_TEST_DOCKER_MACHINE_NAME")
-    if (is.null(name)) {
-      stop("STEVEDORE_TEST_DOCKER_MACHINE_NAME not set")
-    }
-    env <- tryCatch(get_machine_env(name), error = function(e) NULL)
-    MACHINE_INFO <<- list(has_machine = !is.null(env),
-                          env = env)
-  }
-  if (!MACHINE_INFO$has_machine) {
-    testthat::skip("docker-machine not enabled")
-  }
-  MACHINE_INFO$env
 }
 
 
