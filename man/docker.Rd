@@ -5,13 +5,15 @@
 \alias{default_client_set}
 \title{Default docker client}
 \usage{
-default_client_set(...)
+default_client_set(..., quiet = TRUE)
 }
 \arguments{
 \item{...}{Parameters passed through to
 \code{\link{docker_client}}.  Alternatively a single argument of
 a \code{\link{docker_client}} object or \code{NULL} may be given
 (if given then no other arguments are allowed).}
+
+\item{quiet}{Suppress informational messages.}
 }
 \description{
 Default docker client.  This contains an active binding

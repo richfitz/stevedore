@@ -37,6 +37,7 @@
 ##'   \code{\link{docker_client}}.  Alternatively a single argument of
 ##'   a \code{\link{docker_client}} object or \code{NULL} may be given
 ##'   (if given then no other arguments are allowed).
+##' @inheritParams docker_client
 ##' @title Default docker client
 ##' @export docker
 ##' @name docker
@@ -50,7 +51,7 @@
 ##'   # is roughly equivalent to this:
 ##'   stevedore::docker_client()$container$list()
 ##' }
-default_client_set <- function(...) {
+default_client_set <- function(..., quiet = TRUE) {
   dots <- list(...)
   if (length(dots) == 1L && is.null(names(dots)) &&
       (inherits(dots[[1L]], "docker_client") || is.null(dots[[1L]]))) {
@@ -58,7 +59,7 @@ default_client_set <- function(...) {
   } else if (length(dots) > 0L && inherits(dots[[1L]], "docker_client")) {
     stop("If setting a default client directly it must be the only argument")
   } else {
-    client <- docker_client(...)
+    client <- docker_client(..., quiet = quiet)
   }
   prev <- .stevedore$default_client
   .stevedore$default_client <- client
