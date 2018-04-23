@@ -536,10 +536,13 @@ stop_service_and_wait_until_service_container_gone <- function(service) {
   tasks <- service$tasks()
   cl <- service$.parent
   containers <- lapply(tasks, function(x)
-    cl$container$get(x$inspect()$status$container_status$container_id))
+    tryCatch(cl$container$get(x$inspect()$status$container_status$container_id),
+             error = function(e) NULL))
   service$remove()
 
   for (x in containers) {
-    wait_until_container_gone(x)
+    if (!is.null(x)) {
+      wait_until_container_gone(x)
+    }
   }
 }

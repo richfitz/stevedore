@@ -140,7 +140,7 @@ test_that("convergence: failure", {
     "service has not converged in time")
   s <- cl$service$get("myservice")
   expect_is(s, "docker_service")
-  s$remove()
+  stop_service_and_wait_until_service_container_gone(s)
 })
 
 
@@ -166,7 +166,9 @@ test_that("stability failure", {
   expect_true(length(grep("^new", txt)) >= 2L)
   expect_match(txt, "Task has failed, trying again", all = FALSE, fixed = TRUE)
 
-  cl$service$get("myservice")$remove()
+
+  stop_service_and_wait_until_service_container_gone(
+    cl$service$get("myservice"))
 })
 
 
@@ -181,5 +183,5 @@ test_that("don't detach", {
                          command = "error-command",
                          detach = TRUE)
   expect_is(s, "docker_service")
-  s$remove()
+  stop_service_and_wait_until_service_container_gone(s)
 })
