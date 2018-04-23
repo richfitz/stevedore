@@ -10,6 +10,11 @@ There are some tests that authenticate to dockerhub to use a private repository.
 
 There are tests that use a `docker-machine` instance.  To enable these, `STEVEDORE_TEST_USE_DOCKER` must be `true` **and** the environment variable `STEVEDORE_TEST_DOCKER_MACHINE_NAME` must be set to the name of a `docker-machine` machine.  That machine must be running (so that `docker-machine env $STEVEDORE_TEST_DOCKER_MACHINE_NAME` works).
 
+The test behaviour is further modified by:
+
+- `STEVEDORE_TEST_REQUIRE_USE_DOCKER` if set to `true`, then failure to create a docker client is an error
+- `STEVEDORE_TEST_STRICT_CLEANUP` if set to `true`, then the preflight checks are done at every docker client creation, which will make it easier to detect when tests are leaving behind orphan containers, networks, volumes, etc.
+
 ## Design notes
 
 ### `docker_client`
