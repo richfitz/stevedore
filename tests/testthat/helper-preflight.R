@@ -1,6 +1,13 @@
 stevedore_test_preflight_status <- function(cl) {
   msg <- character()
 
+  e <- get_error(cl$node$list())
+  if (!inherits(e, "error")) {
+    msg <- c(msg, "Node is part of a swarm")
+  } else if (e$code != 503L) {
+    msg <- c(msg, "Unexpected response when testing swarm status")
+  }
+
   v <- cl$volume$list()$name
   n <- length(v)
   if (n > 0L) {
@@ -8,7 +15,7 @@ stevedore_test_preflight_status <- function(cl) {
                           n, ngettext(n, "volume", "volumes"),
                           paste(v, collapse = ", ")))
   }
-  v <- cl$container$list()$name
+  v <- cl$container$list(TRUE)$name
   n <- length(v)
   if (n > 0L) {
     msg <- c(msg, sprintf("%d docker %s: %s",
@@ -17,7 +24,7 @@ stevedore_test_preflight_status <- function(cl) {
   }
 
   v <- setdiff(cl$network$list()$name,
-               c("host", "bridge", "none", "docker_gwbridge"))
+               c("host", "bridge", "none", "docker_gwbridge", "ingress"))
   n <- length(v)
   if (n > 0L) {
     msg <- c(msg, sprintf("%d unexpected docker %s: %s",
