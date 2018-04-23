@@ -13,9 +13,11 @@ test_that("privileges", {
 test_that("install", {
   skip_if_no_internet()
 
-  for (v in c(test_docker_versions()[[1]],
+  docker_versions <- test_docker_versions()
+
+  for (v in c(docker_versions[[1]],
               DOCKER_API_VERSION_DEFAULT,
-              tail(test_docker_versions(), 1L))) {
+              tail(docker_versions, 1L))) {
     cl <- test_docker_client(api_version = v)
     key <- rand_str()
     x <- cl$plugin$install("vieux/sshfs:latest", alias = key,

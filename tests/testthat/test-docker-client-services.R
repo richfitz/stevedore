@@ -119,7 +119,7 @@ test_that("replicas & swarm ps", {
   expect_match(ps2$name, ans$id())
   expect_match(ps2$node, cl$node$list()[[1L]])
 
-  ans$remove()
+  stop_service_and_wait_until_service_container_gone(ans)
 })
 
 

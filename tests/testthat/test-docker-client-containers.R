@@ -220,13 +220,6 @@ test_that("archive import (file)", {
 })
 
 test_that("kill", {
-  ## NOTE: This test takes a bit longer to run - the start takes ~0.3s
-  ## for me.  The timings are about the same on the command line
-  ## though, so I'm fairly confident that the issue here is docker and
-  ## the speed at which it is able to get the containers up.  It will
-  ## become necessary to separate out the tests into "short" and
-  ## "long" tests so that I can keep the test cycle reasonable
-  ## locally.
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   x <- d$container$create("alpine", cmd = c("sleep", "10000"), name = nm)
@@ -458,6 +451,7 @@ test_that("attach", {
 test_that("run", {
   d <- test_docker_client()
   txt <- capture.output(ans <- d$container$run("hello-world"))
+  on.exit(ans$container$remove())
   expect_is(ans, "docker_run_output")
 
   expect_equal(names(ans), c("container", "logs"))

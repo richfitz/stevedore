@@ -517,3 +517,29 @@ force_docker_binding <- function() {
   d <- stevedore::docker
   d
 }
+
+
+try_silent <- function(expr) {
+  tryCatch(expr, error = function(e) NULL)
+}
+
+
+wait_until_container_gone <- function(container) {
+  f <- function() {
+    is.null(tryCatch(container$status(), error = function(e) NULL))
+  }
+  wait_until_ready(f, 100, 0.1)
+}
+
+
+stop_service_and_wait_until_service_container_gone <- function(service) {
+  tasks <- service$tasks()
+  cl <- service$.parent
+  containers <- lapply(tasks, function(x)
+    cl$container$get(x$inspect()$status$container_status$container_id))
+  service$remove()
+
+  for (x in containers) {
+    wait_until_container_gone(x)
+  }
+}

@@ -1,6 +1,7 @@
 context("secrets")
 
 test_that("create and delete", {
+  docker_versions <- test_docker_versions()
   cl <- test_docker_client()
 
   id <- cl$swarm$init()
@@ -8,8 +9,8 @@ test_that("create and delete", {
 
   ## This set of tests is highly version specific with at three
   ## patches so I am going to test it over all supported versions:
-  for (v in test_docker_versions()) {
-    cl_v <- test_docker_client(api_version = v)
+  for (v in docker_versions) {
+    cl_v <- docker_client(api_version = v)
 
     key <- rand_str()
     id <- cl$secret$create(key, "secret!")
@@ -53,5 +54,8 @@ test_that("add to container", {
   log <- e$start(detach = FALSE, stream = FALSE)
   expect_identical(as.character(log), data)
 
+  ## This ensures that the daemon has time to clean up the temporary
+  ## volume that it needs to use.
   ans$remove()
+  wait_until_container_gone(container)
 })

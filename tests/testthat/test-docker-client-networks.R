@@ -4,6 +4,7 @@ test_that("create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw <- d$network$create(nm)
+  on.exit(try_silent(nw$remove()))
   expect_is(nw, "docker_network")
   expect_is(nw, "stevedore_object")
 
@@ -22,6 +23,8 @@ test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw1 <- d$network$create(nm)
+  on.exit(try_silent(nw1$remove()))
+
   nw2 <- d$network$get(nm)
   expect_identical(nw1$inspect(FALSE), nw2$inspect(FALSE))
   d$network$remove(nm)
@@ -35,6 +38,7 @@ test_that("list", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   nw <- d$network$create(nm)
+  on.exit(nw$remove())
 
   nwl <- d$network$list()
   expect_is(nwl, "data.frame")
@@ -44,6 +48,8 @@ test_that("list", {
 
 test_that("prune", {
   d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  nw <- d$network$create(nm)
   ans <- d$network$prune()
   expect_match(ans$networks_deleted, "^stevedore_", all = FALSE)
 })
