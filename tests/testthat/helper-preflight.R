@@ -117,19 +117,25 @@ stevedore_preflight <- function() {
 }
 
 
-STEVEDORE_TEST_INFO <- NULL
 stevedore_test_info <- function() {
-  if (is.null(STEVEDORE_TEST_INFO)) {
-    STEVEDORE_TEST_INFO <- stevedore_preflight()
+  if (is.null(.stevedore$test_info)) {
+    info <- stevedore_preflight()
+    if (identical(Sys.getenv("STEVEDORE_TEST_STRICT_CLEANUP"), "true")) {
+      ## avoids any persistent state - every call must find a clean setup
+      return(info)
+    }
+    .stevedore$test_info <- info
   }
-  STEVEDORE_TEST_INFO
+  .stevedore$test_info
 }
+
 
 skip_if_not_using_docker <- function() {
   if (!stevedore_test_info()$use_docker) {
     testthat::skip(stevedore_test_info()$reason)
   }
 }
+
 
 test_docker_client <- function(...) {
   skip_if_no_curl_socket()
