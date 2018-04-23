@@ -460,9 +460,7 @@ validate_volumes <- function(volumes) {
     stop(sprintf("Volume mapping %s does not not match '<src>:<dest>[:ro]",
                  paste(squote(volumes[!ok]), collapse = ", ")))
   }
-  list(binds = binds,
-       volumes = set_names(rep(list(NULL), length(volumes)),
-                           sub(re, "\\1", volumes)))
+  binds
 }
 
 
@@ -755,8 +753,12 @@ mcr_volumes_for_create <- function(volumes, host_config) {
     volumes <- validate_volumes(volumes)
     if (!is.null(volumes)) {
       ## TODO: consider checking that host_config$Binds is not given here
-      host_config$Binds <- volumes[["binds"]]
-      volumes <- volumes[["volumes"]]
+      host_config$Binds <- volumes
+      ## NOTE: in the python client, they also set the 'volumes' entry
+      ## here to a map with key equal to the host part of the volume
+      ## binding and value of {} but this creates weird phantom
+      ## volumes.
+      volumes <- NULL
     }
   }, list(volumes = volumes, host_config = host_config))
 }
