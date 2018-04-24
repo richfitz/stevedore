@@ -383,7 +383,7 @@ skip_on_windows <- function() {
 
 
 make_fake_files <- function(paths) {
-  root <- tempfile()
+  root <- tempfile_test()
   paths <- file.path(root, paths)
   for (d in unique(dirname(paths))) {
     dir.create(d, FALSE, TRUE)
@@ -487,7 +487,7 @@ audit_spec_response <- function(v) {
 
 
 fake_tls_dir <- function() {
-  path <- tempfile()
+  path <- tempfile_test()
   dir.create(path)
   files <- c("key.pem", "ca.pem", "cert.pem")
   for (p in files) {
@@ -545,4 +545,26 @@ stop_service_and_wait_until_service_container_gone <- function(service) {
       wait_until_container_gone(x)
     }
   }
+}
+
+
+## Untar a raw vector
+untar_bin <- function(bin, path = tempfile_test(), ...) {
+  tmp <- tempfile_test()
+  writeBin(bin, tmp)
+  on.exit(unlink(tmp))
+  dir.create(path, FALSE, TRUE)
+  utils::untar(tmp, exdir = path, ...)
+  invisible(path)
+}
+
+
+tempfile_test <- function(tmpdir = tempdir(), fileext = "") {
+  tempfile("stevedore_test", tmpdir, fileext)
+}
+
+
+cleanup_tempdir <- function() {
+  files <- dir(tempdir(), pattern = "^stevedore_test_", full.names = TRUE)
+  unlink(files, recursive = TRUE)
 }

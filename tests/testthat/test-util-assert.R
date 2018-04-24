@@ -109,14 +109,14 @@ test_that("assert_named", {
 })
 
 test_that("assert_directory", {
-  path <- tempfile()
+  path <- tempfile_test()
   expect_error(assert_directory(path), "'path' must be an existing directory")
   writeLines(character(0), path)
   expect_error(assert_directory(path), "'path' must be an existing directory")
   file.remove(path)
   dir.create(path)
   expect_silent(assert_directory(path))
-  unlink(path)
+  unlink(path, recursive = TRUE)
 })
 
 test_that("assert_null", {
@@ -126,8 +126,8 @@ test_that("assert_null", {
 })
 
 test_that("assert_file_exists", {
-  mypath <- tempfile()
-  mypaths <- c(mypath, tempfile())
+  mypath <- tempfile_test()
+  mypaths <- c(mypath, tempfile_test())
   expect_error(assert_file_exists(mypath),
                "File does not exist: ")
   expect_error(assert_file_exists(mypaths),
@@ -137,6 +137,7 @@ test_that("assert_file_exists", {
   writeLines("", mypaths[[2]])
   expect_silent(assert_file_exists(mypath))
   expect_silent(assert_file_exists(mypaths))
+  unlink(mypaths)
 })
 
 test_that("assert_function", {

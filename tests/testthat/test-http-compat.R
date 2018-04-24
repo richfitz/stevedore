@@ -26,7 +26,7 @@ test_that("build", {
   expect_silent(dc$image$build(context, nocache = TRUE, rm = TRUE,
                                stream = NULL,
                                tag = "richfitz/iterate:testing"))
-  p <- tempfile()
+  p <- tempfile_test()
   expect_silent(dc$image$build(context, nocache = TRUE, rm = TRUE,
                                stream = p,
                                tag = "richfitz/iterate:testing"))
@@ -41,7 +41,7 @@ test_that("build", {
   expect_silent(dh$image$build(context, nocache = TRUE, rm = TRUE,
                                stream = NULL,
                                tag = "richfitz/iterate:testing"))
-  p <- tempfile()
+  p <- tempfile_test()
   expect_silent(dh$image$build(context, nocache = TRUE, rm = TRUE,
                                stream = p,
                                tag = "richfitz/iterate:testing"))
@@ -57,7 +57,7 @@ test_that("docker run", {
   expect_silent(
     ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
                             rm = TRUE, stream = FALSE))
-  p <- tempfile()
+  p <- tempfile_test()
   expect_silent(
     ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
                             rm = TRUE, stream = p))
@@ -87,7 +87,7 @@ test_that("exec", {
   expect_equal(format(res2), format(res1))
 
   e3 <- x$exec("ls")
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   expect_silent(res3 <- e3$start(detach = FALSE, stream = tmp))
   expect_is(res3, "docker_stream")
   expect_equal(format(res3), format(res1))
@@ -110,7 +110,7 @@ test_that("pull", {
 
   expect_silent(img2 <- dh$image$pull("alpine:latest", stream = NULL))
 
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   expect_silent(img3 <- dh$image$pull("alpine:latest", stream = tmp))
   expect_match(readLines(tmp), str, fixed = TRUE, all = FALSE)
 })

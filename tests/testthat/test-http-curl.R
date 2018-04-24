@@ -41,6 +41,7 @@ test_that("options: https", {
   on.exit(.stevedore$curl_uses_secure_transport <- curl_uses_secure_transport())
 
   tls_path <- fake_tls_dir()
+  on.exit(unlink(tls_path, recursive = TRUE), add = TRUE)
   cfg <- docker_config(ignore_environment = TRUE,
                        host = "https://1.2.3.4:5678",
                        cert_path = tls_path,
@@ -80,6 +81,7 @@ test_that("write p12", {
 
   path2 <- write_p12("tls/key.pem", "tls/ca.pem", "tls/cert.pem",
                      "stevedore-test-p12", "mypass", FALSE)
+  on.exit(unlink(path2), add = TRUE)
   expect_error(openssl::read_p12(path2, "anotherpass"))
   expect_silent(dat2 <- openssl::read_p12(path2, "mypass"))
   expect_equal(dat2, cmp)
@@ -103,6 +105,8 @@ test_that("options: https + secure transport", {
   expect_match(opts$sslcert, "\\.p12$")
   expect_true(file.exists(opts$sslcert))
   expect_equal(opts$keypasswd, "mypass")
+
+  unlink(opts$sslcert)
 })
 
 
@@ -117,11 +121,12 @@ test_that("options: http", {
 
 
 test_that("make handle", {
+  .stevedore$curl_uses_secure_transport <- FALSE
+  on.exit(.stevedore$curl_uses_secure_transport <- curl_uses_secure_transport())
   cfg <- docker_config(ignore_environment = TRUE,
                        host = "https://1.2.3.4:5678",
                        cert_path = "tls",
                        tls_verify = TRUE)
-  opts <- curl_handle_opts(cfg)
   factory <- make_curl_handle(cfg)
   expect_is(factory, "function")
 

@@ -9,7 +9,7 @@ test_that("invalid url", {
 })
 
 test_that("Nonexistent socket", {
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   expect_false(docker_available(host = tmp, http_client_type = "null"))
   expect_silent(docker_available(host = tmp, http_client_type = "null"))
   expect_message(

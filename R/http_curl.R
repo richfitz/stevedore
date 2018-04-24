@@ -103,7 +103,7 @@ curl_uses_secure_transport <- function() {
 
 ## Can do this via either the system or the openssl package:
 write_p12 <- function(key, ca, cert, name, password, openssl_pkg = NULL) {
-  path <- tempfile(fileext = ".p12")
+  path <- tempfile("stevedore_p12_", fileext = ".p12")
 
   openssl_pkg <- openssl_pkg %||% requireNamespace("openssl", quietly = TRUE)
   if (openssl_pkg) {

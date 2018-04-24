@@ -13,7 +13,7 @@ test_that("report warnings", {
 
 
 test_that("pull status", {
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- pull_status_printer(con)
@@ -28,6 +28,7 @@ test_that("pull status", {
 
   res <- readLines(path)
   expect_equal(res, cmp)
+  unlink(path)
 })
 
 
@@ -37,7 +38,7 @@ test_that("build status: success", {
   ##   writeBin(x$response$content, "sample_responses/build/success")
   ##   writeBin(x$response$content, "sample_responses/build/failure")
 
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- build_status_printer(con)
@@ -58,11 +59,13 @@ test_that("build status: success", {
 
   bin <- read_binary("sample_responses/build/success")
   expect_identical(build_status_id(bin), "8d9538fe3885")
+
+  unlink(path)
 })
 
 
 test_that("build status: failure", {
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- build_status_printer(con)
@@ -84,6 +87,7 @@ test_that("build status: failure", {
   bin <- read_binary("sample_responses/build/failure")
   err <- get_error(build_status_id(bin))
   expect_is(err, "build_error")
+  unlink(path)
 })
 
 
@@ -141,7 +145,7 @@ test_that("docker_stream_printer: null", {
 
 
 test_that("docker_stream_printer: text", {
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- docker_stream_printer(con)
@@ -162,7 +166,7 @@ test_that("docker_stream_printer: text", {
 
 
 test_that("docker_stream_printer: docker_stream", {
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- docker_stream_printer(con, "prefix")
@@ -181,7 +185,7 @@ test_that("docker_stream_printer: docker_stream", {
 
 
 test_that("pull status: silent error", {
-  path <- tempfile()
+  path <- tempfile_test()
   con <- file(path, "w+")
   on.exit(close(con))
   p <- pull_status_printer(con)
@@ -196,10 +200,11 @@ test_that("pull status: silent error", {
 
   res <- readLines(path)
   expect_equal(res, cmp)
+  unlink(path)
 })
 
+
 test_that("pull status: no print", {
-  path <- tempfile()
   p <- pull_status_printer(NULL)
 
   txt <- readLines("sample_responses/pull/ubuntu")
@@ -340,7 +345,8 @@ test_that("validate image and tag", {
 })
 
 test_that("validate stream", {
-  d <- validate_stream(tempfile())
+  path <- tempfile_test()
+  d <- validate_stream(path)
   expect_is(d$stream, "connection")
   expect_equal(summary(d$stream)$mode, "wb")
   expect_true(isOpen(d$stream))
@@ -348,6 +354,7 @@ test_that("validate stream", {
   expect_equal(validate_stream(d$stream),
                list(stream = d$stream, close = FALSE))
   close(d$stream)
+  unlink(path)
 
   expect_equal(validate_stream(stdout()),
                list(stream = stdout(), close = FALSE))
@@ -450,18 +457,18 @@ test_that("get_network_id", {
 
 
 test_that("validate_tar", {
-  path <- tempfile()
+  path <- tempfile_test()
   writeLines("hello", path)
+  on.exit(unlink(path))
+
   res <- validate_tar_input(path)
   expect_is(res, "raw")
   expect_identical(validate_tar_input(res), res)
 
   tmp <- untar_bin(res)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   expect_identical(dir(tmp), basename(path))
   expect_equal(readLines(path), readLines(file.path(tmp, basename(path))))
-
-  unlink(path)
-  unlink(tmp, recursive = TRUE)
 })
 
 
@@ -514,7 +521,7 @@ test_that("after_container_archive", {
   expect_identical(after_container_archive(bytes, list(), NULL),
                    bytes)
 
-  path <- tempfile()
+  path <- tempfile_test()
   on.exit(unlink(path))
 
   expect_identical(after_container_archive(bytes, list(dest = path)), path)

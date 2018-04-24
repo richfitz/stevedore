@@ -12,8 +12,9 @@ test_that("read missing spec is an error", {
 
 test_that("validate", {
   skip_if_not_installed("withr")
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   file.copy(dir(swagger_spec_path(), full.names = TRUE), tmp)
 
   version <- DOCKER_API_VERSION_DEFAULT
@@ -35,8 +36,9 @@ test_that("validate", {
 
 test_that("swagger_spec_index_write", {
   skip_if_not_installed("withr")
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   dir.create(tmp)
+  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
   file.copy(dir(swagger_spec_path(), full.names = TRUE), tmp)
   cmp <- yaml::yaml.load_file(
     system.file("spec/index.yaml", package = "stevedore", mustWork = TRUE))

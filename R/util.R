@@ -96,10 +96,10 @@ set_attributes <- function(x, attr) {
 
 download_file <- function(url, dest, quiet = FALSE) {
   if (!file.exists(dest)) {
-    tmp <- tempfile()
+    tmp <- tempfile("stevedore_download_")
+    on.exit(unlink(tmp))
     curl::curl_download(url, tmp, quiet = quiet, mode = "wb")
     file.copy(tmp, dest)
-    file.remove(tmp)
   }
   dest
 }

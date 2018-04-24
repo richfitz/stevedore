@@ -151,7 +151,7 @@ test_that("stability failure", {
   id <- cl$swarm$init()
   on.exit(cl$swarm$leave(TRUE))
 
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   expect_error(
     cl$service$create(name = "myservice",
                       image = "richfitz/fail",

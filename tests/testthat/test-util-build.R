@@ -51,6 +51,7 @@ test_that("simple cases", {
              "README.md",
              "Dockerfile")
   root <- make_fake_files(paths)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
   dockerfile <- "Dockerfile"
 
   expect_equal(build_file_list(root, NULL), ".")
@@ -86,6 +87,7 @@ test_that("build file list with excluded dockerignore", {
              paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
              "README.md")
   root <- make_fake_files(paths)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
   dockerfile <- "dir1/Dockerfile"
 
   writeLines("dir1", file.path(root, ".dockerignore"))
@@ -115,7 +117,6 @@ test_that("build_tar", {
   expect_is(x, "raw")
 
   tmp <- untar_bin(x)
-  on.exit(unlink(tmp, recursive = TRUE))
 
   expect_equal(dir(tmp, all.files = TRUE, recursive = TRUE),
                dir(root, all.files = TRUE, recursive = TRUE))
@@ -124,11 +125,15 @@ test_that("build_tar", {
   writeLines("dir2", file.path(root, ".dockerignore"))
   x <- build_tar(root, dockerfile)
 
-  tmp <- untar_bin(x)
-  f1 <- dir(tmp, all.files = TRUE, recursive = TRUE)
+  tmp2 <- untar_bin(x)
+
+  f1 <- dir(tmp2, all.files = TRUE, recursive = TRUE)
   f2 <- dir(root, all.files = TRUE, recursive = TRUE)
 
   expect_equal(sort(f1), sort(grep("^dir2", f2, invert = TRUE, value = TRUE)))
+
+  unlink(root, recursive = TRUE)
+  unlink(tmp2, recursive = TRUE)
 })
 
 
@@ -137,6 +142,7 @@ test_that("validate_tar_directory", {
              paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
              "README.md")
   root <- make_fake_files(paths)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
   dockerfile <- "dir1/Dockerfile"
 
   bin <- validate_tar_directory(root, dockerfile)

@@ -252,7 +252,7 @@ test_that("sys_which", {
 })
 
 test_that("reset_line", {
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   con <- file(tmp, "w+")
   on.exit(close(con))
 
@@ -265,8 +265,9 @@ test_that("reset_line", {
   bytes <- readBin(tmp, raw(), file.size(tmp))
   expect_equal(rawToChar(bytes),
                sprintf("hello\r%s\rgoodbye", strrep(" ", 10)))
+  unlink(tmp)
 
-  tmp <- tempfile()
+  tmp <- tempfile_test()
   con <- file(tmp, "w+")
   on.exit(close(con))
   cat("hello", file = con)
@@ -279,6 +280,7 @@ test_that("reset_line", {
 
   bytes <- readBin(tmp, raw(), file.size(tmp))
   expect_equal(rawToChar(bytes), "hello\ngoodbye")
+  unlink(tmp)
 })
 
 test_that("download_file", {
@@ -287,7 +289,7 @@ test_that("download_file", {
   on.exit(x$stop(0))
 
   url <- sprintf("http://localhost:%s/index.html", x$ports()$host_port)
-  p <- tempfile()
+  p <- tempfile_test()
 
   expect_silent(cmp <- download_file(url, p, quiet = TRUE))
   expect_identical(cmp, p)
@@ -298,6 +300,8 @@ test_that("download_file", {
 
   expect_silent(cmp <- download_file(url, p, quiet = TRUE))
   expect_equal(readLines(p), "")
+
+  unlink(p)
 })
 
 
@@ -326,9 +330,14 @@ test_that("set_attributes", {
 
 test_that("has_colour", {
   expect_equal(has_colour(NULL), crayon::has_color())
-  con <- file(tempfile(), "w")
+
+  path <- tempfile_test()
+  con <- file(path, "w")
   on.exit(close(con))
   expect_false(has_colour(con))
+  close(con)
+  on.exit()
+  unlink(path)
 })
 
 
@@ -346,7 +355,7 @@ test_that("nothing", {
 
 
 test_that("read_binary", {
-  p <- tempfile()
+  p <- tempfile_test()
   on.exit(unlink(p))
   bytes <- as.raw(sample(0:255, 10000, replace = TRUE))
   writeBin(bytes, p)
@@ -391,12 +400,13 @@ test_that("sprintfn", {
 
 test_that("download_file", {
   skip_if_no_internet()
-  dest <- download_file("https://google.com", tempfile(), TRUE)
+  dest <- download_file("https://google.com", tempfile_test(), TRUE)
   expect_true(file.exists(dest))
   writeLines("testing", dest)
   expect_identical(download_file("https://google.com", dest, TRUE), dest)
   expect_silent(download_file("https://google.com", dest, FALSE))
   expect_equal(readLines(dest), "testing")
+  unlink(dest)
 })
 
 

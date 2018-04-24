@@ -37,7 +37,7 @@ tar_directory <- function(root) {
 
   owd <- setwd(root)
   on.exit(setwd(owd))
-  tmp <- tempfile(fileext = ".tar")
+  tmp <- tempfile("stevedore_tar_", fileext = ".tar")
   on.exit(unlink(tmp), add = TRUE)
 
   tar_safe(tmp, ".")
@@ -50,7 +50,7 @@ tar_files <- function(files, root, external_list = length(files) > 20) {
 
   owd <- setwd(root)
   on.exit(setwd(owd))
-  tmp <- tempfile(fileext = ".tar")
+  tmp <- tempfile("stevedore_tar_", fileext = ".tar")
   on.exit(unlink(tmp), add = TRUE)
 
   tar_safe(tmp, files, complex = TRUE, external_list = external_list)
@@ -69,7 +69,7 @@ tar_safe <- function(tarfile, files, ..., complex = FALSE,
                      external_list = FALSE) {
   assert_file_exists(files)
   if (external_list) {
-    list <- tempfile()
+    list <- tempfile("stevedore_tar_")
     on.exit(unlink(list))
     writeLines(files, list)
     files <- c("-T", list)
@@ -80,17 +80,6 @@ tar_safe <- function(tarfile, files, ..., complex = FALSE,
     utils::tar(tarfile, files, ...)
   }
   tarfile
-}
-
-
-## Untar a raw vector
-untar_bin <- function(bin, path = tempfile(), ...) {
-  tmp <- tempfile()
-  writeBin(bin, tmp)
-  on.exit(unlink(tmp))
-  dir.create(path, FALSE, TRUE)
-  utils::untar(tmp, exdir = path, ...)
-  invisible(path)
 }
 
 

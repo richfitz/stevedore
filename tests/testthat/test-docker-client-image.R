@@ -73,10 +73,10 @@ test_that("export", {
   tar <- img$export()
   expect_is(tar, "raw")
 
-  path <- tempfile()
+  path <- tempfile_test()
   writeBin(tar, path)
 
-  extract <- tempfile()
+  extract <- tempfile_test()
   dir.create(extract)
   untar(path, exdir = extract)
   expect_true(file.exists(file.path(extract, "manifest.json")))
@@ -135,11 +135,12 @@ test_that("build: multitag", {
 
 
 test_that("build: stream output", {
-  path <- tempfile()
-  con <- file(path, "wb")
-  on.exit(close(con))
   cl <- test_docker_client()
   context <- tar_directory("images/iterate")
+
+  path <- tempfile_test()
+  con <- file(path, "wb")
+  on.exit(close(con))
 
   expect_silent(
     ans <- cl$image$build(context, nocache = TRUE, rm = TRUE, stream = con,
@@ -154,7 +155,7 @@ test_that("build: stream output", {
 })
 
 test_that("build: stream output with file arg", {
-  path <- tempfile()
+  path <- tempfile_test()
   cl <- test_docker_client()
   context <- tar_directory("images/iterate")
 
@@ -168,7 +169,7 @@ test_that("build: stream output with file arg", {
 })
 
 test_that("build: context as directory name", {
-  path <- tempfile()
+  path <- tempfile_test()
   cl <- test_docker_client()
   expect_silent(
     ans <- cl$image$build("images/iterate", nocache = TRUE,
@@ -182,7 +183,7 @@ test_that("build: context as directory name", {
 test_that("build: failure", {
   cl <- test_docker_client()
   ## As above, but missing a resource:
-  path <- tempfile()
+  path <- tempfile_test()
   dir.create(path)
   file.copy("images/iterate/Dockerfile", path)
   context <- tar_directory(path)
@@ -197,7 +198,7 @@ test_that("build: failure", {
 test_that("build: dockerignore", {
   cl <- test_docker_client()
 
-  path <- tempfile()
+  path <- tempfile_test()
   dir.create(path)
   file.copy("images/iterate", path, recursive = TRUE)
 
@@ -206,6 +207,7 @@ test_that("build: dockerignore", {
              paste0("dir3/", c("bar.md", "bar.c")),
              "README.md")
   root <- make_fake_files(paths)
+  on.exit(unlink(root, recursive = TRUE), add = TRUE)
   dockerfile <- c("FROM alpine:latest",
                   "COPY . /contents",
                   "WORKDIR /contents")

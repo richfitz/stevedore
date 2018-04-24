@@ -57,7 +57,7 @@ swagger_spec_path <- function(quiet = FALSE) {
     if (!quiet) {
       message("The option 'stevedore.spec.path' not set - using temporary dir")
     }
-    path <- tempfile()
+    path <- tempfile("stevedore_spec_")
     dir.create(path, TRUE)
     path_pkg <- stevedore_file("spec")
     yml <- dir(path_pkg, pattern = "v[0-9]+\\.[0-9]+.yaml$", full.names = TRUE)

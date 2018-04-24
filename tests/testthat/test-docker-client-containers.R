@@ -131,8 +131,8 @@ test_that("export", {
   tar <- x$export()
   expect_is(tar, "raw")
   path <- untar_bin(tar)
+  on.exit(unlink(path, recursive = TRUE), add = TRUE)
   expect_true("hello" %in% dir(path))
-  unlink(path, recursive = TRUE)
   x$remove()
 })
 
@@ -161,9 +161,10 @@ test_that("archive export", {
 
   bin <- x$get_archive("hello", NULL)
   p <- untar_bin(bin)
+  on.exit(unlink(p, recursive = TRUE), add = TRUE)
   expect_true(file.exists(file.path(p, "hello")))
 
-  path <- x$get_archive("hello", tempfile())
+  path <- x$get_archive("hello", tempfile_test())
   expect_true(file.exists(path))
   expect_identical(readBin(path, raw(), file.size(path)), bin)
 
@@ -181,7 +182,7 @@ test_that("archive import", {
   e <- get_error(x$path_stat("foo"))
   expect_equal(e$code, 404L)
 
-  path <- tempfile()
+  path <- tempfile_test()
   dir.create(path)
   dat <- rand_str(100)
   writeLines(dat, file.path(path, "foo"))
@@ -192,6 +193,7 @@ test_that("archive import", {
   x$put_archive(bin, "/")
   bin2 <- x$get_archive("foo", NULL)
   p <- untar_bin(bin2)
+  on.exit(unlink(p, recursive = TRUE), add = TRUE)
   expect_true(file.exists(file.path(p, "foo")))
   expect_identical(readLines(file.path(p, "foo")), dat)
 })
@@ -204,7 +206,7 @@ test_that("archive import (file)", {
   on.exit(x$remove(force = TRUE))
   x$start()
 
-  path <- tempfile()
+  path <- tempfile_test()
   dir.create(path)
   dat <- rand_str(100)
   p <- file.path(path, "foo")
@@ -213,8 +215,9 @@ test_that("archive import (file)", {
   ## Down here, we need to get the types correct for handling.
   x$put_archive(p, "/")
 
-  tmp <- x$get_archive("foo", tempfile())
+  tmp <- x$get_archive("foo", tempfile_test())
   p2 <- untar_bin(read_binary(tmp))
+  on.exit(unlink(p2, recursive = TRUE), add = TRUE)
   expect_true(file.exists(file.path(p2, "foo")))
   expect_identical(readLines(file.path(p2, "foo")), dat)
 })
@@ -589,7 +592,7 @@ test_that("scalar exec", {
 test_that("stream logs", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  p <- tempfile()
+  p <- tempfile_test()
   x <- d$container$create("richfitz/iterate",
                           cmd = c("10", "0.1"),
                           name = nm)
@@ -612,7 +615,7 @@ test_that("fetch, but don't print, logs", {
                           name = nm)
   x$start()
   x$wait()
-  p <- tempfile()
+  p <- tempfile_test()
   expect_silent(v1 <- x$logs(stream = NULL, follow = TRUE))
   expect_silent(v2 <- x$logs(stream = p, follow = TRUE))
   txt <- capture.output(v3 <- x$logs(stream = stdout(), follow = TRUE))
@@ -661,7 +664,7 @@ test_that("auto-remove: run", {
 test_that("stream", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  p <- tempfile()
+  p <- tempfile_test()
   x <- d$container$run("richfitz/iterate",
                        cmd = c("10", "0.1"),
                        name = nm, detach = FALSE,
@@ -671,12 +674,13 @@ test_that("stream", {
 })
 
 test_that("volume map", {
-  p <- tempfile()
-  dir.create(p)
-  v <- sprintf("%s:%s", getwd(), "/host")
-
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
+
+  p <- tempfile_test()
+  dir.create(p)
+  on.exit(unlink(p, recursive = TRUE), add = TRUE)
+  v <- sprintf("%s:%s", getwd(), "/host")
 
   x <- d$container$create("alpine:latest", cmd = c("ls", "/host"),
                           name = nm, volumes = v)
@@ -892,7 +896,7 @@ test_that("logs with tty", {
   d <- test_docker_client()
   nm1 <- rand_str(10, "stevedore_")
   nm2 <- rand_str(10, "stevedore_")
-  p <- tempfile()
+  p <- tempfile_test()
   x <- d$container$create("richfitz/iterate",
                           cmd = c("10", "0.1"),
                           name = nm1, tty = TRUE)
@@ -918,7 +922,7 @@ test_that("logs with tty", {
 test_that("stream logs with tty", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
-  p <- tempfile()
+  p <- tempfile_test()
   x <- d$container$create("richfitz/iterate",
                           cmd = c("10", "0.1"),
                           name = nm, tty = TRUE)
@@ -933,12 +937,13 @@ test_that("stream logs with tty", {
 })
 
 test_that("run, passing through host_config", {
-  p <- tempfile()
-  dir.create(p)
-  v <- sprintf("%s:%s", getwd(), "/host")
-
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
+
+  p <- tempfile_test()
+  dir.create(p)
+  on.exit(unlink(p, recursive = TRUE), add = TRUE)
+  v <- sprintf("%s:%s", getwd(), "/host")
 
   res <- d$container$run("alpine:latest", cmd = c("ls", "/host"),
                          stream = FALSE, name = nm, volumes = v, rm = TRUE)

@@ -44,7 +44,7 @@ test_that("generate_help", {
 test_that("run help", {
   skip("might also work?")
   skip_on_cran()
-  dest <- tempfile()
+  dest <- tempfile_test()
   cl <- test_docker_client()
   expect_error(cl$help("html"), NA)
 })
@@ -53,7 +53,7 @@ test_that("generate help via utils::help", {
   ## I don't see why this fails with covr, but it does.
   skip("does not work in covr")
   skip_on_cran()
-  dest <- tempfile()
+  dest <- tempfile_test()
   oo <- options(pager = fake_pager(dest))
   on.exit(options(oo))
 

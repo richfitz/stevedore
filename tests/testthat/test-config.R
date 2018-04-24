@@ -38,6 +38,7 @@ test_that("default windows config", {
 
 test_that("machine-compatible tcp", {
   tls_path <- fake_tls_dir()
+  on.exit(unlink(tls_path, recursive = TRUE), add = TRUE)
 
   cfg <- docker_config_validate(api_version = NULL,
                                 host = "https://1.2.3.4:5678",
@@ -65,6 +66,7 @@ test_that("from environment", {
   skip_if_not_installed("withr")
 
   tls_path <- fake_tls_dir()
+  on.exit(unlink(tls_path, recursive = TRUE), add = TRUE)
   cfg <- withr::with_envvar(list(DOCKER_API_VERSION = "1.36",
                                  DOCKER_HOST = "https://1.2.3.4:5678",
                                  DOCKER_CERT_PATH = tls_path,
@@ -120,6 +122,7 @@ test_that("error cases", {
     fixed = TRUE)
 
   tls_path <- fake_tls_dir()
+  on.exit(unlink(tls_path, recursive = TRUE), add = TRUE)
   file.remove(file.path(tls_path, "key.pem"))
   expect_error(
     docker_config(is_windows = FALSE, ignore_environment = TRUE,
