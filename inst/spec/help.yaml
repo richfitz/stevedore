@@ -15,6 +15,42 @@ docker_client:
         "pdf" (or an abbreviation).  By default it uses the value
         `getOption("help_type")` and should follow the same
         behaviour as other R help (e.g., using "?")
+  request:
+    summary: >-
+      Interact directly with the Docker HTTP API.  This might be
+      useful for debugging or for trying out new/experimental docker
+      features that have not yet made it into stevedore.  This is most
+      likely to be useful in conjunction with the Docker API docs;
+      https://docs.docker.com/engine/api Each call will return a list
+      with elements \code{url} (the used url), \code{status_code} (the
+      HTTP status code), \code{headers} (a raw vector containing the
+      returned headers) and \code{content} (a raw vector containing
+      the content).  The \code{curl} driver provides some other
+      entries too.
+    args:
+      verb: >-
+        A HTTP verb (e.g., \code{GET}, \code{POST}).  Will be
+        converted to uppercase.
+      path: >-
+        A path, e.g., \code{/version} or \code{/containers/json}.  Do
+        not provide any hostname, and use an absoluate path.
+      query: >-
+        Optionally, a named list of query parameters (e.g.,
+        \code{list(limit = 10)} as a query parameter for
+        \code{/containers/json}).
+      body: >-
+        Either a raw vector (e.g., a tar-ed image for \code{POST
+        /build}) or a string representing json (e.g. for \code{POST
+        /containers/create})
+      headers: >-
+        Headers to send with the request.  The API does not use this
+        extensively except for \code{X-Registry-Auth} for some
+        endpoints.
+      stream: >-
+        An R function to handle streaming output.  If given then the
+        function must take a single argument which will be a raw
+        vector with the docker daemon's output.  The function's return
+        output is ignored so needs to do all actions via side effects.
 
 docker_container_collection:
   get:

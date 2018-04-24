@@ -163,3 +163,11 @@ test_that("login", {
 test_that("events", {
   skip("not yet tested")
 })
+
+
+test_that("direct access", {
+  cl <- test_docker_client()
+
+  res <- cl$request("GET", "/_ping")
+  expect_equal(res$content, charToRaw("OK"))
+})
