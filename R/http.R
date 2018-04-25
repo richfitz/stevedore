@@ -178,3 +178,9 @@ prepare_body <- function(body) {
   }
   list(raw = body_raw, content_type = content_type)
 }
+
+
+user_agent_header_string <- function(config) {
+  sprintf("stevedore/%s:%s",
+          packageVersion("stevedore"), config$http_client_type)
+}

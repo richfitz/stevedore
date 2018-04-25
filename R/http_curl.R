@@ -55,8 +55,9 @@ http_client_curl <- function(config, min_version = NULL, max_version = NULL) {
 
 make_curl_handle <- function(config) {
   opts <- curl_handle_opts(config)
+  user_agent <- user_agent_header_string(config)
   function(headers = NULL) {
-    headers <- c("User-Agent" = DEFAULT_USER_AGENT, headers)
+    headers <- c("User-Agent" = user_agent, headers)
     h <- curl::new_handle()
     curl::handle_setopt(h, .list = opts)
     curl::handle_setheaders(h, .list = headers)

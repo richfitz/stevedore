@@ -6,7 +6,7 @@ http_client_httppipe <- function(config,
   ## the httppipe package
   base_url <- ""
 
-  headers_agent <- list("User-Agent" = DEFAULT_USER_AGENT)
+  user_agent <- user_agent_header_string(config)
 
   ping <- function() {
     url <- build_url(base_url, DOCKER_API_VERSION_MIN, "/_ping")
@@ -17,7 +17,7 @@ http_client_httppipe <- function(config,
 
   request <- function(verb, path, query = NULL, body = NULL, headers = NULL,
                       hijack = NULL) {
-    headers <- c(headers_agent, as.list(headers))
+    headers <- c(list("User-Agent" = user_agent), as.list(headers))
 
     url <- build_url(base_url, api_version, path, query)
     data <- NULL
