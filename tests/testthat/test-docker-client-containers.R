@@ -731,8 +731,7 @@ test_that("volume map: docker volume", {
   })
 
   x$start()
-  e1 <- x$exec_create(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
-  e1$start(detach = FALSE)
+  x$exec(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
 
   y <- d$container$create("alpine",
                           cmd = c("ls", "/host"),
@@ -761,11 +760,9 @@ test_that("volume map: readonly", {
 
   x$start()
 
-  e1 <- x$exec_create(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
-  ans <- e1$start(detach = FALSE)
+  x$exec(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
 
-  e2 <- x$exec_create(c("ls", "/host"))
-  ans <- e2$start(detach = FALSE)
+  ans <- x$exec(c("ls", "/host"), stream = FALSE)
   expect_equal(ans, character(0))
 })
 
