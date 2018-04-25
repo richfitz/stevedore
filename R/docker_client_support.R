@@ -1089,3 +1089,44 @@ make_service_start_progress <- function(stream) {
 pass_through <- function(x) {
   x
 }
+
+
+make_container_exec <- function(container) {
+  exec_start <- docker_exec(dummy_id(), container$.parent)$start
+
+  args_create <- formals(container$exec_create)
+  args_start <- formals(exec_start)
+  args_start <- args_start[setdiff(names(args_start), names(args_create))]
+  args <- c(args_create, args_start)
+
+  args_to_call <- function(name, x, named = FALSE) {
+    args <- lapply(names(x), as.name)
+    if (named) {
+      names(args) <- names(x)
+    }
+    as.call(c(name, args))
+  }
+
+  body <- c(
+    quote(`{`),
+    call("<-", quote(exec), args_to_call(quote(exec_create), args_create)),
+    args_to_call(quote(exec$start), args_start, TRUE))
+
+  fenv <- new.env(parent = container$.parent$.api_client, hash = FALSE)
+  fenv$exec_create <- container$exec_create
+
+  ret <- as.function(c(args, as.call(body)), fenv)
+  class(ret) <- "docker_client_method"
+
+  help <- attr(container$exec_create, "help")
+  help$summary <- "Create and run an exec instance"
+  help$args <- c(help$args, attr(exec_start, "help")$args[names(args_start)])
+  help$cli <- "exec"
+  help$name <- "exec"
+
+  class(ret) <- "docker_client_method"
+  attr(ret, "help") <- help
+  attr(ret, "name") <- help$name
+
+  ret
+}

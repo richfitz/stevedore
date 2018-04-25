@@ -205,10 +205,7 @@ docker_container <- function(id, parent) {
     "container_changes", self,
     fix = fix_id)
 
-  ## TODO: inject 'start' into here too, which then requires passing
-  ## detach through as well and dealing with those through the
-  ## 'after' function.
-  self$exec <- docker_client_method(
+  self$exec_create <- docker_client_method(
     "exec_create", self,
     fix = fix_id,
     rename = c(stdout = "attach_stdout",
@@ -219,6 +216,8 @@ docker_container <- function(id, parent) {
     process = list(quote(cmd <- validate_command(cmd)),
                    quote(env <- validate_env(env))),
     after = after_exec_create)
+
+  self$exec <- make_container_exec(self)
 
   self$export <- docker_client_method(
     "container_export", self,
@@ -535,6 +534,7 @@ docker_exec <- function(id, parent) {
   ## TODO: explicitly set 'detach' argument
   self$start <- docker_client_method(
     "exec_start", self,
+    defaults = alist(detach = FALSE),
     fix = fix_id,
     hijack = quote(streaming_text(docker_stream_printer(stream))),
     allow_hijack_without_stream = TRUE,

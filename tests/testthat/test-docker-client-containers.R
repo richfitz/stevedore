@@ -397,7 +397,7 @@ test_that("image", {
   x$remove()
 })
 
-test_that("exec", {
+test_that("exec_create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
@@ -405,7 +405,7 @@ test_that("exec", {
                           cmd = c("100", "100"),
                           name = nm)
   x$start()
-  ans <- x$exec("ls")
+  ans <- x$exec_create("ls")
 
   expect_is(ans, "docker_exec")
   expect_is(ans, "stevedore_object")
@@ -424,6 +424,28 @@ test_that("exec", {
   x$remove()
 })
 
+test_that("exec: in one", {
+  d <- test_docker_client()
+  nm <- rand_str(10, "stevedore_")
+  ## this sets up a container that will run forever
+  x <- d$container$create("richfitz/iterate",
+                          cmd = c("100", "100"),
+                          name = nm)
+
+  ## This is almost there but detach needs setting properly to become
+  ## FALSE by default or something.
+  x$start()
+
+  txt <- capture.output(res <- x$exec("ls"))
+
+  expect_is(res, "docker_stream")
+  cmp <- unlist(strsplit(format(res, style = "prefix"), "\n"))
+  expect_equal(txt, cmp)
+
+  x$kill()
+  x$remove()
+})
+
 test_that("exec, twice", {
   skip("wip")
   d <- test_docker_client()
@@ -433,7 +455,7 @@ test_that("exec, twice", {
                           cmd = c("100", "100"),
                           name = nm)
   x$start()
-  ans <- x$exec("ls")
+  ans <- x$exec_create("ls")
 
   ans$start()
   ## This does not throw but it should!  The issue here is that docker
@@ -577,7 +599,7 @@ test_that("scalar exec", {
                           cmd = c("100", "100"),
                           name = nm)
   x$start()
-  ans <- x$exec(I("echo hello world"))
+  ans <- x$exec_create(I("echo hello world"))
   dat <- ans$inspect(FALSE)
   expect_equal(dat$process_config$entrypoint, "echo")
   expect_equal(dat$process_config$arguments, c("hello", "world"))
@@ -709,7 +731,7 @@ test_that("volume map: docker volume", {
   })
 
   x$start()
-  e1 <- x$exec(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
+  e1 <- x$exec_create(c("touch", "/host/foo"), stderr = FALSE, stdout = FALSE)
   e1$start(detach = FALSE)
 
   y <- d$container$create("alpine",
@@ -739,10 +761,10 @@ test_that("volume map: readonly", {
 
   x$start()
 
-  e1 <- x$exec(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
+  e1 <- x$exec_create(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
   ans <- e1$start(detach = FALSE)
 
-  e2 <- x$exec(c("ls", "/host"))
+  e2 <- x$exec_create(c("ls", "/host"))
   ans <- e2$start(detach = FALSE)
   expect_equal(ans, character(0))
 })
