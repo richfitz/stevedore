@@ -702,8 +702,8 @@ get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
     x$id()
   } else {
-    ## TODO: error message should allow for docker_image alternative
-    assert_scalar_character(x, name)
+    assert_scalar_character(
+      x, name, "a scalar character (non-NA) or 'docker_image' object")
     x
   }
 }
@@ -712,8 +712,8 @@ get_network_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_network")) {
     x$id()
   } else {
-    ## TODO: error message should allow for docker_network alternative
-    assert_scalar_character(x, name)
+    assert_scalar_character(
+      x, name, "a scalar character (non-NA) or 'docker_network' object")
     x
   }
 }
