@@ -58,8 +58,8 @@ docker_client_method_nonapi <- function(fun, class, name) {
 ## present.
 stevedore_object_help <- function(name, api_version, help_type) {
   ## nocov start
-  oo <- options(stevedore.help.api_version = api_version,
-                help_type = help_type)
+  set_help_api_last_version(api_version)
+  oo <- options(help_type = help_type)
   on.exit(options(oo))
   help(name, package = "stevedore")
   ## nocov end

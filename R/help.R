@@ -318,8 +318,19 @@ NULL
 
 
 generate_help <- function(sub = NULL, api_version = NULL) {
+  api_version <- api_version %||% get_help_api_last_version()
   tryCatch(generate_help_string(sub, api_version),
            error = function(e) "(automatic help generation has failed)")
+}
+
+
+set_help_api_last_version <- function(api_version) {
+  .stevedore$help_api_last_version <- api_version
+}
+
+
+get_help_api_last_version <- function() {
+  .stevedore$help_api_last_version
 }
 
 
