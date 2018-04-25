@@ -120,3 +120,32 @@ h <- new_handle(capath = "ca.pem",
                 ssl_verifystatus = FALSE)
 curl_fetch_memory("https://127.0.0.1:2376/v1.29/version", handle = h)
 ```
+
+### Debugging HTTP requests
+
+Set up a proxy with:
+
+```
+docker run --rm \
+       -v /var/run/docker.sock:/var/run/docker.sock \
+       -p 2375:2375 \
+       --name docker-proxy \
+       bobrik/socat \
+       -v TCP4-LISTEN:2375,fork,reuseaddr UNIX-CONNECT:/var/run/docker.sock
+```
+
+Then do (in a second terminal)
+
+```
+DOCKER_HOST=tcp://localhost:2375 docker version
+```
+
+and see the http requests made by the official client (will appear in the first terminal), and
+
+
+```r
+cl <- stevedore::docker_client(host = "tcp://localhost:2375")
+cl$version()
+```
+
+to see the requests made by `stevedore`.
