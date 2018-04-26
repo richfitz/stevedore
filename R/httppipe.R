@@ -47,7 +47,7 @@ httppipe_prepare <- function() {
     return(.stevedore$httppipe)
   }
 
-  path_py <- system.file("py", package = "httppipe", mustWork = TRUE)
+  path_py <- system.file("py", package = "stevedore", mustWork = TRUE)
 
   python_set_version("docker")
   python_update_search_path(path_py)
