@@ -144,3 +144,49 @@ test_that("error cases", {
                   host = "tcp://1.2.3.4:5678", tls_verify = TRUE),
     "cert_path not given, but tls_verify requested")
 })
+
+
+test_that("machine parse", {
+  output <- c(
+    'export DOCKER_TLS_VERIFY="1"',
+    'export DOCKER_HOST="tcp://192.168.99.100:2376"',
+    'export DOCKER_CERT_PATH="/Users/rich/.docker/machine/machines/extra"',
+    'export DOCKER_MACHINE_NAME="extra"',
+    '# Run this command to configure your shell: ',
+    '# eval $(/usr/local/bin/docker-machine env --shell bash extra)')
+  expect_equal(
+    machine_env_parse(output),
+    list(DOCKER_TLS_VERIFY = "1",
+         DOCKER_HOST = "tcp://192.168.99.100:2376",
+         DOCKER_CERT_PATH = "/Users/rich/.docker/machine/machines/extra",
+         DOCKER_MACHINE_NAME = "extra"))
+})
+
+
+test_that("fake machine output", {
+  skip_on_os("windows")
+  skip_on_cran()
+
+  tls <- normalizePath("tls")
+
+  env <- c(DOCKER_TLS_VERIFY = "1",
+           DOCKER_HOST = "tcp://192.168.99.100:9999",
+           DOCKER_CERT_PATH = tls,
+           DOCKER_MACHINE_NAME = "extra")
+  p <- fake_docker_machine(env)
+  on.exit(unlink(p, recursive = TRUE))
+  dat <- withr::with_path(p, get_machine_env("extra"))
+  expect_equal(
+    dat,
+    list(DOCKER_TLS_VERIFY = "1",
+         DOCKER_HOST = "tcp://192.168.99.100:9999",
+         DOCKER_CERT_PATH = tls,
+         DOCKER_MACHINE_NAME = "extra"))
+
+  dat <- withr::with_path(p, docker_config(machine = "extra"))
+
+  expect_true(dat$tls_verify)
+  expect_equal(dirname(dat$cert$key), tls)
+  expect_equal(dat$base_url, "https://192.168.99.100:9999")
+  expect_equal(dat$protocol, "https")
+})

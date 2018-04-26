@@ -147,10 +147,15 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
 
 get_machine_env <- function(machine) {
   assert_scalar_character(machine)
-  docker_machine <- Sys_which("docker-machine")
-  dat <- system3(docker_machine, c("env", "--shell", "bash", machine),
-                 check = TRUE)$output
+  dat <- system3(Sys_which("docker-machine"),
+                 c("env", "--shell", "bash", machine),
+                 check = TRUE)
+  machine_env_parse(dat$output)
+}
+
+
+machine_env_parse <- function(string) {
   re <- '^export ([^ ]+)="([^"]+)"$'
-  dat <- dat[grepl(re, dat)]
-  set_names(as.list(sub(re, "\\2", dat)), sub(re, "\\1", dat))
+  string <- string[grepl(re, string)]
+  set_names(as.list(sub(re, "\\2", string)), sub(re, "\\1", string))
 }

@@ -568,3 +568,16 @@ cleanup_tempdir <- function() {
   files <- dir(tempdir(), pattern = "^stevedore_test_", full.names = TRUE)
   unlink(files, recursive = TRUE)
 }
+
+
+fake_docker_machine <- function(env, path = tempfile()) {
+  dir.create(path, FALSE, TRUE)
+  dest <- file.path(path, "docker-machine")
+  code <- c(
+    "#!/usr/bin/env bash",
+    sprintf('echo \'export %s="%s"\'', names(env), unname(env)))
+
+  writeLines(code, dest)
+  Sys.chmod(dest, "755")
+  path
+}
