@@ -102,7 +102,7 @@ container$inspect(reload = FALSE)
 
 ### Current situation
 
-The support for windows is not as comprehensive as for other platforms (but I'm not sure how common using docker is on windows yet).  The reason for this is that [`curl`](https://cran.r-project.org/package=curl) (and the underlying `libcurl` library) do not support communicating over "named pipes" which is how docker works on windows.
+The support for windows is not as comprehensive as for other platforms (but I'm not sure how common using docker is on windows yet).  The reason for this is that [`curl`](https://cran.r-project.org/package=curl) (and the underlying `libcurl` library) do not support communicating over "named pipes" which is how docker works on windows 10.
 
 The package includes a small wrapper around the python sdk's docker support.  On the R side this requires the `reticulate` package.  It also requires that you have a python installation that includes both the `docker` package and `pypiwin32` - once python is installed you can add these packages to python with
 

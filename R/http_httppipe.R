@@ -1,7 +1,6 @@
 http_client_httppipe <- function(config,
                                  min_version = NULL, max_version = NULL) {
-  loadNamespace("httppipe")
-  client <- httppipe::httppipe(config$addr)
+  client <- httppipe(config$addr)
   ## TODO - this should use config$base_url but that needs changes in
   ## the httppipe package
   base_url <- ""

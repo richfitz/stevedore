@@ -255,8 +255,7 @@ skip_if_no_internet <- function() {
 
 
 skip_if_no_httppipe_support <- function() {
-  testthat::skip_if_not_installed("httppipe")
-  if (!httppipe::httppipe_available()) {
+  if (!httppipe_available()) {
     testthat::skip("httppipe support not possible")
   }
 }
