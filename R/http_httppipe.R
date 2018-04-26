@@ -10,7 +10,7 @@ http_client_httppipe <- function(config,
 
   ping <- function() {
     url <- build_url(base_url, DOCKER_API_VERSION_MIN, "/_ping")
-    client("GET", url, NULL, headers_agent)
+    client("GET", url, NULL, list("User-Agent" = user_agent))
   }
   api_version <- http_client_api_version(config$api_version, ping,
                                          min_version, max_version)
