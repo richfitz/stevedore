@@ -17,7 +17,6 @@ Imports:
     yaml (>= 2.1.18)
 Suggests:
     knitr,
-    mockr,
     openssl,
     redux,
     reticulate,
