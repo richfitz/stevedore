@@ -390,7 +390,7 @@ generate_help_string <- function(sub = NULL, api_version = NULL) {
     "inaccuracies may exist between it and stevedore's interface",
     "(especially references to JSON objects). Please report any",
     "documentation that might be improved at",
-    "https://github.com/richfitz/stevedore/issues")
+    "\\url{https://github.com/richfitz/stevedore/issues}")
 
   c(preamble,
     "",

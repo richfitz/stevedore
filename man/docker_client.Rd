@@ -81,8 +81,34 @@ variables (\code{DOCKER_HOST}, \code{DOCKER_CERT_PATH},
 be ignored (this has no effect if \code{machine} is specified).}
 }
 \description{
-Create a docker client object
+Create a docker client object, which allows you to interact with
+docker from R.  The object has several \emph{methods} that allow
+interaction with the docker daemon (for this object they are all
+"system" commands) and \emph{collections}, which contains further
+methods.  The client is structured similarly to the docker command
+line client, such that \code{docker container create <args>} in
+the command line becomes \code{docker$container$create(...)} in R
+(if the client is called R).  You can also access a default client
+by using \code{stevedore::docker} (see \code{\link{docker}}).
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help()}
+}
+\examples{
+if (docker_available()) {
+  # Create a new client object:
+  client <- stevedore::docker_client()
+
+  # Version information for your docker daemon:
+  client$version()
+
+  # General information about your daemon:
+  client$info()
+
+  # Most of the interesting methods are within the collections.
+  # For example, to see a summary of running containers:
+  client$container$list()
+
+  # (see ?docker_container) for more information.
+}
 }
