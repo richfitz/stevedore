@@ -1,9 +1,3 @@
-## This is identical to the file in httppipe, except that we find the
-## Adapter modules in different places (rather than coming from our
-## own package, instead find them in the docker package itself.
-##
-## diff stevedore/inst/py/httppipe.py httppipe/inst/py/httppipe.py
-
 import sys
 
 import docker
