@@ -182,5 +182,5 @@ prepare_body <- function(body) {
 
 user_agent_header_string <- function(config) {
   sprintf("stevedore/%s:%s",
-          packageVersion("stevedore"), config$http_client_type)
+          utils::packageVersion("stevedore"), config$http_client_type)
 }
