@@ -1,9 +1,56 @@
 ##' Docker Client For R
 ##'
-##' A docker client for R, using \code{curl} and an automatically
-##' generated interface.  To get started, please see the package
-##' vignette (\code{vignette("stevedore")} will work if the package
-##' was installed with the vignettes).
+##' \code{stevedore} implements a docker client for R.  Docker is a
+##' framework for "containerisation" - abstracting the details of how
+##' software is installed and run.  It is conceptually similar to
+##' virtualisation but much lighter weight.
+##'
+##' Within the R space containers have been discussed for:
+##'
+##' \emph{Reproducible research}: collecting all dependencies for an
+##' analysis into an image that can be run by other people without
+##' installation headaches.
+##'
+##' \emph{Testing packages}: Collect all the requirements of a package
+##' together and run your tests in an isolated environment.
+##'
+##' Containers can also be used to construct larger applications with
+##' multiple processes that need to talk to each other - for example a
+##' database, API server and proxy server.  One might also implement
+##' something like a set of shiny servers that are load balanced
+##' through a proxy!
+##'
+##' This package provides a complete interface to docker allowing you
+##' to basically everything that can be done from the command line
+##' from within R.  All communication happens over docker's HTTP API
+##' and does not use system commands.  As a result, the information
+##' returned back to R is richer and the interface is likely to be
+##' reliable than parsing the command line output. \code{stevedore}'s
+##' interface is largely automatically generated so will track new
+##' features available in the docker daemon closely.
+##'
+##' The interface is designed to be similar to docker's command link
+##' API - the command for creating a network on the command line is
+##'
+##' \preformatted{
+##' docker network create mynetwork
+##' }
+##'
+##' and in \code{stevedore} can be done as
+##'
+##' \preformatted{
+##' stevedore::docker$network$create("mynetwork")
+##' }
+##'
+##' Familiarity with the command line interface will be helpful but
+##' probably as much because of the concepts as the details.
+##'
+##' To get started, please see the package vignette - running
+##' (\code{vignette("stevedore")} will work if the package was
+##' installed with the vignettes, or see
+##' \href{https://richfitz.github.io/stevedore}. A good place to get
+##' started with the reference documentation is the
+##' \code{\link{docker_client}} function.
 ##'
 ##' @name stevedore
 ##' @docType package
