@@ -5,8 +5,6 @@ services:
   - docker
 r_packages:
   - covr
-r_github_packages:
-  - richfitz/httppipe
 before_script:
   - sudo pip install -U setuptools
   - sudo pip install -U docker
