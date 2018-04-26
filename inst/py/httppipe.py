@@ -4,9 +4,10 @@
 ##
 ## diff stevedore/inst/py/httppipe.py httppipe/inst/py/httppipe.py
 
+import sys
+
 import docker
 import requests
-import sys
 
 IS_WINDOWS_PLATFORM = (sys.platform == 'win32')
 
@@ -15,11 +16,13 @@ if IS_WINDOWS_PLATFORM:
 else:
     from docker.transport import UnixAdapter as HttpAdapter
 
+
 def string_is_binary(x):
   try:
     return x.find('\x00') > 0
   except TypeError:
     return False
+
 
 # Start with the unix socket version because that's fairly easy to get
 # going with and I can test it locally.  Then we can copy over all the
@@ -37,9 +40,8 @@ class Transporter(requests.Session):
         for proto in args:
             self.adapters.pop(proto)
 
-    def simple_request(self, verb, url, headers, data = None):
-        res = self.request(method = verb, url = url, headers = headers,
-                           data = data)
+    def simple_request(self, verb, url, headers, data=None):
+        res = self.request(method=verb, url=url, headers=headers, data=data)
         headers = '\n'.join(
             ['{}: {}'.format(*i) for i in res.raw.headers.items()])
         content = res.content
