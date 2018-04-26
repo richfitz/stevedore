@@ -443,6 +443,9 @@ markdown_to_rd <- function(str, api_version) {
     }
   }
 
+
+  str <- gsub("\\*\\*([^*]+)\\*\\*", "\\\\bold{\\1}", str)
+  str <- gsub("\\*([^*]+)\\*", "\\\\emph{\\1}", str)
   str <- gsub("```([^`]+)```", "\\\\preformatted{\\1}", str)
   str <- gsub("`\\?([^`]+)`", "\\\\code{\\\\link{\\1}}", str)
   str <- gsub("`([^`]+)`", "\\\\code{\\1}", str)
@@ -457,6 +460,8 @@ markdown_to_text <- function(str, colour = crayon::has_color()) {
     repl <- sprintf("%s\\1%s", open, close)
     str <- gsub("```([^`]+)```", repl, paste(str, collapse = "\n"))
     str <- gsub("`([^`]+)`", repl, str)
+    str <- gsub("\\*\\*([^*]+)\\*\\*", repl, str)
+    str <- gsub("\\*([^*]+)\\*", repl, str)
   }
   str
 }
