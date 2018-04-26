@@ -1,8 +1,8 @@
 ##' Default docker client.  This contains an active binding
 ##' (\code{\link{makeActiveBinding}}) to \code{\link{docker_client}} -
 ##' it can be used as an alternative to calling \code{docker_client()}
-##' explicitly (see the examples).  The function
-##'
+##' explicitly (see the examples).  This is a convenience function
+##' designed primarily for interactive use - see Details below.
 ##'
 ##' \code{default_client_set} can be used to control the creation of a
 ##' specific default client.  It returns (invisibly) the previous
@@ -15,23 +15,24 @@
 ##'
 ##' \enumerate{
 ##'
-##' \item it only works by default if the client construction would
-##' work with no arguments.  This is likely to be the case when using
-##' a single-machine setup on Linux/macOS with recent docker but is
-##' very unlikely on windows.
+##' \item the implicit \code{stevedore::docker} object only if the
+##' client construction would work with no arguments.  This is likely
+##' to be the case when using a single-machine setup on Linux/macOS
+##' with recent docker but is very unlikely on windows (particularly
+##' on Windows 7 with docker via docker toolbox/machine).
 ##'
 ##' \item Future versions will probably allow setting R's global
 ##' options to enable fine-tuning of construction (provided this does
 ##' not complicate the logic in looking up values from environment
 ##' variables any further).
 ##'
-##' \item The implcitly constructed version may eventually require
+##' \item The implicitly constructed version may eventually require
 ##' explicit construction, or a flag to allow implicit construction)
 ##'
 ##' }
 ##'
 ##' I'd welcome feedback on how useful \code{stevedore::docker} is,
-##' but please avoid using it in scripts for now, perhaps.
+##' but perhaps avoid using it in scripts for now.
 ##'
 ##' @param ... Parameters passed through to
 ##'   \code{\link{docker_client}}.  Alternatively a single argument of
@@ -40,6 +41,7 @@
 ##' @inheritParams docker_client
 ##' @title Default docker client
 ##' @export docker
+##' @export default_client_set
 ##' @name docker
 ##' @rdname docker
 ##' @examples
@@ -49,7 +51,15 @@
 ##'   stevedore::docker$container$list()
 ##'
 ##'   # is roughly equivalent to this:
-##'   stevedore::docker_client()$container$list()
+##'   client <- stevedore::docker_client()
+##'   client$container$list()
+##'
+##'   # To control the api version used by the default client, you can use:
+##'   stevedore::docker$api_version()
+##'   p <- stevedore::default_client_set(api_version = "1.35")
+##'   stevedore::docker$api_version()
+##'   # Revert to the previous version:
+##'   stevedore::default_client_set(p)
 ##' }
 default_client_set <- function(..., quiet = TRUE) {
   dots <- list(...)
