@@ -867,21 +867,3 @@ docker_types <- function(parent) {
   stevedore_object(self, "docker_types",
                    "Methods for building complex docker types")
 }
-
-
-make_docker_client_request <- function(client) {
-  request <- client$.api_client$http_client$request
-  function(verb, path, query = NULL, body = NULL, headers = NULL,
-           stream = NULL) {
-    assert_scalar_character(verb)
-    assert_scalar_character(path)
-    if (!is.null(query)) {
-      assert_is(query, "list")
-      assert_named(query)
-    }
-    if (!is.null(stream)) {
-      assert_is(stream, "function")
-    }
-    request(toupper(verb), path, query, body, headers, stream)
-  }
-}
