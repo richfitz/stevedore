@@ -6,7 +6,7 @@
 \usage{
 docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
   tls_verify = NULL, machine = NULL, http_client_type = NULL,
-  quiet = FALSE, ignore_environment = FALSE)
+  data_frame = NULL, quiet = FALSE, ignore_environment = FALSE)
 }
 \arguments{
 \item{...}{Reserved for future use.  Passing in any unrecognised
@@ -72,6 +72,20 @@ This option may eventually be moved into the \code{...} argument
 as is not intended for end-user use; it is primarily intended
 for debugging in development (forcing the \code{httppipe} client
 where the \code{curl} client would ordinarily be preferred).}
+
+\item{data_frame}{Function, used to wrap data.frames returned.
+This may make output easier to consume.  You might use
+\code{tibble::as_tibble} to return a \code{tbl_df} or
+\code{datatable::as.data.table} to return \code{data.table}
+objects.  This will be applied to all data.frames \emph{after}
+they are constructed, and so must take a single argument (the
+newly constructed data.frame) and return a new object that is
+largely compatible with data.frame.  Another use for this would
+be to define a function \code{data_frame = function(x)
+structure(x, class = c("foo", "data.frame"))} to set the class
+of all returned data.frame objects to be "foo" as well and then
+defining a custom S3 print method for "foo" that limited the
+output.}
 
 \item{quiet}{Suppress informational messages.}
 

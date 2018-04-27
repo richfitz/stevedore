@@ -117,9 +117,11 @@ docker_client_method <- function(name, object,
                           lapply(names(args), as.name)))
   run_endpoint <- substitute(
     run_endpoint(http_client, endpoint, params, hijack = hijack,
-                 allow_hijack_without_stream = allow_hijack_without_stream),
+                 allow_hijack_without_stream = allow_hijack_without_stream,
+                 output_options = output_options),
     list(hijack = hijack,
-         allow_hijack_without_stream = allow_hijack_without_stream))
+         allow_hijack_without_stream = allow_hijack_without_stream,
+         output_options = api_client$output_options))
   if (is.null(endpoint$extra)) {
     add_extra <- NULL
   } else {

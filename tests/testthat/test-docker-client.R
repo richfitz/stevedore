@@ -171,3 +171,16 @@ test_that("direct access", {
   res <- cl$request("GET", "/_ping")
   expect_equal(res$content, charToRaw("OK"))
 })
+
+
+test_that("custom data.frame handler is enabled", {
+  df <- function(x) {
+    class(x) <- c("foo", class(x))
+    x
+  }
+  cl <- test_docker_client(data_frame = df)
+
+  res <- cl$container$list()
+  expect_is(res, "foo")
+  expect_is(res, "data.frame")
+})

@@ -19,6 +19,7 @@
 docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
                           tls_verify = NULL, machine = NULL,
                           http_client_type = NULL, is_windows = NULL,
+                          as_is_names = FALSE, data_frame = NULL,
                           quiet = FALSE, ignore_environment = FALSE) {
   if (!is.null(machine)) {
     info <- get_machine_env(machine)
@@ -33,11 +34,13 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
   }
 
   docker_config_validate(api_version, host, cert_path, tls_verify,
-                         http_client_type, is_windows, quiet)
+                         http_client_type, is_windows,
+                         as_is_names, data_frame, quiet)
 }
 
 docker_config_validate <- function(api_version, host, cert_path, tls_verify,
-                                   http_client_type, is_windows, quiet) {
+                                   http_client_type, is_windows,
+                                   as_is_names, data_frame, quiet) {
   assert_scalar_logical(quiet)
 
   ## NOTE: api_version is validated later: see http_client_api_version
@@ -132,6 +135,13 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
     cert <- NULL
   }
 
+  assert_scalar_logical(as_is_names)
+  if (is.null(data_frame)) {
+    data_frame <- identity
+  }
+  assert_function(data_frame)
+  output_options <- list(as_is_names = as_is_names, data_frame = data_frame)
+
   list(api_version = api_version,
        protocol = protocol,
        addr = addr,
@@ -141,6 +151,7 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
        tls_verify = tls_verify,
        http_client_type = http_client_type,
        is_windows = is_windows,
+       output_options = output_options,
        quiet = quiet)
 }
 

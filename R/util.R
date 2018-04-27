@@ -555,3 +555,8 @@ Sys_which <- function(x) {
   }
   ret
 }
+
+
+client_output_options <- function(cl) {
+  cl$.parent$.api_client$output_options
+}

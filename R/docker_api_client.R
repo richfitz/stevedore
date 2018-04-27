@@ -8,6 +8,7 @@ docker_api_client <- function(config) {
 
   self$api_version <- self$http_client$api_version
   self$auth <- docker_api_client_auth()
+  self$output_options <- config$output_options
   lock_environment(self)
   self
 }
@@ -114,7 +115,7 @@ docker_api_client_types <- function() {
 
 run_endpoint <- function(http_client, endpoint, params, hijack = NULL,
                          allow_hijack_without_stream = FALSE,
-                         as_is_names = FALSE) {
+                         output_options = NULL) {
   path <- sprintfn(endpoint$path_fmt, params$path)
 
   http_hijack <- !is.null(hijack)
@@ -151,9 +152,9 @@ run_endpoint <- function(http_client, endpoint, params, hijack = NULL,
            content_handler = r_handler,
            header_handler = h_handler)
     } else {
-      ret <- r_handler(res$content, as_is_names = as_is_names)
+      ret <- r_handler(res$content, output_options)
       if (!is.null(h_handler)) {
-        headers <- h_handler(res$headers, as_is_names = as_is_names)
+        headers <- h_handler(res$headers, output_options)
         if (endpoint$method == "HEAD") {
           ## There cannot be a body here
           ret <- headers

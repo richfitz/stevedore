@@ -228,13 +228,14 @@ after_container_path_stat <- function(response, ...) {
 }
 
 
-after_container_top <- function(response, ...) {
+after_container_top <- function(response, params, self) {
   m <- matrix(unlist(response$processes),
               byrow = TRUE, nrow = length(response$processes))
   colnames(m) <- response$titles
   ## NOTE: some of these can be non-text.  Not sure how to safely do
   ## that though.  So for now it's all going to be character.
-  as.data.frame(m, stringsAsFactors = FALSE)
+  res <- as.data.frame(m, stringsAsFactors = FALSE)
+  client_output_options(self)$data_frame(res)
 }
 
 
@@ -870,7 +871,7 @@ docker_client_add_inspect <- function(id, key_name, inspect_name, self,
 }
 
 
-docker_container_ports <- function(attrs) {
+docker_container_ports <- function(attrs, output_options) {
   ports <- attrs$network_settings$ports
 
   if (length(ports) == 0L) {
@@ -884,7 +885,8 @@ docker_container_ports <- function(attrs) {
     host_ip <- unlist(lapply(ports, "[[", "host_ip"), use.names = FALSE)
     host_port <- unlist(lapply(ports, "[[", "host_port"), use.names = FALSE)
   }
-  data_frame(container_port, protocol, host_ip, host_port)
+  output_options$data_frame(
+    data_frame(container_port, protocol, host_ip, host_port))
 }
 
 
@@ -982,7 +984,7 @@ docker_service_ps <- function(self, resolve_names, filters) {
     when = when)
   ret <- ret[order(slot), ]
   rownames(ret) <- NULL
-  ret
+  client_output_options(self)$data_frame(ret)
 }
 
 

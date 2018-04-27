@@ -273,8 +273,11 @@ test_sample_responses <- function(v, skip = NULL) {
         testthat::skip("not yet working")
       }
       dat <- read_sample_response(file)
-      ans1 <- dat$handler(dat$response, FALSE)
-      ans2 <- dat$handler(dat$response, TRUE)
+
+      opts1 <- list(as_is_names = FALSE, data_frame = identity)
+      opts2 <- list(as_is_names = TRUE, data_frame = identity)
+      ans1 <- dat$handler(dat$response, opts1)
+      ans2 <- dat$handler(dat$response, opts2)
       testthat::expect_equal(ans1, dat$reference)
       testthat::expect_equal(ans2, dat$reference, check.attributes = FALSE)
     })
@@ -580,4 +583,10 @@ fake_docker_machine <- function(env, path = tempfile()) {
   writeLines(code, dest)
   Sys.chmod(dest, "755")
   path
+}
+
+
+dummy_data_frame_wrapper <- function(x) {
+  class(x) <- c("extra", class(x))
+  x
 }

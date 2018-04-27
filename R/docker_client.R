@@ -76,6 +76,21 @@
 ##'   for debugging in development (forcing the \code{httppipe} client
 ##'   where the \code{curl} client would ordinarily be preferred).
 ##'
+##'
+##' @param data_frame Function, used to wrap data.frames returned.
+##'   This may make output easier to consume.  You might use
+##'   \code{tibble::as_tibble} to return a \code{tbl_df} or
+##'   \code{datatable::as.data.table} to return \code{data.table}
+##'   objects.  This will be applied to all data.frames \emph{after}
+##'   they are constructed, and so must take a single argument (the
+##'   newly constructed data.frame) and return a new object that is
+##'   largely compatible with data.frame.  Another use for this would
+##'   be to define a function \code{data_frame = function(x)
+##'   structure(x, class = c("foo", "data.frame"))} to set the class
+##'   of all returned data.frame objects to be "foo" as well and then
+##'   defining a custom S3 print method for "foo" that limited the
+##'   output.
+##'
 ##' @param ignore_environment Logical, indicating if environment
 ##'   variables (\code{DOCKER_HOST}, \code{DOCKER_CERT_PATH},
 ##'   \code{DOCKER_TLS_VERIFY} and \code{DOCKER_API_VERSION}) should
@@ -103,12 +118,14 @@
 docker_client <- function(..., api_version = NULL,
                           host = NULL, cert_path = NULL, tls_verify = NULL,
                           machine = NULL,
-                          http_client_type = NULL, quiet = FALSE,
-                          ignore_environment = FALSE) {
+                          http_client_type = NULL,
+                          data_frame = NULL,
+                          quiet = FALSE, ignore_environment = FALSE) {
   assert_empty_dots(..., name = "docker_client")
 
   config <- docker_config(api_version, host, cert_path, tls_verify, machine,
                           http_client_type = http_client_type,
+                          data_frame = data_frame,
                           quiet = quiet,
                           ignore_environment = ignore_environment)
 
@@ -207,7 +224,7 @@ docker_container <- function(id, parent) {
   self$status <- function(reload = TRUE) self$inspect(reload)$state$status
   self$image <- function() docker_container_image(self)
   self$ports <- function(reload = TRUE) {
-    docker_container_ports(self$inspect(reload))
+    docker_container_ports(self$inspect(reload), client_output_options(self))
   }
 
   ## TODO: "attach" is hard because it might need to hijack the

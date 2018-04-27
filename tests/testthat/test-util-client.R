@@ -586,7 +586,10 @@ test_that("after_container_top", {
     TIME = "00:00:00",
     CMD = c("/bin/bash", "sleep 10"))
 
-  expect_equal(after_container_top(d$reference, NULL, NULL), cmp)
+  opts <- list(data_frame = identity, as_is_names = FALSE)
+  self <- list(.parent = list(.api_client = list(output_options = opts)))
+
+  expect_equal(after_container_top(d$reference, NULL, self), cmp)
 })
 
 

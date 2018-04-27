@@ -351,6 +351,20 @@ test_that("top", {
   x$remove()
 })
 
+
+test_that("top works with custom data.frame handler", {
+  d <- docker_client(data_frame = dummy_data_frame_wrapper)
+  nm <- rand_str(10, "stevedore_")
+  x <- d$container$create("bfirsh/reticulate-splines", name = nm)
+  x$start()
+  t <- x$top()
+  x$kill()
+  x$remove()
+  expect_is(t, "data.frame")
+  expect_is(t, "extra")
+})
+
+
 test_that("update", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -839,6 +853,21 @@ test_that("query ports of container with none", {
   x$remove()
 })
 
+
+test_that("port map - data.frame map", {
+  d <- test_docker_client(data_frame = dummy_data_frame_wrapper)
+  nm <- rand_str(10, "stevedore_")
+  x <- d$container$create("nginx", name = nm, ports = TRUE)
+  on.exit(x$remove(force = TRUE))
+  x$start()
+  ports <- x$ports()
+  expect_identical(ports$container_port, "80")
+  expect_is(ports, "extra")
+  expect_is(ports, "data.frame")
+})
+
+
+
 test_that("network: host", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -1055,7 +1084,8 @@ test_that("get (offline)", {
 
 
 test_that("process ports", {
-  expect_equal(docker_container_ports(NULL),
+  opts <- list(data_frame = identity)
+  expect_equal(docker_container_ports(NULL, opts),
                data_frame(container_port = character(0),
                           protocol = character(0),
                           host_ip = character(0),
@@ -1064,7 +1094,7 @@ test_that("process ports", {
   d <- list("80/tcp" = data_frame(host_ip = "0.0.0.0", host_port = "32789"))
   attrs <- list(network_settings = list(ports = d))
 
-  expect_equal(docker_container_ports(attrs),
+  expect_equal(docker_container_ports(attrs, opts),
                data_frame(container_port = "80",
                           protocol = "tcp",
                           host_ip = "0.0.0.0",

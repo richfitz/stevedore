@@ -21,11 +21,11 @@ swagger_header_handler <- function(response, spec) {
       }
       x
     }
-    function(headers, as_is_names) {
+    function(headers, output_options) {
       h <- parse_headers(headers)
       names(h) <- tolower(names(h))
       ret <- lapply(els, f_atomic, h)
-      names(ret) <- if (as_is_names) els else els_r
+      names(ret) <- if (output_options$as_is_names) els else els_r
       ret
     }
   } else {
@@ -88,14 +88,14 @@ swagger_response_handler_json <- function(response, spec) {
   } else {
     stop("not sure how to make this response handler") # nocov [stevedore bug]
   }
-  function(data, as_is_names) {
-    h(raw_to_json(data), as_is_names)
+  function(data, output_options) {
+    h(raw_to_json(data), output_options)
   }
 }
 
 
 swagger_response_handler_null <- function(response, spec) {
-  function(data, as_is_names) {
+  function(data, output_options) {
     if (length(data) > 0L) {
       stop("Expected an empty response") # nocov [stevedore bug]
     }
@@ -107,7 +107,7 @@ swagger_response_handler_null <- function(response, spec) {
 ## This is the slightly odd outcome of /swarm/init, which returns a
 ## json encoded string
 swagger_response_handler_json_string <- function(response, spec) {
-  function(data, as_is_names) {
+  function(data, output_options) {
     assert_scalar_character(data)
     data
   }
@@ -175,26 +175,26 @@ swagger_response_handler_object <- function(schema, spec) {
   f_atomic <- function(v, data) {
     pick(data, v, atomic$missing[[type[[v]]]])[[1L]]
   }
-  f_object <- function(v, data, as_is_names) {
+  f_object <- function(v, data, output_options) {
     x <- pick(data, v, NULL)
-    x %&&% object_handlers[[v]](x, as_is_names)
+    x %&&% object_handlers[[v]](x, output_options)
   }
-  f_array <- function(v, data, as_is_names) {
-    array_handlers[[v]](pick(data, v, NULL), as_is_names)
+  f_array <- function(v, data, output_options) {
+    array_handlers[[v]](pick(data, v, NULL), output_options)
   }
 
-  function(data, as_is_names) {
+  function(data, output_options) {
     ret <- vector("list", length(type))
     names(ret) <- els
     ret[els_atomic] <- lapply(els_atomic, f_atomic, data)
-    ret[els_object] <- lapply(els_object, f_object, data, as_is_names)
-    ret[els_array]  <- lapply(els_array,  f_array,  data, as_is_names)
+    ret[els_object] <- lapply(els_object, f_object, data, output_options)
+    ret[els_array]  <- lapply(els_array,  f_array,  data, output_options)
     ## TODO: where we have array strings it might be good to
     ## distinguish between a length 1 array and a string - these have
     ## differecnes in how they're interpreted.  I need to think about
     ## this on the args side too and probably the solution here should
     ## reflect the solution there.  Probably a "scalar" attribute?
-    if (!as_is_names && length(ret) > 0L) {
+    if (!output_options$as_is_names && length(ret) > 0L) {
       names(ret) <- els_r
     }
 
@@ -209,9 +209,9 @@ swagger_response_handler_object <- function(schema, spec) {
       }
       if (length(extra) > 0L) {
         if (!is.null(additional_properties_handler)) {
-          extra <- lapply(extra, additional_properties_handler, as_is_names)
+          extra <- lapply(extra, additional_properties_handler, output_options)
         }
-        if (!as_is_names && length(extra) > 0L) {
+        if (!output_options$as_is_names && length(extra) > 0L) {
           names(extra) <- pascal_to_snake_cached(names(extra))
         }
         ret <- c(ret, extra)
@@ -248,7 +248,7 @@ swagger_response_handler_array <- function(schema, spec) {
 swagger_response_handler_array_atomic <- function(missing, empty) {
   force(missing)
   force(empty)
-  function(x, as_is_names) {
+  function(x, output_options) {
     if (is.null(x)) empty else vapply2(x, identity, missing, USE.NAMES = FALSE)
   }
 }
@@ -257,8 +257,8 @@ swagger_response_handler_array_atomic <- function(missing, empty) {
 swagger_response_handler_array_array <- function(items, spec) {
   handler <- swagger_response_handler_array(items, spec)
   rm(spec)
-  function(x, as_is_names) {
-    lapply(x, handler, as_is_names)
+  function(x, output_options) {
+    lapply(x, handler, output_options)
   }
 }
 
@@ -292,33 +292,34 @@ swagger_response_handler_array_object_df <- function(items, spec) {
     vapply2(data, pick, atomic$type[[type[[v]]]], v,
             atomic$missing[[type[[v]]]], USE.NAMES = FALSE)
   }
-  f_array <- function(v, data, as_is_names) {
+  f_array <- function(v, data, output_options) {
     x <- lapply(data, pick, v, NULL)
-    I(lapply(x, array_handlers[[v]], as_is_names))
+    I(lapply(x, array_handlers[[v]], output_options))
   }
-  f_object <- function(v, data, as_is_names) {
+  f_object <- function(v, data, output_options) {
     ## Ah bollocks - I've totally messed this up here and the
     ## recursion is not working correctly I think - the data as coming
     ## in here is missing a layer of listing.  This could come from a
     ## bunch of places unfortunately.
     x <- lapply(data, pick, v, NULL)
-    I(lapply(x, object_handlers[[v]], as_is_names))
+    I(lapply(x, object_handlers[[v]], output_options))
   }
 
-  function(data, as_is_names) {
+  function(data, output_options) {
     if (!is.null(names(data))) {
       stop("Was handed the wrong sort of thing") # nocov [stevedore bug]
     }
     ret <- vector("list", length(cols))
     names(ret) <- cols
     ret[cols_atomic] <- lapply(cols_atomic, f_atomic, data)
-    ret[cols_object] <- lapply(cols_object, f_object, data, as_is_names)
-    ret[cols_array]  <- lapply(cols_array,  f_array,  data, as_is_names)
+    ret[cols_object] <- lapply(cols_object, f_object, data, output_options)
+    ret[cols_array]  <- lapply(cols_array,  f_array,  data, output_options)
 
-    if (!as_is_names && length(ret) > 0L) {
+    if (!output_options$as_is_names && length(ret) > 0L) {
       names(ret) <- cols_r
     }
-    as.data.frame(ret, stringsAsFactors = FALSE, check.names = FALSE)
+    output_options$data_frame(
+      as.data.frame(ret, stringsAsFactors = FALSE, check.names = FALSE))
   }
 }
 
@@ -337,13 +338,13 @@ swagger_response_handler_array_object_list <- function(items, spec) {
     stop("Unsupported additionalProperties") # nocov [stevedore bug]
   }
 
-  function(data, as_is_names) {
+  function(data, output_options) {
     if (additional_properties == "string") {
       data <- lapply(data, vcapply, identity)
     } else {
       stop("extra handling needed here") # nocov [stevedore bug]
     }
-    if (!as_is_names) {
+    if (!output_options$as_is_names) {
       rename <- function(x) {
         if (!is.null(names(x))) {
           names(x) <- pascal_to_snake_cached(names(x))
@@ -358,21 +359,21 @@ swagger_response_handler_array_object_list <- function(items, spec) {
 
 
 swagger_response_handler_binary <- function(...) {
-  function(data, as_is_names) {
+  function(data, output_options) {
     data
   }
 }
 
 
 swagger_response_handler_text <- function(...) {
-  function(data, as_is_names) {
+  function(data, output_options) {
     raw_to_char(data)
   }
 }
 
 
 swagger_response_handler_chunked_string <- function(...) {
-  function(data, as_is_names) {
+  function(data, output_options) {
     decode_chunked_string(data)
   }
 }
