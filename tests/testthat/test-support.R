@@ -69,3 +69,36 @@ test_that("docker_api_client_auth", {
   auth$set("foo", str)
   expect_equal(auth$get("foo"), base64encode(str))
 })
+
+
+test_that("client request", {
+  r <- function(verb, path, query, body, headers, stream) {
+    list(verb = verb, path = path, query = query, body = body,
+         headers = headers, stream = stream)
+  }
+  client <- list(.api_client = list(http_client = list(request = r)))
+  request <- make_docker_client_request(client)
+
+  expect_equal(request("GET", "/path"),
+               list(verb = "GET", path = "/path", query = NULL, body = NULL,
+                    headers = NULL, stream = NULL))
+  expect_equal(request("get", "/path"),
+               list(verb = "GET", path = "/path", query = NULL, body = NULL,
+                    headers = NULL, stream = NULL))
+
+  expect_equal(request("GET", "/path", list(a = 1)),
+               list(verb = "GET", path = "/path", query = list(a = 1),
+                    body = NULL, headers = NULL, stream = NULL))
+  expect_error(request("GET", "/path", 1),
+               "'query' must be a list")
+
+  expect_equal(request("GET", "/path", body = raw(10)),
+               list(verb = "GET", path = "/path", query = NULL,
+                    body = raw(10), headers = NULL, stream = NULL))
+
+  expect_equal(request("GET", "/path", stream = identity),
+               list(verb = "GET", path = "/path", query = NULL,
+                    body = NULL, headers = NULL, stream = identity))
+  expect_error(request("GET", "/path", stream = TRUE),
+               "'stream' must be a function")
+})
