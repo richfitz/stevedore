@@ -32,6 +32,7 @@ test_that("all help generates", {
   }
 })
 
+
 test_that("generate_help", {
   expect_equal(generate_help(NULL), generate_help_string(NULL))
   expect_error(generate_help_string("other"), "impossible!")
@@ -48,6 +49,7 @@ test_that("run help", {
   cl <- test_docker_client()
   expect_error(cl$help("html"), NA)
 })
+
 
 test_that("generate help via utils::help", {
   ## I don't see why this fails with covr, but it does.
@@ -88,6 +90,7 @@ test_that("construct all api versions", {
   }
 })
 
+
 test_that("format one method", {
   d <- null_docker_client()
   s1 <- format(d$ping)
@@ -96,6 +99,7 @@ test_that("format one method", {
   expect_identical(s1, s2)
   expect_false(identical(s3, s1))
 })
+
 
 test_that("markdown_to_text", {
   expect_equal(markdown_to_text("hello `code` world", FALSE),
@@ -106,4 +110,13 @@ test_that("markdown_to_text", {
                "hello \033[1mcode\033[22m world")
   expect_equal(markdown_to_text("hello ```code``` world", TRUE),
                "hello \033[1mcode\033[22m world")
+})
+
+
+test_that("version remembering", {
+  set_help_api_last_version("1.32")
+  expect_equal(get_help_api_last_version(), "1.32")
+  set_help_api_last_version("1.33")
+  expect_equal(get_help_api_last_version(), "1.33")
+  set_help_api_last_version(NULL)
 })

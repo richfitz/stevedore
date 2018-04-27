@@ -42,11 +42,6 @@ docker_client_method_nonapi <- function(fun, class, name) {
 }
 
 
-## NOTE: - this is not always utils::help here because I need to make
-## sure that we can go via devtool's help in testing.  So I am trying
-## a bit of a hack here, using a conditional in the NAMESPACE - this
-## is similar to the approach taken in backports
-##
 ## NOTE: help_type is passed through by option because the devtools
 ## shim does not pass help_type through, but the option manages to
 ## make it.
@@ -56,6 +51,9 @@ docker_client_method_nonapi <- function(fun, class, name) {
 ## and returns no file at all!  And then testing with mockr goes very
 ## badly with the devtools help shim.  So this looks untestable at
 ## present.
+##
+## NOTE: Trying to make the underlying help function swappable fails
+## poorly because of the amount of NSE involved in the devtools shim.
 stevedore_object_help <- function(name, api_version, help_type) {
   ## nocov start
   set_help_api_last_version(api_version)
