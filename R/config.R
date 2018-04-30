@@ -27,11 +27,11 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
     cert_path <- info$DOCKER_CERT_PATH
     tls_verify <- !is.null(info$DOCKER_TLS_VERIFY)
   } else if (!ignore_environment) {
-    api_version <- api_version %||% Sys_getenv1("DOCKER_API_VERSION")
     host <- host %||% Sys_getenv1("DOCKER_HOST")
     cert_path <- cert_path %||% Sys_getenv1("DOCKER_CERT_PATH")
     tls_verify <- tls_verify %||% !is.null(Sys_getenv1("DOCKER_TLS_VERIFY"))
   }
+  api_version <- api_version %||% Sys_getenv1("DOCKER_API_VERSION")
 
   docker_config_validate(api_version, host, cert_path, tls_verify,
                          http_client_type, is_windows,
