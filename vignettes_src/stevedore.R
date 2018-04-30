@@ -286,6 +286,31 @@ curl::parse_headers(curl::curl_fetch_memory(url)$headers)
 nginx$stop(t = 0)
 
 
+## ## Run commands in running containers with `exec`
+
+## With the command-line tool, `docker exec <container name>
+## <command>` lets you run an arbitrary command within a running
+## container.  `stevedore` does this with the `exec` method of a
+## container object.
+
+## Reasons for doing this include debugging (using arbitrary commands
+## to inspect/interact with a container while it does its primary
+## task) but it can also be used in deployment (e.g., sending a "go"
+## signal after copying files into the container).
+
+## To demonstrate, we need a long running container:
+x <- docker$container$run("richfitz/iterate", c("1000", "10"),
+                          detach = TRUE, rm = TRUE)
+x$status()
+
+## With the container running we can run additional commands:
+res <- x$exec("ls")
+
+## This streams the output of the command by default (to the
+## connection indicated by the `stream`) argument.  Output is also
+## returned as part of the object:
+res
+
 ## ## Images
 
 ## ### Pulling
