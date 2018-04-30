@@ -10,6 +10,48 @@
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help()}
 ##'
+##' @section Connection options:
+##'
+##' \code{stevedore} can connect to the docker daemon via a unix
+##' socket (this is the default set-up on Linux and macOS), over a
+##' named pipe (Windows 10 - see below) and https over a normal tcp
+##' connection (this is especially useful with
+##' \href{https://docs.docker.com/machine/}{\code{docker-machine}}.
+##'
+##' \enumerate{
+##'
+##' \item If the \code{machine} argument is given then
+##'   \code{stevedore} queries \code{docker-machine} for settings.  If
+##'   that command fails (e.g., there is no machine,
+##'   \code{docker-machine} not installed) then that will cause an
+##'   error.  (Note that the \code{docker-machine} output does not
+##'   include api version information so the \code{api_version}
+##'   argument is relevent, but \code{host}, \code{cert_path} and
+##'   \code{tls_verify} will be silently ignored if provided).
+##'
+##' \item The arguments \code{host} overrides the environment variable
+##'   \code{DOCKER_HOST}, \code{cert_path} overrides
+##'   \code{DOCKER_CERT_PATH} and \code{tls_verify} overrides
+##'   \code{DOCKER_TLS_VERIFY}.  If \code{ignore_environment} is
+##'   \code{TRUE} then the environment variables are not used at all.
+##'
+##' \item if \code{code} is not provided by any of the above methods
+##'   (machine, argument or envrironment variable) it will fall back
+##'   on the default unix socket (\code{var/run/docker.sock}) on
+##'   Linux/macOS or the default windows named pipe
+##'   (\code{npipe:////./pipe/docker_engine}) on windows.
+##'
+##' }
+##'
+##' The api version is set by the \code{api_version} argument, which
+##' falls back on the environment variable \code{DOCKER_API_VERSION}
+##' (this is the same as the docker command line client and the python
+##' SDK).  If neither are provided then \code{stevedore} uses the
+##' default version of 1.29.  If \code{api_client = "detect"} is
+##' provided, then \code{stevedore} will attempt to detect the api
+##' version being used by the daemon and match that (provided it falls
+##' within the range of versions supported by the package).
+##'
 ##' @title Create docker client
 ##'
 ##' @param ... Reserved for future use.  Passing in any unrecognised
@@ -62,7 +104,7 @@
 ##'   package for R that would make managing docker machines from R
 ##'   easier.  As an alternative to this option, one can set
 ##'   docker-machine environment variables as described in
-##'   `docker-machine env` before running R and they would be picked
+##'   \code{docker-machine env} before running R and they would be picked
 ##'   up as described above.
 ##'
 ##' @param http_client_type HTTP client type to use.  The options are

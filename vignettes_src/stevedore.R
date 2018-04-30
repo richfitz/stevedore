@@ -68,9 +68,9 @@ nginx_ready <- function(port, attempts = 10) {
 
 ## The main function in the package is `docker_client`; this will
 ## construct an object with which we can talk with the docker server.
-## Currently this is hardcoded to only work with a docker server that
-## is running over the default unix socket (`/var/run/docker.sock`),
-## but hopefully soon this can be relaxed.
+## By default this will look at a number of environment variables and
+## try to connect to the correct daemon.  See `?docker_client` for
+## information on controlling creating the connection.
 docker <- stevedore::docker_client()
 
 ## The client object looks a lot like an
