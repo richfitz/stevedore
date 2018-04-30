@@ -31,7 +31,12 @@ httppipe <- function(path) {
 
 
 httppipe_available <- function(verbose = FALSE) {
-  e <- tryCatch(httppipe_prepare(), error = identity)
+  do_httppipe_available(verbose, httppipe_prepare)
+}
+
+
+do_httppipe_available <- function(verbose, prepare) {
+  e <- tryCatch(prepare(), error = identity)
   err <- inherits(e, "error")
   if (verbose && err) {
     message(sprintf("Failed to load httppipe with error message:\n  %s",

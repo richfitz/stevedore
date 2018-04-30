@@ -65,13 +65,22 @@ test_that("no streaming implemented", {
 
 test_that("available", {
   skip_on_cran()
-  skip_on_travis()
+  cl <- test_docker_client()# only when this works...
   expect_true(httppipe_available())
-  with_mock(httppipe_prepare = function() stop("can't load python"), {
-    expect_false(httppipe_available())
-    expect_silent(httppipe_available())
-    expect_message(httppipe_available(TRUE), "can't load python")
-  })
+})
+
+
+test_that("available: verbose", {
+  mock_httppipe_prepare <- function() stop("can't load python")
+  expect_false(do_httppipe_available(FALSE, mock_httppipe_prepare))
+  expect_silent(do_httppipe_available(FALSE, mock_httppipe_prepare))
+  expect_message(do_httppipe_available(TRUE, mock_httppipe_prepare),
+                 "can't load python")
+
+  mock_httppipe_prepare <- function() TRUE
+  expect_true(do_httppipe_available(FALSE, mock_httppipe_prepare))
+  expect_silent(do_httppipe_available(FALSE, mock_httppipe_prepare))
+  expect_silent(do_httppipe_available(TRUE, mock_httppipe_prepare))
 })
 
 
