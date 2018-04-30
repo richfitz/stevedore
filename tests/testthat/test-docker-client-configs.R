@@ -58,7 +58,7 @@ test_that("add to container", {
   container_id <- tasks[[1]]$inspect()$status$container_status$container_id
   container <- cl$container$get(container_id)
   log <- container$exec(c("cat", sprintf("/%s", name)), stream = FALSE)
-  expect_identical(as.character(log), data)
+  expect_identical(as.character(log$output), data)
 
   ## This ensures that the daemon has time to clean up the temporary
   ## volume that it needs to use.

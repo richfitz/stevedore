@@ -452,9 +452,11 @@ test_that("exec: in one", {
 
   txt <- capture.output(res <- x$exec("ls"))
 
-  expect_is(res, "docker_stream")
-  cmp <- unlist(strsplit(format(res, style = "prefix"), "\n"))
+  expect_is(res$output, "docker_stream")
+  cmp <- unlist(strsplit(format(res$output, style = "prefix"), "\n"))
   expect_equal(txt, cmp)
+  expect_equal(res$exit_code, 0L)
+  expect_match(res$id, "^[[:xdigit:]]+$")
 
   x$kill()
   x$remove()

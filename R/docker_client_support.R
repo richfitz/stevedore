@@ -1110,7 +1110,12 @@ make_container_exec <- function(container) {
   body <- c(
     quote(`{`),
     call("<-", quote(exec), args_to_call(quote(exec_create), args_create)),
-    args_to_call(quote(exec$start), args_start, TRUE))
+    call("<-", quote(ans), args_to_call(quote(exec$start), args_start, TRUE)),
+    call("<-", quote(info), quote(exec$inspect())),
+    quote(list(id = info$id,
+               exit_code = info$exit_code,
+               details = info,
+               output = ans)))
 
   fenv <- new.env(parent = container$.parent$.api_client, hash = FALSE)
   fenv$exec_create <- container$exec_create

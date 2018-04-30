@@ -75,19 +75,19 @@ test_that("exec", {
   on.exit(x$remove(force = TRUE))
 
   txt1 <- capture.output(res1 <- x$exec("ls"))
-  expect_is(res1, "docker_stream")
+  expect_is(res1$output, "docker_stream")
 
-  cmp <- unlist(strsplit(format(res1, style = "prefix"), "\n"))
+  cmp <- unlist(strsplit(format(res1$output, style = "prefix"), "\n"))
   expect_equal(txt1, cmp)
 
   expect_silent(res2 <- x$exec("ls", stream = FALSE))
-  expect_is(res2, "docker_stream")
-  expect_equal(format(res2), format(res1))
+  expect_is(res2$output, "docker_stream")
+  expect_equal(format(res2$output), format(res1$output))
 
   tmp <- tempfile_test()
   expect_silent(res3 <- x$exec("ls", stream = tmp))
-  expect_is(res3, "docker_stream")
-  expect_equal(format(res3), format(res1))
+  expect_is(res3$output, "docker_stream")
+  expect_equal(format(res3$output), format(res1$output))
   expect_equal(readLines(tmp), txt1)
 })
 
