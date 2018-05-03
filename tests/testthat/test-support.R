@@ -102,3 +102,9 @@ test_that("client request", {
   expect_error(request("GET", "/path", stream = TRUE),
                "'stream' must be a function")
 })
+
+
+test_that("after_container_wait", {
+  expect_equal(after_container_wait(list(status_code = 1L)),
+               list(exit_code = 1L))
+})

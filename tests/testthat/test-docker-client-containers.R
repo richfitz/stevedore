@@ -385,7 +385,7 @@ test_that("wait", {
   nm <- rand_str(10, "stevedore_")
   x <- d$container$create("hello-world", name = nm)
   x$start()
-  expect_equal(x$wait(), list(status_code = 0L))
+  expect_equal(x$wait(), list(exit_code = 0L))
   expect_equal(x$status(), "exited")
   x$remove()
 })
@@ -511,7 +511,7 @@ test_that("run: detach", {
   d <- test_docker_client()
   ans <- d$container$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
   expect_is(ans, "docker_container")
-  expect_equal(ans$wait(), list("status_code" = 0L))
+  expect_equal(ans$wait(), list("exit_code" = 0L))
   ans$remove()
 })
 
@@ -889,7 +889,7 @@ test_that("network: host", {
   on.exit(y$remove(force = TRUE), add = TRUE)
   y$start()
   code <- y$wait()
-  expect_false(code$status_code == 0)
+  expect_false(code$exit_code == 0)
   expect_equal(format(y$logs(), style = "plain"), character(0))
 
   ## Then with host networking
@@ -897,7 +897,7 @@ test_that("network: host", {
   on.exit(z$remove(force = TRUE), add = TRUE)
   z$start()
   code <- z$wait()
-  expect_true(code$status_code == 0)
+  expect_true(code$exit_code == 0)
   expect_match(format(z$logs(), style = "plain"), "nginx", all = FALSE)
 })
 
@@ -934,7 +934,7 @@ test_that("network: custom", {
                           network = network, name = client)
   y$start()
   code <- y$wait()
-  expect_true(code$status_code == 0)
+  expect_true(code$exit_code == 0)
   expect_match(format(y$logs(), style = "plain"), "nginx", all = FALSE)
 })
 

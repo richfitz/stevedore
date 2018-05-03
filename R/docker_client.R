@@ -397,7 +397,8 @@ docker_container <- function(id, parent) {
 
   self$wait <- docker_client_method(
     "container_wait", self,
-    fix = fix_id)
+    fix = fix_id,
+    after = after_container_wait)
 
   stevedore_object(self, "docker_container",
                    "Work with a particular docker container")

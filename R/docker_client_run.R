@@ -38,10 +38,10 @@ make_docker_run <- function(client) {
 
     if (can_stream) {
       out <- container$logs(stream = stream_data$stream, follow = TRUE)
-      exit_status <- container$wait()$status_code
+      exit_status <- container$wait()$exit_code
     } else {
       ## TODO: warn here that this will block?
-      exit_status <- container$wait()$status_code
+      exit_status <- container$wait()$exit_code
       out <- container$logs()
       ## NOTE: this duplicates some of the logic in print.docker_stream
       if (!is.null(stream_data$stream)) {

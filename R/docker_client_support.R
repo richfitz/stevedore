@@ -301,6 +301,12 @@ after_container_update <- function(response, params, self) {
 }
 
 
+after_container_wait <- function(response, ...) {
+  ## Rename for consistency with other docker endpoints.
+  list(exit_code = response$status_code)
+}
+
+
 after_service_create <- function(response, params, self) {
   ret <- docker_service(response$id, self$.parent)
   if (!params$detach) {
