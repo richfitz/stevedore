@@ -823,7 +823,7 @@ test_that("volume map: readonly", {
   x$exec(c("touch", "/host/foo"), stdout = FALSE, stderr = FALSE)
 
   ans <- x$exec(c("ls", "/host"), stream = FALSE)
-  expect_equal(ans, character(0))
+  expect_equal(ans$output, character(0))
 })
 
 
