@@ -1,9 +1,11 @@
 context("docker client")
 
+
 test_that("unknown args prevented", {
   expect_error(docker_client(foo = "bar"),
                "Unknown argument passed to 'docker_client': foo")
 })
+
 
 ## The most simple nontrivial thing with the docker client
 test_that("ping", {
@@ -34,6 +36,7 @@ test_that("info", {
   expect_is(info, "list")
 })
 
+
 test_that("version", {
   d <- test_docker_client()
   v <- d$version()
@@ -41,16 +44,19 @@ test_that("version", {
   expect_is(v$api_version, "character")
 })
 
+
 test_that("df", {
   skip("df containers output looks broken to me")
   d <- test_docker_client()
   df <- d$df()
 })
 
+
 test_that("events", {
   skip("events this needs some streaming support")
   d <- test_docker_client()
 })
+
 
 test_that("children", {
   d <- null_docker_client()
@@ -88,6 +94,7 @@ test_that("children", {
   expect_is(d$plugin, "stevedore_object")
 })
 
+
 test_that("Prevent invalid access", {
   d <- null_docker_client()
   expect_error(d$foo, "No element 'foo' within 'docker_client' object")
@@ -102,6 +109,7 @@ test_that("Prevent invalid access", {
                fixed = TRUE)
 })
 
+
 test_that("print", {
   d <- null_docker_client()
   out <- capture.output(x <- print(d))
@@ -115,10 +123,12 @@ test_that("print", {
   expect_true(any(out == "  get(id)"))
 })
 
+
 test_that("api_version", {
   d <- null_docker_client()
   expect_equal(d$api_version(), DOCKER_API_VERSION_DEFAULT)
 })
+
 
 test_that("print endpoints", {
   d <- null_docker_client()
@@ -156,9 +166,11 @@ test_that("print endpoints", {
     all = FALSE, fixed = TRUE)
 })
 
+
 test_that("login", {
   skip("not yet tested")
 })
+
 
 test_that("events", {
   skip("not yet tested")

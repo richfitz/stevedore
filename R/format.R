@@ -114,7 +114,7 @@ print.stevedore_object <- function(x, ..., indent = 2L) {
     title <- vcapply(nms[!is_fn], function(el) attr(x[[el]], "title"))
     cl <- vcapply(nms[!is_fn], function(el) class(x[[el]])[[1]])
     i <- order(cl == "docker_types")
-    cat(sprintf("%s%s: %s\n", strrep(" " , indent), nms[!is_fn][i], title[i]),
+    cat(sprintf("%s%s: %s\n", strrep(" ", indent), nms[!is_fn][i], title[i]),
         sep = "")
   }
 

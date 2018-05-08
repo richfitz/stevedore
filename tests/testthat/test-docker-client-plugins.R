@@ -1,5 +1,6 @@
 context("docker client: plugins")
 
+
 test_that("privileges", {
   skip_if_no_internet()
   cl <- test_docker_client()

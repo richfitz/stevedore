@@ -7,9 +7,12 @@ DOCKER_API_VERSION_DEFAULT <- "1.29"
 DEFAULT_DOCKER_UNIX_SOCKET <- "unix:///var/run/docker.sock"
 DEFAULT_DOCKER_WINDOWS_PIPE <- "npipe:////./pipe/docker_engine"
 
+STEVEDORE_UNIMPLEMENTED <- "post /session"
+
 HELP <- "\r\b:\n"
 
 .stevedore <- new.env(parent = emptyenv())
+
 
 stevedore_reset <- function() {
   rm(list = ls(.stevedore, all.names = TRUE), envir = .stevedore)

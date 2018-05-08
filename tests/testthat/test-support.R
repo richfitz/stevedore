@@ -1,5 +1,6 @@
 context("support")
 
+
 test_that("as_docker_filter", {
   fil <- c(1:10)
   expect_error(as_docker_filter(fil), "'fil' must be named")

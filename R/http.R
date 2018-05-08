@@ -21,6 +21,7 @@ connection_info <- function(client) {
        tls_certificates = config$cert)
 }
 
+
 ## Generate (and possibly throw) S3 errors out of http errors
 ##
 ## This probably belongs in the swagger.R file as it's being called

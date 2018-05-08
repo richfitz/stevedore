@@ -1,5 +1,6 @@
 context("types")
 
+
 test_that("handler: scalar atomic", {
   h <- swagger_type_make_handler_scalar_atomic("foo", "integer")
   expect_equal(h(1L), jsonlite::unbox(1L))

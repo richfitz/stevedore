@@ -1,5 +1,6 @@
 context("util (assert)")
 
+
 test_that("assert_character", {
   object <- NULL
   expect_error(assert_character(object), "'object' must be a character")
@@ -9,6 +10,7 @@ test_that("assert_character", {
 
   expect_silent(assert_character("fred"))
 })
+
 
 test_that("assert_nonmissing", {
   object <- NA
@@ -20,6 +22,7 @@ test_that("assert_nonmissing", {
   expect_silent(assert_nonmissing(TRUE))
 })
 
+
 test_that("assert_scalar", {
   object <- 1:5
   expect_error(assert_scalar(object), "'object' must be a scalar")
@@ -28,6 +31,7 @@ test_that("assert_scalar", {
 
   expect_silent(assert_scalar(TRUE))
 })
+
 
 test_that("assert_logical", {
   object <- NULL
@@ -39,6 +43,7 @@ test_that("assert_logical", {
   expect_silent(assert_logical(TRUE))
 })
 
+
 test_that("assert_is", {
   object <- NULL
   expect_error(assert_is(object, "data.frame"), "'object' must be a data.frame")
@@ -49,6 +54,7 @@ test_that("assert_is", {
   expect_silent(assert_is(mtcars, "data.frame"))
 })
 
+
 test_that("assert_raw", {
   object <- NULL
   expect_error(assert_raw(object), "'object' must be raw")
@@ -58,6 +64,7 @@ test_that("assert_raw", {
 
   expect_silent(assert_raw(raw()))
 })
+
 
 test_that("assert_integer", {
   object <- NULL
@@ -108,6 +115,7 @@ test_that("assert_named", {
   expect_silent(assert_named(set_names(object, c("a", "b", "c")), TRUE, "x"))
 })
 
+
 test_that("assert_directory", {
   path <- tempfile_test()
   expect_error(assert_directory(path), "'path' must be an existing directory")
@@ -119,11 +127,13 @@ test_that("assert_directory", {
   unlink(path, recursive = TRUE)
 })
 
+
 test_that("assert_null", {
   object <- 1L
   expect_error(assert_null(object), "'object' must be NULL")
   expect_silent(assert_null(NULL))
 })
+
 
 test_that("assert_file_exists", {
   mypath <- tempfile_test()
@@ -140,11 +150,13 @@ test_that("assert_file_exists", {
   unlink(mypaths)
 })
 
+
 test_that("assert_function", {
   object <- NULL
   expect_error(assert_function(object), "'object' must be a function")
   expect_silent(assert_function(sin))
 })
+
 
 test_that("assert_empty_dots", {
   expect_silent(assert_empty_dots(name = "foo"))

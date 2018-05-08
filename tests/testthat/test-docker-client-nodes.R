@@ -1,5 +1,6 @@
 context("docker client: nodes")
 
+
 test_that("create (offline)", {
   d <- null_docker_client()
   n <- d$node$get(dummy_id())

@@ -10,6 +10,7 @@ swagger_types <- function(version, spec) {
   ret
 }
 
+
 ## Support for complex types (e.g. TaskSpec).  This is a similar
 ## amount of work to swagger args unfortunately, but might be somewhat
 ## easier to test.

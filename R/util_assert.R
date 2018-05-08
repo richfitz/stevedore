@@ -6,6 +6,7 @@ assert_scalar_character <- function(x, name = deparse(substitute(x)),
   invisible(x)
 }
 
+
 assert_scalar_integer <- function(x, strict = FALSE,
                                   name = deparse(substitute(x)),
                                   what = "a scalar integer (non-NA)") {
@@ -33,12 +34,15 @@ assert_scalar_logical <- function(x, name = deparse(substitute(x)),
   invisible(x)
 }
 
+
 assert_scalar <- function(x, name = deparse(substitute(x)), what = "scalar") {
   if (length(x) != 1) {
     stop(sprintf("'%s' must be a %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
+
+
 assert_nonmissing <- function(x, name = deparse(substitute(x)),
                               what = "non-NA") {
   if (any(is.na(x))) {
@@ -46,6 +50,7 @@ assert_nonmissing <- function(x, name = deparse(substitute(x)),
   }
   invisible(x)
 }
+
 
 assert_character <- function(x, name = deparse(substitute(x)),
                              what = "a character") {
@@ -55,12 +60,14 @@ assert_character <- function(x, name = deparse(substitute(x)),
   invisible(x)
 }
 
+
 assert_raw <- function(x, name = deparse(substitute(x)), what = "raw") {
   if (!is.raw(x)) {
     stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
   invisible(x)
 }
+
 
 assert_logical <- function(x, name = deparse(substitute(x)), what = "logical") {
   if (!is.logical(x)) {
@@ -88,6 +95,7 @@ assert_is <- function(x, cl, name = deparse(substitute(x)), what = NULL) {
   invisible(x)
 }
 
+
 assert_integer <- function(x, strict = FALSE, name = deparse(substitute(x)),
                            what = "integer") {
   if (!(is.integer(x))) {
@@ -114,11 +122,13 @@ assert_named <- function(x, unique = FALSE, name = deparse(substitute(x)),
   }
 }
 
+
 assert_directory <- function(x, name = deparse(substitute(x))) {
   if (!is_directory(x)) {
     stop(sprintf("'%s' must be an existing directory", name), call. = FALSE)
   }
 }
+
 
 assert_scalar_logical_or_null <- function(x, name = deparse(substitute(x)),
                                           what = NULL) {
@@ -137,17 +147,20 @@ assert_scalar_character_or_null <- function(x, name = deparse(substitute(x)),
   }
 }
 
+
 assert_null <- function(x, name = deparse(substitute(x)), what = "NULL") {
   if (!is.null(x)) {
     stop(sprintf("'%s' must be %s", name, what), call. = FALSE)
   }
 }
 
+
 assert_function <- function(x, name = deparse(substitute(x))) {
   if (!is.function(x)) {
     stop(sprintf("'%s' must be a function", name))
   }
 }
+
 
 assert_file_exists <- function(x) {
   msg <- x[!file.exists(x)]

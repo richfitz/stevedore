@@ -1,5 +1,6 @@
 context("dockerignore")
 
+
 test_that("parse_dockerignore: empty", {
   expect_null(parse_dockerignore(character()))
   expect_null(parse_dockerignore(NULL))

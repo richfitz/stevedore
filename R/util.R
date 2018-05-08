@@ -74,10 +74,12 @@ substr_len <- function(x, start, len) {
   substr(x, start, start + len - 1L)
 }
 
+
 as_na <- function(x) {
   x[] <- NA
   x
 }
+
 
 pick <- function(x, el, missing) {
   if (el %in% names(x)) {
@@ -87,12 +89,14 @@ pick <- function(x, el, missing) {
   }
 }
 
+
 set_attributes <- function(x, attr) {
   for (i in names(attr)) {
     attr(x, i) <- attr[[i]]
   }
   x
 }
+
 
 download_file <- function(url, dest, quiet = FALSE) {
   if (!file.exists(dest)) {
@@ -103,6 +107,7 @@ download_file <- function(url, dest, quiet = FALSE) {
   }
   dest
 }
+
 
 RE_PASCAL_START <- local({
   special <- c("CA", "CPU", "DNS", "GID", "ID", "IO", "IP", "IPAM",
@@ -150,6 +155,7 @@ snake_to_pascal <- function(x) {
   paste0(toupper(substr(x, 1, 1)), substr(x, 2, nchar(x)))
 }
 
+
 camel_to_snake <- function(x) {
   if (length(x) != 1L) {
     return(vcapply(x, camel_to_snake, USE.NAMES = FALSE))
@@ -167,6 +173,7 @@ camel_to_snake <- function(x) {
   }
   x
 }
+
 
 snake_to_camel <- function(x) {
   if (length(x) != 1L) {
@@ -199,27 +206,33 @@ lock_environment <- function(env) {
   invisible(env)
 }
 
+
 set_names <- function(x, nms) {
   names(x) <- nms
   x
 }
 
+
 from_json <- function(x) {
   jsonlite::fromJSON(x, simplifyVector = FALSE)
 }
+
 
 raw_to_char <- function(bin) {
   ## iconv(readBin(bin, character()), from = "UTF-8", to = "UTF-8")
   rawToChar(bin)
 }
 
+
 raw_to_json <- function(bin) {
   from_json(raw_to_char(bin))
 }
 
+
 as_call <- function(...) {
   as.call(list(...))
 }
+
 
 dollar <- function(...) {
   f <- function(a, b) {
@@ -233,9 +246,11 @@ dollar <- function(...) {
   ret
 }
 
+
 string_starts_with <- function(x, sub) {
   substr(x, 1, nchar(sub)) == sub
 }
+
 
 reset_line <- function(stream, width, newline_if_not_tty = FALSE,
                        is_tty = isatty(stream)) {
@@ -245,6 +260,7 @@ reset_line <- function(stream, width, newline_if_not_tty = FALSE,
     cat("\n", file = stream)
   }
 }
+
 
 ## Previously this did a deparse(args(f)) with a width cutoff, but
 ## that does not format long arg/default pairs nicely, eventually
@@ -287,13 +303,16 @@ capture_args <- function(f, name, indent = 4, width = getOption("width"),
   paste0(trimws(ret, "right"), collapse = "\n")
 }
 
+
 is_directory <- function(x) {
   file.exists(x) & file.info(x, extra_cols = FALSE)$isdir
 }
 
+
 tolower1 <- function(x) {
   paste0(tolower(substr(x, 1, 1)), substr(x, 2, nchar(x)))
 }
+
 
 ## The python command looks to split these up a bit; in
 ## types/containers.py there's a call to split_command which then goes
@@ -306,6 +325,7 @@ split_command <- function(x) {
   }
   strsplit(x, "\\s+")[[1L]]
 }
+
 
 ## Previously yaml read in overflowing integers without a warning -
 ## the currentl version converts to NA_integer_ with a warning - but I
@@ -322,9 +342,11 @@ yaml_handlers <- function() {
   })
 }
 
+
 yaml_load_file <- function(path) {
   yaml::yaml.load_file(path, handlers = yaml_handlers())
 }
+
 
 yaml_load <- function(str) {
   yaml::yaml.load(str, handlers = yaml_handlers())
@@ -339,18 +361,22 @@ has_colour <- function(dest) {
   }
 }
 
+
 squote <- function(x) {
   sprintf("'%s'", x)
 }
+
 
 data_frame <- function(...) {
   data.frame(..., stringsAsFactors = FALSE)
 }
 
+
 is_integer_like <- function(x) {
   is.integer(x) ||
     (is.numeric(x) && all(max(abs(as.integer(x) - x)) < 1e-8))
 }
+
 
 sys_which <- function(name) {
   assert_scalar_character(name)
@@ -360,6 +386,7 @@ sys_which <- function(name) {
   }
   unname(ret)
 }
+
 
 ## From orderly:R/util.R
 system3 <- function(command, args, check = FALSE) {
@@ -375,17 +402,21 @@ system3 <- function(command, args, check = FALSE) {
   ret
 }
 
+
 is_windows <- function() {
   Sys.info()[["sysname"]] == "Windows"
 }
+
 
 nothing <- function(...) {
   invisible()
 }
 
+
 read_binary <- function(path) {
   readBin(path, raw(), file.size(path))
 }
+
 
 indent <- function(x, n) {
   paste0(strrep(" ", n), x)
@@ -442,6 +473,7 @@ hash_file <- function(files) {
   assert_file_exists(files)
   unname(tools::md5sum(normalizePath(files, mustWork = TRUE)))
 }
+
 
 stevedore_file <- function(path) {
   system.file(path, package = "stevedore", mustWork = TRUE)
@@ -503,7 +535,7 @@ join_text_list <- function(x) {
 
 ## TODO: what does this do out of timezone?
 parse_timestamp <- function(timestamp) {
-  t <- strptime(timestamp, "%Y-%m-%dT%H:%M:%OS", "GMT")
+  strptime(timestamp, "%Y-%m-%dT%H:%M:%OS", "GMT")
 }
 
 
@@ -559,4 +591,8 @@ Sys_which <- function(x) {
 
 client_output_options <- function(cl) {
   cl$.parent$.api_client$output_options
+}
+
+
+noop <- function(...) {
 }

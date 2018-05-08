@@ -1,14 +1,17 @@
 context("spec utilites")
 
+
 test_that("startup", {
   stevedore:::.onLoad()
   expect_equal(.stevedore$client_data, list())
 })
 
+
 test_that("read missing spec is an error", {
   expect_error(swagger_spec_read("0.0.1"),
                "Invalid version 0.0.1; try one of", fixed = TRUE)
 })
+
 
 test_that("validate", {
   skip_if_not_installed("withr")
@@ -33,6 +36,7 @@ test_that("validate", {
     expect_error(swagger_spec_read(version, refresh = TRUE),
                  "Spec for 1.29 had different md5 than expected"))
 })
+
 
 test_that("swagger_spec_index_write", {
   skip_if_not_installed("withr")

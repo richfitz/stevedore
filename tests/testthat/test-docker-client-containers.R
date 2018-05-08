@@ -1,5 +1,6 @@
 context("docker client: containers")
 
+
 test_that("create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -30,6 +31,7 @@ test_that("create, using image", {
   x$remove()
 })
 
+
 test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -44,6 +46,7 @@ test_that("get", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("list", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -57,6 +60,7 @@ test_that("list", {
 
   x$remove()
 })
+
 
 test_that("list with arguments", {
   d <- test_docker_client()
@@ -91,6 +95,7 @@ test_that("list with arguments", {
   x$remove()
 })
 
+
 test_that("prune", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -99,6 +104,7 @@ test_that("prune", {
   ans <- d$container$prune()
   expect_true(x$id() %in% ans$containers_deleted)
 })
+
 
 test_that("diff", {
   ## TODO: need to get a better test in here - one that actually shows
@@ -112,6 +118,7 @@ test_that("diff", {
   expect_is(xd, "data.frame")
   x$remove()
 })
+
 
 test_that("export", {
   d <- test_docker_client()
@@ -136,6 +143,7 @@ test_that("export", {
   x$remove()
 })
 
+
 test_that("path_stat", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -151,6 +159,7 @@ test_that("path_stat", {
   expect_is(e, "docker_error")
   expect_equal(e$code, 404L)
 })
+
 
 test_that("archive export", {
   ## TODO: another tar endpoint
@@ -172,6 +181,7 @@ test_that("archive export", {
                "'dest' must be a scalar character (non-NA), or NULL",
                fixed = TRUE)
 })
+
 
 test_that("archive import", {
   d <- test_docker_client()
@@ -197,6 +207,7 @@ test_that("archive import", {
   expect_true(file.exists(file.path(p, "foo")))
   expect_identical(readLines(file.path(p, "foo")), dat)
 })
+
 
 test_that("archive import (file)", {
   d <- test_docker_client()
@@ -234,6 +245,7 @@ test_that("kill", {
   x$remove()
 })
 
+
 test_that("logs", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -263,6 +275,7 @@ test_that("logs", {
   expect_match(capture.output(print(logs)), "Reticulating spline \\d+...")
 })
 
+
 test_that("pause/unpause", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -289,6 +302,7 @@ test_that("pause/unpause", {
   x$remove()
 })
 
+
 test_that("rename", {
   d <- test_docker_client()
   nm1 <- rand_str(10, "stevedore_")
@@ -300,6 +314,7 @@ test_that("rename", {
   expect_equal(x$reload()$name(), nm2)
   x$remove()
 })
+
 
 test_that("restart", {
   d <- test_docker_client()
@@ -317,6 +332,7 @@ test_that("restart", {
   x$remove()
 })
 
+
 test_that("stats", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -329,6 +345,7 @@ test_that("stats", {
   x$remove()
 })
 
+
 test_that("stop", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -338,6 +355,7 @@ test_that("stop", {
   expect_equal(x$status(), "exited")
   x$remove()
 })
+
 
 test_that("top", {
   d <- test_docker_client()
@@ -380,6 +398,7 @@ test_that("update", {
   expect_identical(info2$host_config$memory_swap, -1L)
 })
 
+
 test_that("wait", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -389,6 +408,7 @@ test_that("wait", {
   expect_equal(x$status(), "exited")
   x$remove()
 })
+
 
 test_that("prune", {
   d <- test_docker_client()
@@ -401,6 +421,7 @@ test_that("prune", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("image", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -410,6 +431,7 @@ test_that("image", {
   expect_equal(cmp$inspect(), img$inspect())
   x$remove()
 })
+
 
 test_that("exec_create", {
   d <- test_docker_client()
@@ -438,6 +460,7 @@ test_that("exec_create", {
   x$remove()
 })
 
+
 test_that("exec: in one", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -462,6 +485,7 @@ test_that("exec: in one", {
   x$remove()
 })
 
+
 test_that("exec, twice", {
   skip("wip")
   d <- test_docker_client()
@@ -481,13 +505,16 @@ test_that("exec, twice", {
   expect_error(ans$start())
 })
 
+
 test_that("resize", {
   skip("untested")
 })
 
+
 test_that("attach", {
   skip("attach is not yet implemented")
 })
+
 
 test_that("run", {
   d <- test_docker_client()
@@ -507,6 +534,7 @@ test_that("run", {
   expect_match(txt, "  $logs", fixed = TRUE, all = FALSE)
 })
 
+
 test_that("run: detach", {
   d <- test_docker_client()
   ans <- d$container$run("richfitz/iterate", c("10", "0.1"), detach = TRUE)
@@ -514,6 +542,7 @@ test_that("run: detach", {
   expect_equal(ans$wait(), list("exit_code" = 0L))
   ans$remove()
 })
+
 
 test_that("run: no such container", {
   d <- test_docker_client()
@@ -536,12 +565,14 @@ test_that("run: no such container", {
   expect_equal(e$endpoint, "image_create")
 })
 
+
 test_that("run with get/pull error handling", {
   d <- test_docker_client()
   err <- get_error(d$container$run("foo bar"))
   expect_is(err, "docker_error")
   expect_equal(err$code, 400L) # bad request
 })
+
 
 test_that("run: remove", {
   d <- test_docker_client()
@@ -552,6 +583,7 @@ test_that("run: remove", {
   e <- get_error(d$container$get(ans$container$id()))
   expect_true(is_docker_error_not_found(e))
 })
+
 
 test_that("run: error", {
   d <- test_docker_client()
@@ -572,6 +604,7 @@ test_that("run: error", {
   expect_equal(e$out, docker_stream("throwing error 4\n", 1L))
 })
 
+
 test_that("run: error to stderr", {
   d <- test_docker_client()
   e <- get_error(
@@ -584,12 +617,14 @@ test_that("run: error to stderr", {
     "Command '14' in image 'richfitz/error:latest' returned non-zero exit status 14\nthrowing error 14 to stderr\n", fixed = TRUE)
 })
 
+
 test_that("run with image", {
   d <- test_docker_client()
   img <- d$image$get("hello-world")
   ans <- d$container$run(img, rm = TRUE, stream = FALSE)
   expect_is(ans$logs, "docker_stream")
 })
+
 
 test_that("scalar cmd", {
   d <- test_docker_client()
@@ -606,6 +641,7 @@ test_that("scalar cmd", {
                "hello world\n")
   c1$remove()
 })
+
 
 test_that("scalar exec", {
   d <- test_docker_client()
@@ -627,6 +663,7 @@ test_that("scalar exec", {
   x$remove()
 })
 
+
 test_that("stream logs", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -642,6 +679,7 @@ test_that("stream logs", {
 
   x$remove()
 })
+
 
 test_that("fetch, but don't print, logs", {
   ## Getting some stray beginning of lines using follow on a stopped
@@ -670,6 +708,7 @@ test_that("fetch, but don't print, logs", {
   x$remove()
 })
 
+
 test_that("auto-remove: create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -683,6 +722,7 @@ test_that("auto-remove: create", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("auto-remove: run", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -695,6 +735,7 @@ test_that("auto-remove: run", {
   e <- repeat_until_error(x$inspect)
   expect_equal(e$code, 404L)
 })
+
 
 ## TODO: there is not a test in here (or anywhere really) that this
 ## shows that this actually streams logs from the beginning (rather
@@ -710,6 +751,7 @@ test_that("stream", {
   expect_equal(paste0(readLines(p), "\n"),
                format(x$logs, style = "prefix"))
 })
+
 
 test_that("volume map", {
   d <- test_docker_client()
@@ -728,6 +770,7 @@ test_that("volume map", {
                sort(dir()))
   x$remove()
 })
+
 
 test_that("volume map: docker volume", {
   skip_on_travis() # FIXME
@@ -758,6 +801,7 @@ test_that("volume map: docker volume", {
   y$remove()
 })
 
+
 test_that("volume map: readonly", {
   skip_on_travis() # FIXME
   d <- test_docker_client()
@@ -781,6 +825,7 @@ test_that("volume map: readonly", {
   ans <- x$exec(c("ls", "/host"), stream = FALSE)
   expect_equal(ans, character(0))
 })
+
 
 test_that("port map", {
   ## Roughly equivalent to:
@@ -808,6 +853,7 @@ test_that("port map", {
   expect_true(grepl("nginx", rawToChar(dat$content)))
 })
 
+
 test_that("port map - random free port", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -830,6 +876,7 @@ test_that("port map - random free port", {
   expect_true(grepl("nginx", rawToChar(dat$content)))
 })
 
+
 test_that("port map - expose all ports", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -839,6 +886,7 @@ test_that("port map - expose all ports", {
   ports <- x$ports()
   expect_identical(ports$container_port, "80")
 })
+
 
 test_that("query ports of container with none", {
   d <- test_docker_client()
@@ -901,6 +949,7 @@ test_that("network: host", {
   expect_match(format(z$logs(), style = "plain"), "nginx", all = FALSE)
 })
 
+
 test_that("network: custom", {
   ## Here's the scenario:
   ##
@@ -938,6 +987,7 @@ test_that("network: custom", {
   expect_match(format(y$logs(), style = "plain"), "nginx", all = FALSE)
 })
 
+
 test_that("logs with tty", {
   ## > When the TTY setting is enabled in POST /containers/create, the
   ## > stream is not multiplexed. The data exchanged over the hijacked
@@ -969,6 +1019,7 @@ test_that("logs with tty", {
   y$remove()
 })
 
+
 test_that("stream logs with tty", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -985,6 +1036,7 @@ test_that("stream logs with tty", {
 
   x$remove()
 })
+
 
 test_that("run, passing through host_config", {
   d <- test_docker_client()
@@ -1004,6 +1056,7 @@ test_that("run, passing through host_config", {
   expect_true(is_docker_error_not_found(e))
 })
 
+
 test_that("commit", {
   d <- test_docker_client()
   x <- d$container$run("alpine:3.1", c("tar", "-zcvf", "/etc.tar.gz", "/etc"),
@@ -1020,6 +1073,7 @@ test_that("commit", {
 
   img$remove()
 })
+
 
 test_that("versioned responses", {
   skip("work in progress")
@@ -1045,6 +1099,7 @@ test_that("versioned responses", {
   x$remove(force = TRUE)
 })
 
+
 test_that("environment variables on create", {
   d <- test_docker_client()
   res <- d$container$run("alpine", "env", detach = FALSE, stream = NULL,
@@ -1052,6 +1107,7 @@ test_that("environment variables on create", {
   txt <- format(res$logs, style = "plain", strip_newline = TRUE)
   expect_true("X_FOO=1" %in% txt)
 })
+
 
 test_that("set user", {
   skip_on_windows()

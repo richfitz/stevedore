@@ -63,9 +63,6 @@ docker_api_client_auth <- function() {
 }
 
 
-STEVEDORE_UNIMPLEMENTED <- "post /session"
-
-
 docker_api_client_data_check <- function(spec, endpoints) {
   done <- vcapply(endpoints, function(x) paste(x$method, x$path))
 

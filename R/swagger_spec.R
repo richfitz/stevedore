@@ -143,6 +143,7 @@ swagger_spec_path_resolve <- function(path, data) {
   ret
 }
 
+
 ## Some patching drama:
 patch_doc_filters <- function(x) {
   from1 <- "encoded as JSON (a `map[string][]string`)"
@@ -152,7 +153,7 @@ patch_doc_filters <- function(x) {
                  "\\(a `map\\[string\\]\\[\\]string`\\)")
   to2 <- "A named character vector of filters"
 
-  re <- paste('(encoded as JSON \\(a `map\\[string\\]\\[\\]string`\\))\\.',
+  re <- paste("(encoded as JSON \\(a `map\\[string\\]\\[\\]string`\\))\\.",
               'For example, `\\{"(.*?)": \\["(.*)"\\]\\}`')
   if (grepl(re, x)) {
     x <- sub(re, paste0(to1, '.  For example `c(\\2 = "\\3")`'), x)

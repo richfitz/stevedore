@@ -1,5 +1,6 @@
 context("spec (responses)")
 
+
 ## The spec is incorrect about the PortBinding type which is used in
 ##
 ##     GET /containers/{id}/json => NetworkSettings => Ports
@@ -24,6 +25,7 @@ test_that("regression: container_inspect", {
   expect_equal(ans2, dat$reference, check.attributes = FALSE)
   expect_equal(names(ans1), pascal_to_snake(names(ans2)))
 })
+
 
 test_that("system_df is a problem for unpacking of lists", {
   dat <- read_sample_response("sample_responses/regression/system_df_1.R")

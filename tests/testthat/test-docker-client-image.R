@@ -1,9 +1,11 @@
 context("docker client: images")
 
+
 test_that("list", {
   d <- test_docker_client()$image$list()
   expect_is(d, "data.frame")
 })
+
 
 test_that("get", {
   img <- test_docker_client()$image$get("hello-world")
@@ -13,6 +15,7 @@ test_that("get", {
 
   expect_true("hello-world:latest" %in% img$tags())
 })
+
 
 test_that("get by reference", {
   sha <- "sha256:f2a9173236"
@@ -26,6 +29,7 @@ test_that("get by reference", {
   expect_equal(img2$id(), img1$id())
 })
 
+
 test_that("id/short_id", {
   img <- test_docker_client()$image$get("hello-world")
   d <- test_docker_client()$image$list()
@@ -37,11 +41,13 @@ test_that("id/short_id", {
   expect_equal(nchar(i2), 17L)
 })
 
+
 test_that("inspect", {
   img <- test_docker_client()$image$get("hello-world")
   d <- img$inspect()
   expect_is(d, "list")
 })
+
 
 test_that("tag/reload/untag", {
   img <- test_docker_client()$image$get("hello-world")
@@ -55,11 +61,13 @@ test_that("tag/reload/untag", {
   expect_false(expect %in% img$tags())
 })
 
+
 test_that("untag - invalid tag", {
   img <- test_docker_client()$image$get("hello-world")
   tag <- rand_str(10)
   expect_error(img$untag(tag), sprintf("Invalid repo_tag '%s:latest'", tag))
 })
+
 
 test_that("history", {
   img <- test_docker_client()$image$get("hello-world")
@@ -67,6 +75,7 @@ test_that("history", {
   expect_is(h, "data.frame")
   expect_equal(h$id[[1]], img$id())
 })
+
 
 test_that("export", {
   img <- test_docker_client()$image$get("hello-world")
@@ -81,6 +90,7 @@ test_that("export", {
   untar(path, exdir = extract)
   expect_true(file.exists(file.path(extract, "manifest.json")))
 })
+
 
 test_that("import", {
   cl <- test_docker_client()
@@ -111,9 +121,9 @@ test_that("build: success", {
   cl <- test_docker_client()
   context <- tar_directory("images/iterate")
 
-  txt <- capture.output({
+  txt <- capture.output(
     ans <- cl$image$build(context, nocache = TRUE, rm = TRUE,
-                          tag = "richfitz/iterate:testing")})
+                          tag = "richfitz/iterate:testing"))
 
   expect_match(txt, "Successfully built", all = FALSE)
   expect_is(ans, "docker_image")
@@ -154,6 +164,7 @@ test_that("build: stream output", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+
 test_that("build: stream output with file arg", {
   path <- tempfile_test()
   cl <- test_docker_client()
@@ -168,6 +179,7 @@ test_that("build: stream output with file arg", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+
 test_that("build: context as directory name", {
   path <- tempfile_test()
   cl <- test_docker_client()
@@ -180,6 +192,7 @@ test_that("build: context as directory name", {
   expect_equal(ans$tags(), "richfitz/iterate:testing")
 })
 
+
 test_that("build: failure", {
   cl <- test_docker_client()
   ## As above, but missing a resource:
@@ -188,9 +201,9 @@ test_that("build: failure", {
   file.copy("images/iterate/Dockerfile", path)
   context <- tar_directory(path)
 
-  txt <- capture.output({
+  txt <- capture.output(
     ans <- get_error(cl$image$build(context, nocache = TRUE, rm = TRUE,
-                                    tag = "richfitz/iterate:failure"))})
+                                    tag = "richfitz/iterate:failure")))
   expect_is(ans, "build_error")
 })
 
@@ -265,9 +278,6 @@ test_that("pull", {
   expect_match(txt, "Downloaded newer", all = FALSE)
 })
 
-test_that("push", {
-  skip("not yet tested")
-})
 
 test_that("search", {
   skip_if_no_internet()
@@ -279,6 +289,7 @@ test_that("search", {
   expect_false(ans$is_official[i])
   expect_false(ans$is_automated[i])
 })
+
 
 ## This tests that we have everything plumbed enough that we do see
 ## api differences in the responses when requesting different api
@@ -293,6 +304,7 @@ test_that("api versions", {
   expect_true("os_version" %in% names(info_1))
   expect_false("os_version" %in% names(info_2))
 })
+
 
 test_that("export", {
   cl <- test_docker_client()
@@ -310,6 +322,7 @@ test_that("export", {
   expect_true(length(b3) > length(b1))
   expect_true(length(b3) > length(b2))
 })
+
 
 test_that("push/pull with auth", {
   skip_if_no_internet()

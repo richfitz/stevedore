@@ -1,5 +1,6 @@
 context("errors")
 
+
 test_that("is_docker_error_not_found", {
   expect_false(is_docker_error_not_found(NULL))
   expect_false(is_docker_error_not_found(

@@ -1,5 +1,6 @@
 context("docker client: tasks")
 
+
 test_that("create (offline)", {
   d <- null_docker_client()
   s <- d$task$get(dummy_id())

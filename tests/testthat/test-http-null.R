@@ -1,5 +1,6 @@
 context("http (null)")
 
+
 test_that("creation", {
   config <- docker_config(http_client_type = "null", ignore_environment = TRUE)
 
@@ -12,6 +13,7 @@ test_that("creation", {
   cl <- http_client_null(config, NULL, NULL)
   expect_equal(cl$api_version, DOCKER_API_VERSION_DEFAULT)
 })
+
 
 test_that("use", {
   config <- docker_config(http_client_type = "null", ignore_environment = TRUE)

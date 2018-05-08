@@ -1,6 +1,6 @@
 ## may need to pin the SSL version, or allow it to be configured
 ## https://github.com/docker/docker-py/issues/963
-
+##
 ## From the UI perspective, what is the correct behaviour here with
 ## respect to overriding configuration variables?  I think that the
 ## right move would be to prefer:
@@ -10,12 +10,11 @@
 ## 3. platform-specific default
 ##
 ## I think that that is consistent with the docker client behaviour.
-
+##
 ## Getting behaviour around the DOCKER_TLS_VERIFY correct is not easy,
 ## partly because it's not really testable.  I think that with the
 ## proxy approach we can test a plain http version, so that will be
 ## useful.  For now, just focussing on the main codepaths.
-
 docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
                           tls_verify = NULL, machine = NULL,
                           http_client_type = NULL, is_windows = NULL,
@@ -37,6 +36,7 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
                          http_client_type, is_windows,
                          as_is_names, data_frame, quiet)
 }
+
 
 docker_config_validate <- function(api_version, host, cert_path, tls_verify,
                                    http_client_type, is_windows,

@@ -215,6 +215,7 @@ docker_client <- function(..., api_version = NULL,
                    "Control the docker daemon")
 }
 
+
 docker_container_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
@@ -255,6 +256,7 @@ docker_container_collection <- function(parent) {
   stevedore_object(self, "docker_container_collection",
                    "Work with docker containers")
 }
+
 
 docker_container <- function(id, parent) {
   self <- new_stevedore_object(parent)
@@ -471,6 +473,7 @@ docker_image_collection <- function(parent) {
                    "Work with docker images")
 }
 
+
 docker_image <- function(id, parent) {
   ## NOTE: used in 'name()' to record the given name - this is
   ## different to most of the other cases here and I'm not sure how
@@ -518,6 +521,7 @@ docker_image <- function(id, parent) {
                    "Work with a particular docker image")
 }
 
+
 docker_network_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
@@ -541,6 +545,7 @@ docker_network_collection <- function(parent) {
   stevedore_object(self, "docker_network_collection",
                    "Work with docker networks")
 }
+
 
 docker_network <- function(id, parent) {
   self <- new_stevedore_object(parent)
@@ -569,6 +574,7 @@ docker_network <- function(id, parent) {
                    "Work with a particular docker network")
 }
 
+
 docker_volume_collection <- function(parent) {
   self <- new_stevedore_object(parent)
 
@@ -592,6 +598,7 @@ docker_volume_collection <- function(parent) {
                    "Work with docker volumes")
 }
 
+
 docker_volume <- function(name, parent) {
   self <- new_stevedore_object(parent)
   fix_name <- docker_client_add_inspect(name, "name", "volume_inspect", self)
@@ -607,6 +614,7 @@ docker_volume <- function(name, parent) {
   stevedore_object(self, "docker_volume",
                    "Work with a particular docker volume")
 }
+
 
 docker_exec <- function(id, parent) {
   self <- new_stevedore_object(parent)
@@ -764,6 +772,7 @@ docker_task_collection <- function(parent) {
   stevedore_object(self, "docker_task_collection",
                    "Work with docker tasks")
 }
+
 
 docker_task <- function(id, parent) {
   self <- new_stevedore_object(parent)

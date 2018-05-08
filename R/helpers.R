@@ -11,6 +11,7 @@ user <- function(name = NULL, group = FALSE, numeric = TRUE) {
   }
 }
 
+
 user_name <- function(name) {
   if (is.null(name)) {
     e <- Sys.getenv()
@@ -25,6 +26,7 @@ user_name <- function(name) {
     name
   }
 }
+
 
 numeric_id <- function(name, group, is_windows) {
   if (is_windows) {

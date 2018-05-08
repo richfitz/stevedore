@@ -1,5 +1,6 @@
 context("util")
 
+
 test_that("camel <-> snake", {
   expect_equal(camel_to_snake("fooBar"), "foo_bar")
   expect_equal(camel_to_snake("foo_bar"), "foo_bar")
@@ -12,11 +13,13 @@ test_that("camel <-> snake", {
                c("fooBar", "fizzBuzz"))
 })
 
+
 test_that("case convert with consecutive capitals", {
   expect_equal(pascal_to_snake("NanoCPUs"), "nano_cpus")
   ## The conversion is lossy though:
   expect_equal(snake_to_pascal("nano_cpus"), "NanoCpus")
 })
+
 
 test_that("case convert: reference check", {
   nms <- read.csv(stevedore_file("spec/names.csv"), stringsAsFactors = FALSE)
@@ -25,6 +28,7 @@ test_that("case convert: reference check", {
   i <- !(nms$from %in% ex$from)
   expect_equal(nms$to[i], pascal_to_snake(nms$from[i]))
 })
+
 
 test_that("case convert: caching", {
   pascal_to_snake_cache_reset()
@@ -39,6 +43,7 @@ test_that("case convert: caching", {
   expect_true(from %in% .stevedore$names[, "from"])
   expect_true(to %in% .stevedore$names[, "to"])
 })
+
 
 test_that("case convert: special cases", {
   ## See notes in design.md
@@ -80,10 +85,12 @@ test_that("case convert: special cases", {
   expect_equal(pascal_to_snake("UTSMode"), "uts_mode")
 })
 
+
 test_that("case convert: exceptions", {
   expect_equal(pascal_to_snake("MinAPIVersion"), "min_apiversion")
   expect_equal(pascal_to_snake_cached("MinAPIVersion"), "min_api_version")
 })
+
 
 test_that("is_error", {
   expect_false(is_error(NULL))
@@ -92,6 +99,7 @@ test_that("is_error", {
   class(cond) <- c("docker_error", "error", "condition")
   expect_true(is_error(cond))
 })
+
 
 test_that("split command", {
   expect_identical(split_command("hello"), "hello")
@@ -104,6 +112,7 @@ test_that("split command", {
   expect_error(split_command('"foo bar"'), "A proper command splitter")
 })
 
+
 test_that("check command", {
   expect_identical(validate_command("hello world"), "hello world")
   expect_identical(validate_command(I("hello world")), c("hello", "world"))
@@ -112,12 +121,14 @@ test_that("check command", {
   expect_identical(validate_command(I(letters)), I(letters))
 })
 
+
 ## The new yaml package introduces integer overflow with warnings.
 test_that("yaml overflow", {
   str <- "Resources:\n  NanoCPUs: 4000000000"
   expect_identical(yaml_load(str),
                    list(Resources = list(NanoCPUs = 4e9)))
 })
+
 
 test_that("stream filtering", {
   s <- rep(1:2, length.out = 10)
@@ -130,6 +141,7 @@ test_that("stream filtering", {
   expect_equal(format(obj, style = "plain", filter = c("stdin")), character(0))
   expect_equal(format(obj, style = "plain", filter = NULL), x)
 })
+
 
 test_that("stream truncating", {
   s <- rep(1:2, length.out = 10)
@@ -242,6 +254,7 @@ test_that("integer apply/json serialisation", {
   expect_identical(viapply(from_json(s2), "[[", "a"), (1:2) * 10^10)
 })
 
+
 test_that("sys_which", {
   expect_silent(p <- sys_which("ping"))
   expect_is(p, "character")
@@ -250,6 +263,7 @@ test_that("sys_which", {
   expect_error(sys_which("unknown-program-never-exists"),
                "Did not find program 'unknown-program-never-exists'")
 })
+
 
 test_that("reset_line", {
   tmp <- tempfile_test()
@@ -282,6 +296,7 @@ test_that("reset_line", {
   expect_equal(rawToChar(bytes), "hello\ngoodbye")
   unlink(tmp)
 })
+
 
 test_that("download_file", {
   d <- test_docker_client()

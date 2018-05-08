@@ -1,5 +1,6 @@
 context("default client")
 
+
 test_that("set default", {
   default_client_del()
   default_client_set(http_client_type = "null")

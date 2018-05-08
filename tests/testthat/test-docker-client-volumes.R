@@ -1,5 +1,6 @@
 context("docker client: volumes")
 
+
 test_that("create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -19,6 +20,7 @@ test_that("create", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -34,6 +36,7 @@ test_that("get", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("list", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -46,6 +49,7 @@ test_that("list", {
   expect_true(nm %in% vl$name)
 })
 
+
 test_that("map", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -57,6 +61,7 @@ test_that("map", {
                fixed = TRUE)
 })
 
+
 test_that("prune", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -64,6 +69,7 @@ test_that("prune", {
   ans <- d$volume$prune()
   expect_match(ans$volumes_deleted, "^stevedore_", all = FALSE)
 })
+
 
 test_that("labels", {
   d <- test_docker_client()

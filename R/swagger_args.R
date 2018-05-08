@@ -35,7 +35,8 @@ swagger_args_parse <- function(method, path, x, spec) {
       args <- c(args[i1], args_body, args[i2])
       args_in <- c(args_in[i1], rep("body", length(args_body)), args_in[i2])
       body_type <- "combine"
-    } else { # body$schema$type == "string"
+    } else {
+      ## here, body$schema$type == "string"
       body_type <- "single"
       p <- args[[i_body]]
       args[[i_body]] <- c(p[names(p) != "schema"], p$schema)

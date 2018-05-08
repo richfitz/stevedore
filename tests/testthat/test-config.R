@@ -1,5 +1,6 @@
 context("config")
 
+
 test_that("default unix config", {
   cfg <- docker_config_validate(api_version = NULL, host = NULL,
                                 cert_path = NULL, tls_verify = NULL,
@@ -156,8 +157,8 @@ test_that("machine parse", {
     'export DOCKER_HOST="tcp://192.168.99.100:2376"',
     'export DOCKER_CERT_PATH="/Users/rich/.docker/machine/machines/extra"',
     'export DOCKER_MACHINE_NAME="extra"',
-    '# Run this command to configure your shell: ',
-    '# eval $(/usr/local/bin/docker-machine env --shell bash extra)')
+    "# Run this command to configure your shell: ",
+    "# eval $(/usr/local/bin/docker-machine env --shell bash extra)")
   expect_equal(
     machine_env_parse(output),
     list(DOCKER_TLS_VERIFY = "1",

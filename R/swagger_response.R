@@ -262,6 +262,7 @@ swagger_response_handler_array_array <- function(items, spec) {
   }
 }
 
+
 ## This one is the nasty case; we handle an object but after
 ## collection convert it into a data frame.  There's some duplication
 ## here with swagger_response_handler_object but it's not avoidable

@@ -1,5 +1,6 @@
 context("swarm")
 
+
 test_that("swarm init/leave", {
   cl <- test_docker_client()
   id <- cl$swarm$init()

@@ -23,7 +23,7 @@ image_name_with_tag <- function(x, name = deparse(substitute(x))) {
 ## TODO: this does not handle references (repo/image@ref) but that's
 ## not that hard to add in here provided we can actually pass the @ref
 ## through as if it was tag to things like pull
-DOCKER_REPO_RE <- '^(.+/)?([^:]+)(:[^:]+)?$'
+DOCKER_REPO_RE <- "^(.+/)?([^:]+)(:[^:]+)?$"
 parse_image_name <- function(image, name = deparse(substitute(image))) {
   assert_scalar_character(image, name)
   if (!grepl(DOCKER_REPO_RE, image, perl = TRUE)) {

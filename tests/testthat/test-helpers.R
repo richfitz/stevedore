@@ -1,5 +1,6 @@
 context("helpers")
 
+
 test_that("user", {
   skip_on_windows()
   id <- user()
@@ -7,6 +8,7 @@ test_that("user", {
   expect_match(id, "^[0-9]+$")
   expect_equal(id, system3("id", "-u")$output)
 })
+
 
 test_that("user, width group", {
   skip_on_windows()
@@ -18,16 +20,19 @@ test_that("user, width group", {
                            system3("id", "-g")$output))
 })
 
+
 test_that("pick user", {
   skip_on_windows()
   expect_equal(user("root"), "0")
   expect_equal(user("root", TRUE), "0:0")
 })
 
+
 test_that("missing user", {
   nm <- rand_str()
   expect_error(user(nm), "'id' failed with message:")
 })
+
 
 test_that("no numeric_id on windows", {
   expect_error(numeric_id(NULL, FALSE, TRUE),
@@ -35,6 +40,7 @@ test_that("no numeric_id on windows", {
   expect_error(numeric_id(NULL, TRUE, TRUE),
                "Cannot return numeric id on windows")
 })
+
 
 test_that("user_name", {
   expect_identical(user_name("rich"), "rich")

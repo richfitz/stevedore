@@ -95,10 +95,11 @@ report_warnings <- function(x, action) {
   }
 }
 
+
 ## ** printers **
 pull_status_printer <- function(stream = stdout()) {
   if (is.null(stream)) {
-    return(function(x) {})
+    return(noop)
   }
   assert_is(stream, "connection")
   last_is_progress <- FALSE
@@ -109,7 +110,6 @@ pull_status_printer <- function(stream = stdout()) {
     if (last_is_progress) {
       reset_line(stream, width)
     }
-    status <- x$status
     if (length(x$progressDetail > 0L)) {
       last_is_progress <<- TRUE
       cur <- x$progressDetail[["current"]]
@@ -361,7 +361,7 @@ invisible_self <- function(response, params, self) {
 
 docker_stream_printer <- function(stream, style = "auto") {
   if (is.null(stream)) {
-    return(function(x) {})
+    return(noop)
   }
   assert_is(stream, "connection")
   function(x) {
@@ -652,7 +652,7 @@ validate_service_configs <- function(task_template, client) {
 
 validate_service_replicas <- function(replicas, global) {
   global <- isTRUE(assert_scalar_logical(global))
-  if (is.null(replicas) && !global) { # default:
+  if (is.null(replicas) && !global) {
     return(NULL)
   }
 
@@ -841,7 +841,7 @@ docker_client_getter <- function(getter, parent, name = "id") {
   env$getter <- getter
   env$parent <- parent
 
-  args <- alist(id =)
+  args <- alist(id = )
   names(args) <- name
   body <- substitute(getter(id, parent), list(id = as.name(name)))
 
@@ -1010,7 +1010,7 @@ docker_service_wait_converged <- function(service, timeout,
   repeat {
     tasks <- service$tasks()
     state <- vcapply(tasks, function(t) t$inspect(FALSE)$status$state)
-    m <- pr(state)
+    pr(state)
     if (sum(state == "running") == n) {
       cat2("\n", file = stream)
       break
@@ -1053,7 +1053,8 @@ make_service_start_progress <- function(stream) {
                      "ready" = "ready",
                      "starting" = "start",
                      "running" = "running")
-  states_end <- c("complete", "shutdown", "rejected", "failed")
+  ## alternatively ended states are:
+  ##   "complete", "shutdown", "rejected", "failed"
   title <- paste0(paste(states_active, collapse = " > "), "\n")
   pos_end <- cumsum(unname(nchar(states_active)) + 3L) - 3L
 

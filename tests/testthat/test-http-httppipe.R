@@ -1,5 +1,6 @@
 context("http with httppipe")
 
+
 test_that("construction", {
   skip_if_not_installed("httppipe")
   config <- docker_config(ignore_environment = TRUE,
@@ -14,6 +15,7 @@ test_that("construction", {
   expect_is(x$ping, "function")
 })
 
+
 test_that("basic connection works", {
   skip_if_no_httppipe_support()
   dc <- test_docker_client()
@@ -22,6 +24,7 @@ test_that("basic connection works", {
 
   expect_identical(dc$version(), dh$version())
 })
+
 
 test_that("binary output", {
   skip_if_no_httppipe_support()
@@ -37,6 +40,7 @@ test_that("binary output", {
   x$kill()
   x$remove()
 })
+
 
 test_that("version detect", {
   invisible(test_docker_client()) # skips if not present

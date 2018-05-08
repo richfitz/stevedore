@@ -1,5 +1,6 @@
 context("docker client: services")
 
+
 test_that("create (offline)", {
   d <- null_docker_client()
   s <- d$service$get(dummy_id())

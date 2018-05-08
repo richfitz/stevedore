@@ -1,5 +1,6 @@
 context("docker client: networks")
 
+
 test_that("create", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -19,6 +20,7 @@ test_that("create", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("get", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -34,6 +36,7 @@ test_that("get", {
   expect_equal(e$code, 404L)
 })
 
+
 test_that("list", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -46,6 +49,7 @@ test_that("list", {
   expect_true(nm %in% nwl$name)
 })
 
+
 test_that("prune", {
   d <- test_docker_client()
   nm <- rand_str(10, "stevedore_")
@@ -53,6 +57,7 @@ test_that("prune", {
   ans <- d$network$prune()
   expect_match(ans$networks_deleted, "^stevedore_", all = FALSE)
 })
+
 
 test_that("containers", {
   d <- test_docker_client()
@@ -79,9 +84,11 @@ test_that("containers", {
   expect_identical(res[[1]]$id(), x$id())
 })
 
+
 test_that("connect", {
   skip("connect is untested")
 })
+
 
 test_that("disconnect", {
   skip("disconnect is untested")

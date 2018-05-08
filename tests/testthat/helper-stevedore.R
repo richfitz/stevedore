@@ -442,7 +442,6 @@ update_name_cache <- function(root) {
 audit_spec_response <- function(v) {
   endpoints <- docker_api_client_endpoints()
   produces <- function(x, spec) {
-    path_data <- swagger_path_parse(x$path)
     d <- spec$paths[[x$path]][[x$method]]
     type <- get_response_type(x$method, x$path, d)
     if (type == "application/json") {

@@ -1,5 +1,6 @@
 context("http (compatibility)")
 
+
 test_that("streaming raw", {
   dc <- test_docker_client()
   dh <- test_docker_client(http_client_type = "httppipe")
@@ -15,6 +16,7 @@ test_that("streaming raw", {
 
   expect_true(all(logs1 %in% logs2))
 })
+
 
 test_that("build", {
   dc <- test_docker_client()
@@ -48,6 +50,7 @@ test_that("build", {
   expect_match(readLines(p), "FROM alpine:latest", all = FALSE)
 })
 
+
 test_that("docker run", {
   dh <- test_docker_client(http_client_type = "httppipe")
   expect_output(
@@ -63,6 +66,7 @@ test_that("docker run", {
                             rm = TRUE, stream = p))
   expect_match(readLines(p), "Doing 10 iterations", all = FALSE)
 })
+
 
 test_that("exec", {
   dh <- test_docker_client(http_client_type = "httppipe")
@@ -91,6 +95,7 @@ test_that("exec", {
   expect_equal(readLines(tmp), txt1)
 })
 
+
 test_that("pull", {
   skip_if_no_internet()
   dc <- test_docker_client(http_client_type = "curl")
@@ -111,6 +116,7 @@ test_that("pull", {
   expect_silent(img3 <- dh$image$pull("alpine:latest", stream = tmp))
   expect_match(readLines(tmp), str, fixed = TRUE, all = FALSE)
 })
+
 
 test_that("log follow does not work", {
   dh <- test_docker_client(http_client_type = "httppipe")

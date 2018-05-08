@@ -1,6 +1,6 @@
 ## All curl interactions go in this file; this isolates all the
 ## low-level communication bits.
-
+##
 ## The only other curl:: call is in http where we use it's header
 ## parsing.
 http_client_curl <- function(config, min_version = NULL, max_version = NULL) {

@@ -1,5 +1,6 @@
 context("util (client)")
 
+
 test_that("report warnings", {
   expect_silent(report_warnings(character(0), "doing a thing"))
   expect_warning(report_warnings("my warning", "doing a thing"),
@@ -211,6 +212,7 @@ test_that("pull status: no print", {
   expect_silent(for (i in txt) p(from_json(i)))
 })
 
+
 test_that("validate volumes", {
   expect_null(validate_volumes(NULL))
   expect_null(validate_volumes(character()))
@@ -231,6 +233,7 @@ test_that("validate volumes", {
     "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
     fixed = TRUE)
 })
+
 
 test_that("validate ports", {
   expect_null(validate_ports(NULL))
@@ -254,6 +257,7 @@ test_that("validate ports", {
   expect_error(validate_ports("111x"),
                "Port binding '111x' does not not match '<host>:<container>")
 })
+
 
 test_that("validate ports: random", {
   expect_equal(validate_ports("80"),
@@ -326,6 +330,7 @@ test_that("parse image", {
     fixed = TRUE)
 })
 
+
 test_that("validate image and tag", {
   ## Check that names propagate on error:
   img <- "foo:latest"
@@ -343,6 +348,7 @@ test_that("validate image and tag", {
                list(repo = NULL, name = "foo", image = "foo", tag = "3.1",
                     registry = "docker.io"))
 })
+
 
 test_that("validate stream", {
   path <- tempfile_test()
@@ -366,6 +372,7 @@ test_that("validate stream", {
   expect_equal(validate_stream(FALSE),
                list(stream = NULL, close = FALSE))
 })
+
 
 test_that("validate env", {
   expect_null(validate_env(NULL))

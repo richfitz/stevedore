@@ -73,7 +73,6 @@ swagger_endpoint <- function(x, types, spec) {
 
 ## Basically just used above
 get_response_type <- function(method, path, data) {
-  f <- function(x) x$responses[as.integer(names(x$responses)) < 300]
   if (is.null(data)) {
     stop("stevedore bug") # nocov [stevedore bug]
   }
