@@ -506,16 +506,6 @@ test_that("exec, twice", {
 })
 
 
-test_that("resize", {
-  skip("untested")
-})
-
-
-test_that("attach", {
-  skip("attach is not yet implemented")
-})
-
-
 test_that("run", {
   d <- test_docker_client()
   txt <- capture.output(ans <- d$container$run("hello-world"))
