@@ -253,9 +253,11 @@ test_that("validate ports", {
   expect_identical(str, cmp)
 
   expect_error(validate_ports(""),
-               "Port binding '' does not not match '<host>:<container>")
+               "Port binding '' does not not match '[<host>:]<container>'",
+               fixed = TRUE)
   expect_error(validate_ports("111x"),
-               "Port binding '111x' does not not match '<host>:<container>")
+               "Port binding '111x' does not not match '[<host>:]<container>",
+               fixed = TRUE)
 })
 
 

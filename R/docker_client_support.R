@@ -493,8 +493,9 @@ validate_ports <- function(ports) {
   ok <- i_random | i_explicit
   if (any(!ok)) {
     ## TODO: This does not include all possibilities
-    stop(sprintf("Port binding %s does not not match '<host>:<container>'",
-                 paste(squote(ports[!ok]), collapse = ", ")))
+    stop(sprintf(
+      "Port binding %s does not not match '[<host>:]<container>'",
+      paste(squote(ports[!ok]), collapse = ", ")))
   }
 
   n <- length(ports)
