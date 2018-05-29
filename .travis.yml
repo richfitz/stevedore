@@ -18,6 +18,7 @@ before_script:
   - docker pull nginx
   - docker pull bobrik/socat:latest
   - (cd tests/testthat/images && ./build.sh)
+  - cp vignettes_src/*.Rmd vignettes
 after_success:
   - Rscript -e 'covr::codecov()'
 env:
