@@ -138,15 +138,17 @@ test_that("make handle", {
 
 
 test_that("connect over http", {
-  port <- 12375
   cl <- test_docker_client()
   proxy <- cl$container$run(
     "bobrik/socat",
     c("TCP4-LISTEN:2375,fork,reuseaddr", "UNIX-CONNECT:/var/run/docker.sock"),
     volumes = "/var/run/docker.sock:/var/run/docker.sock",
-    ports = sprintf("%d:2375", port),
+    ports = 2375,,
     rm = TRUE, detach = TRUE)
   on.exit(proxy$kill())
+
+  ## The port on the proxy container:
+  port <- proxy$ports()$host_port
 
   ## Here we should try and wait:
   f <- function() {
