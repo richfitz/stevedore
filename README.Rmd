@@ -46,21 +46,21 @@ docker
 With this you can run containers:
 
 ```{r, run}
-docker$container$run("alpine:3.1", c("echo", "hello world"))
+docker$containers$run("alpine:3.1", c("echo", "hello world"))
 ```
 
 Or run containers in the background
 
 ```{r, background}
-docker$container$run("bfirsh/reticulate-splines", detach = TRUE)
+docker$containers$run("bfirsh/reticulate-splines", detach = TRUE)
 ```
 
 You can manage containers
 
 ```{r, list}
-docker$container$list()
-id <- docker$container$list(limit = 1L)$id
-container <- docker$container$get(id)
+docker$containers$list()
+id <- docker$containers$list(limit = 1L)$id
+container <- docker$containers$get(id)
 container
 ```
 
@@ -76,20 +76,20 @@ container$remove()
 And manage images
 
 ```{r, images}
-head(docker$image$list())
+head(docker$images$list())
 ```
 
 Some of these functions have many arguments, but `stevedore` includes help inline:
 
 ```{r, help}
-docker$container$create
+docker$containers$create
 ```
 
-as well as via an `help()` method on each object (e.g., `docker$help()`, `docker$container$help()`) which will display help for the API version that you are using.
+as well as via an `help()` method on each object (e.g., `docker$help()`, `docker$containers$help()`) which will display help for the API version that you are using.
 
 ## Approach
 
-Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions `r stevedore:::DOCKER_API_VERSION_MIN` to `r stevedore:::DOCKER_API_VERSION_MAX` (defaulting to `r stevedore:::DOCKER_API_VERSION_DEFAULT`).
+Docker publishes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions ` stevedore:::DOCKER_API_VERSION_MIN` to `stevedore:::DOCKER_API_VERSION_MAX` (defaulting to ` stevedore:::DOCKER_API_VERSION_DEFAULT`).
 
 This approach means that the output will be type-stable - there is no inference on what to return based on what the server chooses to return.  With a given API version, the same fields will always be returned.  Some of this information is very rich, for example, for the backgrounded container above:
 
