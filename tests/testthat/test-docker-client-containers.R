@@ -1156,3 +1156,40 @@ test_that("process ports", {
                           host_ip = character(0),
                           host_port = character(0)))
 })
+
+
+test_that("cp_in single file", {
+  cl <- test_docker_client()
+  tmp1 <- tempfile()
+  tmp2 <- tempfile()
+  writeLines("hello world", tmp1)
+  writeLines("goodbye world", tmp2)
+
+  nm <- rand_str(10, "stevedore_")
+  x <- cl$container$run("richfitz/iterate",
+                        cmd = c("100", "100"),
+                        name = nm,
+                        rm = TRUE,
+                        detach = TRUE)
+  on.exit({
+    x$kill()
+    unlink(c(tmp1, tmp2))
+  })
+
+  remote_read <- function(path, x) {
+    as.character(x$exec(c("cat", path), stream = FALSE)$output)
+  }
+
+  ## file => nonexistant (and create)
+  x$cp_in(tmp1, "tmp/myfile")
+  expect_equal(remote_read("tmp/myfile", x), "hello world\n")
+
+  ## file => file (and overwrite)
+  x$cp_in(tmp2, "tmp/myfile")
+  expect_equal(remote_read("tmp/myfile", x), "goodbye world\n")
+
+  ## file => directory
+  x$cp_in(tmp1, "tmp")
+  expect_equal(remote_read(file.path("tmp", basename(tmp1)), x),
+               "hello world\n")
+})

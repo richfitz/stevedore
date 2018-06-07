@@ -201,6 +201,14 @@ docker_container:
       Short status of the container ("running", "exited", etc).
     args:
       reload: Refresh container data?
+  cp_in:
+    summary: >-
+      Copy files or directory into the container.
+    args:
+      src: >-
+        File or directory to copy into the container.
+      dest: >-
+        Destination within the container.  This must be a single path.
 
 docker_image:
   help: *help

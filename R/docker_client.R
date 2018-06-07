@@ -329,6 +329,10 @@ docker_container <- function(id, parent) {
     process = list(quote(src <- validate_tar_input(src))),
     after = nothing)
 
+  ## Two functions to around which docker cp can be built
+  self$cp_in <- function(src, dest) docker_container_cp_in(self, src, dest)
+  ## self$cp_out <- function(src, dest) docker_container_cp_out(self, src, dest)
+
   self$kill <- docker_client_method(
     "container_kill", self,
     fix = fix_id)

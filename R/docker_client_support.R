@@ -904,6 +904,80 @@ docker_container_image <- function(self) {
 }
 
 
+docker_container_cp_in <- function(self, src, dest) {
+  assert_file_exists(src)
+  src_is_dir <- is_directory(src)
+  src_is_file <- !src_is_dir
+
+  nodnd <- "True"
+
+  ## stat is surprisingly slow
+  dest_stat <- tryCatch(self$path_stat(dest), error = identity)
+  if (inherits(dest_stat, "docker_error")) {
+    if (dest_stat$code != 404L) {
+      stop(dest_stat)
+    }
+    dest_exists <- FALSE
+  } else {
+    dest_exists <- TRUE
+  }
+  if (dest_exists) {
+    ## This test (for directoriness) is not documented anywhere but
+    ## _seems_ to work; the docker spec just includes a "TODO" for the
+    ## stat endpoint.
+    dest_is_dir <- dest_stat$mode > 2^31
+    dest_is_file <- !dest_is_dir
+  } else {
+    dest_is_dir <- FALSE
+    dest_is_file <- FALSE
+  }
+
+  ## This is the same behaviour
+  if (!dest_is_dir && grepl("/$", dest)) {
+    stop("'dest' is a directory but does not exist on container")
+  }
+  if (dest_is_file && src_is_dir) {
+    stop(sprintf("Cannot copy dir '%s' as dest '%s' is file", src, dest))
+  }
+
+  ## file -> directory => directory/file
+  ## file -> directory/nonexistant => directory/nonexistant
+  ## file -> directory/file => directory/file (overwriting if not existing)
+  ##
+  ## dir -> directory => directory/dir
+  ## dir -> directory/nonexistant => directory/nonexistant
+  ## dir -> directory/file => XXX error
+
+
+  ## Options here are:
+  ## file -> nonexistant
+  ## file -> file => rename the file
+  ## file -> directory [ok]
+  ## directory -> directory [ok]
+  ## directory -> file [error] [ok]
+  ## directory -> nonexistant
+
+  if (dest_is_dir) {
+    dest_cp <- dest
+    bin <- if (src_is_file) tar_file(src) else tar_directory(src)
+  } else {
+    if (src_is_dir) {
+      browser()
+    }
+
+    tmp <- tempfile()
+    dir.create(tmp)
+    on.exit(unlink(tmp, recursive = TRUE))
+    file.copy(src, file.path(tmp, basename(dest)), recursive = src_is_dir)
+    bin <- tar_directory(tmp)
+    dest_cp <- dirname(dest)
+  }
+  ## TODO: fix for put_archive here - the no_overwrite_dir_non_dir arg
+  ## is well wrong.
+  self$put_archive(bin, dest_cp, no_overwrite_dir_non_dir = "True")
+}
+
+
 ## TODO: repo and tag should be separate as for tag (with option
 ## to do them together).
 docker_image_untag <- function(repo_tag, image) {
