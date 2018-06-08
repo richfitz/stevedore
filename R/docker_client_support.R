@@ -937,7 +937,7 @@ docker_container_cp_in <- function(self, src, dest) {
     stop("'dest' is a directory but does not exist on container")
   }
   if (dest_is_file && src_is_dir) {
-    stop(sprintf("Cannot copy dir '%s' as dest '%s' is file", src, dest))
+    stop(sprintf("Cannot copy dir '%s' as dest '%s' is a file", src, dest))
   }
 
   ## file -> directory => directory/file
@@ -959,18 +959,22 @@ docker_container_cp_in <- function(self, src, dest) {
 
   if (dest_is_dir) {
     dest_cp <- dest
-    bin <- if (src_is_file) tar_file(src) else tar_directory(src)
+    bin <- tar_file(src)
   } else {
-    if (src_is_dir) {
-      browser()
-    }
+    dest_cp <- dirname(dest)
 
     tmp <- tempfile()
     dir.create(tmp)
     on.exit(unlink(tmp, recursive = TRUE))
-    file.copy(src, file.path(tmp, basename(dest)), recursive = src_is_dir)
-    bin <- tar_directory(tmp)
-    dest_cp <- dirname(dest)
+    if (src_is_dir && !dest_exists) {
+      file.copy(src, tmp, recursive = TRUE)
+      file.rename(file.path(tmp, basename(src)),
+                  file.path(tmp, basename(dest)))
+      bin <- tar_file(file.path(tmp, basename(dest)))
+    } else {
+      file.copy(src, file.path(tmp, basename(dest)), recursive = TRUE)
+      bin <- tar_directory(tmp)
+    }
   }
   ## TODO: fix for put_archive here - the no_overwrite_dir_non_dir arg
   ## is well wrong.

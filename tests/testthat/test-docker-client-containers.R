@@ -1193,3 +1193,42 @@ test_that("cp_in single file", {
   expect_equal(remote_read(file.path("tmp", basename(tmp1)), x),
                "hello world\n")
 })
+
+
+test_that("cp in a directory", {
+  cl <- test_docker_client()
+  tmp1 <- tempfile()
+  tmp2 <- tempfile()
+  dir.create(tmp1)
+  dir.create(tmp2)
+  writeLines("hello world", file.path(tmp1, "a"))
+  writeLines("goodbye world", file.path(tmp2, "a"))
+
+  nm <- rand_str(10, "stevedore_")
+  x <- cl$container$run("richfitz/iterate",
+                        cmd = c("100", "100"),
+                        name = nm,
+                        rm = TRUE,
+                        detach = TRUE)
+  on.exit({
+    x$kill()
+    unlink(c(tmp1, tmp2), recursive = TRUE)
+  })
+
+  remote_read <- function(path, x) {
+    as.character(x$exec(c("cat", path), stream = FALSE)$output)
+  }
+
+  ## directory => nonexistant (and create)
+  x$cp_in(tmp1, "tmp/mydir")
+  expect_equal(remote_read("tmp/mydir/a", x), "hello world\n")
+
+  ## file => existing directory
+  x$cp_in(tmp2, "tmp")
+  filename <- sprintf("tmp/%s/a", basename(tmp2))
+  expect_equal(remote_read(filename, x), "goodbye world\n")
+
+  ## directory => file
+  expect_error(x$cp_in(tmp2, "/usr/local/bin/iterate"),
+               "as dest '/usr/local/bin/iterate' is a file")
+})

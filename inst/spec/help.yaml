@@ -203,7 +203,9 @@ docker_container:
       reload: Refresh container data?
   cp_in:
     summary: >-
-      Copy files or directory into the container.
+      Copy files or directory into the container.  This function tries
+      to follow the same semantics as the command line `docker cp`
+      command.
     args:
       src: >-
         File or directory to copy into the container.
