@@ -1232,3 +1232,74 @@ test_that("cp in a directory", {
   expect_error(x$cp_in(tmp2, "/usr/local/bin/iterate"),
                "as dest '/usr/local/bin/iterate' is a file")
 })
+
+
+test_that("cp_out single file", {
+  cl <- test_docker_client()
+
+  nm <- rand_str(10, "stevedore_")
+  x <- cl$container$run("richfitz/iterate",
+                        cmd = c("100", "100"),
+                        name = nm,
+                        rm = TRUE,
+                        detach = TRUE)
+  on.exit({
+    x$kill()
+    unlink(c(tmp1, tmp2))
+  })
+
+  txt <- readLines("images/iterate/iterate")
+
+  ## file => dir
+  tmp1 <- tempfile()
+  dir.create(tmp1)
+  x$cp_out("/usr/local/bin/iterate", tmp1)
+  expect_equal(readLines(file.path(tmp1, "iterate")), txt)
+
+  ## file => nonexistant
+  tmp2 <- tempfile()
+  x$cp_out("/usr/local/bin/iterate", tmp2)
+  expect_equal(readLines(tmp2), txt)
+
+  ## file => existing file
+  tmp3 <- tempfile()
+  writeLines("hello", tmp3)
+  x$cp_out("/usr/local/bin/iterate", tmp3)
+  expect_equal(readLines(tmp3), txt)
+})
+
+
+
+test_that("cp_out directory", {
+  cl <- test_docker_client()
+
+  nm <- rand_str(10, "stevedore_")
+  x <- cl$container$run("richfitz/iterate",
+                        cmd = c("100", "100"),
+                        name = nm,
+                        rm = TRUE,
+                        detach = TRUE)
+  on.exit({
+    x$kill()
+    unlink(c(tmp1, tmp2))
+  })
+
+  txt <- readLines("images/iterate/iterate")
+
+  ## dir => dir
+  tmp1 <- tempfile()
+  dir.create(tmp1)
+  x$cp_out("/usr/local/bin", tmp1)
+  expect_equal(readLines(file.path(tmp1, "bin", "iterate")), txt)
+
+  ## file => nonexistant
+  tmp2 <- tempfile()
+  x$cp_out("/usr/local/bin", tmp2)
+  expect_equal(readLines(file.path(tmp2, "iterate")), txt)
+
+  ## file => existing file
+  tmp3 <- tempfile()
+  writeLines("hello", tmp3)
+  expect_error(x$cp_out("/usr/local/bin", tmp3),
+               "Can't overwrite file '.+' with directory '.+'")
+})

@@ -982,6 +982,46 @@ docker_container_cp_in <- function(self, src, dest) {
 }
 
 
+docker_container_cp_out <- function(self, src, dest) {
+  assert_scalar_character(dest)
+  dest_exists <- file.exists(dest)
+  if (!dest_exists && !file.exists(dirname(dest))) {
+    stop("Destination directory does not exist")
+  }
+  dest_is_dir <- is_directory(dest)
+
+  tarfile <- tempfile()
+  on.exit(unlink(tarfile))
+  self$get_archive(src, tarfile)
+
+  if (dest_is_dir) {
+    utils::untar(tarfile, exdir = dest)
+  } else {
+    exdir <- tempfile()
+    on.exit(unlink(exdir, recursive = TRUE), add = TRUE)
+    utils::untar(tarfile, exdir = exdir)
+    files <- dir(exdir, all.files = TRUE, no.. = TRUE)
+    src_is_dir <- is_directory(file.path(exdir, files))
+
+    ## JFC R's file copying is painful
+    if (src_is_dir && !dest_exists) {
+      src_tmp <- file.path(exdir, basename(dest))
+      file.rename(file.path(exdir, files), src_tmp)
+      file.copy(src_tmp, dirname(dest),
+                overwrite = TRUE, recursive = TRUE)
+    } else if (src_is_dir && !dest_is_dir) {
+      stop(sprintf(
+        "Can't overwrite file '%s' with directory '%s'",
+        dest, src))
+    } else {
+      file.copy(file.path(exdir, files), dest,
+                overwrite = TRUE, recursive = TRUE)
+    }
+  }
+  invisible(NULL)
+}
+
+
 ## TODO: repo and tag should be separate as for tag (with option
 ## to do them together).
 docker_image_untag <- function(repo_tag, image) {

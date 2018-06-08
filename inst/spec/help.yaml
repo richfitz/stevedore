@@ -211,6 +211,16 @@ docker_container:
         File or directory to copy into the container.
       dest: >-
         Destination within the container.  This must be a single path.
+  cp_out:
+    summary: >-
+      Copy files or directories from the container.  This function tries
+      to follow the same semantics as the command line `docker cp`
+      command.
+    args:
+      src: >-
+        File or directory within the container to copy to the host.
+      dest: >-
+        Destination on the host.  This must be a single path.
 
 docker_image:
   help: *help

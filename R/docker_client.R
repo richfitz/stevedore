@@ -331,7 +331,7 @@ docker_container <- function(id, parent) {
 
   ## Two functions to around which docker cp can be built
   self$cp_in <- function(src, dest) docker_container_cp_in(self, src, dest)
-  ## self$cp_out <- function(src, dest) docker_container_cp_out(self, src, dest)
+  self$cp_out <- function(src, dest) docker_container_cp_out(self, src, dest)
 
   self$kill <- docker_client_method(
     "container_kill", self,
