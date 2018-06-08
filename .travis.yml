@@ -29,3 +29,4 @@ addons:
       - libcurl4-openssl-dev
       - python-numpy
       - python-requests
+      - libhiredis-dev
