@@ -320,8 +320,6 @@ docker_container <- function(id, parent) {
     process = list(quote(assert_scalar_character_or_null(dest))),
     after = after_container_archive)
 
-  ## TODO: option for compression, pass through to tar file (much
-  ## easier to get right if we can rely on R tar)
   self$put_archive <- docker_client_method(
     "container_import", self,
     fix = fix_id,
