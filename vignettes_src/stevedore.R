@@ -315,7 +315,7 @@ res
 
 ## ### Pulling
 
-##+ include = FALSE, error = FALSE
+##+ include = FALSE, error = TRUE
 docker$image$remove("bash:latest")
 
 ## Images can be directly pulled with `docker$image$pull` providing
