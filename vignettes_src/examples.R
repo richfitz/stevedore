@@ -73,28 +73,7 @@ con$KEYS("*")
 redis$kill()
 
 ## The same approach works for other database that might be large or
-## awkward to install
-pg <- docker$container$run("postgres", name = "pg", ports = "5432",
-                           detach = TRUE, rm = TRUE)
-
-##+ echo = FALSE
-pg_ready(pg$ports()$host_port)
-
-## Now we have a full Postgres server running and can start writing
-## data into it without worrying about clobbering anyone elses data.
-con <- DBI::dbConnect(RPostgres::Postgres(),
-                      host = "localhost",
-                      port = pg$ports()$host_port,
-                      user = "postgres")
-DBI::dbWriteTable(con, "mtcars", mtcars)
-
-## And if anything goes wrong, you can inspect the logs of the server
-## easily if the client does not give informative error messages:
-##+ error = TRUE
-DBI::dbWriteTable(con, "mtcars", iris, append = TRUE)
-pg$logs(tail = 2)
-
-pg$kill()
+## awkward to install, such as Postgres or MySQL.
 
 ## ## Testing shiny apps
 

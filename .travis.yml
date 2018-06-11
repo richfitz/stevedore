@@ -16,7 +16,6 @@ before_script:
   - docker pull alpine:3.1
   - docker pull bfirsh/reticulate-splines
   - docker pull nginx
-  - docker pull postgres
   - docker pull redis
   - docker pull bobrik/socat:latest
   - (cd tests/testthat/images && ./build.sh)
