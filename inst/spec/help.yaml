@@ -82,7 +82,7 @@ docker_container_collection:
         the docker daemon).
   help: *help
   run:
-    cli: "docker run"
+    cli: run
     summary: >-
       Run a command in a new container
     description: |
@@ -210,7 +210,7 @@ docker_container:
       ports are mapped to random ports on the host.
     args:
       reload: *reload-container
-    cli: "docker container port"
+    cli: "container port"
   reload:
     summary: >-
       Refresh infomation on the container from the server, returning
@@ -490,7 +490,7 @@ docker_service:
         constructed from a combination of service name (or id) and the
         replicate number.
       filters: *service-task-filters
-    cli: "docker service ps"
+    cli: "service ps"
 
 docker_task_collection:
   help: *help
