@@ -993,7 +993,7 @@ docker_container_cp_in <- function(self, src, dest) {
                   file.path(tmp, basename(dest)))
       bin <- tar_file(file.path(tmp, basename(dest)))
     } else {
-      file.copy(src, file.path(tmp, basename(dest)), recursive = TRUE)
+      file.copy(src, file.path(tmp, basename(dest)), recursive = src_is_dir)
       bin <- tar_directory(tmp)
     }
   }
@@ -1035,8 +1035,10 @@ docker_container_cp_out <- function(self, src, dest) {
         "Can't overwrite file '%s' with directory '%s'",
         dest, src))
     } else {
+      ## here we don't always want 'recursive' as it will be ignored
+      ## (with a warning) if 'to' is not a single existing directory
       file.copy(file.path(exdir, files), dest,
-                overwrite = TRUE, recursive = TRUE)
+                overwrite = TRUE, recursive = src_is_dir)
     }
   }
   invisible(NULL)
