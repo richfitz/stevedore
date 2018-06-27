@@ -193,6 +193,10 @@ docker_client <- function(..., api_version = NULL,
 
   self$ping <- docker_client_method("system_ping", self)
 
+  self$cp <- function(src, dest) {
+    docker_client_cp(self, src, dest)
+  }
+
   self$version <- docker_client_method("system_version", self)
   self$api_version <- function() self$.api_client$http_client$api_version
   self$request <- make_docker_client_request(self)

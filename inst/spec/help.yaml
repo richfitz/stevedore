@@ -51,6 +51,25 @@ docker_client:
         function must take a single argument which will be a raw
         vector with the docker daemon's output.  The function's return
         output is ignored so needs to do all actions via side effects.
+  cp:
+    summary: >-
+      Copy a file or directory between the host filesystem and a
+      running container.  Like the command line, exactly one of `from`
+      and `to` must be in the form `<container>:<path>` while the
+      other must be in the form `<path>`.  This wrapper is included
+      for compatiblity with the docker command line and is available
+      in a slightly more flexible form as `cp_out` and `cp_in`
+      methods of a `docker_container` object.
+    cli: cp
+    args:
+      src: >-
+        The source file or directory.  If on the host it may be a
+        relative or an absolute path.  If on the container then it
+        must be of the form `<container_id>:<path>`; the container id
+        can be an id (hex) or name.
+      dest: >-
+        The destination file or directory, with the same pattern as
+        `from`.
 
 docker_container_collection:
   get:

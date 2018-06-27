@@ -196,3 +196,30 @@ test_that("custom data.frame handler is enabled", {
   expect_is(res, "foo")
   expect_is(res, "data.frame")
 })
+
+
+test_that("cp", {
+  nm <- rand_str(10, "stevedore_")
+  cl <- test_docker_client()
+  x <- cl$container$run("richfitz/iterate", cmd = c("100", "100"),
+                        name = nm, rm = TRUE, detach = TRUE)
+  on.exit(x$kill())
+
+  tmp <- tempfile()
+  cl$cp(sprintf("%s:/usr/local/bin/iterate", nm), tmp)
+  expect_equal(readLines(tmp), readLines("images/iterate/iterate"))
+
+  cl$cp(tmp, sprintf("%s:/copy", nm))
+
+  res <- as.character(x$exec(c("cat", "/copy"), stdout = TRUE, stderr = FALSE,
+                             stream = FALSE)$output)
+  expect_equal(strsplit(res, "\n", fixed = TRUE)[[1]],
+               readLines(tmp))
+
+  expect_error(cl$cp("foo", "bar"),
+               "must specify at least one container source",
+               fixed = TRUE)
+  expect_error(cl$cp(sprintf("%s:foo", nm), sprintf("%s:bar", nm)),
+               "copying between containers is not supported",
+               fixed = TRUE)
+})

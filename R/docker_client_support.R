@@ -878,6 +878,27 @@ docker_client_add_inspect <- function(id, key_name, inspect_name, self,
 }
 
 
+docker_client_cp <- function(self, src, dest) {
+  re <- "^([A-Za-z0-9_-]+):(.+)$"
+  src_is_container <- grepl(re, src)
+  dest_is_container <- grepl(re, dest)
+
+  if (src_is_container && dest_is_container) {
+    ## This is the same message as docker (18.04.0-ce, build 3d479c0)
+    stop("copying between containers is not supported")
+  } else if (!src_is_container && !dest_is_container) {
+    ## This is the same message as docker (18.04.0-ce, build 3d479c0)
+    stop("must specify at least one container source")
+  } else if (src_is_container) {
+    container <- self$container$get(sub(re, "\\1", src))
+    container$cp_out(sub(re, "\\2", src), dest)
+  } else {
+    container <- self$container$get(sub(re, "\\1", dest))
+    container$cp_in(src, sub(re, "\\2", dest))
+  }
+}
+
+
 docker_container_ports <- function(attrs, output_options) {
   ports <- attrs$network_settings$ports
 

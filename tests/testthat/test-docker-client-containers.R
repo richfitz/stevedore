@@ -1269,7 +1269,6 @@ test_that("cp_out single file", {
 })
 
 
-
 test_that("cp_out directory", {
   cl <- test_docker_client()
 
