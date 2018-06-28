@@ -19,7 +19,8 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
                           tls_verify = NULL, machine = NULL,
                           http_client_type = NULL, is_windows = NULL,
                           as_is_names = FALSE, data_frame = NULL,
-                          quiet = FALSE, ignore_environment = FALSE) {
+                          quiet = FALSE, ignore_environment = FALSE,
+                          debug = NULL) {
   if (!is.null(machine)) {
     info <- get_machine_env(machine)
     host <- info$DOCKER_HOST
@@ -34,14 +35,26 @@ docker_config <- function(api_version = NULL, host = NULL, cert_path = NULL,
 
   docker_config_validate(api_version, host, cert_path, tls_verify,
                          http_client_type, is_windows,
-                         as_is_names, data_frame, quiet)
+                         as_is_names, data_frame, quiet, debug)
 }
 
 
 docker_config_validate <- function(api_version, host, cert_path, tls_verify,
                                    http_client_type, is_windows,
-                                   as_is_names, data_frame, quiet) {
+                                   as_is_names, data_frame, quiet, debug) {
   assert_scalar_logical(quiet)
+
+  ## NOTE: we can't easily use a file here because it's complicated
+  ## with multiplc things opening it one after the other and every new
+  ## request gets a new handle.  This does mean that considerable care
+  ## is needed to use a file-based connection because if the
+  ## connection is closed all further API calls will fail!
+  if (is.logical(debug) && length(debug) == 1L && !is.na(debug)) {
+    debug <- if (debug) stdout() else NULL
+  }
+  if (!is.null(debug)) {
+    assert_is(debug, "connection")
+  }
 
   ## NOTE: api_version is validated later: see http_client_api_version
 
@@ -152,7 +165,8 @@ docker_config_validate <- function(api_version, host, cert_path, tls_verify,
        http_client_type = http_client_type,
        is_windows = is_windows,
        output_options = output_options,
-       quiet = quiet)
+       quiet = quiet,
+       debug = debug)
 }
 
 

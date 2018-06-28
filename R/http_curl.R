@@ -83,6 +83,10 @@ curl_handle_opts <- function(config) {
   } else {
     opts <- NULL
   }
+  if (!is.null(config$debug)) {
+    opts$verbose <- TRUE
+    opts$debugfunction <- curl_debugfunction(config$debug)
+  }
   opts
 }
 
@@ -99,6 +103,37 @@ curl_handle_opts_secure_transport <- function(opts) {
 
 curl_uses_secure_transport <- function() {
   curl::curl_version()$ssl_version == "SecureTransport"
+}
+
+
+curl_debugfunction <- function(stream = stdout()) {
+  ## Debug types are:
+  ##
+  ##   0: text
+  ##   1: header in
+  ##   2: header out
+  ##   3: data in
+  ##   4: data out
+  ##   5: ssl in
+  ##   6: ssl out
+  ##
+  ## These are the close to the prefixes used by httr, which seems
+  ## like a reasonable place to start.
+  prefix <- list(" *", "<-", "->", "<<", ">>", "*<", "*>")
+  ## There's a bit of a faff here involved with managing to use
+  ## capture.output that I don't see is necessary but is really
+  ## required for the tests.
+  is_stdout <- identical(stream, stdout())
+  function(type, msg) {
+    p <- prefix[[type + 1L]]
+    if (any(msg == as.raw(0x00))) {
+      txt <- sprintf("%s <binary %d bytes>", p, length(msg))
+    } else {
+      msg_lines <- unlist(strsplit(rawToChar(msg), "[\r\n]+"))
+      txt <- paste(sprintf("%s %s\n", p, msg_lines), collapse = "")
+    }
+    cat(txt, file = if (is_stdout) stdout() else stream)
+  }
 }
 
 

@@ -187,3 +187,40 @@ test_that("connect to machine", {
   expect_equivalent(cl$ping(), "OK")
   expect_is(cl$container$list(), "data.frame")
 })
+
+
+test_that("debug http", {
+  cl <- test_docker_client() # ensures we can do docker things
+
+  config <- docker_config(ignore_environment = TRUE,
+                          http_client_type = "curl",
+                          is_windows = FALSE,
+                          debug = TRUE)
+  cl <- http_client_curl(config)
+  txt <- capture.output(res <- cl$ping())
+
+  expect_match(
+    txt,
+    user_agent_header_string(config),
+    fixed = TRUE, all = FALSE)
+  expect_equal(res$content, charToRaw("OK"))
+
+  ## to a file:
+  dest <- tempfile()
+  con <- file(dest, "wb")
+  on.exit(close(con))
+  config <- docker_config(ignore_environment = TRUE,
+                          http_client_type = "curl",
+                          is_windows = FALSE,
+                          debug = con)
+  res <- http_client_curl(config)$ping()
+  close(con)
+  on.exit()
+  txt <- readLines(dest)
+
+  expect_match(
+    txt,
+    user_agent_header_string(config),
+    fixed = TRUE, all = FALSE)
+  expect_equal(res$content, charToRaw("OK"))
+})
