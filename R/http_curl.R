@@ -127,7 +127,7 @@ curl_debugfunction <- function(stream = stdout()) {
   function(type, msg) {
     p <- prefix[[type + 1L]]
     if (any(msg == as.raw(0x00))) {
-      txt <- sprintf("%s <binary %d bytes>", p, length(msg))
+      txt <- sprintf("%s <binary %d bytes>\n", p, length(msg))
     } else {
       msg_lines <- unlist(strsplit(rawToChar(msg), "[\r\n]+"))
       txt <- paste(sprintf("%s %s\n", p, msg_lines), collapse = "")

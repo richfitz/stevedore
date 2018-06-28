@@ -224,3 +224,19 @@ test_that("debug http", {
     fixed = TRUE, all = FALSE)
   expect_equal(res$content, charToRaw("OK"))
 })
+
+
+test_that("debug http: binary", {
+  cl <- test_docker_client() # ensures we can do docker things
+
+  config <- docker_config(ignore_environment = TRUE,
+                          http_client_type = "curl",
+                          is_windows = FALSE,
+                          debug = TRUE)
+  cl <- http_client_curl(config)
+
+  set.seed(1)
+  dat <- sample(as.raw(255:0))
+  txt <- capture.output(cl$request("POST", "/some/endpoint", body = dat))
+  expect_match(txt, ">> <binary 256 bytes>", fixed = TRUE, all = FALSE)
+})
