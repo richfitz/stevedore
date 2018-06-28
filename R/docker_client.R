@@ -118,7 +118,6 @@
 ##'   for debugging in development (forcing the \code{httppipe} client
 ##'   where the \code{curl} client would ordinarily be preferred).
 ##'
-##'
 ##' @param data_frame Function, used to wrap data.frames returned.
 ##'   This may make output easier to consume.  You might use
 ##'   \code{tibble::as_tibble} to return a \code{tbl_df} or
@@ -139,6 +138,17 @@
 ##'   be ignored (this has no effect if \code{machine} is specified).
 ##'
 ##' @param quiet Suppress informational messages.
+##'
+##' @param debug Enable http debugging (supported by the curl http
+##'   driver only).  Provide a connection object and http headers and
+##'   content will be sent to it.  Using \code{debug = TRUE} is
+##'   equivalent to \code{code = stdout()}, while \code{debug = FALSE}
+##'   is equivalent to \code{debug = NULL} (the default) which
+##'   prevents debugging information being printed.  This option can
+##'   be used to write to a file by opening a writeable connection but
+##'   care must be made not to close this connection because otherwise
+##'   the curl requests may fail.
+##'
 ##' @export
 ##' @examples
 ##' if (docker_available()) {
@@ -162,13 +172,14 @@ docker_client <- function(..., api_version = NULL,
                           machine = NULL,
                           http_client_type = NULL,
                           data_frame = NULL,
-                          quiet = FALSE, ignore_environment = FALSE) {
+                          quiet = FALSE, debug = NULL,
+                          ignore_environment = FALSE) {
   assert_empty_dots(..., name = "docker_client")
 
   config <- docker_config(api_version, host, cert_path, tls_verify, machine,
                           http_client_type = http_client_type,
                           data_frame = data_frame,
-                          quiet = quiet,
+                          quiet = quiet, debug = debug,
                           ignore_environment = ignore_environment)
 
   self <- new_stevedore_object(NULL)

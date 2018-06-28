@@ -223,3 +223,10 @@ test_that("cp", {
                "copying between containers is not supported",
                fixed = TRUE)
 })
+
+
+test_that("debug http", {
+  cl <- test_docker_client(debug = TRUE)
+  txt <- capture.output(res <- cl$ping())
+  expect_match(tolower(txt), "user-agent", fixed = TRUE, all = FALSE)
+})

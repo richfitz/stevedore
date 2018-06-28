@@ -6,7 +6,8 @@
 \usage{
 docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
   tls_verify = NULL, machine = NULL, http_client_type = NULL,
-  data_frame = NULL, quiet = FALSE, ignore_environment = FALSE)
+  data_frame = NULL, quiet = FALSE, debug = NULL,
+  ignore_environment = FALSE)
 }
 \arguments{
 \item{...}{Reserved for future use.  Passing in any unrecognised
@@ -88,6 +89,16 @@ defining a custom S3 print method for "foo" that limited the
 output.}
 
 \item{quiet}{Suppress informational messages.}
+
+\item{debug}{Enable http debugging (supported by the curl http
+driver only).  Provide a connection object and http headers and
+content will be sent to it.  Using \code{debug = TRUE} is
+equivalent to \code{code = stdout()}, while \code{debug = FALSE}
+is equivalent to \code{debug = NULL} (the default) which
+prevents debugging information being printed.  This option can
+be used to write to a file by opening a writeable connection but
+care must be made not to close this connection because otherwise
+the curl requests may fail.}
 
 \item{ignore_environment}{Logical, indicating if environment
 variables (\code{DOCKER_HOST}, \code{DOCKER_CERT_PATH},
