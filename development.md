@@ -123,7 +123,15 @@ curl_fetch_memory("https://127.0.0.1:2376/v1.29/version", handle = h)
 
 ### Debugging HTTP requests
 
-Set up a proxy with:
+From the `stevedore` client itself, get debugging information as
+
+```r
+cl <- stevedore::docker_client(debug = TRUE)
+```
+
+which will print all chatter that the client sends and recieves.
+
+To see everything that happens across the server, first set up a proxy with:
 
 ```
 docker run --rm \
