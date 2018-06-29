@@ -85,13 +85,41 @@ test_that("containers", {
 })
 
 
-test_that("connect", {
-  skip("connect is untested")
-})
+test_that("connect/disconnect", {
+  d <- test_docker_client()
+  nm_server <- rand_str(10, "stevedore_")
+  nm_client <- rand_str(10, "stevedore_")
+  nm_network <- rand_str(3, "stevedore_")
 
+  nw <- d$network$create(nm_network)
+  server <- d$container$run(
+    "nginx", name = nm_server, network = nm_network,
+    detach = TRUE, rm = TRUE)
+  client <- d$container$run(
+    "richfitz/iterate", cmd = c("100", "100"),
+    name = nm_client, detach = TRUE, rm = TRUE)
+  on.exit({
+    client$remove(force = TRUE)
+    server$remove(force = TRUE)
+    nw$remove()
+  })
 
-test_that("disconnect", {
-  skip("disconnect is untested")
+  nw$connect(client$id())
+
+  res <- client$exec(c("wget", sprintf("http://%s", nm_server)),
+                     stream = FALSE)
+  expect_equal(res$exit_code, 0L)
+
+  tmp <- tempfile()
+  client$cp_out("index.html", tmp)
+  expect_true(any(grepl("<html>", readLines(tmp), ignore.case = TRUE)))
+
+  nw$disconnect(client$id())
+
+  res <- client$exec(c("wget", sprintf("http://%s", nm_server),
+                       "-O", "index2.html"),
+                     stream = FALSE)
+  expect_equal(res$exit_code, 1L)
 })
 
 
