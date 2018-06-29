@@ -6,7 +6,8 @@ test_that("default unix config", {
                                 cert_path = NULL, tls_verify = NULL,
                                 http_client_type = NULL,
                                 as_is_names = FALSE, data_frame = identity,
-                                is_windows = FALSE, quiet = FALSE)
+                                is_windows = FALSE, quiet = FALSE,
+                                debug = FALSE)
   expect_null(cfg$api_version)
   expect_equal(cfg$addr, sub("unix://", "", DEFAULT_DOCKER_UNIX_SOCKET))
   expect_equal(cfg$protocol, "socket")
@@ -23,12 +24,14 @@ test_that("default windows config", {
                                 cert_path = NULL, tls_verify = NULL,
                                 http_client_type = NULL,
                                 as_is_names = FALSE, data_frame = identity,
-                                is_windows = TRUE, quiet = FALSE)
+                                is_windows = TRUE, quiet = FALSE,
+                                debug = FALSE)
   cmp <- docker_config_validate(api_version = NULL, host = NULL,
                                 cert_path = NULL, tls_verify = NULL,
                                 http_client_type = NULL,
                                 as_is_names = FALSE, data_frame = identity,
-                                is_windows = FALSE, quiet = FALSE)
+                                is_windows = FALSE, quiet = FALSE,
+                                debug = FALSE)
   expect_null(cfg$api_version)
   expect_equal(cfg$addr, DEFAULT_DOCKER_WINDOWS_PIPE)
   expect_equal(cfg$protocol, "npipe")
@@ -50,7 +53,8 @@ test_that("machine-compatible tcp", {
                                 tls_verify = TRUE,
                                 http_client_type = NULL,
                                 as_is_names = FALSE, data_frame = identity,
-                                is_windows = FALSE, quiet = FALSE)
+                                is_windows = FALSE, quiet = FALSE,
+                                debug = FALSE)
 
   tls_files <- c("key.pem", "ca.pem", "cert.pem")
   expect_null(cfg$api_version)
