@@ -246,6 +246,7 @@ docker_container_collection <- function(parent) {
     process = list(
       quote(image <- get_image_id(image)),
       quote(cmd <- validate_command(cmd)),
+      quote(if (!is.null(network)) network <- get_network_id(network)),
       quote(env <- validate_env(env)),
       mcr_volumes_for_create(quote(volumes), quote(host_config)),
       mcr_ports_for_create(quote(ports), quote(host_config)),
@@ -577,6 +578,8 @@ docker_network <- function(id, parent) {
 
   self$connect <- docker_client_method(
     "network_connect", self,
+    process = list(
+      quote(container <- get_container_id(container))),
     fix = fix_id)
 
   self$disconnect <- docker_client_method(
