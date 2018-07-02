@@ -704,6 +704,17 @@ validate_plugin_configure_body <- function(body) {
 
 
 ## ** utilities **
+get_container_id <- function(x, name = deparse(substitute(x))) {
+  if (inherits(x, "docker_container")) {
+    x$id()
+  } else {
+    assert_scalar_character(
+      x, name, "a scalar character (non-NA) or 'docker_container' object")
+    x
+  }
+}
+
+
 get_image_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_image")) {
     x$id()
@@ -713,6 +724,7 @@ get_image_id <- function(x, name = deparse(substitute(x))) {
     x
   }
 }
+
 
 get_network_id <- function(x, name = deparse(substitute(x))) {
   if (inherits(x, "docker_network")) {

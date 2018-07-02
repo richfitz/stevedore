@@ -262,6 +262,9 @@ x$remove()
 ##+ error = TRUE
 x$status()
 
+##+ include = FALSE
+y$remove()
+
 ## Information about ports (for containers that expose them) can be
 ## retrieved with `$ports()`.  The `nginx` image creates a web
 ## server/proxy that exposes port 80 from the container.  We can map

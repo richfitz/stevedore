@@ -448,6 +448,15 @@ test_that("decode_chunked_string", {
 })
 
 
+test_that("get_container_id", {
+  expect_equal(get_container_id("aa"), "aa")
+  expect_equal(
+    get_container_id(structure(list(id = function() "bb"),
+                               class = "docker_container")),
+    "bb")
+})
+
+
 test_that("get_image_id", {
   expect_equal(get_image_id("aa"), "aa")
   expect_equal(
