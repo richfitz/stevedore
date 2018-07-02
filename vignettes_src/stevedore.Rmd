@@ -331,6 +331,10 @@ Once a container has been removed most methods will not work properly:
 x$status()
 ```
 
+``` {r include = FALSE}
+y$remove()
+```
+
 Information about ports (for containers that expose them) can be
 retrieved with `$ports()`.  The `nginx` image creates a web
 server/proxy that exposes port 80 from the container.  We can map
@@ -389,6 +393,11 @@ connection indicated by the `stream`) argument.  Output is also
 returned as part of the object:
 ``` {r }
 res
+```
+
+(don't forget to remove your detached containers later!)
+``` {r }
+x$kill()
 ```
 
 ## Images
