@@ -38,12 +38,13 @@ lang_output <- function(x, lang) {
 c_output <- function(x) lang_output(x, "cc")
 r_output <- function(x) lang_output(x, "r")
 plain_output <- function(x) lang_output(x, "plain")
-##+ include = FALSE
-local({
+build_iterate <- function() {
   p <- system.file("images/iterate", package = "stevedore", mustWork = TRUE)
   stopifnot(file.copy(p, ".", recursive = TRUE))
   stevedore::docker_client()$image$build("iterate", tag = "richfitz/iterate")
-})
+}
+##+ include = FALSE
+build_iterate()
 nginx_ready <- function(port, attempts = 10) {
 
   f <- function() {
@@ -416,6 +417,10 @@ img$untag("richfitz/iterate:0.0.1")
 ## actually deleted if there are no other tags pointing at an image
 ## _and_ if `noprune` is not `TRUE`.
 img$remove()
+
+### At this point, try to leave the image existing!
+##+ include = FALSE
+build_iterate()
 
 ## ## Volumes
 
