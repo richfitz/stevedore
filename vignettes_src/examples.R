@@ -17,23 +17,6 @@ lang_output <- function(x, lang) {
 c_output <- function(x) lang_output(x, "cc")
 r_output <- function(x) lang_output(x, "r")
 plain_output <- function(x) lang_output(x, "plain")
-pg_ready <- function(port, host = "localhost", user = "postgres",
-                     attempts = 10) {
-  f <- function() {
-    con <- DBI::dbConnect(RPostgres::Postgres(),
-                          host = host, port = port, user = user)
-    on.exit(DBI::dbDisconnect(con))
-    DBI::dbListTables(con)
-    TRUE
-  }
-  for (i in seq_len(attempts)) {
-    if (tryCatch(f(), error = function(e) FALSE)) {
-      return()
-    }
-    Sys.sleep(1)
-  }
-  stop("postgres not available in time")
-}
 
 ## ## Using a database in testing
 
