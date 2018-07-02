@@ -11,3 +11,4 @@ __pycache__
 ^demo$
 ^development\.md$
 vignettes_src
+^stevedore_.*\.tar\.gz$
