@@ -314,6 +314,9 @@ res <- x$exec("ls")
 ## returned as part of the object:
 res
 
+## (don't forget to remove your detached containers later!)
+x$kill()
+
 ## ## Images
 
 ## ### Pulling
