@@ -107,7 +107,7 @@ The support for windows is not as comprehensive as for other platforms (but I'm 
 You will need a python installation (both python2 and python3 should work), along with [`reticulate`](https://cran.r-project.org/package=reticulate).  Whatever python you use needs to be able to find the python packages `requests`, `six` and `pipywin32`.  You can test if everything is working by running
 
 ```
-httppipe::httppipe_available(verbose = TRUE)
+httppipe::httppipe_available()
 ```
 
 which will return `TRUE` if everything is OK, and otherwise print some information about errors loading the package.  In the case of error consult the reticulate documentation (`vignette("versions", package = "reticulate")` will be especially useful).  Improvements to installation documentation and process are welcome!
