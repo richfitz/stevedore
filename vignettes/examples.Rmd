@@ -24,10 +24,6 @@ install.packages("redux")
 docker <- stevedore::docker_client()
 ```
 
-```
-## The option 'stevedore.spec.path' not set - using temporary dir
-```
-
 ```r
 redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)

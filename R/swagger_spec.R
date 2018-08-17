@@ -20,23 +20,6 @@ swagger_spec_read <- function(version, quiet = FALSE, refresh = FALSE) {
 }
 
 
-swagger_spec_path <- function(quiet = FALSE) {
-  path <- getOption("stevedore.spec.path", NULL)
-  if (is.null(path)) {
-    if (!quiet) {
-      message("The option 'stevedore.spec.path' not set - using temporary dir")
-    }
-    path <- tempfile("stevedore_spec_")
-    dir.create(path, TRUE)
-    path_pkg <- stevedore_file("spec")
-    yml <- dir(path_pkg, pattern = "v[0-9]+\\.[0-9]+.yaml$", full.names = TRUE)
-    file.copy(yml, path)
-    options(stevedore.spec.path = path)
-  }
-  path
-}
-
-
 swagger_spec_patch <- function(dat, patch_file) {
   patch <- yaml_load_file(patch_file)
   v <- numeric_version(dat$info$version)

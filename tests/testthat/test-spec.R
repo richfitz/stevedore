@@ -57,21 +57,3 @@ test_that("image build clean in old versions", {
     "'image_build_clean' (POST /build/prune) requires docker API version at least 1.31 (version 1.29 used)",
     fixed = TRUE)
 })
-
-
-test_that("spec into temporary dir", {
-  oo <- options(stevedore.spec.path = NULL)
-  on.exit(options(oo))
-
-  expect_message(p1 <- swagger_spec_path(FALSE),
-                 "The option 'stevedore.spec.path' not set")
-  expect_equal(dir(p1),
-               dir(stevedore_file("spec"), pattern = "v[0-9]+\\.[0-9]+.yaml$"))
-
-  options(stevedore.spec.path = NULL)
-  expect_silent(p2 <- swagger_spec_path(TRUE))
-  expect_equal(dir(p1), dir(p2))
-
-  unlink(p1, recursive = TRUE)
-  unlink(p2, recursive = TRUE)
-})
