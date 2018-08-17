@@ -1,39 +1,15 @@
-swagger_spec_index <- function(refresh = FALSE) {
-  if (is.null(.stevedore$index) || refresh) {
-    path <- stevedore_file("spec/index.yaml")
-    dat <- yaml_load_file(path)
-    names(dat) <- sub("^v", "", names(dat))
-    .stevedore$index <- dat
-  }
-  .stevedore$index
-}
-
-
 swagger_spec_read <- function(version, quiet = FALSE, refresh = FALSE) {
   if (!refresh && version %in% names(.stevedore$spec)) {
     return(.stevedore$spec[[version]])
   }
-  ## NOTE: in theory we should be ok for versions that are _greater_
-  ## than the biggest we have, but with a warning, so long as the file
-  ## can be found on the docker website.  There's a bit of testing to
-  ## get all of that right though.  That should be dealt with at a
-  ## higher level than this function though, which should just read a
-  ## spec.
-  path <- swagger_spec_path(quiet)
-  spec_index <- swagger_spec_index()
 
-  pos <- names(spec_index)
+  pos <- swagger_spec_versions()
   if (!(version %in% pos)) {
     stop(sprintf("Invalid version %s; try one of %s",
                  version, paste(pos, collapse = ", ")))
   }
-  path_yml <- swagger_spec_fetch(version, path, quiet)
-  md5_found <- hash_file(path_yml)
-  md5_expected <- spec_index[[version]]
-  if (md5_found != md5_expected) {
-    stop(sprintf("Spec for %s had different md5 than expected (%s, not %s)",
-                 version, md5_found, md5_expected))
-  }
+
+  path_yml <- stevedore_file(sprintf("spec/v%s.yaml.bz2", version))
   ret <- yaml_load_file(path_yml)
   ret <- swagger_spec_patch(ret, stevedore_file("spec/patch.yaml"))
   ret <- swagger_spec_patch(ret, stevedore_file("spec/stevedore.yaml"))
@@ -41,13 +17,6 @@ swagger_spec_read <- function(version, quiet = FALSE, refresh = FALSE) {
   .stevedore$spec[[version]] <- ret
 
   ret
-}
-
-
-swagger_spec_fetch <- function(version, path, quiet = FALSE) {
-  url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
-  dest <- file.path(path, sprintf("v%s.yaml", version))
-  download_file(url, dest, quiet)
 }
 
 
@@ -102,16 +71,6 @@ swagger_spec_patch <- function(dat, patch_file) {
 
 swagger_spec_versions <- function() {
   version_range(DOCKER_API_VERSION_MIN, DOCKER_API_VERSION_MAX)
-}
-
-
-## This is used only in the package Makefile
-swagger_spec_index_write <- function(path) {
-  versions <- swagger_spec_versions()
-  files <- vcapply(versions, swagger_spec_fetch, path)
-  md5 <- hash_file(files)
-  names(md5) <- paste0("v", names(files))
-  cat(yaml::as.yaml(as.list(md5)), file = file.path(path, "index.yaml"))
 }
 
 

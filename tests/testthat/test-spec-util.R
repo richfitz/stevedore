@@ -36,18 +36,3 @@ test_that("validate", {
     expect_error(swagger_spec_read(version, refresh = TRUE),
                  "Spec for 1.29 had different md5 than expected"))
 })
-
-
-test_that("swagger_spec_index_write", {
-  skip_if_not_installed("withr")
-  tmp <- tempfile_test()
-  dir.create(tmp)
-  on.exit(unlink(tmp, recursive = TRUE), add = TRUE)
-  file.copy(dir(swagger_spec_path(), full.names = TRUE), tmp)
-  cmp <- yaml::yaml.load_file(
-    system.file("spec/index.yaml", package = "stevedore", mustWork = TRUE))
-  swagger_spec_index_write(tmp)
-  filename <- file.path(tmp, "index.yaml")
-  expect_true(file.exists(filename))
-  expect_equal(yaml::yaml.load_file(filename), cmp)
-})

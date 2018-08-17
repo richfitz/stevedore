@@ -12,3 +12,5 @@ __pycache__
 ^development\.md$
 vignettes_src
 ^stevedore_.*\.tar\.gz$
+^inst/spec/v[0-9.]\.yaml$
+^scripts$
