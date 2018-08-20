@@ -508,3 +508,26 @@ test_that("system3", {
   expect_error(system3("id", "-adsfa", check = TRUE),
                paste(res$output, collapse = "\n"), fixed = TRUE)
 })
+
+
+## These ones are are just to ensure that some assertions work as expected
+test_that("swagger_get_type corner cases", {
+  expect_error(swagger_get_type(list(allOf = list())),
+               "Should not happen [stevedore bug]", fixed = TRUE)
+  expect_error(swagger_get_type(list()),
+               "Could not determine type [stevedore bug]", fixed = TRUE)
+})
+
+
+test_that("swagger_arg_collect corner case", {
+  expect_error(swagger_arg_collect(list("in" = "other")),
+               "assertion error [stevedore bug]", fixed = TRUE)
+})
+
+
+test_that("swagger_arg_collect_query corner cases", {
+  expect_error(swagger_arg_collect_query(list(type = "array")),
+               "Unknown array query type [stevedore bug]", fixed = TRUE)
+  expect_error(swagger_arg_collect_query(list(type = "other")),
+               "Unknown query type [stevedore bug]", fixed = TRUE)
+})

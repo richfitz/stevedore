@@ -387,9 +387,9 @@ swagger_get_type <- function(x) {
     if (!is.null(x$enum)) {
       ret <- "string"
     } else if ("allOf" %in% names(x)) {
-      stop("Should not happen") # nocov [stevedore bug]
+      stop("Should not happen [stevedore bug]")
     } else {
-      stop("Could not determine type") # nocov [stevedore bug]
+      stop("Could not determine type [stevedore bug]")
     }
   }
   if (setequal(ret, c("array", "string"))) {

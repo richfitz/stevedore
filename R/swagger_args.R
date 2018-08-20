@@ -129,7 +129,7 @@ swagger_arg_collect <- function(p, dest, handlers) {
          query = swagger_arg_collect_query(p, dest),
          body = swagger_arg_collect_body(p, dest, handlers),
          header = swagger_arg_collect_header(p, dest),
-         stop("assertion error"))
+         stop("assertion error [stevedore bug]"))
 }
 
 
@@ -161,9 +161,9 @@ swagger_arg_collect_query <- function(p, dest) {
       validate <- quote(assert_scalar_character)
     }
   } else if (type == "array") {
-    stop("Unknown query type") # nocov [stevedore bug]
+    stop("Unknown array query type [stevedore bug]")
   } else {
-    stop("Unknown query type") # nocov [stevedore bug]
+    stop("Unknown query type [stevedore bug]")
   }
 
   nm <- as.symbol(p$name)
