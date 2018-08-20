@@ -58,6 +58,9 @@ pkgdown:
 	${RSCRIPT} -e "library(methods); pkgdown::build_site()"
 
 website: pkgdown
-	./update_web.sh
+	./scripts/update_web.sh
+
+specs:
+	Rscript ./scripts/download_spec.R
 
 .PHONY: all test document install vignettes
