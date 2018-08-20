@@ -315,6 +315,29 @@ res <- x$exec("ls")
 ## returned as part of the object:
 res
 
+## ## Copy files into and out of containers
+
+## Just like `docker cp`, `stevedore` lets you copy files into and out
+## of containers.  The logic mimics the logic in the docker command
+## line client as closely as possible.
+
+## To copy a file into our container `x`, use `$cp_in`
+path <- tempfile()
+writeLines("hello", path)
+x$cp_in(path, "/hello")
+
+## And the new file is on the container
+x$exec(c("cat", "/hello"), stream = FALSE)$output
+
+## The input can be a single file or a single directory.
+
+## To copy out, use `$cp_out`
+dest <- tempfile()
+x$cp_out("/usr/local/bin/iterate", dest)
+
+## Here is the iterate script, from the container:
+readLines(dest, n = 10)
+
 ## (don't forget to remove your detached containers later!)
 x$kill()
 
