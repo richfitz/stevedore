@@ -20,6 +20,8 @@ before_script:
   - docker pull bobrik/socat:latest
   - (cd tests/testthat/images && ./build.sh)
   - cp vignettes_src/*.Rmd vignettes
+  - sudo pip install -U setuptools
+  - sudo pip install -U docker
 after_success:
   - Rscript -e 'covr::codecov()'
 env:
