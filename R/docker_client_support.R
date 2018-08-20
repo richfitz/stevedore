@@ -948,7 +948,9 @@ docker_container_cp_in <- function(self, src, dest) {
   dest_stat <- tryCatch(self$path_stat(dest), error = identity)
   if (inherits(dest_stat, "docker_error")) {
     if (dest_stat$code != 404L) {
-      stop(dest_stat)
+      ## TODO: testing this requires factoring this out a bit, but
+      ## there's not a lot here that can go wrong I think.
+      stop(dest_stat) # nocov
     }
     dest_exists <- FALSE
   } else {

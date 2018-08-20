@@ -1192,6 +1192,10 @@ test_that("cp_in single file", {
   x$cp_in(tmp1, "tmp")
   expect_equal(remote_read(file.path("tmp", basename(tmp1)), x),
                "hello world\n")
+
+  ## file => missing dir
+  expect_error(x$cp_in(tmp1, "missingdir/"),
+               "'dest' is a directory but does not exist on container")
 })
 
 
@@ -1266,6 +1270,11 @@ test_that("cp_out single file", {
   writeLines("hello", tmp3)
   x$cp_out("/usr/local/bin/iterate", tmp3)
   expect_equal(readLines(tmp3), txt)
+
+  ## file => missing directory
+  tmp4 <- file.path(tempfile(), "subdir")
+  expect_error(x$cp_out("/usr/local/bin/iterate", tmp4),
+               "Destination directory does not exist")
 })
 
 
