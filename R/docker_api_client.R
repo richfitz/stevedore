@@ -130,6 +130,11 @@ run_endpoint <- function(http_client, endpoint, params, hijack = NULL,
     res$content <- hijacked_content(hijack)
   }
 
+  run_endpoint_handler(res, endpoint, http_hijack, output_options)
+}
+
+
+run_endpoint_handler <- function(res, endpoint, http_hijack, output_options) {
   status_code <- res$status_code
   if (status_code >= 300) {
     reason <-
@@ -139,7 +144,7 @@ run_endpoint <- function(http_client, endpoint, params, hijack = NULL,
   } else {
     r_handler <- endpoint$response_handlers[[as.character(res$status_code)]]
     if (is.null(r_handler)) {
-      stop("unexpected response code ", res$status_code) # nocov [stevedore bug]
+      stop("unexpected response code ", res$status_code)
     }
     h_handler <- endpoint$header_handlers[[as.character(res$status_code)]]
     if (http_hijack) {

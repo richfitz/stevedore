@@ -200,3 +200,12 @@ test_that("prepare_body", {
                list(raw = charToRaw("hello"),
                     content_type = "application/json"))
 })
+
+
+## Should only be generatable by a server error I think, and then all
+## error codes (>=300) are dealt with anyway.
+test_that("unexpected status code", {
+  expect_error(
+    run_endpoint_handler(list(status_code = 201), list(), FALSE, NULL),
+    "unexpected response code 201")
+})
