@@ -138,7 +138,7 @@ skip_if_not_using_docker <- function() {
 
 
 ## This keeps tests anchored on a particular version easily
-test_docker_client <- function(..., api_version = API_VERSION_DEFAULT) {
+test_docker_client <- function(..., api_version = DOCKER_API_VERSION_DEFAULT) {
   skip_if_no_curl_socket()
   skip_if_not_using_docker()
   docker_client(..., api_version = api_version, ignore_environment = TRUE)
