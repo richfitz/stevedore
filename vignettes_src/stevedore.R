@@ -336,7 +336,19 @@ dest <- tempfile()
 x$cp_out("/usr/local/bin/iterate", dest)
 
 ## Here is the iterate script, from the container:
-readLines(dest, n = 10)
+writeLines(readLines(dest, n = 10))
+
+## There is also a convenience method at the root of the docker object
+## that behaves more like `docker cp` and requires that one of the source or destination arguments is given in `<container>:<path>` format:
+src <- paste0(x$name(), ":/usr/local/bin/iterate")
+src
+
+## as
+dest2 <- tempfile()
+docker$cp(src, dest2)
+
+## which achives the same thing as the `$cp_out` command above.
+unname(tools::md5sum(c(dest, dest2)))
 
 ## (don't forget to remove your detached containers later!)
 x$kill()
