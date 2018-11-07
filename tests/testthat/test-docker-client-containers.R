@@ -371,7 +371,7 @@ test_that("top", {
 
 
 test_that("top works with custom data.frame handler", {
-  d <- docker_client(data_frame = dummy_data_frame_wrapper)
+  d <- test_docker_client(data_frame = dummy_data_frame_wrapper)
   nm <- rand_str(10, "stevedore_")
   x <- d$container$create("bfirsh/reticulate-splines", name = nm)
   x$start()
