@@ -137,21 +137,11 @@ curl_debugfunction <- function(stream = stdout()) {
 }
 
 
-## Can do this via either the system or the openssl package:
-write_p12 <- function(key, ca, cert, name, password, openssl_pkg = NULL) {
+write_p12 <- function(key, ca, cert, name, password) {
   path <- tempfile("stevedore_p12_", fileext = ".p12")
-
-  openssl_pkg <- openssl_pkg %||% requireNamespace("openssl", quietly = TRUE)
-  if (openssl_pkg) {
-    ca <- openssl::read_cert_bundle(ca)
-    openssl::write_p12(key = key, cert = cert, ca = ca,
-                       name = name, password = password, path = path)
-  } else {
-    args <- c("pkcs12", "-export", "-inkey", key, "-in", cert, "-CAfile", ca,
-              "-chain", "-name", name, "-out", path, "-password",
-              paste0("pass:", password))
-    system3(Sys_which("openssl"), args)
-  }
-
+  loadNamespace("openssl")
+  ca <- openssl::read_cert_bundle(ca)
+  openssl::write_p12(key = key, cert = cert, ca = ca,
+                     name = name, password = password, path = path)
   path
 }
