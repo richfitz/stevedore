@@ -124,18 +124,14 @@ http_client_api_version <- function(api_version, ping,
   max_version <- max_version %||% DOCKER_API_VERSION_MAX
   version_type <- "Requested"
   if (is.null(api_version)) {
-    api_version <- DOCKER_API_VERSION_DEFAULT
+    version_type <- "Detected"
+    api_version <- ping_version(ping())
   } else if (inherits(api_version, "numeric_version")) {
     assert_scalar(api_version)
     api_version <- as.character(api_version)
   } else {
     assert_scalar_character("api_version")
-    if (tolower(api_version) == "detect") {
-      api_version <- ping_version(ping())
-      version_type <- "Detected"
-    } else {
-      numeric_version(api_version) # or throw
-    }
+    numeric_version(api_version)
   }
 
   if (numeric_version(api_version) > numeric_version(max_version)) {

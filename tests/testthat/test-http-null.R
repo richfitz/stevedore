@@ -9,9 +9,9 @@ test_that("creation", {
   expect_equal(cl$api_version, DOCKER_API_VERSION_DEFAULT)
 
   config <- docker_config(http_client_type = "null", ignore_environment = TRUE,
-                          api_version = "detect")
+                          api_version = DOCKER_API_VERSION_MAX)
   cl <- http_client_null(config, NULL, NULL)
-  expect_equal(cl$api_version, DOCKER_API_VERSION_DEFAULT)
+  expect_equal(cl$api_version, DOCKER_API_VERSION_MAX)
 })
 
 

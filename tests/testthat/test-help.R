@@ -35,10 +35,12 @@ test_that("all help generates", {
 
 
 test_that("generate_help", {
-  expect_equal(generate_help(NULL), generate_help_string(NULL))
-  expect_error(generate_help_string("other"), "impossible!")
-  expect_silent(generate_help("other"))
-  expect_equal(generate_help("other"),
+  v <- DOCKER_API_VERSION_DEFAULT
+  expect_equal(generate_help(NULL, v),
+               generate_help_string(NULL, v))
+  expect_error(generate_help_string("other", v), "impossible!")
+  expect_silent(generate_help("other", v))
+  expect_equal(generate_help("other", v),
                "(automatic help generation has failed)", fixed = TRUE)
 })
 

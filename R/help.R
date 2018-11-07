@@ -334,7 +334,10 @@ get_help_api_last_version <- function() {
 }
 
 
-generate_help_string <- function(sub = NULL, api_version = NULL) {
+generate_help_string <- function(sub, api_version) {
+  if (is.null(api_version)) {
+    stop("'api_version' must be given [stevedore_bug]") # nocov
+  }
   ## We should store the last used version in a cache I think?
   x <- docker_client(api_version = api_version,
                      http_client_type = "null",
@@ -438,7 +441,7 @@ markdown_to_rd <- function(str, api_version) {
     if (grepl(re_link_internal, str)) {
       repl <- sprintf(
         "\\href{https://docs.docker.com/engine/api/%s/#\\2}{\\1}",
-        api_version %||% DOCKER_API_VERSION_DEFAULT)
+        api_version)
       str <- gsub(re_link_internal, repl, str)
     }
   }

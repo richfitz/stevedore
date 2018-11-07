@@ -46,11 +46,9 @@
 ##' The api version is set by the \code{api_version} argument, which
 ##' falls back on the environment variable \code{DOCKER_API_VERSION}
 ##' (this is the same as the docker command line client and the python
-##' SDK).  If neither are provided then \code{stevedore} uses the
-##' default version of 1.29.  If \code{api_client = "detect"} is
-##' provided, then \code{stevedore} will attempt to detect the api
-##' version being used by the daemon and match that (provided it falls
-##' within the range of versions supported by the package).
+##' SDK).  If neither are provided then \code{stevedore} will detect
+##' the api version being used by the daemon and match that (provided
+##' it falls within the range of versions supported by the package).
 ##'
 ##' @title Create docker client
 ##'
@@ -58,19 +56,17 @@
 ##'   argument will throw an error.  Part of the role of this argument
 ##'   is to force use of named arguments until the API is stabilised.
 ##'
-##' @param api_version Version of the API request from the api.
-##'   Options are \code{NULL} (the default) - use the package's
-##'   default version (currently
-##'   \Sexpr{stevedore:::DOCKER_API_VERSION_DEFAULT}), a version as a
-##'   string or \code{\link{numeric_version}} object (supported
-##'   between \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
-##'   \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}), or the string
-##'   \code{detect} which will use the highest version out of the
-##'   version reported by the api and
-##'   \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}.  If the environment
-##'   variable \code{DOCKER_API_VERSION} is set then this will be used
-##'   as the version (this is the same behaviour as the command line
-##'   client).
+##' @param api_version Version of the API request from the api.  The
+##'   default value, \code{NULL}, detects the docker server API
+##'   version and attempts to match it (this mirrors the default
+##'   behaviour of the docker command line client).  Alternatively,
+##'   provide an API version number as a string or
+##'   \code{\link{numeric_version}} object (supported between
+##'   \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
+##'   \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}).  The version
+##'   \Sexpr{stevedore:::DOCKER_API_VERSION_DEFAULT} is the version
+##'   used in most automated tests, and if problems are encoutered,
+##'   consider forcing this version).
 ##'
 ##' @param host The URL for the docker daemon.  This can be a unix
 ##'   socket (e.g., unix:///var/run/docker.sock) on macOS/Linux, a
