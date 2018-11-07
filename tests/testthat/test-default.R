@@ -50,6 +50,7 @@ test_that("clear defaults", {
 
 
 test_that("binding", {
+  skip_if_not_using_docker()
   e <- new_empty_env()
   default_client_binding(e)
   expect_equal(names(e), "docker")
