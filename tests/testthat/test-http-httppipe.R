@@ -15,8 +15,8 @@ test_that("construction", {
   expect_false(x$can_stream)
   expect_is(x$ping, "function")
 
-  expected <- parse_headers(rawToChar(cl$ping()$headers))[["Api-Version"]]
-  expect_equal(cl$api_version, expected)
+  expected <- parse_headers(rawToChar(x$ping()$headers))[["Api-Version"]]
+  expect_equal(x$api_version, expected)
 })
 
 
@@ -49,7 +49,7 @@ test_that("binary output", {
 test_that("version detect", {
   invisible(test_docker_client()) # skips if not present
 
-  config <- docker_config(api_version = "detect", http_client_type = "httppipe",
+  config <- docker_config(api_version = NULL, http_client_type = "httppipe",
                           ignore_environment = TRUE)
   cl <- http_client(config, min_version = "0.0.1", max_version = "9.9.9")
   expect_equal(cl$api_version,
