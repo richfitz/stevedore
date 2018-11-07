@@ -5,11 +5,8 @@ services:
   - docker
 r_packages:
   - covr
-  # only needed during the 3.4 -> 3.5 changeover
-  - devtools
 r_github_packages:
   - richfitz/httppipe
-  - viking/r-yaml
 before_script:
   - docker pull hello-world
   - docker pull alpine
