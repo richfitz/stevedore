@@ -34,7 +34,7 @@ redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)
 ```
 
-We now have a redis server running on `r redis$ports()$host_port`
+We now have a Redis server running on `r redis$ports()$host_port`
 ``` {r }
 redis$ports()
 ```
@@ -112,7 +112,7 @@ local({
 })
 ```
 
-For this we have a dockerfile, which contains
+For this we have a Dockerfile, which contains
 ``` {r echo = FALSE, results = "asis"}
 plain_output(readLines("tester/Dockerfile"))
 ```

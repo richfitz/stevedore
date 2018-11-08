@@ -177,7 +177,7 @@ x$id()
 x$name()
 x$labels()
 
-## More detailed information (**much** more detailed) can be reteieved
+## More detailed information (**much** more detailed) can be retrieved
 ## with the `$inspect()` method
 x$inspect()
 
@@ -347,7 +347,7 @@ src
 dest2 <- tempfile()
 docker$cp(src, dest2)
 
-## which achives the same thing as the `$cp_out` command above.
+## which achieves the same thing as the `$cp_out` command above.
 unname(tools::md5sum(c(dest, dest2)))
 
 ## (don't forget to remove your detached containers later!)
@@ -405,7 +405,7 @@ unlink("iterate", recursive = TRUE)
 
 ## ### Working with image objects
 
-## Eachimage object has a number of methods.
+## Each image object has a number of methods.
 img <- docker$image$get("richfitz/iterate")
 img
 
@@ -424,7 +424,7 @@ img$tags()
 img$inspect()
 
 ## the exact format varies between docker API versions but should be
-## the same for all images within an API verison.
+## the same for all images within an API version.
 
 ## The `history()` method returns a data.frame of information about
 ## the history of an image (i.e., the layers that it is constructed
@@ -470,7 +470,7 @@ docker$volume$list()
 
 ## ### Working with volume objects
 
-## There's very little that can be done with volume objets:
+## There's very little that can be done with volume objects:
 vol
 
 ## We can get the name:

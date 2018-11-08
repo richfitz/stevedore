@@ -31,7 +31,7 @@ docker <- stevedore::docker_client()
 redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)
 
-## We now have a redis server running on `r redis$ports()$host_port`
+## We now have a Redis server running on `r redis$ports()$host_port`
 redis$ports()
 
 ## Make a connection to the Redis server:
@@ -95,7 +95,7 @@ local({
   stopifnot(file.copy(p, ".", recursive = TRUE))
 })
 
-## For this we have a dockerfile, which contains
+## For this we have a Dockerfile, which contains
 ##+ echo = FALSE, results = "asis"
 plain_output(readLines("tester/Dockerfile"))
 

@@ -1,7 +1,7 @@
 ---
 title: "Examples and use-cases"
 author: "Rich FitzJohn"
-date: "2018-07-02"
+date: "2018-11-08"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Using docker with stevedore}
@@ -22,14 +22,12 @@ install.packages("redux")
 
 ```r
 docker <- stevedore::docker_client()
-```
 
-```r
 redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)
 ```
 
-We now have a redis server running on 32781
+We now have a Redis server running on 32775
 
 ```r
 redis$ports()
@@ -37,7 +35,7 @@ redis$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1           6379      tcp 0.0.0.0     32781
+## 1           6379      tcp 0.0.0.0     32775
 ```
 
 Make a connection to the Redis server:
@@ -147,7 +145,7 @@ that you're running in a totally clean environment (and that you
 really know what all the dependencies of your package are)
 
 
-For this we have a dockerfile, which contains
+For this we have a Dockerfile, which contains
 ```plain
 FROM r-base
 
@@ -219,23 +217,23 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 
 ```
 ## Step 1/6 : FROM r-base
-##  ---> 190658892827
+##  ---> e4a158184cc5
 ## Step 2/6 : RUN apt-get update &&         apt-get install -yy                 git                 libcurl4-openssl-dev                 libssl-dev                 qpdf
 ##  ---> Using cache
-##  ---> 41caf17f2873
+##  ---> ef239ce55ffe
 ## Step 3/6 : RUN install2.r --error         curl         knitr         openssl         rcmdcheck         rmarkdown         rcorpora         testthat         uuid
 ##  ---> Using cache
-##  ---> ab4db8e7e710
+##  ---> 412ea6a1c8a4
 ## Step 4/6 : COPY tester.sh /usr/local/bin
 ##  ---> Using cache
-##  ---> fe61ff49046a
+##  ---> 079439ae1bae
 ## Step 5/6 : RUN chmod +x /usr/local/bin/tester.sh
 ##  ---> Using cache
-##  ---> a644777e367f
+##  ---> 9d56dca452f9
 ## Step 6/6 : ENTRYPOINT ["/usr/local/bin/tester.sh"]
 ##  ---> Using cache
-##  ---> 63c523fa6eb6
-## Successfully built 63c523fa6eb6
+##  ---> 68e1b48c1b2c
+## Successfully built 68e1b48c1b2c
 ## Successfully tagged richfitz/tester:latest
 ```
 
@@ -247,8 +245,8 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ```
 
 ```
-## E> Cloning into '/tmp/tmp.3P092s8lrR'...
-## O> * checking for file ‘/tmp/tmp.3P092s8lrR/DESCRIPTION’ ... OK
+## E> Cloning into '/tmp/tmp.3r6OVHu5N6'...
+## O> * checking for file ‘/tmp/tmp.3r6OVHu5N6/DESCRIPTION’ ... OK
 ## O> * preparing ‘ids’:
 ## O> * checking DESCRIPTION meta-information ... OK
 ## O> * installing the package to build vignettes
@@ -258,68 +256,70 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ## O> * looking to see if a ‘data/datalist’ file should be added
 ## O> * building ‘ids_1.0.1.tar.gz’
 ## E>
-## O> ────────────────────────────────────────────────────────────────────────────────
-## O> ─  using log directory ‘/tmp/RtmpDzmFcE/file3e3a8742bc/ids.Rcheck’
-## O> ─  using R version 3.5.0 (2018-04-23)
-## O> ─  using platform: x86_64-pc-linux-gnu (64-bit)
+## O> ── R CMD check ─────────────────────────────────────────────────────────────────
+## O>   ─  using log directory ‘/tmp/Rtmp9phSht/file3f69a6c616/ids.Rcheck’
+## O> ─  using R version 3.5.1 (2018-07-02)
+## O>   ─  using platform: x86_64-pc-linux-gnu (64-bit)
 ## O> ─  using session charset: UTF-8
-## O> ─  using options ‘--no-manual --as-cran’
-## O> ✔  checking for file ‘ids/DESCRIPTION’
+## O>   ─  using options ‘--no-manual --as-cran’
+## O>   ✔  checking for file ‘ids/DESCRIPTION’
 ## O> ─  this is package ‘ids’ version ‘1.0.1’
-## O> ✔  checking package namespace information
-## O> ✔  checking package dependencies
-## O> ✔  checking if this is a source package
+## O>    checking package namespace information ...  ✔  checking package namespace information
+## O>    checking package dependencies ...  ✔  checking package dependencies (1.2s)
+## O>    checking if this is a source package ...  ✔  checking if this is a source package
 ## O> ✔  checking if there is a namespace
-## O> ✔  checking for executable files
+## O>   ✔  checking for .dll and .exe files
 ## O> ✔  checking for hidden files and directories
-## O> ✔  checking for portable file names
+## O>    checking for portable file names ...  ✔  checking for portable file names
 ## O> ✔  checking for sufficient/correct file permissions
 ## O> ✔  checking serialization versions
-## O> ✔  checking whether package ‘ids’ can be installed
-## O> ✔  checking installed package size
-## O> ✔  checking package directory
+## O>    checking whether package ‘ids’ can be installed ...  ✔  checking whether package ‘ids’ can be installed (854ms)
+## O>   ✔  checking installed package size
+## O>      checking package directory ...  ✔  checking package directory
 ## O> ✔  checking ‘build’ directory
-## O> ✔  checking DESCRIPTION meta-information
-## O> ✔  checking top-level files
+## O>    checking DESCRIPTION meta-information ...  ✔  checking DESCRIPTION meta-information
+## O>   ✔  checking top-level files
 ## O> ✔  checking for left-over files
-## O> ✔  checking index information
-## O> ✔  checking package subdirectories
-## O> ✔  checking R files for non-ASCII characters
-## O> ✔  checking R files for syntax errors
-## O> ✔  checking whether the package can be loaded
-## O> ✔  checking whether the package can be loaded with stated dependencies
-## O> ✔  checking whether the package can be unloaded cleanly
-## O> ✔  checking whether the namespace can be loaded with stated dependencies
-## O> ✔  checking whether the namespace can be unloaded cleanly
-## O> ✔  checking loading without being on the library search path
-## O> ✔  checking dependencies in R code
-## O> ✔  checking S3 generic/method consistency
-## O> ✔  checking replacement functions
-## O> ✔  checking foreign function calls
-## O> ✔  checking R code for possible problems
-## O> ✔  checking Rd files
-## O> ✔  checking Rd metadata
-## O> ✔  checking Rd line widths
-## O> ✔  checking Rd cross-references
-## O> ✔  checking for missing documentation entries
-## O> ✔  checking for code/documentation mismatches
-## O> ✔  checking Rd \usage sections
-## O> ✔  checking Rd contents
-## O> ✔  checking for unstated dependencies in examples
-## O> ✔  checking R/sysdata.rda
-## O> ✔  checking installed files from ‘inst/doc’
-## O> ✔  checking files in ‘vignettes’
-## O> ✔  checking examples
-## O> ✔  checking for unstated dependencies in ‘tests’
-## O> ─  checking tests ...  Running ‘testthat.R’
-## O>     OK
-## O> ✔  checking for unstated dependencies in vignettes
-## O> ✔  checking package vignettes in ‘inst/doc’
-## O> ✔  checking re-building of vignette outputs
-## O>
-## O> ── 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
+## O>    checking index information ...  ✔  checking index information
+## O>      checking package subdirectories ...  ✔  checking package subdirectories
+## O>      checking R files for non-ASCII characters ...  ✔  checking R files for non-ASCII characters
+## O>      checking R files for syntax errors ...  ✔  checking R files for syntax errors
+## O>      checking whether the package can be loaded ...  ✔  checking whether the package can be loaded
+## O>      checking whether the package can be loaded with stated dependencies ...  ✔  checking whether the package can be loaded with stated dependencies
+## O>      checking whether the package can be unloaded cleanly ...  ✔  checking whether the package can be unloaded cleanly
+## O>      checking whether the namespace can be loaded with stated dependencies ...  ✔  checking whether the namespace can be loaded with stated dependencies
+## O>      checking whether the namespace can be unloaded cleanly ...  ✔  checking whether the namespace can be unloaded cleanly
+## O>      checking loading without being on the library search path ...  ✔  checking loading without being on the library search path
+## O>      checking dependencies in R code ...  ✔  checking dependencies in R code
+## O>      checking S3 generic/method consistency ...  ✔  checking S3 generic/method consistency (416ms)
+## O>      checking replacement functions ...  ✔  checking replacement functions
+## O>      checking foreign function calls ...  ✔  checking foreign function calls
+## O>      checking R code for possible problems ...  ✔  checking R code for possible problems (2s)
+## O>      checking Rd files ...  ✔  checking Rd files
+## O>      checking Rd metadata ...  ✔  checking Rd metadata
+## O>      checking Rd line widths ...  ✔  checking Rd line widths
+## O>      checking Rd cross-references ...  ✔  checking Rd cross-references
+## O>      checking for missing documentation entries ...  ✔  checking for missing documentation entries
+## O>      checking for code/documentation mismatches ...  ✔  checking for code/documentation mismatches (347ms)
+## O>      checking Rd \usage sections ...  ✔  checking Rd \usage sections (541ms)
+## O>      checking Rd contents ...  ✔  checking Rd contents
+## O>      checking for unstated dependencies in examples ...  ✔  checking for unstated dependencies in examples
+## O>      checking R/sysdata.rda ...  ✔  checking R/sysdata.rda
+## O>      checking installed files from ‘inst/doc’ ...  ✔  checking installed files from ‘inst/doc’
+## O>      checking files in ‘vignettes’ ...     checking files in ‘vignettes’ ...   ✔  checking files in ‘vignettes’
+## O>    checking examples ...     checking examples ...   ✔  checking examples (732ms)
+## O>      checking for unstated dependencies in ‘tests’ ...  ✔  checking for unstated dependencies in ‘tests’
+## O>      checking tests ...  ─  checking tests ...
+## O>      Running ‘testthat.R’    ✔  Running ‘testthat.R’
+## O>      checking for unstated dependencies in vignettes ...  ✔  checking for unstated dependencies in vignettes
+## O>   ✔  checking package vignettes in ‘inst/doc’
+## O>      checking re-building of vignette outputs ...  ✔  checking re-building of vignette outputs (1.1s)
 ## O>
 ## O>
+## O>   ── R CMD check results ────────────────────────────────────────── ids 1.0.1 ────
+## O> Duration: 12.4s
+## O>
+## O> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 ```
 
 
