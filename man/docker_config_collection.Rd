@@ -4,7 +4,7 @@
 \alias{docker_config_collection}
 \title{Management commands for working with swarm configs}
 \description{
-Methods for managing docker swarm configs.  This object is
+Methods for managing docker swarm configurations.  This object is
   \code{$config} within a \code{\link{docker_client}} object.
 }
 \details{
@@ -13,6 +13,6 @@ Methods for managing docker swarm configs.  This object is
 \seealso{
 \code{\link{docker_swarm_collection}} for management
   commands for the swarm itself, and
-  \code{\link{docker_secret_collection}} for a similar inteface
+  \code{\link{docker_secret_collection}} for a similar interface
   for configuring sensitive configurations.
 }

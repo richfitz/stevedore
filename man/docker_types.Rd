@@ -16,7 +16,7 @@ the most fluid parts of the docker API are the different options
 that are supported via things like \code{host_config}.
 
 These functions are needed because \code{stevedore} aims to be a
-fairly direct wrapping aroud the docker API.  For most of the
+fairly direct wrapping around the docker API.  For most of the
 single host methods the types here are not really used (with the
 notable exception of \code{host_config} which is used by
 \code{$container$create} and \code{$container$update}).  But for

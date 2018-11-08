@@ -32,7 +32,7 @@ Reasons for failure to connect might include:
 \itemize{
 \item You do not have a docker daemon running
 
-\item You have docker installed but the socket in a nonstandard
+\item You have docker installed but the socket in a non-standard
 place and have not adjusted environment variables accordingly
 
 \item You do not have permission to write to the docker socket

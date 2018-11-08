@@ -13,6 +13,6 @@ Methods for managing docker swarm secrets.  This object is
 \seealso{
 \code{\link{docker_swarm_collection}} for management
   commands for the swarm itself, and
-  \code{\link{docker_config_collection}} for a similar inteface
+  \code{\link{docker_config_collection}} for a similar interface
   for configuring non-sensitive configurations.
 }

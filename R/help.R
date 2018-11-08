@@ -238,12 +238,12 @@ NULL
 ##'
 ##' @seealso \code{\link{docker_swarm_collection}} for management
 ##'   commands for the swarm itself, and
-##'   \code{\link{docker_config_collection}} for a similar inteface
+##'   \code{\link{docker_config_collection}} for a similar interface
 ##'   for configuring non-sensitive configurations.
 NULL
 
 
-##' Methods for managing docker swarm configs.  This object is
+##' Methods for managing docker swarm configurations.  This object is
 ##'   \code{$config} within a \code{\link{docker_client}} object.
 ##'
 ##' \Sexpr[results=rd,stage=render]{stevedore:::generate_help("config")}
@@ -254,7 +254,7 @@ NULL
 ##'
 ##' @seealso \code{\link{docker_swarm_collection}} for management
 ##'   commands for the swarm itself, and
-##'   \code{\link{docker_secret_collection}} for a similar inteface
+##'   \code{\link{docker_secret_collection}} for a similar interface
 ##'   for configuring sensitive configurations.
 NULL
 
@@ -300,7 +300,7 @@ NULL
 ##' that are supported via things like \code{host_config}.
 ##'
 ##' These functions are needed because \code{stevedore} aims to be a
-##' fairly direct wrapping aroud the docker API.  For most of the
+##' fairly direct wrapping around the docker API.  For most of the
 ##' single host methods the types here are not really used (with the
 ##' notable exception of \code{host_config} which is used by
 ##' \code{$container$create} and \code{$container$update}).  But for

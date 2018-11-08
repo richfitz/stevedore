@@ -14,16 +14,16 @@ docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
 argument will throw an error.  Part of the role of this argument
 is to force use of named arguments until the API is stabilised.}
 
-\item{api_version}{Version of the API request from the api.  The
-default value, \code{NULL}, detects the docker server API
-version and attempts to match it (this mirrors the default
-behaviour of the docker command line client).  Alternatively,
-provide an API version number as a string or
-\code{\link{numeric_version}} object (supported between
-\Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
+\item{api_version}{Version of the API to use when communicating
+with the docker daemon.  The default value, \code{NULL}, detects
+the docker server API version and attempts to match it (this
+mirrors the default behaviour of the docker command line
+client).  Alternatively, provide an API version number as a
+string or \code{\link{numeric_version}} object (supported
+between \Sexpr{stevedore:::DOCKER_API_VERSION_MIN} and
 \Sexpr{stevedore:::DOCKER_API_VERSION_MAX}).  The version
 \Sexpr{stevedore:::DOCKER_API_VERSION_DEFAULT} is the version
-used in most automated tests, and if problems are encoutered,
+used in most automated tests, and if problems are encountered,
 consider forcing this version).}
 
 \item{host}{The URL for the docker daemon.  This can be a unix
@@ -42,7 +42,7 @@ This is ignored without warning if used with a socket or named
 pipe connection.}
 
 \item{tls_verify}{Logical, indicating if TLS should be verified.
-This is only used if using an https connction (i.e., host is a
+This is only used if using an https connection (i.e., host is a
 tcp/http/https url and\code{cert_path} is given).  If not given,
 we use the environment variable \code{DOCKER_TLS_VERIFY}.}
 
@@ -54,7 +54,7 @@ exist and be running.  \code{stevedore} will run
 variables to contact this machine and use these values for
 \code{host}, \code{cert_path} and \code{tls_verify} (silently
 ignoring any provided values).  Carl Boettiger is working on a
-\href{https://github.com/cboettig/dockermachine}{dockermachine}
+\href{https://github.com/cboettig/dockermachine}{docker machine}
 package for R that would make managing docker machines from R
 easier.  As an alternative to this option, one can set
 docker-machine environment variables as described in
@@ -133,8 +133,8 @@ connection (this is especially useful with
   that command fails (e.g., there is no machine,
   \code{docker-machine} not installed) then that will cause an
   error.  (Note that the \code{docker-machine} output does not
-  include api version information so the \code{api_version}
-  argument is relevent, but \code{host}, \code{cert_path} and
+  include API version information so the \code{api_version}
+  argument is relevant, but \code{host}, \code{cert_path} and
   \code{tls_verify} will be silently ignored if provided).
 
 \item The arguments \code{host} overrides the environment variable
@@ -144,18 +144,18 @@ connection (this is especially useful with
   \code{TRUE} then the environment variables are not used at all.
 
 \item if \code{code} is not provided by any of the above methods
-  (machine, argument or envrironment variable) it will fall back
+  (machine, argument or environment variable) it will fall back
   on the default unix socket (\code{var/run/docker.sock}) on
   Linux/macOS or the default windows named pipe
   (\code{npipe:////./pipe/docker_engine}) on windows.
 
 }
 
-The api version is set by the \code{api_version} argument, which
+The API version is set by the \code{api_version} argument, which
 falls back on the environment variable \code{DOCKER_API_VERSION}
 (this is the same as the docker command line client and the python
 SDK).  If neither are provided then \code{stevedore} will detect
-the api version being used by the daemon and match that (provided
+the API version being used by the daemon and match that (provided
 it falls within the range of versions supported by the package).
 }
 

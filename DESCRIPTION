@@ -1,9 +1,9 @@
 Package: stevedore
 Title: Docker Client
 Version: 0.0.5
-Description: Work with containers over the Docker 'API'.  Rather than
+Description: Work with containers over the Docker API.  Rather than
     using system calls to interact with a docker client, using the
-    'API' directly means that we can recieve richer information from
+    API directly means that we can receive richer information from
     docker.  The interface in the package is automatically generated
     using the 'OpenAPI' (a.k.a., 'swagger') specification, and all
     return values are checked in order to make them type stable.
@@ -28,3 +28,4 @@ RoxygenNote: 6.0.1
 VignetteBuilder: knitr
 Encoding: UTF-8
 ByteCompile: TRUE
+Language: en-GB
