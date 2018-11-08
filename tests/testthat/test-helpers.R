@@ -29,6 +29,7 @@ test_that("pick user", {
 
 
 test_that("missing user", {
+  skip_on_windows()
   nm <- rand_str()
   expect_error(user(nm), "'id' failed with message:")
 })

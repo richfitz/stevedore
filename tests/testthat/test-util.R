@@ -293,7 +293,7 @@ test_that("reset_line", {
   on.exit()
 
   bytes <- readBin(tmp, raw(), file.size(tmp))
-  expect_equal(rawToChar(bytes), "hello\ngoodbye")
+  expect_match(rawToChar(bytes), "hello[\n|\r\n]goodbye")
   unlink(tmp)
 })
 
