@@ -247,6 +247,7 @@ has_internet <- function() {
 
 
 skip_if_no_internet <- function() {
+  skip_on_windows()
   if (has_internet()) {
     return()
   }
