@@ -97,8 +97,9 @@ This approach means that the output will be type-stable - there is no inference 
 container$inspect(reload = FALSE)
 ```
 
-
 ## Windows support
+
+Windows support for docker through this package is currently incomplete.
 
 ### Current situation
 
@@ -134,18 +135,13 @@ The primary limitation of the `httppipe` interface is that streaming connections
 
 The support in this package is a duplicate of the micropackage [`httppipe`](http://github.com/richfitz/httppipe).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
 
-## Roadmap
-
-There is still a lot of work to do here:
-
-* windows support needs work (see above for details)
-* endpoints that require http hijacking are not fully supported (i.e., attach) but the foundations are there to support this - stdin is likely to be a major hassle though and I'm not sure if it's possible from within R's REPL.  The websockets approach might be better but stands very little chance of working on windows.
-
-
 ## Development and testing
 
 See the [development guide](development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
 
+## Package limitations
+
+Endpoints that require "http hijacking" are not fully supported (primarily `attach`) but the foundations are there to support this - stdin is likely to be a major hassle though and I'm not sure if it's possible from within R's REPL.
 
 ## Installation
 
@@ -168,7 +164,6 @@ Once installed, find out if everything is set up to use docker by running
 ```{r, available}
 stevedore::docker_available()
 ```
-
 
 ## Licence
 
