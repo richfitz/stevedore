@@ -3,7 +3,7 @@
 
 [![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
 [![Travis-CI Build Status](https://travis-ci.org/richfitz/stevedore.svg?branch=master)](https://travis-ci.org/richfitz/stevedore)
-  [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&svg=true)](https://ci.appveyor.com/project/richfitz/stevedore)
+[![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&svg=true)](https://ci.appveyor.com/project/richfitz/stevedore)
 [![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
 
 A docker client for R
@@ -955,7 +955,7 @@ container$inspect(reload = FALSE)
 
 ## Windows support
 
-Windows support for docker through this package is currently incomplete.
+Windows support for docker through this package is currently incomplete.  The [appveyor build](https://ci.appveyor.com/project/richfitz/stevedore) tests only the parts of the package that don't actually call docker due to difficult-to-debug issues with container compatibility on that platform.
 
 ### Current situation
 

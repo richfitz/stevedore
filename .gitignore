@@ -8,3 +8,4 @@ docs/
 *.pyc
 __pycache__
 README.html
+stevedore_*.tar.gz
