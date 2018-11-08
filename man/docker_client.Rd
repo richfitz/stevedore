@@ -160,7 +160,7 @@ it falls within the range of versions supported by the package).
 }
 
 \examples{
-if (docker_available()) {
+if (stevedore::docker_available()) {
   # Create a new client object:
   client <- stevedore::docker_client()
 

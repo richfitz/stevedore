@@ -147,7 +147,7 @@
 ##'
 ##' @export
 ##' @examples
-##' if (docker_available()) {
+##' if (stevedore::docker_available()) {
 ##'   # Create a new client object:
 ##'   client <- stevedore::docker_client()
 ##'

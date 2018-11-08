@@ -46,7 +46,7 @@
 ##' @rdname docker
 ##' @examples
 ##'
-##' if (docker_available()) {
+##' if (stevedore::docker_available()) {
 ##'   # This:
 ##'   stevedore::docker$container$list()
 ##'

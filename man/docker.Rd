@@ -57,7 +57,7 @@ but perhaps avoid using it in scripts for now.
 
 \examples{
 
-if (docker_available()) {
+if (stevedore::docker_available()) {
   # This:
   stevedore::docker$container$list()
 
