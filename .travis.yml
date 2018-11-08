@@ -4,6 +4,7 @@ cache: packages
 services:
   - docker
 r_packages:
+  - xml2
   - covr
 before_script:
   - sudo pip install -U setuptools
