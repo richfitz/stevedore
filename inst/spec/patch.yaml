@@ -53,7 +53,7 @@
   value:
     produces: "application/json"
 
-- version: ["1.25", "1.33"]
+- version: ["1.25", "1.37"]
   path: ["paths", "/containers/{id}/archive", "put", "parameters",
   "@name = inputStream", "schema"]
   value:
