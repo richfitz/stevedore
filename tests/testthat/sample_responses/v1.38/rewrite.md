@@ -1,0 +1,6 @@
+- [ ] node_inspect.json
+- [ ] node_list.json
+- [ ] plugin_inspect.json
+- [ ] plugin_list.json
+- [ ] swarm_inspect.json
+- [ ] system_info.json

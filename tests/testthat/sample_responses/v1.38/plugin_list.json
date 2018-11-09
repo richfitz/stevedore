@@ -1,0 +1,127 @@
+[
+  {
+    "Id": "5724e2c8652da337ab2eedd19fc6fc0ec908e4bd907c7421bf6a8dfc70c4c078",
+    "Name": "tiborvass/sample-volume-plugin",
+    "Enabled": true,
+    "Settings": {
+      "Mounts": [
+        {
+          "Name": "some-mount",
+          "Description": "This is a mount that's used by the plugin.",
+          "Settable": [
+            "string"
+          ],
+          "Source": "/var/lib/docker/plugins/",
+          "Destination": "/mnt/state",
+          "Type": "bind",
+          "Options": [
+            "rbind",
+            "rw"
+          ]
+        }
+      ],
+      "Env": [
+        "DEBUG=0"
+      ],
+      "Args": [
+        "string"
+      ],
+      "Devices": [
+        {
+          "Name": "string",
+          "Description": "string",
+          "Settable": [
+            "string"
+          ],
+          "Path": "/dev/fuse"
+        }
+      ]
+    },
+    "PluginReference": "localhost:5000/tiborvass/sample-volume-plugin:latest",
+    "Config": {
+      "DockerVersion": "17.06.0-ce",
+      "Description": "A sample volume plugin for Docker",
+      "Documentation": "https://docs.docker.com/engine/extend/plugins/",
+      "Interface": {
+        "Types": [
+          "docker.volumedriver/1.0"
+        ],
+        "Socket": "plugins.sock",
+        "ProtocolScheme": "some.protocol/v1.0"
+      },
+      "Entrypoint": [
+        "/usr/bin/sample-volume-plugin",
+        "/data"
+      ],
+      "WorkDir": "/bin/",
+      "User": {
+        "UID": 1000,
+        "GID": 1000
+      },
+      "Network": {
+        "Type": "host"
+      },
+      "Linux": {
+        "Capabilities": [
+          "CAP_SYS_ADMIN",
+          "CAP_SYSLOG"
+        ],
+        "AllowAllDevices": false,
+        "Devices": [
+          {
+            "Name": "string",
+            "Description": "string",
+            "Settable": [
+              "string"
+            ],
+            "Path": "/dev/fuse"
+          }
+        ]
+      },
+      "PropagatedMount": "/mnt/volumes",
+      "IpcHost": false,
+      "PidHost": false,
+      "Mounts": [
+        {
+          "Name": "some-mount",
+          "Description": "This is a mount that's used by the plugin.",
+          "Settable": [
+            "string"
+          ],
+          "Source": "/var/lib/docker/plugins/",
+          "Destination": "/mnt/state",
+          "Type": "bind",
+          "Options": [
+            "rbind",
+            "rw"
+          ]
+        }
+      ],
+      "Env": [
+        {
+          "Name": "DEBUG",
+          "Description": "If set, prints debug messages",
+          "Settable": null,
+          "Value": "0"
+        }
+      ],
+      "Args": {
+        "Name": "args",
+        "Description": "command line arguments",
+        "Settable": [
+          "string"
+        ],
+        "Value": [
+          "string"
+        ]
+      },
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:675532206fbf3030b8458f88d6e26d4eb1577688a25efec97154c94e8b6b4887",
+          "sha256:e216a057b1cb1efc11f8a268f37ef62083e70b1b38323ba252e25ac88904a7e8"
+        ]
+      }
+    }
+  }
+]

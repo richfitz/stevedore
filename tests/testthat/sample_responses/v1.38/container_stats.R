@@ -1,0 +1,87 @@
+## version: 1.38
+## method: get
+## path: /containers/{id}/stats
+## code: 200
+## response: {"read":"2015-01-08T22:57:31.547920715Z","pids_stats":{"current":3},"networks":{"eth0":{"rx_bytes":5338,"rx_dropped":0,"rx_errors":0,"rx_packets":36,"tx_bytes":648,"tx_dropped":0,"tx_errors":0,"tx_packets":8},"eth5":{"rx_bytes":4641,"rx_dropped":0,"rx_errors":0,"rx_packets":26,"tx_bytes":690,"tx_dropped":0,"tx_errors":0,"tx_packets":9}},"memory_stats":{"stats":{"total_pgmajfault":0,"cache":0,"mapped_file":0,"total_inactive_file":0,"pgpgout":414,"rss":6537216,"total_mapped_file":0,"writeback":0,"unevictable":0,"pgpgin":477,"total_unevictable":0,"pgmajfault":0,"total_rss":6537216,"total_rss_huge":6291456,"total_writeback":0,"total_inactive_anon":0,"rss_huge":6291456,"hierarchical_memory_limit":67108864,"total_pgfault":964,"total_active_file":0,"active_anon":6537216,"total_active_anon":6537216,"total_pgpgout":414,"total_cache":0,"inactive_anon":0,"active_file":0,"pgfault":964,"inactive_file":0,"total_pgpgin":477},"max_usage":6651904,"usage":6537216,"failcnt":0,"limit":67108864},"blkio_stats":{},"cpu_stats":{"cpu_usage":{"percpu_usage":[8646879,24472255,36438778,30657443],"usage_in_usermode":50000000,"total_usage":100215355,"usage_in_kernelmode":30000000},"system_cpu_usage":739306590000000,"online_cpus":4,"throttling_data":{"periods":0,"throttled_periods":0,"throttled_time":0}},"precpu_stats":{"cpu_usage":{"percpu_usage":[8646879,24350896,36438778,30657443],"usage_in_usermode":50000000,"total_usage":100093996,"usage_in_kernelmode":30000000},"system_cpu_usage":9492140000000,"online_cpus":4,"throttling_data":{"periods":0,"throttled_periods":0,"throttled_time":0}}}
+list(
+  read = "2015-01-08T22:57:31.547920715Z",
+  pids_stats = list(current = 3L),
+  networks = list(
+    eth0 = list(
+      rx_bytes = 5338L,
+      rx_dropped = 0L,
+      rx_errors = 0L,
+      rx_packets = 36L,
+      tx_bytes = 648L,
+      tx_dropped = 0L,
+      tx_errors = 0L,
+      tx_packets = 8L),
+    eth5 = list(
+      rx_bytes = 4641L,
+      rx_dropped = 0L,
+      rx_errors = 0L,
+      rx_packets = 26L,
+      tx_bytes = 690L,
+      tx_dropped = 0L,
+      tx_errors = 0L,
+      tx_packets = 9L)),
+  memory_stats = list(
+    stats = list(
+      total_pgmajfault = 0L,
+      cache = 0L,
+      mapped_file = 0L,
+      total_inactive_file = 0L,
+      pgpgout = 414L,
+      rss = 6537216L,
+      total_mapped_file = 0L,
+      writeback = 0L,
+      unevictable = 0L,
+      pgpgin = 477L,
+      total_unevictable = 0L,
+      pgmajfault = 0L,
+      total_rss = 6537216L,
+      total_rss_huge = 6291456L,
+      total_writeback = 0L,
+      total_inactive_anon = 0L,
+      rss_huge = 6291456L,
+      hierarchical_memory_limit = 67108864L,
+      total_pgfault = 964L,
+      total_active_file = 0L,
+      active_anon = 6537216L,
+      total_active_anon = 6537216L,
+      total_pgpgout = 414L,
+      total_cache = 0L,
+      inactive_anon = 0L,
+      active_file = 0L,
+      pgfault = 964L,
+      inactive_file = 0L,
+      total_pgpgin = 477L),
+    max_usage = 6651904L,
+    usage = 6537216L,
+    failcnt = 0L,
+    limit = 67108864L),
+  blkio_stats = structure(list(), names = character()),
+  cpu_stats = list(
+    cpu_usage = list(
+      percpu_usage = list(8646879L, 24472255L, 36438778L, 30657443L),
+      usage_in_usermode = 50000000L,
+      total_usage = 100215355L,
+      usage_in_kernelmode = 30000000L),
+    system_cpu_usage = 739306590000000,
+    online_cpus = 4L,
+    throttling_data = list(
+      periods = 0L,
+      throttled_periods = 0L,
+      throttled_time = 0L)),
+  precpu_stats = list(
+    cpu_usage = list(
+      percpu_usage = list(8646879L, 24350896L, 36438778L, 30657443L),
+      usage_in_usermode = 50000000L,
+      total_usage = 100093996L,
+      usage_in_kernelmode = 30000000L),
+    system_cpu_usage = 9492140000000,
+    online_cpus = 4L,
+    throttling_data = list(
+      periods = 0L,
+      throttled_periods = 0L,
+      throttled_time = 0L)))

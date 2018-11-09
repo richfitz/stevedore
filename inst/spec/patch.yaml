@@ -5,7 +5,7 @@
   value:
     type: "string"
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/system/df", "get", "responses", "200", "schema", "properties", "Containers"]
   replace: true
   value:
@@ -43,17 +43,17 @@
   value:
     type: "object"
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/system/df", "get"]
   value:
     produces: "application/json"
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/containers/{id}/top", "get"]
   value:
     produces: "application/json"
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/containers/{id}/archive", "put", "parameters",
   "@name = inputStream", "schema"]
   value:
@@ -145,7 +145,7 @@
 # least is returning 'ID' rather than 'Id' for the created secret.
 # Not sure if this will persist in 1.37 onwards, or if patching it
 # here is even the correct thing to do.
-- version: ["1.36", "1.37"]
+- version: ["1.36", "1.38"]
   path: ["paths", "/secrets/create", "post", "responses", "201", "schema"]
   replace: true
   value:
@@ -156,7 +156,7 @@
 
 # And also for configs, which makes sense because they share a lot of
 # interface
-- version: ["1.36", "1.37"]
+- version: ["1.36", "1.38"]
   path: ["paths", "/configs/create", "post", "responses", "201", "schema"]
   replace: true
   value:
@@ -166,12 +166,12 @@
         type: "string"
 
 # This one is me getting null types wrong I think - rather than looking
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/secrets/{id}", "delete", "produces"]
   value: ~
   replace: true
 
-- version: ["1.30", "1.37"]
+- version: ["1.30", "1.38"]
   path: ["paths", "/configs/{id}", "delete", "produces"]
   value: ~
   replace: true
@@ -182,7 +182,7 @@
   value:
     produces: "application/chunked-string"
 
-- version: ["1.29", "1.37"]
+- version: ["1.29", "1.38"]
   path: ["paths", "/tasks/{id}/logs", "get"]
   value:
     produces: "application/chunked-string"
@@ -194,18 +194,18 @@
 
 # this is pretty bad: the spec claims it will return 204 but instead
 # returns 200
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/plugins/pull", "post", "responses"]
   value:
     200:
       description: "no error"
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/plugins/{name}", "delete", "responses", "200", "schema"]
   value: ~
   replace: true
 
-- version: ["1.25", "1.37"]
+- version: ["1.25", "1.38"]
   path: ["paths", "/plugins/{name}", "delete", "produces"]
   value: ~
   replace: true
@@ -306,12 +306,12 @@
   value:
     $ref: "#/definitions/TLSInfo"
 
-- version: ["1.37", "1.37"]
+- version: ["1.37", "1.38"]
   path: ["definitions", "PeerNode"]
   value:
     type: "object"
 
-- version: ["1.25", "1.39"]
+- version: ["1.25", "1.38"]
   path: ["definitions", "Secret", "properties", "Spec",]
   value:
     $ref: "#/definitions/SecretSpec"
