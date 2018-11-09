@@ -1,6 +1,6 @@
 Package: stevedore
 Title: Docker Client
-Version: 0.0.6
+Version: 0.9.0
 Description: Work with containers over the Docker API.  Rather than
     using system calls to interact with a docker client, using the
     API directly means that we can receive richer information from
@@ -10,6 +10,8 @@ Description: Work with containers over the Docker API.  Rather than
 License: MIT + file LICENSE
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
     email = "rich.fitzjohn@gmail.com"))
+URL: https://github.com/richfitz/stevedore
+BugReports: https://github.com/richfitz/stevedore/issues
 Imports:
     crayon,
     curl (>= 2.3.0),
