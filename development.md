@@ -157,3 +157,9 @@ cl$version()
 ```
 
 to see the requests made by `stevedore`.
+
+## Adding a new spec
+
+* Increase the version number `DOCKER_API_VERSION_MAX` in [`R/zzz.R`](R/zzz.R)
+* Run `Rscript ./scripts/download_spec.R`
+* Follow further instructions in [`tests/testthat/sample_responses/README.md`](tests/testthat/sample_responses/README.md#adding-a-new-set)

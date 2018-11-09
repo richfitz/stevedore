@@ -57,29 +57,39 @@ all.equal(ans1, dat$reference)
 
 ## Adding a new set
 
-The easy bit:
+The easy bit; to generate responses for `1.39`, from `1.38`, do:
 
 ```
-V_OLD=1.34
-V_NEW=1.35
-rm -rf "v$V_NEW"
-cp -r "v$V_OLD" "v$V_NEW"
-ls -1 "v${V_NEW}"/*.json | sed 's;.*/;- [ ] ;' > "v${V_NEW}/rewrite.md"
-(cd v${V_NEW} && ../rewrite.sh "'version: $V_OLD'" "'version: ${V_NEW}'")
-rm "v${V_NEW}"/*.json "v${V_NEW}"/*.bak
-cp "../test-spec-responses-${V_OLD}.R" "../test-spec-responses-${V_NEW}.R"
+./generate.sh 1.38 1.39
 ```
 
-Then, go to the spec page, e.g. https://docs.docker.com/engine/api/v1.35/
+Then, go to the spec page, e.g. https://docs.docker.com/engine/api/v1.39/
 
 Open rewrite.md
 
-For each endpoint in rewrite.md, identify the docker endpoint and copy the response sample into a json file
+For each endpoint in rewrite.md, identify the docker endpoint and copy the response sample into a json file.
+
+Edit `tests/testthat/helper-stevedore.R` and lower the max version in `audit_spec_response` to your last good version
 
 Run the tests:
 
 ```
-test_file("test-spec-responses-1.35.R")
+test_file("test-spec-responses-1.39.R")
 ```
 
 Inspect any failures, fix, repeat
+
+Things to try:
+
+* `inst/spec/patch.yml` - things that are patched up to the previous version *probably* still apply to the new version
+* `git diff --no-index v1.38.yaml v1.39.yaml` gives a nice summary of changes
+
+Tickling individual failures is helpful:
+
+```r
+dat <- read_sample_response("sample_responses/v1.39/system_df.R")
+opts <- list(as_is_names = FALSE, data_frame = identity)
+ans <- dat$handler(dat$response, opts)
+ref <- dat$reference
+all.equal(ans, ref)
+```
