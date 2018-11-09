@@ -54,12 +54,15 @@ docker_client_method_nonapi <- function(fun, class, name) {
 ##
 ## NOTE: Trying to make the underlying help function swappable fails
 ## poorly because of the amount of NSE involved in the devtools shim.
+##
+## NOTE: To get this working under devtools::load_all(), one must
+## remove the utils:: prefix to help()
 stevedore_object_help <- function(name, api_version, help_type) {
   ## nocov start
   set_help_api_last_version(api_version)
   oo <- options(help_type = help_type)
   on.exit(options(oo))
-  help(name, package = "stevedore")
+  utils::help(name, package = "stevedore")
   ## nocov end
 }
 
