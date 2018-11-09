@@ -71,7 +71,9 @@ tar_safe <- function(tarfile, files, ..., complex = FALSE,
   if (external_list) {
     list <- tempfile("stevedore_tar_")
     on.exit(unlink(list))
-    writeLines(files, list)
+    with_connection(list, open = "wb", function(con) {
+      writeLines(files, con, sep = "\n")
+    })
     files <- c("-T", list)
   }
   if (complex) {

@@ -590,3 +590,10 @@ client_output_options <- function(cl) {
 
 noop <- function(...) {
 }
+
+
+with_connection <- function(path, fn, ...) {
+  con <- file(path, ...)
+  on.exit(close(con))
+  fn(con)
+}
