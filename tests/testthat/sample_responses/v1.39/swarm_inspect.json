@@ -1,0 +1,67 @@
+{
+  "ID": "abajmipo7b4xz5ip2nrla6b11",
+  "Version": {
+    "Index": 373531
+  },
+  "CreatedAt": "2016-08-18T10:44:24.496525531Z",
+  "UpdatedAt": "2017-08-09T07:09:37.632105588Z",
+  "Spec": {
+    "Name": "default",
+    "Labels": {
+      "com.example.corp.type": "production",
+      "com.example.corp.department": "engineering"
+    },
+    "Orchestration": {
+      "TaskHistoryRetentionLimit": 10
+    },
+    "Raft": {
+      "SnapshotInterval": 10000,
+      "KeepOldSnapshots": 0,
+      "LogEntriesForSlowFollowers": 500,
+      "ElectionTick": 3,
+      "HeartbeatTick": 1
+    },
+    "Dispatcher": {
+      "HeartbeatPeriod": 5000000000
+    },
+    "CAConfig": {
+      "NodeCertExpiry": 7776000000000000,
+      "ExternalCAs": [
+        {
+          "Protocol": "cfssl",
+          "URL": "string",
+          "Options": {
+            "property1": "string",
+            "property2": "string"
+          },
+          "CACert": "string"
+        }
+      ],
+      "SigningCACert": "string",
+      "SigningCAKey": "string",
+      "ForceRotate": 0
+    },
+    "EncryptionConfig": {
+      "AutoLockManagers": false
+    },
+    "TaskDefaults": {
+      "LogDriver": {
+        "Name": "json-file",
+        "Options": {
+          "max-file": "10",
+          "max-size": "100m"
+        }
+      }
+    }
+  },
+  "TLSInfo": {
+    "TrustRoot": "-----BEGIN CERTIFICATE-----\nMIIBajCCARCgAwIBAgIUbYqrLSOSQHoxD8CwG6Bi2PJi9c8wCgYIKoZIzj0EAwIw\nEzERMA8GA1UEAxMIc3dhcm0tY2EwHhcNMTcwNDI0MjE0MzAwWhcNMzcwNDE5MjE0\nMzAwWjATMREwDwYDVQQDEwhzd2FybS1jYTBZMBMGByqGSM49AgEGCCqGSM49AwEH\nA0IABJk/VyMPYdaqDXJb/VXh5n/1Yuv7iNrxV3Qb3l06XD46seovcDWs3IZNV1lf\n3Skyr0ofcchipoiHkXBODojJydSjQjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMB\nAf8EBTADAQH/MB0GA1UdDgQWBBRUXxuRcnFjDfR/RIAUQab8ZV/n4jAKBggqhkjO\nPQQDAgNIADBFAiAy+JTe6Uc3KyLCMiqGl2GyWGQqQDEcO3/YG36x7om65AIhAJvz\npxv6zFeVEkAEEkqIYi0omA9+CjanB/6Bz4n1uw8H\n-----END CERTIFICATE-----\n",
+    "CertIssuerSubject": "MBMxETAPBgNVBAMTCHN3YXJtLWNh",
+    "CertIssuerPublicKey": "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEmT9XIw9h1qoNclv9VeHmf/Vi6/uI2vFXdBveXTpcPjqx6i9wNazchk1XWV/dKTKvSh9xyGKmiIeRcE4OiMnJ1A=="
+  },
+  "RootRotationInProgress": false,
+  "JoinTokens": {
+    "Worker": "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-1awxwuwd3z9j1z3puu7rcgdbx",
+    "Manager": "SWMTKN-1-3pu6hszjas19xyp7ghgosyx9k8atbfcr8p2is99znpy26u2lkl-7p73s1dx5in4tatdymyhg9hu2"
+  }
+}
