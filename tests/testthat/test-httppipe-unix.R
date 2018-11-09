@@ -2,6 +2,8 @@ context("httppipe - unix")
 
 test_that("basic use", {
   skip_on_cran()
+  skip_if_not_using_docker()
+  skip_if_not_installed("reticulate")
 
   h <- httppipe("/var/run/docker.sock")
 
@@ -19,6 +21,8 @@ test_that("basic use", {
 
 test_that("post", {
   skip_on_cran()
+  skip_if_not_using_docker()
+  skip_if_not_installed("reticulate")
 
   h <- httppipe("/var/run/docker.sock")
 
@@ -45,6 +49,8 @@ test_that("post", {
 
 test_that("no streaming implemented", {
   skip_on_cran()
+  skip_if_not_using_docker()
+  skip_if_not_installed("reticulate")
 
   h <- httppipe("/var/run/docker.sock")
 
@@ -65,6 +71,8 @@ test_that("no streaming implemented", {
 
 test_that("available", {
   skip_on_cran()
+  skip_if_not_using_docker()
+  skip_if_not_installed("reticulate")
   cl <- test_docker_client()# only when this works...
   expect_true(httppipe_available())
 })
@@ -85,6 +93,7 @@ test_that("available: verbose", {
 
 
 test_that("python_locate_version", {
+  skip_if_not_installed("reticulate")
   expect_error(python_locate_version("nosuchmodule"),
                "Did not find required python module 'nosuchmodule'")
 })
