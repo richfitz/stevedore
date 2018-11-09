@@ -62,7 +62,12 @@ httppipe_prepare <- function() {
 
 
 python_locate_version <- function(module) {
-  cfg <- reticulate::py_discover_config(module)
+  if (module %in% names(.stevedore$python)) {
+    cfg <- .stevedore$python[[module]]
+  } else {
+    cfg <- reticulate::py_discover_config(module)
+    .stevedore$python[[module]] <- cfg
+  }
   if (is.null(cfg$required_module_path)) {
     stop(sprintf("Did not find required python module '%s'", module),
          call. = FALSE)
