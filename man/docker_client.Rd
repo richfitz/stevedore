@@ -111,8 +111,7 @@ interaction with the docker daemon (for this object they are all
 methods.  The client is structured similarly to the docker command
 line client, such that \code{docker container create <args>} in
 the command line becomes \code{docker$container$create(...)} in R
-(if the client is called R).  You can also access a default client
-by using \code{stevedore::docker} (see \code{\link{docker}}).
+(if the client is called R).
 }
 \details{
 \Sexpr[results=rd,stage=render]{stevedore:::generate_help()}
