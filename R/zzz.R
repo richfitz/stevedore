@@ -22,7 +22,6 @@ stevedore_reset <- function() {
   .stevedore$curl_uses_secure_transport <- curl_uses_secure_transport()
   .stevedore$default_client <- NULL
   .stevedore$python <- list()
-  default_client_binding(asNamespace("stevedore"))
 }
 
 

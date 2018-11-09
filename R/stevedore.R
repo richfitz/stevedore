@@ -39,7 +39,8 @@
 ##' and in \code{stevedore} can be done as
 ##'
 ##' \preformatted{
-##' stevedore::docker$network$create("mynetwork")
+##' docker <- stevedore::docker_client()
+##' docker$network$create("mynetwork")
 ##' }
 ##'
 ##' Familiarity with the command line interface will be helpful but
