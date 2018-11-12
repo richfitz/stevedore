@@ -17,7 +17,10 @@ install:
 	R CMD INSTALL .
 
 build:
-	R CMD build --no-manual --no-build-vignettes .
+	R CMD build .
+
+build_quick:
+	R CMD build --no-manual .
 
 check:
 	_R_CHECK_CRAN_INCOMING_=FALSE make check_all
