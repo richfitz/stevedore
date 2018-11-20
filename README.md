@@ -1,10 +1,11 @@
 <!-- -*-markdown-*- -->
 # stevedore
 
-[![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Travis-CI Build Status](https://travis-ci.org/richfitz/stevedore.svg?branch=master)](https://travis-ci.org/richfitz/stevedore)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&svg=true)](https://ci.appveyor.com/project/richfitz/stevedore)
 [![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
+[![](http://www.r-pkg.org/badges/version/stevedore)](https://cran.r-project.org/package=stevedore)
 
 A docker client for R
 
@@ -439,7 +440,7 @@ as well as via an `help()` method on each object (e.g., `docker$help()`, `docker
 
 ## Approach
 
-The Docker API is [versioned](https://docs.docker.com/develop/sdk/#api-version-matrix) and each version includes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions 1.25 to 1.37 (defaulting to 1.29).
+The Docker API is [versioned](https://docs.docker.com/develop/sdk/#api-version-matrix) and each version includes a [machine-readable API specification](https://docs.docker.com/engine/api/v1.29).  Rather than manually write wrappers that fit the output docker gives, `stevedore` _generates_ an interface directly from the spefification.  Currently `stevedore` supports docker API versions 1.25 to 1.39 (defaulting to 1.29).
 
 This approach means that the output will be type-stable - there is no inference on what to return based on what the server chooses to return.  With a given API version, the same fields will always be returned.  Some of this information is very rich, for example, for the backgrounded container above:
 
@@ -993,7 +994,7 @@ The support in this package is a duplicate of the micropackage [`httppipe`](http
 
 ## Development and testing
 
-See the [development guide](development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
+See the [development guide](https://github.com/richfitz/stevedore/blob/master/development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
 
 ## Package limitations
 
@@ -1001,10 +1002,10 @@ Endpoints that require "http hijacking" are not fully supported (primarily `atta
 
 ## Installation
 
-Currently, `stevedore` is not on CRAN, but can be installed directly from GitHub using devtools
+`stevedore` can be installed from CRAN using
 
 ```r
-devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
+install.packages("stevedore")
 ```
 
 On windows you will also need `reticulate`
@@ -1026,8 +1027,14 @@ stevedore::docker_available()
 ## [1] TRUE
 ```
 
+To install the development version from GitHub, you can use `remotes`:
+
+```r
+remotes::install_github("richfitz/stevedore", upgrade = FALSE)
+```
+
 ## Licence
 
 MIT © [Rich FitzJohn](https://github.com/richfitz).
 
-Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/richfitz/stevedore/blob/master/CONDUCT.md). By participating in this project you agree to abide by its terms.

@@ -1,10 +1,11 @@
 <!-- -*-markdown-*- -->
 # stevedore
 
-[![Project Status: WIP - Initial development is in progress, but there has not yet been a stable, usable release suitable for the public.](http://www.repostatus.org/badges/latest/wip.svg)](http://www.repostatus.org/#wip)
+[![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![Travis-CI Build Status](https://travis-ci.org/richfitz/stevedore.svg?branch=master)](https://travis-ci.org/richfitz/stevedore)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&svg=true)](https://ci.appveyor.com/project/richfitz/stevedore)
 [![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
+[![](http://www.r-pkg.org/badges/version/stevedore)](https://cran.r-project.org/package=stevedore)
 
 A docker client for R
 
@@ -138,7 +139,7 @@ The support in this package is a duplicate of the micropackage [`httppipe`](http
 
 ## Development and testing
 
-See the [development guide](development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
+See the [development guide](https://github.com/richfitz/stevedore/blob/master/development.md) if you want to get started developing `stevedore` - it provides pointers to the core objects.
 
 ## Package limitations
 
@@ -146,10 +147,10 @@ Endpoints that require "http hijacking" are not fully supported (primarily `atta
 
 ## Installation
 
-Currently, `stevedore` is not on CRAN, but can be installed directly from GitHub using devtools
+`stevedore` can be installed from CRAN using
 
 ```r
-devtools::install_github("richfitz/stevedore", upgrade_dependencies = FALSE)
+install.packages("stevedore")
 ```
 
 On windows you will also need `reticulate`
@@ -166,8 +167,14 @@ Once installed, find out if everything is set up to use docker by running
 stevedore::docker_available()
 ```
 
+To install the development version from GitHub, you can use `remotes`:
+
+```r
+remotes::install_github("richfitz/stevedore", upgrade = FALSE)
+```
+
 ## Licence
 
 MIT © [Rich FitzJohn](https://github.com/richfitz).
 
-Please note that this project is released with a [Contributor Code of Conduct](CONDUCT.md). By participating in this project you agree to abide by its terms.
+Please note that this project is released with a [Contributor Code of Conduct](https://github.com/richfitz/stevedore/blob/master/CONDUCT.md). By participating in this project you agree to abide by its terms.
