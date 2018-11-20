@@ -1,4 +1,4 @@
-FROM r-base
+FROM rocker/r-ver:latest
 
 RUN apt-get update && \
         apt-get install -yy \
