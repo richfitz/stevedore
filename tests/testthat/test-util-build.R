@@ -108,6 +108,7 @@ test_that("build file list with excluded dockerignore", {
 
 
 test_that("build_tar", {
+  skip_if_external_tar_unsupported()
   paths <- c(paste0("dir1/", c("a.txt", "Dockerfile")),
              paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
              "README.md")
@@ -139,6 +140,7 @@ test_that("build_tar", {
 
 
 test_that("validate_tar_directory", {
+  skip_if_external_tar_unsupported()
   paths <- c(paste0("dir1/", c("a.txt", "Dockerfile")),
              paste0("dir2/", c("file.txt", "foo.md", "secret.json")),
              "README.md")

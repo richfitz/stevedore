@@ -19,6 +19,7 @@ test_that("tar_directory", {
 
 
 test_that("selective tar", {
+  skip_if_external_tar_unsupported()
   p <- tempfile_test()
   dir.create(p, TRUE, FALSE)
 
@@ -37,6 +38,7 @@ test_that("selective tar", {
 
 
 test_that("tar_file", {
+  skip_if_external_tar_unsupported()
   bin <- tar_file("sample_responses/README.md")
   tmp <- untar_bin(bin)
   expect_equal(dir(tmp), "README.md")
@@ -56,6 +58,7 @@ test_that("tar failure", {
 
 
 test_that("external list", {
+  skip_if_external_tar_unsupported()
   p <- tempfile_test()
   dir.create(p, TRUE, FALSE)
   for (i in letters) {

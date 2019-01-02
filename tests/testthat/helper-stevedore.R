@@ -579,3 +579,10 @@ dummy_data_frame_wrapper <- function(x) {
   class(x) <- c("extra", class(x))
   x
 }
+
+
+skip_if_external_tar_unsupported <- function() {
+  if (tolower(Sys.info()[["sysname"]]) == "solaris") {
+    testthat::skip("Stevedore does not support this tar")
+  }
+}

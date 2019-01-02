@@ -475,6 +475,7 @@ test_that("get_network_id", {
 
 
 test_that("validate_tar", {
+  skip_if_external_tar_unsupported()
   path <- tempfile_test()
   writeLines("hello", path)
   on.exit(unlink(path))
