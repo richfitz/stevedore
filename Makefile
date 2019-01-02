@@ -58,7 +58,7 @@ vignettes:
 	make vignettes_install
 
 pkgdown:
-	${RSCRIPT} -e "library(methods); pkgdown::build_site()"
+	${RSCRIPT} -e "library(methods); pkgdown::build_site(lazy = TRUE)"
 
 website: pkgdown
 	./scripts/update_web.sh
