@@ -255,11 +255,17 @@ test_that("integer apply/json serialisation", {
 })
 
 
-test_that("sys_which", {
+test_that("sys_which passes for found program", {
+  if (!nzchar(Sys.which("ping"))) {
+    skip("ping not on path")
+  }
   expect_silent(p <- sys_which("ping"))
   expect_is(p, "character")
   expect_identical(p, unname(Sys.which("ping")))
+})
 
+
+test_that("sys_which throws for non existant program", {
   expect_error(sys_which("unknown-program-never-exists"),
                "Did not find program 'unknown-program-never-exists'")
 })
