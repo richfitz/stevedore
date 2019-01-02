@@ -4,7 +4,7 @@ author: "Rich FitzJohn"
 date: "2018-11-08"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Using docker with stevedore}
+  %\VignetteIndexEntry{Examples and use-cases}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---

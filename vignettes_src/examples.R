@@ -4,7 +4,7 @@
 ## date: "`r Sys.Date()`"
 ## output: rmarkdown::html_vignette
 ## vignette: >
-##   %\VignetteIndexEntry{Using docker with stevedore}
+##   %\VignetteIndexEntry{Examples and use-cases}
 ##   %\VignetteEngine{knitr::rmarkdown}
 ##   %\VignetteEncoding{UTF-8}
 ## ---
