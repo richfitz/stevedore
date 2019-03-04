@@ -266,6 +266,11 @@ test_that("validate ports", {
     "Port binding 'localhost' does not match '[<ip>:][<host>:]<container>'",
     fixed = TRUE)
 
+  expect_error(
+    validate_ports("0:1:2:3"),
+    "Port binding '0:1:2:3' does not match '[<ip>:][<host>:]<container>'",
+    fixed = TRUE)
+
   ## Check serialisation:
   str <-
     as.character(jsonlite::toJSON(validate_ports("11022:22")$port_bindings))

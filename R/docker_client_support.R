@@ -490,7 +490,7 @@ validate_ports <- function(ports) {
   if (any(i)) {
     stop(sprintf(
       "Port binding %s does not match '[<ip>:][<host>:]<container>'",
-      paste(squote(ports[!i]), collapse = ", ")))
+      paste(squote(ports[i]), collapse = ", ")))
   }
 
   ports_split <- vapply(ports_split, function(x)
