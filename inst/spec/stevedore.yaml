@@ -83,7 +83,7 @@
 
 # totally different!
 
-- version: ["1.29", "1.29"]
+- version: ["1.25", "1.29"]
   path: ["definitions", "Config", "properties", "ExposedPorts", "description"]
   value: &container-ports >-
     A character vector of port mappings between the container and
