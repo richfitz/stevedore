@@ -330,7 +330,7 @@ set_help_api_last_version <- function(api_version) {
 
 
 get_help_api_last_version <- function() {
-  .stevedore$help_api_last_version
+  .stevedore$help_api_last_version %||% DOCKER_API_VERSION_DEFAULT
 }
 
 
