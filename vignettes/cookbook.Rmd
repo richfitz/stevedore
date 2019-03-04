@@ -1,0 +1,112 @@
+---
+title: "Cookbook"
+author: "Rich FitzJohn"
+date: "2019-03-04"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Cookbook}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+
+This vignette contains short snippets of `stevedore` calls to
+perform simple tasks, alongside a docker command line equivalent.
+
+Conventions:
+
+* We assume that a `stevedore` docker client object has been
+  created with `docker <- stevedore::docker_client()` (to avoid
+  repetition in examples)
+* All docker command line examples start with `$` to represent the
+  unix/bash prompt
+
+
+
+```r
+docker <- stevedore::docker_client()
+```
+```
+
+## Start a container with ports published to the host
+
+
+
+```
+
+With docker cli:
+
+```
+$ docker run --rm -p 8888:80 gplates/gws
+```
+
+the `-p 8888:80` publishes port `80` in the container to port
+`8888` on the host.
+
+In `stevedore`, this can be done with:
+
+```r
+gws <- docker$container$run("gplates/gws", ports = "8888:80",
+                            detach = TRUE, rm = TRUE)
+gws$ports()
+```
+
+```
+##   container_port protocol host_ip host_port
+## 1             80      tcp 0.0.0.0      8888
+```
+
+
+
+To use a random port, omit the host portion (here `8888:`) as
+
+```
+$ docker run --rm -p 80 gplates/gws
+```
+
+or, with `stevedore`
+
+```r
+gws <- docker$container$run("gplates/gws", ports = 80,
+                            detach = TRUE, rm = TRUE)
+```
+
+To determine the port you can use the `ports()` method
+
+```r
+gws$ports()
+```
+
+```
+##   container_port protocol host_ip host_port
+## 1             80      tcp 0.0.0.0     32772
+```
+
+
+
+If the container declares its exposed ports using an `EXPOSE
+<port>` directive in the `Dockerfile` then you can automatically
+publish all declared ports to random host ports with `-P` as
+
+```
+$ docker run --rm -P gplates/gws
+```
+
+or with `stevedore` by using `ports = TRUE`
+
+
+```r
+gws <- docker$container$run("gplates/gws", ports = TRUE, detach = TRUE)
+gws$ports()
+```
+
+```
+##   container_port protocol host_ip host_port
+## 1             80      tcp 0.0.0.0     32773
+```
+
+
+
+<small>As contributed by [Brian O'Meara](https://github.com/bomeara) in
+[#44](https://github.com/richfitz/stevedore/issues/44)</small>

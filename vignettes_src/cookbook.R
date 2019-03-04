@@ -36,7 +36,7 @@ docker <- stevedore::docker_client()
 ## ## Start a container with ports published to the host
 
 ```{r, include = FALSE}
-docker$pull("gplates/gws")
+docker$image$pull("gplates/gws")
 ```
 
 ## With docker cli:
