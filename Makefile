@@ -51,7 +51,13 @@ vignettes/examples.Rmd: vignettes_src/examples.Rmd
 	sed -i.bak 's/[[:space:]]*$$//' $@
 	rm -f $@.bak
 
-vignettes_install: vignettes/stevedore.Rmd vignettes/examples.Rmd
+vignettes/cookbook.Rmd: vignettes_src/cookbook.Rmd
+	cd vignettes_src && ${RSCRIPT} -e 'knitr::knit("cookbook.Rmd")'
+	mv vignettes_src/cookbook.md $@
+	sed -i.bak 's/[[:space:]]*$$//' $@
+	rm -f $@.bak
+
+vignettes_install: vignettes/stevedore.Rmd vignettes/examples.Rmd vignettes/cookbook.Rmd
 	${RSCRIPT} -e 'library(methods); devtools::build_vignettes()'
 
 vignettes:
