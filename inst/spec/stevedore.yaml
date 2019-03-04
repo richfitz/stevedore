@@ -88,12 +88,17 @@
   value: &container-ports >-
     A character vector of port mappings between the container and
     host, in (1) the form `<host>:<container>` (e.g., `10080:80` to
-    map the container's port 80 to the host's port 10080), (2) the
-    form `<port>` as shorthand for `<port>:<port>`, or (3) a single
-    logical value `TRUE` indicating to map all container ports to
-    random available ports on the host.  You can use the `$ports()`
-    method in the `?docker_container` object to query the port mapping
-    of a running container.
+    map the container's port 80 to the host's port 10080),
+    `<ip>:<host>:<container>` to bind a specific host interface as
+    well as a port (e.g., you can use `localhost` or `127.0.0.1` for
+    the first element), (3) form `<port>` to map the containers port
+    to a random available port on the host s shorthand for
+    `<port>:<port>`, or (3) a single logical value `TRUE` indicating
+    to map all container ports to random available ports on the host.
+    You can use the `$ports()` method in the `?docker_container`
+    object to query the port mapping of a running container.  Multiple
+    values can be provided to map multiple ports to the host (e.g.,
+    `c("80", "443:443")`.
 
 - version: ["1.25", "1.29"]
   path: ["definitions", "Config", "properties", "Volumes", "description"]
