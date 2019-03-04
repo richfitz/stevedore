@@ -503,7 +503,7 @@ validate_ports <- function(ports) {
 
   ## NOTE: it might be better tp provide better messages here - this
   ## is a different failiure to above, but it's not really a problem.
-  err <- !grepl("[0-9]*", host_port) | !grepl("[0-9]+", container_port)
+  err <- !grepl("^[0-9]*$", host_port) | !grepl("^[0-9]+$", container_port)
   if (any(err)) {
     stop(sprintf(
       "Port binding %s does not match '[<ip>:][<host>:]<container>'",
