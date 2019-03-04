@@ -222,15 +222,15 @@ test_that("validate volumes", {
                c("foo:bar", "/a/b:/c/d:ro"))
 
   expect_error(validate_volumes("foo"),
-               "Volume mapping 'foo' does not not match '<src>:<dest>[:ro]",
+               "Volume mapping 'foo' does not match '<src>:<dest>[:ro]",
                fixed = TRUE)
   expect_error(
     validate_volumes(c("foo", "bar")),
-    "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
+    "Volume mapping 'foo', 'bar' does not match '<src>:<dest>[:ro]",
     fixed = TRUE)
   expect_error(
     validate_volumes(c("foo", "a:b", "bar")),
-    "Volume mapping 'foo', 'bar' does not not match '<src>:<dest>[:ro]",
+    "Volume mapping 'foo', 'bar' does not match '<src>:<dest>[:ro]",
     fixed = TRUE)
 })
 
@@ -246,18 +246,40 @@ test_that("validate ports", {
                         HostPort = jsonlite::unbox("22")))),
                     ports = list("33/tcp" = NULL)))
 
+  ## As reported in https://github.com/richfitz/stevedore/issues/45
+  expect_equal(validate_ports("localhost:22:33"),
+               list(port_bindings = list(
+                      "33/tcp" = list(list(
+                        HostIp = jsonlite::unbox("localhost"),
+                        HostPort = jsonlite::unbox("22")))),
+                    ports = list("33/tcp" = NULL)))
+  ## https://docs.docker.com/v17.09/engine/userguide/networking/default_network/binding/
+  expect_equal(validate_ports("localhost::33"),
+               list(port_bindings = list(
+                      "33/tcp" = list(list(
+                        HostIp = jsonlite::unbox("localhost"),
+                        HostPort = jsonlite::unbox("")))),
+                    ports = list("33/tcp" = NULL)))
+
+  expect_error(
+    validate_ports("localhost"),
+    "Port binding 'localhost' does not match '[<ip>:][<host>:]<container>'",
+    fixed = TRUE)
+
   ## Check serialisation:
   str <-
     as.character(jsonlite::toJSON(validate_ports("11022:22")$port_bindings))
   cmp <- '{"22/tcp":[{"HostIp":"","HostPort":"11022"}]}'
   expect_identical(str, cmp)
 
-  expect_error(validate_ports(""),
-               "Port binding '' does not not match '[<host>:]<container>'",
-               fixed = TRUE)
-  expect_error(validate_ports("111x"),
-               "Port binding '111x' does not not match '[<host>:]<container>",
-               fixed = TRUE)
+  expect_error(
+    validate_ports(""),
+    "Port binding '' does not match '[<ip>:][<host>:]<container>'",
+    fixed = TRUE)
+  expect_error(
+    validate_ports("111x"),
+    "Port binding '111x' does not match '[<ip>:][<host>:]<container>",
+    fixed = TRUE)
 })
 
 

@@ -465,7 +465,7 @@ validate_volumes <- function(volumes) {
   re <- "^(.+):([^:]+)$"
   ok <- grepl(re, volumes)
   if (any(!ok)) {
-    stop(sprintf("Volume mapping %s does not not match '<src>:<dest>[:ro]",
+    stop(sprintf("Volume mapping %s does not match '<src>:<dest>[:ro]",
                  paste(squote(volumes[!ok]), collapse = ", ")))
   }
   binds
@@ -485,32 +485,30 @@ validate_ports <- function(ports) {
   }
   assert_character(ports)
 
-  ## NOTE: this is _not_ enough to capture what docker can do but it's
-  ## a starting point for working out to complete support.
-  re_random <- "^[0-9]+$"
-  re_explicit <- "^([0-9]+):([0-9]+)$"
-
-  i_random <- grepl(re_random, ports)
-  i_explicit <- grepl(re_explicit, ports)
-
-  ok <- i_random | i_explicit
-  if (any(!ok)) {
-    ## TODO: This does not include all possibilities
+  ports_split <- strsplit(ports, ":", fixed = TRUE)
+  i <- lengths(ports_split) > 3
+  if (any(i)) {
     stop(sprintf(
-      "Port binding %s does not not match '[<host>:]<container>'",
-      paste(squote(ports[!ok]), collapse = ", ")))
+      "Port binding %s does not match '[<ip>:][<host>:]<container>'",
+      paste(squote(ports[!i]), collapse = ", ")))
   }
 
-  n <- length(ports)
-  protocol <- rep("tcp", n)
-  host_ip <- character(n)
-  host_port <- character(n)
-  container_port <- character(n)
+  ports_split <- vapply(ports_split, function(x)
+    c(rep("", 3 - length(x)), x), character(3))
 
-  container_port[i_random] <- ports[i_random]
-  container_port[i_explicit] <- sub(re_explicit, "\\2", ports[i_explicit])
+  protocol <- rep("tcp", length(ports))
+  host_ip <- ports_split[1, ]
+  host_port <- ports_split[2, ]
+  container_port <- ports_split[3, ]
 
-  host_port[i_explicit] <- sub(re_explicit, "\\1", ports[i_explicit])
+  ## NOTE: it might be better tp provide better messages here - this
+  ## is a different failiure to above, but it's not really a problem.
+  err <- !grepl("[0-9]*", host_port) | !grepl("[0-9]+", container_port)
+  if (any(err)) {
+    stop(sprintf(
+      "Port binding %s does not match '[<ip>:][<host>:]<container>'",
+      paste(squote(ports[!i]), collapse = ", ")))
+  }
 
   container_port <- sprintf("%s/%s", container_port, protocol)
 
