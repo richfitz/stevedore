@@ -1,4 +1,6 @@
 language: r
+# without setting the distribution we get 14.04 which is really too old.
+dist: xenial
 sudo: required
 cache: packages
 services:
