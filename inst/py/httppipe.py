@@ -1,12 +1,21 @@
 import sys
 
+from packaging import version
+
 import docker
 import requests
 
 IS_WINDOWS_PLATFORM = (sys.platform == 'win32')
 
 if IS_WINDOWS_PLATFORM:
-    from docker.transport import NpipeAdapter as HttpAdapter
+    # See changes in
+    #   https://github.com/docker/docker-py/commit/4d7d408
+    # which is at version 3.8.0-dev and which change how the adapter
+    # is called.
+    if version.parse(docker.__version__) > version.parse("3.8.0"):
+        from docker.transport import NpipeHTTPAdapter as HttpAdapter
+    else:
+        from docker.transport import NpipeAdapter as HttpAdapter
 else:
     from docker.transport import UnixAdapter as HttpAdapter
 
