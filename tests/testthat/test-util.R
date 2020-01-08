@@ -327,18 +327,19 @@ test_that("download_file", {
 
 
 test_that("pretty_bytes", {
+  expect_equal(pretty_bytes(0), "0 B")
   expect_equal(pretty_bytes(1), "1 B")
-  expect_equal(pretty_bytes(12), "12 B")
-  expect_equal(pretty_bytes(123), "123 B")
-  expect_equal(pretty_bytes(1234), "1.23 kB")
-  expect_equal(pretty_bytes(12345), "12.35 kB")
-  expect_equal(pretty_bytes(123456), "123.46 kB")
-  expect_equal(pretty_bytes(1234567), "1.23 MB")
-  expect_equal(pretty_bytes(12345678), "12.35 MB")
-  expect_equal(pretty_bytes(123456789), "123.46 MB")
-  expect_equal(pretty_bytes(1234567890), "1.23 GB")
-  expect_equal(pretty_bytes(12345678901), "12.35 GB")
-  expect_equal(pretty_bytes(123456789012), "123.46 GB")
+  expect_equal(pretty_bytes(11), "11 B")
+  expect_equal(pretty_bytes(111), "111 B")
+  expect_equal(pretty_bytes(1111), "1.11 kB")
+  expect_equal(pretty_bytes(11111), "11.11 kB")
+  expect_equal(pretty_bytes(111111), "111.11 kB")
+  expect_equal(pretty_bytes(1111111), "1.11 MB")
+  expect_equal(pretty_bytes(11111111), "11.11 MB")
+  expect_equal(pretty_bytes(111111111), "111.11 MB")
+  expect_equal(pretty_bytes(1111111111), "1.11 GB")
+  expect_equal(pretty_bytes(11111111111), "11.11 GB")
+  expect_equal(pretty_bytes(111111111111), "111.11 GB")
 })
 
 

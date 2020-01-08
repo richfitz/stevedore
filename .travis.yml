@@ -20,8 +20,6 @@ before_script:
   #  - cp vignettes_src/*.Rmd vignettes
   - sudo pip install -U setuptools
   - sudo pip install -U docker
-after_success:
-  - Rscript -e 'covr::codecov()'
 env:
   - STEVEDORE_TEST_USE_DOCKER=true STEVEDORE_TEST_REQUIRE_DOCKER=true
 addons:
@@ -31,3 +29,9 @@ addons:
       - python-numpy
       - python-requests
       - libhiredis-dev
+matrix:
+  include:
+  - r: devel
+  - r: release
+    after_success:
+    - Rscript -e 'covr::codecov()'
