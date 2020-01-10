@@ -29,15 +29,12 @@ plain_output <- function(x) lang_output(x, "plain")
 ## * All docker command line examples start with `$` to represent the
 ##   unix/bash prompt
 
-```{r}
 docker <- stevedore::docker_client()
-```
 
 ## ## Start a container with ports published to the host
 
-```{r, include = FALSE}
+##+ include=FALSE
 docker$image$pull("gplates/gws")
-```
 
 ## With docker cli:
 
