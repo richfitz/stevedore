@@ -18,8 +18,8 @@ clean_file <- function(path) {
   x <- readLines(path, encoding = "UTF-8")
   x <- gsub("’", "'", x)
   x <- gsub("└", "*", x)
-  x <- gsub("“", '"', x)
-  x <- gsub("”", '"', x)
+  x <- gsub("“", "'", x)
+  x <- gsub("”", "'", x)
   x <- gsub("＝", "=", x)
   if (length(suppressMessages(tools::showNonASCII(x))) > 0) {
     stop("did not clean all non-ascii")
