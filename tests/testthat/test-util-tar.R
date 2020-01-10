@@ -2,6 +2,7 @@ context("util (tar)")
 
 
 test_that("tar_directory", {
+  skip_if_external_tar_unsupported()
   p <- tempfile_test()
   dir.create(p, TRUE, FALSE)
   for (i in letters) {
@@ -49,6 +50,7 @@ test_that("tar_file", {
 
 
 test_that("tar failure", {
+  skip_if_external_tar_unsupported()
   p1 <- tempfile_test()
   p2 <- tempfile_test()
   expect_error(tar_system(p1, p2),
