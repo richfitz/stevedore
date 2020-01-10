@@ -435,7 +435,6 @@ src
 ```
 
 as
-
 ``` {r }
 dest2 <- tempfile()
 docker$cp(src, dest2)

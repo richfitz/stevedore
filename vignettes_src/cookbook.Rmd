@@ -31,17 +31,13 @@ Conventions:
   unix/bash prompt
 
 ``` {r }
-```{r}
 docker <- stevedore::docker_client()
-```
 ```
 
 ## Start a container with ports published to the host
 
-``` {r }
-```{r, include = FALSE}
+``` {r include=FALSE}
 docker$image$pull("gplates/gws")
-```
 ```
 
 With docker cli:

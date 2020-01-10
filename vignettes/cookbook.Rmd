@@ -1,7 +1,7 @@
 ---
 title: "Cookbook"
 author: "Rich FitzJohn"
-date: "2019-03-04"
+date: "2020-01-10"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Cookbook}
@@ -23,17 +23,17 @@ Conventions:
   unix/bash prompt
 
 
-
 ```r
 docker <- stevedore::docker_client()
 ```
+
+```
+## Detected API version '1.40' is above max version '1.39'; downgrading
 ```
 
 ## Start a container with ports published to the host
 
 
-
-```
 
 With docker cli:
 
@@ -80,7 +80,7 @@ gws$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32772
+## 1             80      tcp 0.0.0.0     32774
 ```
 
 
@@ -103,7 +103,7 @@ gws$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32773
+## 1             80      tcp 0.0.0.0     32775
 ```
 
 
