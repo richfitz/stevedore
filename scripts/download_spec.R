@@ -9,7 +9,22 @@ docker_spec_fetch1 <- function(version, dest) {
   url <- sprintf("https://docs.docker.com/engine/api/v%s/swagger.yaml", version)
   dest_file <- file.path(dest, sprintf("v%s.yaml", version))
   download_file(url, dest_file)
+  clean_file(dest_file)
   bzip_file(dest_file)
+}
+
+
+clean_file <- function(path) {
+  x <- readLines(path, encoding = "UTF-8")
+  x <- gsub("’", "'", x)
+  x <- gsub("└", "*", x)
+  x <- gsub("“", '"', x)
+  x <- gsub("”", '"', x)
+  x <- gsub("＝", "=", x)
+  if (length(suppressMessages(tools::showNonASCII(x))) > 0) {
+    stop("did not clean all non-ascii")
+  }
+  writeLines(x, path)
 }
 
 

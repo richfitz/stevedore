@@ -315,7 +315,3 @@
   path: ["definitions", "Secret", "properties", "Spec",]
   value:
     $ref: "#/definitions/SecretSpec"
-
-- version: ["1.25", "1.39"]
-  path: ["paths", "/containers/{id}/changes", "get", "summary"]
-  value: Get changes on a container's filesystem
