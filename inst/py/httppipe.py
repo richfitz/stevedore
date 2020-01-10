@@ -1,7 +1,5 @@
 import sys
 
-from packaging import version
-
 import docker
 import requests
 
@@ -12,12 +10,15 @@ if IS_WINDOWS_PLATFORM:
     #   https://github.com/docker/docker-py/commit/4d7d408
     # which is at version 3.8.0-dev and which change how the adapter
     # is called.
-    if version.parse(docker.__version__) > version.parse("3.8.0"):
+    try:
         from docker.transport import NpipeHTTPAdapter as HttpAdapter
-    else:
+    except ImportError:
         from docker.transport import NpipeAdapter as HttpAdapter
 else:
-    from docker.transport import UnixAdapter as HttpAdapter
+    try:
+        from docker.transport import UnixHTTPAdapter as HttpAdapter
+    except ImportError:
+        from docker.transport import UnixAdapter as HttpAdapter
 
 
 def string_is_binary(x):

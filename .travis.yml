@@ -9,7 +9,6 @@ r_packages:
 before_script:
   - sudo pip install -U setuptools
   - sudo pip install -U docker
-  - sudo pip install -U packaging
   - docker pull hello-world
   - docker pull alpine
   - docker pull alpine:3.1
