@@ -4,10 +4,19 @@
 \alias{docker_client}
 \title{Create docker client}
 \usage{
-docker_client(..., api_version = NULL, host = NULL, cert_path = NULL,
-  tls_verify = NULL, machine = NULL, http_client_type = NULL,
-  data_frame = NULL, quiet = FALSE, debug = NULL,
-  ignore_environment = FALSE)
+docker_client(
+  ...,
+  api_version = NULL,
+  host = NULL,
+  cert_path = NULL,
+  tls_verify = NULL,
+  machine = NULL,
+  http_client_type = NULL,
+  data_frame = NULL,
+  quiet = FALSE,
+  debug = NULL,
+  ignore_environment = FALSE
+)
 }
 \arguments{
 \item{...}{Reserved for future use.  Passing in any unrecognised

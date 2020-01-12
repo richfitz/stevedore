@@ -3,7 +3,6 @@
 \docType{package}
 \name{stevedore}
 \alias{stevedore}
-\alias{stevedore-package}
 \title{Docker Client For R}
 \description{
 \code{stevedore} implements a docker client for R.  Docker is a
