@@ -1,7 +1,7 @@
 ---
 title: "Cookbook"
 author: "Rich FitzJohn"
-date: "2020-01-10"
+date: "2020-01-12"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Cookbook}
@@ -25,10 +25,6 @@ Conventions:
 
 ```r
 docker <- stevedore::docker_client()
-```
-
-```
-## Detected API version '1.40' is above max version '1.39'; downgrading
 ```
 
 ## Start a container with ports published to the host
@@ -80,7 +76,7 @@ gws$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32774
+## 1             80      tcp 0.0.0.0     32771
 ```
 
 
@@ -103,7 +99,7 @@ gws$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32775
+## 1             80      tcp 0.0.0.0     32772
 ```
 
 

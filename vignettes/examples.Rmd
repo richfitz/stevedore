@@ -1,7 +1,7 @@
 ---
 title: "Examples and use-cases"
 author: "Rich FitzJohn"
-date: "2020-01-10"
+date: "2020-01-12"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{Examples and use-cases}
@@ -22,18 +22,12 @@ install.packages("redux")
 
 ```r
 docker <- stevedore::docker_client()
-```
 
-```
-## Detected API version '1.40' is above max version '1.39'; downgrading
-```
-
-```r
 redis <- docker$container$run("redis", name = "redis", ports = "6379",
                               detach = TRUE, rm = TRUE)
 ```
 
-We now have a Redis server running on 32772
+We now have a Redis server running on 32769
 
 ```r
 redis$ports()
@@ -41,7 +35,7 @@ redis$ports()
 
 ```
 ##   container_port protocol host_ip host_port
-## 1           6379      tcp 0.0.0.0     32772
+## 1           6379      tcp 0.0.0.0     32769
 ```
 
 Make a connection to the Redis server:
@@ -225,35 +219,177 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## Step 1/6 : FROM rocker/r-ver:latest
 ##  ---> f3ed4b5c4d71
 ## Step 2/6 : RUN apt-get update &&         apt-get install -yy                 git                 libcurl4-openssl-dev                 libssl-dev                 qpdf
-##  ---> Using cache
-##  ---> 9132ad815afa
+##  ---> Running in 6a6764feef2c
+## Get:1 http://deb.debian.org/debian buster InRelease [122 kB]
+## Get:3 http://deb.debian.org/debian buster-updates InRelease [49.3 kB]
+## Get:2 http://security-cdn.debian.org/debian-security buster/updates InRelease [65.4 kB]
+## Get:4 http://deb.debian.org/debian buster/main amd64 Packages [7,908 kB]
+## Get:5 http://security-cdn.debian.org/debian-security buster/updates/main amd64 Packages [169 kB]
+## Get:6 http://deb.debian.org/debian buster-updates/main amd64 Packages [5,792 B]
+## Fetched 8,319 kB in 4s (1,901 kB/s)
+## Reading package lists...
+## Reading package lists...
+## Building dependency tree...
+## Reading state information...
+## The following additional packages will be installed:
+##   git-man less libcurl3-gnutls libedit2 liberror-perl libgdbm-compat4 libgdbm6
+##   libpcre2-8-0 libperl5.28 libqpdf21 libxmuu1 netbase openssh-client patch
+##   perl perl-modules-5.28 xauth
+## Suggested packages:
+##   gettext-base git-daemon-run | git-daemon-sysvinit git-doc git-el git-email
+##   git-gui gitk gitweb git-cvs git-mediawiki git-svn libcurl4-doc libidn11-dev
+##   libkrb5-dev libldap2-dev librtmp-dev libssh2-1-dev pkg-config zlib1g-dev
+##   gdbm-l10n libssl-doc keychain libpam-ssh monkeysphere ssh-askpass ed
+##   diffutils-doc perl-doc libterm-readline-gnu-perl
+##   | libterm-readline-perl-perl libb-debug-perl liblocale-codes-perl
+## The following NEW packages will be installed:
+##   git git-man less libcurl3-gnutls libcurl4-openssl-dev libedit2 liberror-perl
+##   libgdbm-compat4 libgdbm6 libpcre2-8-0 libperl5.28 libqpdf21 libssl-dev
+##   libxmuu1 netbase openssh-client patch perl perl-modules-5.28 qpdf xauth
+## 0 upgraded, 21 newly installed, 0 to remove and 2 not upgraded.
+## Need to get 19.2 MB of archives.
+## After this operation, 103 MB of additional disk space will be used.
+## Get:1 http://deb.debian.org/debian buster/main amd64 perl-modules-5.28 all 5.28.1-6 [2,873 kB]
+## Get:2 http://security-cdn.debian.org/debian-security buster/updates/main amd64 git-man all 1:2.20.1-2+deb10u1 [1,620 kB]
+## Get:4 http://deb.debian.org/debian buster/main amd64 libgdbm6 amd64 1.18.1-4 [64.7 kB]
+## Get:3 http://security-cdn.debian.org/debian-security buster/updates/main amd64 git amd64 1:2.20.1-2+deb10u1 [5,620 kB]
+## Get:5 http://deb.debian.org/debian buster/main amd64 libgdbm-compat4 amd64 1.18.1-4 [44.1 kB]
+## Get:6 http://deb.debian.org/debian buster/main amd64 libperl5.28 amd64 5.28.1-6 [3,883 kB]
+## Get:7 http://deb.debian.org/debian buster/main amd64 perl amd64 5.28.1-6 [204 kB]
+## Get:8 http://deb.debian.org/debian buster/main amd64 less amd64 487-0.1+b1 [129 kB]
+## Get:9 http://deb.debian.org/debian buster/main amd64 netbase all 5.6 [19.4 kB]
+## Get:10 http://deb.debian.org/debian buster/main amd64 libedit2 amd64 3.1-20181209-1 [94.0 kB]
+## Get:11 http://deb.debian.org/debian buster/main amd64 openssh-client amd64 1:7.9p1-10+deb10u1 [782 kB]
+## Get:12 http://deb.debian.org/debian buster/main amd64 libcurl3-gnutls amd64 7.64.0-4 [329 kB]
+## Get:13 http://deb.debian.org/debian buster/main amd64 libpcre2-8-0 amd64 10.32-5 [213 kB]
+## Get:14 http://deb.debian.org/debian buster/main amd64 liberror-perl all 0.17027-2 [30.9 kB]
+## Get:15 http://deb.debian.org/debian buster/main amd64 libcurl4-openssl-dev amd64 7.64.0-4 [419 kB]
+## Get:16 http://deb.debian.org/debian buster/main amd64 libqpdf21 amd64 8.4.0-2 [435 kB]
+## Get:17 http://deb.debian.org/debian buster/main amd64 libssl-dev amd64 1.1.1d-0+deb10u2 [1,793 kB]
+## Get:18 http://deb.debian.org/debian buster/main amd64 libxmuu1 amd64 2:1.1.2-2+b3 [23.9 kB]
+## Get:19 http://deb.debian.org/debian buster/main amd64 patch amd64 2.7.6-3+deb10u1 [126 kB]
+## Get:20 http://deb.debian.org/debian buster/main amd64 qpdf amd64 8.4.0-2 [413 kB]
+## Get:21 http://deb.debian.org/debian buster/main amd64 xauth amd64 1:1.0.10-1 [40.3 kB]
+## [91mdebconf: delaying package configuration, since apt-utils is not installed
+## [0mFetched 19.2 MB in 6s (3,115 kB/s)
+## Selecting previously unselected package perl-modules-5.28.
+## (Reading database ... (Reading database ... 5%(Reading database ... 10%(Reading database ... 15%(Reading database ... 20%(Reading database ... 25%(Reading database ... 30%(Reading database ... 35%(Reading database ... 40%(Reading database ... 45%(Reading database ... 50%(Reading database ... 55%(Reading database ... 60%(Reading database ... 65%(Reading database ... 70%(Reading database ... 75%(Reading database ... 80%(Reading database ... 85%(Reading database ... 90%(Reading database ... 95%(Reading database ... 100%(Reading database ... 12848 files and directories currently installed.)
+## Preparing to unpack .../00-perl-modules-5.28_5.28.1-6_all.deb ...
+## Unpacking perl-modules-5.28 (5.28.1-6) ...
+## Selecting previously unselected package libgdbm6:amd64.
+## Preparing to unpack .../01-libgdbm6_1.18.1-4_amd64.deb ...
+## Unpacking libgdbm6:amd64 (1.18.1-4) ...
+## Selecting previously unselected package libgdbm-compat4:amd64.
+## Preparing to unpack .../02-libgdbm-compat4_1.18.1-4_amd64.deb ...
+## Unpacking libgdbm-compat4:amd64 (1.18.1-4) ...
+## Selecting previously unselected package libperl5.28:amd64.
+## Preparing to unpack .../03-libperl5.28_5.28.1-6_amd64.deb ...
+## Unpacking libperl5.28:amd64 (5.28.1-6) ...
+## Selecting previously unselected package perl.
+## Preparing to unpack .../04-perl_5.28.1-6_amd64.deb ...
+## Unpacking perl (5.28.1-6) ...
+## Selecting previously unselected package less.
+## Preparing to unpack .../05-less_487-0.1+b1_amd64.deb ...
+## Unpacking less (487-0.1+b1) ...
+## Selecting previously unselected package netbase.
+## Preparing to unpack .../06-netbase_5.6_all.deb ...
+## Unpacking netbase (5.6) ...
+## Selecting previously unselected package libedit2:amd64.
+## Preparing to unpack .../07-libedit2_3.1-20181209-1_amd64.deb ...
+## Unpacking libedit2:amd64 (3.1-20181209-1) ...
+## Selecting previously unselected package openssh-client.
+## Preparing to unpack .../08-openssh-client_1%3a7.9p1-10+deb10u1_amd64.deb ...
+## Unpacking openssh-client (1:7.9p1-10+deb10u1) ...
+## Selecting previously unselected package libcurl3-gnutls:amd64.
+## Preparing to unpack .../09-libcurl3-gnutls_7.64.0-4_amd64.deb ...
+## Unpacking libcurl3-gnutls:amd64 (7.64.0-4) ...
+## Selecting previously unselected package libpcre2-8-0:amd64.
+## Preparing to unpack .../10-libpcre2-8-0_10.32-5_amd64.deb ...
+## Unpacking libpcre2-8-0:amd64 (10.32-5) ...
+## Selecting previously unselected package liberror-perl.
+## Preparing to unpack .../11-liberror-perl_0.17027-2_all.deb ...
+## Unpacking liberror-perl (0.17027-2) ...
+## Selecting previously unselected package git-man.
+## Preparing to unpack .../12-git-man_1%3a2.20.1-2+deb10u1_all.deb ...
+## Unpacking git-man (1:2.20.1-2+deb10u1) ...
+## Selecting previously unselected package git.
+## Preparing to unpack .../13-git_1%3a2.20.1-2+deb10u1_amd64.deb ...
+## Unpacking git (1:2.20.1-2+deb10u1) ...
+## Selecting previously unselected package libcurl4-openssl-dev:amd64.
+## Preparing to unpack .../14-libcurl4-openssl-dev_7.64.0-4_amd64.deb ...
+## Unpacking libcurl4-openssl-dev:amd64 (7.64.0-4) ...
+## Selecting previously unselected package libqpdf21:amd64.
+## Preparing to unpack .../15-libqpdf21_8.4.0-2_amd64.deb ...
+## Unpacking libqpdf21:amd64 (8.4.0-2) ...
+## Selecting previously unselected package libssl-dev:amd64.
+## Preparing to unpack .../16-libssl-dev_1.1.1d-0+deb10u2_amd64.deb ...
+## Unpacking libssl-dev:amd64 (1.1.1d-0+deb10u2) ...
+## Selecting previously unselected package libxmuu1:amd64.
+## Preparing to unpack .../17-libxmuu1_2%3a1.1.2-2+b3_amd64.deb ...
+## Unpacking libxmuu1:amd64 (2:1.1.2-2+b3) ...
+## Selecting previously unselected package patch.
+## Preparing to unpack .../18-patch_2.7.6-3+deb10u1_amd64.deb ...
+## Unpacking patch (2.7.6-3+deb10u1) ...
+## Selecting previously unselected package qpdf.
+## Preparing to unpack .../19-qpdf_8.4.0-2_amd64.deb ...
+## Unpacking qpdf (8.4.0-2) ...
+## Selecting previously unselected package xauth.
+## Preparing to unpack .../20-xauth_1%3a1.0.10-1_amd64.deb ...
+## Unpacking xauth (1:1.0.10-1) ...
+## Setting up perl-modules-5.28 (5.28.1-6) ...
+## Setting up libedit2:amd64 (3.1-20181209-1) ...
+## Setting up less (487-0.1+b1) ...
+## debconf: unable to initialize frontend: Dialog
+## debconf: (No usable dialog-like program is installed, so the dialog based frontend cannot be used. at /usr/share/perl5/Debconf/FrontEnd/Dialog.pm line 76.)
+## debconf: falling back to frontend: Readline
+## Setting up libcurl3-gnutls:amd64 (7.64.0-4) ...
+## Setting up libqpdf21:amd64 (8.4.0-2) ...
+## Setting up libcurl4-openssl-dev:amd64 (7.64.0-4) ...
+## Setting up qpdf (8.4.0-2) ...
+## Setting up libssl-dev:amd64 (1.1.1d-0+deb10u2) ...
+## Setting up patch (2.7.6-3+deb10u1) ...
+## Setting up libpcre2-8-0:amd64 (10.32-5) ...
+## Setting up git-man (1:2.20.1-2+deb10u1) ...
+## Setting up netbase (5.6) ...
+## Setting up libxmuu1:amd64 (2:1.1.2-2+b3) ...
+## Setting up libgdbm6:amd64 (1.18.1-4) ...
+## Setting up openssh-client (1:7.9p1-10+deb10u1) ...
+## Setting up libgdbm-compat4:amd64 (1.18.1-4) ...
+## Setting up libperl5.28:amd64 (5.28.1-6) ...
+## Setting up xauth (1:1.0.10-1) ...
+## Setting up perl (5.28.1-6) ...
+## Setting up liberror-perl (0.17027-2) ...
+## Setting up git (1:2.20.1-2+deb10u1) ...
+## Processing triggers for libc-bin (2.28-10) ...
+## Removing intermediate container 6a6764feef2c
+##  ---> 7cf3bd16a336
 ## Step 3/6 : RUN install2.r --error         curl         knitr         openssl         rcmdcheck         rmarkdown         rcorpora         testthat         uuid
-##  ---> Running in 51c20bf8327e
+##  ---> Running in 4fedb68c3d63
 ## [91malso installing the dependencies ‘ps’, ‘glue’, ‘stringi’, ‘sys’, ‘processx’, ‘assertthat’, ‘fansi’, ‘backports’, ‘Rcpp’, ‘rstudioapi’, ‘evaluate’, ‘highr’, ‘markdown’, ‘stringr’, ‘yaml’, ‘xfun’, ‘askpass’, ‘callr’, ‘cli’, ‘crayon’, ‘desc’, ‘digest’, ‘pkgbuild’, ‘prettyunits’, ‘R6’, ‘rprojroot’, ‘sessioninfo’, ‘withr’, ‘xopen’, ‘htmltools’, ‘base64enc’, ‘jsonlite’, ‘mime’, ‘tinytex’, ‘ellipsis’, ‘magrittr’, ‘pkgload’, ‘praise’, ‘rlang’
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/ps_1.3.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 261887 bytes (255 KB)
-## ===[0m[91m===[0m[91m===[0m[91m==[0m[91m=[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m=[0m[91m===[0m[91m====[0m[91m==[0m[91m====[0m[91m===[0m[91m===[0m[91m===[0m[91m====
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 261887 bytes (255 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m===[0m[91m=[0m[91m===[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==
 ## downloaded 255 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/glue_1.3.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 122950 bytes (120 KB)
-## ======[0m[91m=======[0m[91m======[0m[91m======[0m[91m=[0m[91m=======[0m[91m======[0m[91m=======[0m[91m====
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 122950 bytes (120 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=======[0m[91m======[0m[91m=======[0m[91m=======[0m[91m====
 ## downloaded 120 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/stringi_1.4.4.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 7284184 bytes (6.9 MB)
+## trying URL 'https://cran.rstudio.com/src/contrib/stringi_1.4.5.tar.gz'
+## [0m[91mContent type 'application/x-gzip' length 7284255 bytes (6.9 MB)
 ## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 6.9 MB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/sys_3.3.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 20225 bytes (19 KB)
-## =======================================[0m[91m===========
+## ==================================================
 ## downloaded 19 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/processx_3.4.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 123430 bytes (120 KB)
-## ======[0m[91m=======[0m[91m==========[0m[91m===[0m[91m======[0m[91m=======[0m[91m=====[0m[91m======[0m[91m
+## =[0m[91m==[0m[91m=======[0m[91m=[0m[91m=[0m[91m====[0m[91m=======[0m[91m=======[0m[91m======[0m[91m=======[0m[91m=======
 ## downloaded 120 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/assertthat_0.2.1.tar.gz'
@@ -263,112 +399,112 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/fansi_0.4.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 270906 bytes (264 KB)
-## ==[0m[91m===[0m[91m==[0m[91m===[0m[91m=[0m[91m=====[0m[91m===[0m[91m=[0m[91m====[0m[91m===[0m[91m=[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m===[0m[91m===[0m[91m===[0m[91m==
-## downloaded 264 KB
+## ===[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m==[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m=[0m[91m===[0m[91m==[0m[91m===[0m[91m===[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m===[0m[91m==[0m[91m
+## [0m[91mdownloaded 264 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/backports_1.1.5.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 14798 bytes (14 KB)
-## ==================================================
-## downloaded 14 KB
+## =[0m[91m=[0m[91m=[0m[91m=[0m[91m==============================================
+## [0m[91mdownloaded 14 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/Rcpp_1.0.3.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 2749025 bytes (2.6 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
 ## downloaded 2.6 MB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rstudioapi_0.10.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 61888 bytes (60 KB)
-## ============[0m[91m=======================[0m[91m===============
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 61888 bytes (60 KB)
+## ======[0m[91m======[0m[91m==============[0m[91m=============[0m[91m========[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 60 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/evaluate_0.14.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 24206 bytes (23 KB)
-## =================================[0m[91m=================
+## ==========[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================================
 ## downloaded 23 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/highr_0.8.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 17445 bytes (17 KB)
-## =============================================[0m[91m=====
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 17445 bytes (17 KB)
+## [0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m===[0m[91m==[0m[91m===[0m[91m==[0m[91m====[0m[91m===[0m[91m=======================[0m[91m==[0m[91m===
 ## downloaded 17 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/markdown_1.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 81050 bytes (79 KB)
-## =========[0m[91m==========[0m[91m==========[0m[91m==========[0m[91m=[0m[91m==========
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 81050 bytes (79 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================[0m[91m==========
 ## downloaded 79 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/stringr_1.4.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 135777 bytes (132 KB)
-## =====[0m[91m======[0m[91m======[0m[91m======[0m[91m======[0m[91m======[0m[91m======[0m[91m=======[0m[91m==
+## trying URL 'https://cran.rstudio.com/src/contrib/stringr_1.4.0.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 135777 bytes (132 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=====[0m[91m=[0m[91m=====[0m[91m======[0m[91m======[0m[91m==[0m[91m======[0m[91m======[0m[91m=======
 ## downloaded 132 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/yaml_2.2.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 89447 bytes (87 KB)
-## ========[0m[91m==========[0m[91m=========[0m[91m========[0m[91m==========[0m[91m=====
+## trying URL 'https://cran.rstudio.com/src/contrib/yaml_2.2.0.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 89447 bytes (87 KB)
+## ===============================[0m[91m===================
 ## downloaded 87 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/xfun_0.11.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/xfun_0.11.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 57700 bytes (56 KB)
-## =============[0m[91m===============[0m[91m==============[0m[91m========
+## ==================================================
 ## downloaded 56 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/askpass_1.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 5730 bytes
-## ==================================================
+## trying URL 'https://cran.rstudio.com/src/contrib/askpass_1.1.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 5730 bytes
+## [0m[91m====[0m[91m=[0m[91m=[0m[91m=[0m[91m=====[0m[91m=[0m[91m=====================================
 ## downloaded 5730 bytes
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/callr_3.4.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 100129 bytes (97 KB)
-## =======[0m[91m============[0m[91m========[0m[91m=====[0m[91m===========[0m[91m=======
+## trying URL 'https://cran.rstudio.com/src/contrib/callr_3.4.0.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 100129 bytes (97 KB)
+## =======[0m[91m===[0m[91m======[0m[91m======[0m[91m======[0m[91m========[0m[91m=========[0m[91m=====
 ## downloaded 97 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/cli_2.0.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 111914 bytes (109 KB)
-## =======[0m[91m=======[0m[91m=======[0m[91m=======[0m[91m========[0m[91m=======[0m[91m=======
+## =======[0m[91m=======[0m[91m=======[0m[91m=======[0m[91m=======[0m[91m========[0m[91m=======
 ## downloaded 109 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/crayon_1.3.4.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 658694 bytes (643 KB)
-## =[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m==[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=
-## [0m[91mdownloaded 643 KB
+## trying URL 'https://cran.rstudio.com/src/contrib/crayon_1.3.4.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 658694 bytes (643 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m==
+## downloaded 643 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/desc_1.2.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 65612 bytes (64 KB)
-## ============[0m[91m============[0m[91m=============[0m[91m=============
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 65612 bytes (64 KB)
+## ===============[0m[91m============[0m[91m=============[0m[91m==========
 ## downloaded 64 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/digest_0.6.23.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 143316 bytes (139 KB)
-## =====[0m[91m======[0m[91m======[0m[91m=====[0m[91m======[0m[91m======[0m[91m======[0m[91m=====[0m[91m=====
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 143316 bytes (139 KB)
+## =====[0m[91m=======[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=====[0m[91m=====
 ## downloaded 139 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/pkgbuild_1.0.6.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 29322 bytes (28 KB)
-## ===========================[0m[91m==[0m[91m=====================[0m[91m
+## trying URL 'https://cran.rstudio.com/src/contrib/pkgbuild_1.0.6.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 29322 bytes (28 KB)
+## [0m[91m=[0m[91m=[0m[91m=========================[0m[91m=======================
 ## downloaded 28 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/prettyunits_1.1.0.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 10179 bytes
-## ==================================================
+## ==================================================[0m[91m
 ## downloaded 10179 bytes
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/R6_2.4.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 35536 bytes (34 KB)
-## ======================[0m[91m==================[0m[91m==========
+## ==================================================
 ## downloaded 34 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rprojroot_1.3-2.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/rprojroot_1.3-2.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 50414 bytes (49 KB)
-## ===============[0m[91m=======================[0m[91m============
+## ===============[0m[91m=================[0m[91m================[0m[91m==[0m[91m
 ## downloaded 49 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/sessioninfo_1.1.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 46027 bytes (44 KB)
-## =================[0m[91m==================[0m[91m===============
+## =================[0m[91m============[0m[91m===[0m[91m=[0m[91m====[0m[91m=[0m[91m=====[0m[91m=[0m[91m=[0m[91m=[0m[91m====[0m[91m
 ## downloaded 44 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/withr_2.1.2.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 53578 bytes (52 KB)
-## ==============[0m[91m===============[0m[91m=====================
+## ===[0m[91m=[0m[91m==[0m[91m=[0m[91m===========================================
 ## downloaded 52 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/xopen_1.0.0.tar.gz'
@@ -378,27 +514,27 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/htmltools_0.4.0.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 52542 bytes (51 KB)
-## ===============[0m[91m===============[0m[91m====================[0m[91m
+## ===============[0m[91m===============[0m[91m====================
 ## downloaded 51 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/base64enc_0.1-3.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/base64enc_0.1-3.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 7833 bytes
-## ==================================================
+## [0m[91m=[0m[91m=[0m[91m================================================[0m[91m
 ## downloaded 7833 bytes
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/jsonlite_1.6.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 1052728 bytes (1.0 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m
 ## downloaded 1.0 MB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/mime_0.8.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 12813 bytes (12 KB)
-## ==================================================
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 12813 bytes (12 KB)
+## [0m[91m=[0m[91m=[0m[91m======[0m[91m=[0m[91m=[0m[91m========================================
 ## downloaded 12 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/tinytex_0.18.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/tinytex_0.18.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 24265 bytes (23 KB)
-## ================================[0m[91m==================
+## ==[0m[91m=[0m[91m=[0m[91m=[0m[91m===[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================
 ## downloaded 23 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/ellipsis_0.3.0.tar.gz'
@@ -408,62 +544,62 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/magrittr_1.5.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 200504 bytes (195 KB)
-## ===[0m[91m====[0m[91m=[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m======[0m[91m
+## ===[0m[91m=====[0m[91m=[0m[91m====[0m[91m===[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m==
 ## downloaded 195 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/pkgload_1.0.2.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/pkgload_1.0.2.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 55605 bytes (54 KB)
-## ==============[0m[91m===============[0m[91m=====================
+## ====[0m[91m=[0m[91m=============================================
 ## downloaded 54 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/praise_1.0.0.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/praise_1.0.0.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 6100 bytes
 ## ==================================================
 ## downloaded 6100 bytes
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rlang_0.4.2.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/rlang_0.4.2.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 807983 bytes (789 KB)
-## [0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 789 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/curl_4.3.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/curl_4.3.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 673779 bytes (657 KB)
-## =[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m==
+## =[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m==
 ## downloaded 657 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/knitr_1.26.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 883689 bytes (862 KB)
-## [0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
+## trying URL 'https://cran.rstudio.com/src/contrib/knitr_1.26.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 883689 bytes (862 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 862 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/openssl_1.4.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 1206885 bytes (1.2 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+## ===[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 1.2 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rcmdcheck_1.3.3.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 45380 bytes (44 KB)
-## =================[0m[91m==================[0m[91m===============
-## downloaded 44 KB
+## trying URL 'https://cran.rstudio.com/src/contrib/rcmdcheck_1.3.3.tar.gz'
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 45380 bytes (44 KB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m===========================[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
+## [0m[91mdownloaded 44 KB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rmarkdown_2.0.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 3186667 bytes (3.0 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
-## downloaded 3.0 MB
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
+## [0m[91mdownloaded 3.0 MB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rcorpora_2.0.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 1432100 bytes (1.4 MB)
+## [0m[91mContent type 'application/x-gzip'[0m[91m length 1432100 bytes (1.4 MB)
 ## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
 ## downloaded 1.4 MB
 ##
 ## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/testthat_2.3.1.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 247984 bytes (242 KB)
-## ===[0m[91m=[0m[91m===[0m[91m=[0m[91m====[0m[91m=[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m====[0m[91m====
+## ===[0m[91m==[0m[91m====[0m[91m===[0m[91m=[0m[91m===[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m====[0m[91m====
 ## downloaded 242 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/uuid_0.1-2.tar.gz'
+## trying URL 'https://cran.rstudio.com/src/contrib/uuid_0.1-2.tar.gz'
 ## [0m[91mContent type 'application/x-gzip' length 46706 bytes (45 KB)
-## ============================[0m[91m==================[0m[91m====
+## ==============[0m[91m==================[0m[91m==================
 ## downloaded 45 KB
 ##
 ## [0m[91m* installing *source* package ‘ps’ ...
@@ -482,7 +618,7 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api-linux.c -o api-linux.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o ps.so init.o api-common.o common.o extra.o dummy.o posix.o api-posix.o linux.o api-linux.o -L/usr/local/lib/R/lib -lR
 ## [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-ps/00new/ps
-## [0m[91m** R
+## ** R
 ## [0m[91m** inst
 ## [0m[91m** byte-compile and prepare package for lazy loading
 ## [0m[91m** help
@@ -492,7 +628,7 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## [0m[91m** checking absolute paths in shared objects and dynamic libraries
 ## [0m[91m** testing if installed package can be loaded from final location
 ## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (ps)
+## * DONE (ps)
 ## [0m[91m* installing *source* package ‘glue’ ...
 ## [0m[91m** package ‘glue’ successfully unpacked and MD5 sums checked
 ## [0m[91m** using staged installation
@@ -566,9 +702,9 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## checking whether we can fetch icudt... [91mdownloading the ICU data library (icudt)
 ## [0m[91moutput path: icu61/data/icudt61l.zip
 ## [0m[91mtrying URL 'http://www.ibspan.waw.pl/~gagolews/stringi/icudt61l.zip'
-## [0m[91mContent type 'application/zip' length 10791080 bytes (10.3 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
-## downloaded 10.3 MB
+## [0m[91mContent type 'application/zip'[0m[91m length 10791080 bytes (10.3 MB)
+## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
+## [0m[91mdownloaded 10.3 MB
 ##
 ## [0m[91micudt fetch successful
 ## [0mconfigure: creating ./config.status
@@ -1736,7 +1872,7 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## [0m[91m** checking absolute paths in shared objects and dynamic libraries
 ## [0m[91m** testing if installed package can be loaded from final location
 ## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (askpass)
+## * DONE (askpass)
 ## [0m[91m* installing *source* package ‘cli’ ...
 ## [0m[91m** package ‘cli’ successfully unpacked and MD5 sums checked
 ## [0m[91m** using staged installation
@@ -2028,21 +2164,21 @@ img <- docker$image$build("tester", tag = "richfitz/tester")
 ## [0m[91m** testing if installed package keeps a record of temporary installation path
 ## [0m[91m* DONE (testthat)
 ## [0m[91m
-## The downloaded source packages are in
+## [0m[91mThe downloaded source packages are in
 ## 	‘/tmp/downloaded_packages’
-## [0mRemoving intermediate container 51c20bf8327e
-##  ---> 0c8d185df1ee
+## [0mRemoving intermediate container 4fedb68c3d63
+##  ---> 4793cd0a9742
 ## Step 4/6 : COPY tester.sh /usr/local/bin
-##  ---> 0c75fa8e6152
+##  ---> bd6cf5371b42
 ## Step 5/6 : RUN chmod +x /usr/local/bin/tester.sh
-##  ---> Running in 3a78eaf52a20
-## Removing intermediate container 3a78eaf52a20
-##  ---> 3233d97870d8
+##  ---> Running in 773796bbe2b2
+## Removing intermediate container 773796bbe2b2
+##  ---> fa74f9d6360c
 ## Step 6/6 : ENTRYPOINT ["/usr/local/bin/tester.sh"]
-##  ---> Running in c6445308bd5e
-## Removing intermediate container c6445308bd5e
-##  ---> c0e41639ee3a
-## Successfully built c0e41639ee3a
+##  ---> Running in 8b65a8103536
+## Removing intermediate container 8b65a8103536
+##  ---> f28c74a4b075
+## Successfully built f28c74a4b075
 ## Successfully tagged richfitz/tester:latest
 ```
 
@@ -2054,8 +2190,8 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ```
 
 ```
-## E> Cloning into '/tmp/tmp.sb2IIlofgV'...
-## O> * checking for file ‘/tmp/tmp.sb2IIlofgV/DESCRIPTION’ ... OK
+## E> Cloning into '/tmp/tmp.7eoWpFjoX1'...
+## O> * checking for file ‘/tmp/tmp.7eoWpFjoX1/DESCRIPTION’ ... OK
 ## O> * preparing ‘ids’:
 ## O> * checking DESCRIPTION meta-information ... OK
 ## O> * installing the package to build vignettes
@@ -2066,7 +2202,7 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ## O> * building ‘ids_1.1.0.tar.gz’
 ## E>
 ## O> ── R CMD check ─────────────────────────────────────────────────────────────────
-## O> * using log directory ‘/tmp/RtmpgsYVCz/file90417947b1/ids.Rcheck’
+## O> * using log directory ‘/tmp/Rtmph66C1d/file6a36150827/ids.Rcheck’
 ## O> * using R version 3.6.2 (2019-12-12)
 ## O> * using platform: x86_64-pc-linux-gnu (64-bit)
 ## O> * using session charset: UTF-8
@@ -2132,7 +2268,7 @@ invisible(docker$container$run(img, "https://github.com/richfitz/ids",
 ## O> Status: OK
 ## O>
 ## O> ── R CMD check results ────────────────────────────────────────── ids 1.1.0 ────
-## O> Duration: 14.3s
+## O> Duration: 15.7s
 ## O>
 ## O> 0 errors ✔ | 0 warnings ✔ | 0 notes ✔
 ```
