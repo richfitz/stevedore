@@ -1,4 +1,6 @@
 language: r
+# without setting the distribution we get 14.04 which is really too old.
+dist: xenial
 sudo: required
 cache: packages
 services:
@@ -7,8 +9,6 @@ r_packages:
   - xml2
   - covr
 before_script:
-  - sudo pip install -U setuptools
-  - sudo pip install -U docker
   - docker pull hello-world
   - docker pull alpine
   - docker pull alpine:3.1
