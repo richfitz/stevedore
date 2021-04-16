@@ -16,3 +16,4 @@ vignettes_src
 ^inst/spec/v[0-9.]+\.yaml$
 ^scripts$
 ^appveyor\.yml$
+^\.github$
