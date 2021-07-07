@@ -559,7 +559,7 @@ validate_env <- function(env, name = deparse(substitute(env))) {
   if (is.recursive(env)) {
     if (any(lengths(env) > 1)) {
       stop(sprintf("All elements of '%s' must be scalar (or use atomic vector)",
-                   name, call. = FALSE))
+                   name), call. = FALSE)
     }
     env <- vcapply(env, function(x) if (is.null(x)) "" else as.character(x))
   }
