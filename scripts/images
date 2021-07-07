@@ -1,0 +1,9 @@
+#!/bin/sh
+docker pull hello-world
+docker pull alpine
+docker pull alpine:3.1
+docker pull bfirsh/reticulate-splines
+docker pull nginx
+docker pull redis
+docker pull bobrik/socat:latest
+(cd tests/testthat/images && ./build.sh)
