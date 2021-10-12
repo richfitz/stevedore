@@ -73,9 +73,6 @@ jobs:
       # - name: Pull images
       #   run: ./scripts/images
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-
       - name: Check
         env:
           _R_CHECK_CRAN_INCOMING_REMOTE_: false
