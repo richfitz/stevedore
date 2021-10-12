@@ -136,7 +136,7 @@ The primary limitation of the `httppipe` interface is that streaming connections
 
 ### Going forward
 
-The support in this package is a duplicate of the micropackage [`httppipe`](http://github.com/richfitz/httppipe).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
+The support in this package is a duplicate of the micropackage [`httppipe`](http://github.com/richfitz/httppipe/).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
 
 ## Development and testing
 
