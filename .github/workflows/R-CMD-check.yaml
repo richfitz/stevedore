@@ -70,8 +70,8 @@ jobs:
           remotes::install_cran("rcmdcheck")
         shell: Rscript {0}
 
-      # - name: Pull images
-      #   run: ./scripts/images
+      - name: Pull images
+        run: ./scripts/images
 
       - name: Check
         env:
