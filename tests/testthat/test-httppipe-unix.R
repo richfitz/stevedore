@@ -93,6 +93,7 @@ test_that("available: verbose", {
 
 
 test_that("python_locate_version", {
+  skip_on_cran()
   skip_if_not_installed("reticulate")
   expect_error(python_locate_version("nosuchmodule"),
                "Did not find required python module 'nosuchmodule'")
