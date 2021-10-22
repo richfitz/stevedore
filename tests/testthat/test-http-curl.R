@@ -16,8 +16,12 @@ test_that("construction", {
   expect_true(cl$can_stream)
   expect_is(cl$ping, "function")
 
-  expected <- parse_headers(rawToChar(cl$ping()$headers))[["Api-Version"]]
-  expect_equal(cl$api_version, expected)
+  version_api <- parse_headers(rawToChar(cl$ping()$headers))[["Api-Version"]]
+  version_max <- DOCKER_API_VERSION_MAX
+  version_expected <- as.character(
+    min(numeric_version(version_api), numeric_version(version_max)))
+
+  expect_equal(cl$api_version, version_expected)
 })
 
 
@@ -131,7 +135,7 @@ test_that("connect over http", {
   on.exit(proxy$kill())
 
   ## The port on the proxy container:
-  port <- proxy$ports()$host_port
+  port <- proxy$ports()$host_port[[1]]
 
   ## Here we should try and wait:
   f <- function() {
@@ -142,7 +146,7 @@ test_that("connect over http", {
 
   cl_http <- docker_client(host = sprintf("tcp://localhost:%s", port),
                            ignore_environment = TRUE)
-  expect_identical(cl_http$ping(), cl$ping())
+  expect_equal(cl_http$ping(), cl$ping(), check.attributes = FALSE)
   expect_is(cl_http$container$list(), "data.frame")
 })
 
@@ -173,7 +177,9 @@ test_that("connect to machine", {
 
 
 test_that("debug http", {
+  ## NOTE: this test, via libcurl, creates un-suppressable output
   cl <- test_docker_client() # ensures we can do docker things
+  skip_on_cran()
 
   config <- docker_config(ignore_environment = TRUE,
                           http_client_type = "curl",

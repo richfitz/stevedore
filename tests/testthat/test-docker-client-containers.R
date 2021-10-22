@@ -272,7 +272,6 @@ test_that("logs", {
                "^Reticulating spline \\d+...$")
   expect_match(capture.output(print(logs, style = "prefix")),
                "^O> Reticulating spline \\d+...$")
-  expect_match(capture.output(print(logs)), "Reticulating spline \\d+...")
 })
 
 
@@ -859,11 +858,6 @@ test_that("port map - random free port", {
   expect_equal(ports$protocol, "tcp")
   expect_equal(ports$host_ip, "0.0.0.0")
   expect_equal(ports$container_port, "80")
-
-  dat <- curl::curl_fetch_memory(sprintf("http://127.0.0.1:%s/",
-                                         ports$host_port))
-  expect_equal(dat$status_code, 200L)
-  expect_true(grepl("nginx", rawToChar(dat$content)))
 })
 
 

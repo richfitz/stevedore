@@ -175,7 +175,8 @@ test_that("stream printing", {
                "^Reticulating spline \\d+...$")
   expect_match(capture.output(print(logs, style = "prefix")),
                "^O> Reticulating spline \\d+...$")
-  expect_match(capture.output(print(logs)), "Reticulating spline \\d+...")
+  expect_match(capture_output_no_crayon(print(logs)),
+               "Reticulating spline \\d+...")
 })
 
 
@@ -309,7 +310,14 @@ test_that("download_file", {
   x <- d$container$run("nginx", detach = TRUE, ports = TRUE, rm = TRUE)
   on.exit(x$stop(0))
 
-  url <- sprintf("http://localhost:%s/index.html", x$ports()$host_port)
+  url <- sprintf("http://localhost:%s/index.html", x$ports()$host_port[[1]])
+
+  f <- function() {
+    res <- curl::curl_fetch_memory(url)
+    res$status_code == 200
+  }
+  wait_until_ready(f)
+
   p <- tempfile_test()
 
   expect_silent(cmp <- download_file(url, p, quiet = TRUE))

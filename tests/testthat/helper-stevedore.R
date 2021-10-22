@@ -588,3 +588,10 @@ skip_if_external_tar_unsupported <- function() {
     testthat::skip("Stevedore does not support this tar")
   }
 }
+
+
+capture_output_no_crayon <- function(code) {
+  withr::with_options(
+    list(crayon.enabled = FALSE),
+    capture.output(force(code)))
+}
