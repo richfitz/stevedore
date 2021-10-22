@@ -2,6 +2,7 @@ context("http (compatibility)")
 
 
 test_that("streaming raw", {
+  skip_if_no_httppipe_support()
   dc <- test_docker_client()
   dh <- test_docker_client(http_client_type = "httppipe")
 
@@ -19,6 +20,7 @@ test_that("streaming raw", {
 
 
 test_that("build", {
+  skip_if_no_httppipe_support()
   dc <- test_docker_client()
   context <- tar_directory("images/iterate")
   expect_output(dc$image$build(context, nocache = TRUE, rm = TRUE,
@@ -52,6 +54,7 @@ test_that("build", {
 
 
 test_that("docker run", {
+  skip_if_no_httppipe_support()
   dh <- test_docker_client(http_client_type = "httppipe")
   expect_output(
     ans <- dh$container$run("richfitz/iterate", c("10", "0"), detach = FALSE,
@@ -69,6 +72,7 @@ test_that("docker run", {
 
 
 test_that("exec", {
+  skip_if_no_httppipe_support()
   dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
   ## this sets up a container that will run forever
@@ -97,6 +101,8 @@ test_that("exec", {
 
 
 test_that("pull", {
+  skip_if_no_httppipe_support()
+  skip_on_cran()
   skip_if_no_internet()
   dc <- test_docker_client(http_client_type = "curl")
   dh <- test_docker_client(http_client_type = "httppipe")
@@ -119,6 +125,7 @@ test_that("pull", {
 
 
 test_that("log follow does not work", {
+  skip_if_no_httppipe_support()
   dh <- test_docker_client(http_client_type = "httppipe")
   nm <- rand_str(10, "stevedore_")
   x <- dh$container$create("richfitz/iterate", c("1000", "1"), name = nm)

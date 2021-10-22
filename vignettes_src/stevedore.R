@@ -75,7 +75,7 @@ nginx_ready <- function(port, attempts = 10) {
 docker <- stevedore::docker_client()
 
 ## The client object looks a lot like an
-## [`R6`](https://github.com/wch/R6) object (though it is implemented
+## [`R6`](https://github.com/r-lib/R6/) object (though it is implemented
 ## differently because the interface here is automatically generated
 ## in ways that don't play nicely with R6).  But if you are at all
 ## familiar with R6 objects it should seem quite familiar.

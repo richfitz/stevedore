@@ -49,7 +49,7 @@
 ##' To get started, please see the package vignette - running
 ##' \code{vignette("stevedore")} will work if the package was
 ##' installed with the vignettes, or see
-##' \url{https://richfitz.github.io/stevedore}. A good place to get
+##' \url{https://richfitz.github.io/stevedore/}. A good place to get
 ##' started with the reference documentation is the
 ##' \code{\link{docker_client}} function.
 ##'

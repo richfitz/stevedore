@@ -241,7 +241,7 @@ swagger_type_help <- function(x, info, spec) {
   args <- set_names(vcapply(properties, pick, "description", NA_character_),
                     nms_r)
 
-  special <- intersect(info$special, names(args))
+  special <- intersect(names(info$special), names(args))
   if (length(special) > 0L) {
     str1 <- args[special]
     str1[is.na(str1)] <- ""

@@ -139,27 +139,27 @@ test_that("print endpoints", {
     "----------",
     "Ping. This is a dummy endpoint you can use to test if the server is",
     "  accessible.")
-  expect_equal(txt, expect)
+  expect_equal(txt[1:4], expect) # sometimes there is a blank line here
 
-  txt <- capture.output(print(d$login))
+  txt <- capture_output_no_crayon(print(d$login))
   expect_match(txt, "Check auth configuration",
                all = FALSE, fixed = TRUE)
   expect_match(txt, "  email: For authentication to check",
                all = FALSE, fixed = TRUE)
 
-  txt <- capture.output(print(d$events))
+  txt <- capture_output_no_crayon(print(d$events))
   expect_match(
     txt,
     "        - `type=<string>` object to filter by, one of `container`,",
     all = FALSE, fixed = TRUE)
 
-  txt <- capture.output(print(d$login))
+  txt <- capture_output_no_crayon(print(d$login))
   expect_match(
     txt,
     "Check auth configuration. Validate credentials for a registry and, if",
     all = FALSE, fixed = TRUE)
 
-  txt <- capture.output(print(d$container$create))
+  txt <- capture_output_no_crayon(print(d$container$create))
   expect_match(
     txt,
     "  shell: Shell for when `RUN`, `CMD`, and `ENTRYPOINT` uses a shell",

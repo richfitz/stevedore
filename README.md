@@ -5,7 +5,7 @@
 [![Travis-CI Build Status](https://travis-ci.org/richfitz/stevedore.svg?branch=master)](https://travis-ci.org/richfitz/stevedore)
 [![AppVeyor build status](https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&svg=true)](https://ci.appveyor.com/project/richfitz/stevedore)
 [![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
-[![](http://www.r-pkg.org/badges/version/stevedore)](https://cran.r-project.org/package=stevedore)
+[![](https://www.r-pkg.org/badges/version/stevedore)](https://cran.r-project.org/package=stevedore)
 
 A docker client for R
 
@@ -990,7 +990,7 @@ The primary limitation of the `httppipe` interface is that streaming connections
 
 ### Going forward
 
-The support in this package is a duplicate of the micropackage [`httppipe`](http://github.com/richfitz/httppipe).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
+The support in this package is a duplicate of the micropackage [`httppipe`](https://github.com/richfitz/httppipe/).  This implements the minimum functionality with windows named pipes to support docker.  I would **love** for someone to help port this to a python-free package.  This probably requires a bit of C/C++ and knowledge of the win32 API.
 
 ## Development and testing
 

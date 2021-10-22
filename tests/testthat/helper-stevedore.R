@@ -247,6 +247,7 @@ has_internet <- function() {
 
 
 skip_if_no_internet <- function() {
+  skip_on_cran()
   skip_on_windows()
   if (has_internet()) {
     return()
@@ -256,6 +257,8 @@ skip_if_no_internet <- function() {
 
 
 skip_if_no_httppipe_support <- function() {
+  skip("httppipe needs update for new python/reticulate")
+  skip_on_cran()
   if (!httppipe_available()) {
     testthat::skip("httppipe support not possible")
   }
@@ -583,7 +586,15 @@ dummy_data_frame_wrapper <- function(x) {
 
 skip_if_external_tar_unsupported <- function() {
   testthat::skip_on_os("solaris")
+  testthat::skip_on_cran()
   if (tolower(Sys.info()[["sysname"]]) == "solaris") {
     testthat::skip("Stevedore does not support this tar")
   }
+}
+
+
+capture_output_no_crayon <- function(code) {
+  withr::with_options(
+    list(crayon.enabled = FALSE),
+    capture.output(force(code)))
 }

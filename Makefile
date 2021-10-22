@@ -1,5 +1,5 @@
 PACKAGE := $(shell grep '^Package:' DESCRIPTION | sed -E 's/^Package:[[:space:]]+//')
-RSCRIPT = Rscript --no-init-file
+RSCRIPT = Rscript
 
 all: install
 
