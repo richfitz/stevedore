@@ -256,6 +256,7 @@ skip_if_no_internet <- function() {
 
 
 skip_if_no_httppipe_support <- function() {
+  skip("httppipe needs update for new python/reticulate")
   if (!httppipe_available()) {
     testthat::skip("httppipe support not possible")
   }

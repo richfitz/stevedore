@@ -75,9 +75,9 @@ jobs:
         if: runner.os == 'Linux'
         run: ./scripts/images
 
-      - name: Setup tmate session
-        if: runner.os == 'Linux'
-        uses: mxschmitt/action-tmate@v3
+      # - name: Setup tmate session
+      #   if: runner.os == 'Linux'
+      #   uses: mxschmitt/action-tmate@v3
 
       - name: Check
         env:
