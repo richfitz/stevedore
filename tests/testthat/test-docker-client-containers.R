@@ -855,9 +855,9 @@ test_that("port map - random free port", {
   expect_equal(names(ports),
                c("container_port", "protocol", "host_ip", "host_port"))
   expect_true(all(vlapply(ports, is.character)))
-  expect_equal(ports$protocol, "tcp")
-  expect_equal(ports$host_ip, "0.0.0.0")
-  expect_equal(ports$container_port, "80")
+  expect_equal(ports$protocol[[1]], "tcp")
+  expect_equal(ports$host_ip[[1]], "0.0.0.0")
+  expect_equal(ports$container_port[[1]], "80")
 })
 
 
@@ -868,7 +868,7 @@ test_that("port map - expose all ports", {
   on.exit(x$remove(force = TRUE))
   x$start()
   ports <- x$ports()
-  expect_identical(ports$container_port, "80")
+  expect_identical(ports$container_port[[1]], "80")
 })
 
 
@@ -895,7 +895,7 @@ test_that("port map - data.frame map", {
   on.exit(x$remove(force = TRUE))
   x$start()
   ports <- x$ports()
-  expect_identical(ports$container_port, "80")
+  expect_identical(ports$container_port[[1]], "80")
   expect_is(ports, "extra")
   expect_is(ports, "data.frame")
 })

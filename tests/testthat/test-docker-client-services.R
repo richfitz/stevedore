@@ -32,7 +32,7 @@ test_that("basic swarm service create", {
   expect_equal(dat$id, ans$id())
   expect_equal(dat$version$index, ans$version(FALSE))
   expect_equal(dat$spec$name, "hello")
-  expect_equal(dat$spec$task_template$container_spec$image, "richfitz/iterate")
+  expect_match(dat$spec$task_template$container_spec$image, "richfitz/iterate")
   expect_equal(dat$spec$task_template$container_spec$args, c("1000", "1"))
 
   dat <- cl$service$list()
@@ -64,7 +64,7 @@ test_that("basic swarm service create - expanded types", {
   expect_equal(dat$id, ans$id())
   expect_equal(dat$version$index, ans$version(FALSE))
   expect_equal(dat$spec$name, "hello")
-  expect_equal(dat$spec$task_template$container_spec$image, "richfitz/iterate")
+  expect_match(dat$spec$task_template$container_spec$image, "richfitz/iterate")
   expect_equal(dat$spec$task_template$container_spec$args, c("1000", "1"))
 
   dat <- cl$service$list()
@@ -106,7 +106,7 @@ test_that("replicas & swarm ps", {
   ps <- ans$ps()
   expect_is(ps, "data.frame")
   expect_equal(ps$name, sprintf("redis.%d", seq_len(n)))
-  expect_equal(ps$image, rep("redis", n))
+  expect_match(ps$image, "redis", n)
   expect_equal(ps$desired_state, rep("running", n))
   expect_equal(ps$current_state, rep("running", n))
   expect_match(ps$when, "ago$")
