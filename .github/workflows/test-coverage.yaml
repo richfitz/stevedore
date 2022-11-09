@@ -13,6 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
+      STEVEDORE_TEST_USE_DOCKER: true
 
     steps:
       - uses: actions/checkout@v3
