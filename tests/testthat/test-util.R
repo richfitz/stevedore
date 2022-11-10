@@ -478,7 +478,6 @@ test_that("pass_through", {
 
 
 test_that("parse_timestamp", {
-  skip_on_cran() # somehow platform dependent?
   t <- parse_timestamp("2018-03-22T11:51:26.854401Z")
   expect_false(is.na(t))
   expect_is(t, "POSIXt")
