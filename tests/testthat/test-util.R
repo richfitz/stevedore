@@ -482,12 +482,8 @@ test_that("parse_timestamp", {
   expect_false(is.na(t))
   expect_is(t, "POSIXt")
   expect_is(t, "POSIXlt")
-
-  cmp <- structure(list(sec = 26.854401, min = 51L, hour = 11L, mday = 22L,
-                        mon = 2L, year = 118L, wday = 4L, yday = 80L,
-                        isdst = 0L),
-                   class = c("POSIXlt", "POSIXt"), tzone = "GMT")
-  expect_identical(t, cmp)
+  cmp <- as.POSIXlt(ISOdatetime(2018, 03, 22, 11, 51, 26.854401, tz = "GMT"))
+  expect_equal(t, cmp)
 })
 
 
