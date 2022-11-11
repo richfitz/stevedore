@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">stevedore</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/stevedore.html">Get started</a>
 </li>
@@ -50,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/richfitz/stevedore/">
+  <a href="https://github.com/richfitz/stevedore/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,62 +81,73 @@
 
       
 
-      </header><script src="cookbook_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Cookbook</h1>
-                        <h4 class="author">Rich FitzJohn</h4>
+                        <h4 data-toc-skip class="author">Rich
+FitzJohn</h4>
             
-            <h4 class="date">2020-01-12</h4>
+            <h4 data-toc-skip class="date">2020-01-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/richfitz/stevedore/blob/master/vignettes/cookbook.Rmd"><code>vignettes/cookbook.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/richfitz/stevedore/blob/HEAD/vignettes/cookbook.Rmd" class="external-link"><code>vignettes/cookbook.Rmd</code></a></small>
       <div class="hidden name"><code>cookbook.Rmd</code></div>
 
     </div>
 
     
     
-<p>This vignette contains short snippets of <code>stevedore</code> calls to perform simple tasks, alongside a docker command line equivalent.</p>
+<p>This vignette contains short snippets of <code>stevedore</code> calls
+to perform simple tasks, alongside a docker command line equivalent.</p>
 <p>Conventions:</p>
 <ul>
-<li>We assume that a <code>stevedore</code> docker client object has been created with <code>docker &lt;- stevedore::docker_client()</code> (to avoid repetition in examples)</li>
-<li>All docker command line examples start with <code><a href="https://rdrr.io/r/base/Extract.html">$</a></code> to represent the unix/bash prompt</li>
+<li>We assume that a <code>stevedore</code> docker client object has
+been created with <code>docker &lt;- stevedore::docker_client()</code>
+(to avoid repetition in examples)</li>
+<li>All docker command line examples start with <code>$</code> to
+represent the unix/bash prompt</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="../reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<div id="start-a-container-with-ports-published-to-the-host" class="section level2">
-<h2 class="hasAnchor">
-<a href="#start-a-container-with-ports-published-to-the-host" class="anchor"></a>Start a container with ports published to the host</h2>
+<code class="sourceCode R"><span><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="../reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<div class="section level2">
+<h2 id="start-a-container-with-ports-published-to-the-host">Start a container with ports published to the host<a class="anchor" aria-label="anchor" href="#start-a-container-with-ports-published-to-the-host"></a>
+</h2>
 <p>With docker cli:</p>
 <pre><code>$ docker run --rm -p 8888:80 gplates/gws</code></pre>
-<p>the <code>-p 8888:80</code> publishes port <code>80</code> in the container to port <code>8888</code> on the host.</p>
+<p>the <code>-p 8888:80</code> publishes port <code>80</code> in the
+container to port <code>8888</code> on the host.</p>
 <p>In <code>stevedore</code>, this can be done with:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="st">"8888:80"</span>,
-                            detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0      8888</code></pre>
-<p>To use a random port, omit the host portion (here <code>8888:</code>) as</p>
+<code class="sourceCode R"><span><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="st">"8888:80"</span>,</span>
+<span>                            detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   container_port protocol host_ip host_port</span></span>
+<span><span class="co">## 1             80      tcp 0.0.0.0      8888</span></span></code></pre>
+<p>To use a random port, omit the host portion (here <code>8888:</code>)
+as</p>
 <pre><code>$ docker run --rm -p 80 gplates/gws</code></pre>
 <p>or, with <code>stevedore</code></p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="fl">80</span>,
-                            detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="fl">80</span>,</span>
+<span>                            detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>To determine the port you can use the <code>ports()</code> method</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32771</code></pre>
-<p>If the container declares its exposed ports using an <code>EXPOSE &lt;port&gt;</code> directive in the <code>Dockerfile</code> then you can automatically publish all declared ports to random host ports with <code>-P</code> as</p>
+<code class="sourceCode R"><span><span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   container_port protocol host_ip host_port</span></span>
+<span><span class="co">## 1             80      tcp 0.0.0.0     32771</span></span></code></pre>
+<p>If the container declares its exposed ports using an
+<code>EXPOSE &lt;port&gt;</code> directive in the
+<code>Dockerfile</code> then you can automatically publish all declared
+ports to random host ports with <code>-P</code> as</p>
 <pre><code>$ docker run --rm -P gplates/gws</code></pre>
 <p>or with <code>stevedore</code> by using <code>ports = TRUE</code></p>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="cn">TRUE</span>, detach <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   container_port protocol host_ip host_port
-## 1             80      tcp 0.0.0.0     32772</code></pre>
-<p><small>As contributed by <a href="https://github.com/bomeara">Brian O’Meara</a> in <a href="https://github.com/richfitz/stevedore/issues/44">#44</a></small></p>
+<code class="sourceCode R"><span><span class="va">gws</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"gplates/gws"</span>, ports <span class="op">=</span> <span class="cn">TRUE</span>, detach <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">gws</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   container_port protocol host_ip host_port</span></span>
+<span><span class="co">## 1             80      tcp 0.0.0.0     32772</span></span></code></pre>
+<p><small>As contributed by <a href="https://github.com/bomeara" class="external-link">Brian
+O’Meara</a> in <a href="https://github.com/richfitz/stevedore/issues/44" class="external-link">#44</a></small></p>
 </div>
   </div>
 
@@ -155,11 +162,13 @@
 
 
       <footer><div class="copyright">
-  <p>Developed by Rich FitzJohn.</p>
+  <p></p>
+<p>Developed by Rich FitzJohn.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -167,6 +176,8 @@
 
   
 
+
+  
 
   </body>
 </html>

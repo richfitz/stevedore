@@ -24,6 +24,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-home">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -36,18 +38,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">stevedore</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="articles/stevedore.html">Get started</a>
 </li>
@@ -55,7 +51,7 @@
   <a href="reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -75,7 +71,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/richfitz/stevedore/">
+  <a href="https://github.com/richfitz/stevedore/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -92,15 +88,17 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
-<div id="stevedore" class="section level1">
-<div class="page-header"><h1 class="hasAnchor">
-<a href="#stevedore" class="anchor"></a>stevedore</h1></div>
+<div class="section level1">
+<div class="page-header"><h1 id="stevedore">stevedore<a class="anchor" aria-label="anchor" href="#stevedore"></a>
+</h1></div>
 
 <p>A docker client for R</p>
-<p><img src="https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif" alt="hello world example of stevedore"></p>
-<div id="background" class="section level2">
-<h2 class="hasAnchor">
-<a href="#background" class="anchor"></a>Background</h2>
+<div class="figure">
+<img src="https://raw.githubusercontent.com/richfitz/stevedore/master/demo/hello.gif" alt=""><p class="caption">hello world example of stevedore</p>
+</div>
+<div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
 <p><strong>What is docker?</strong> Docker is a platform for “containerising” applications - running them in isolation from one another, removing differences of how they are built, what they are built from, and what resources they need (disk, ports, users, etc). It’s similar conceptually to virtualisation, but much more light weight.</p>
 <p><strong>Why would one want to use docker from R?</strong> Whenever you need to control external processes from an R script or package, it might be useful to interact with this process from in containers using docker</p>
 <ul>
@@ -111,868 +109,868 @@
 <li>
 <em>a researcher</em> might use docker to do a reproducible analysis, or preserve the artefacts that were created along with a copy of the environment that created them</li>
 </ul>
-<p>These are discussed further in the <a href="https://richfitz.github.io/stevedore/articles/examples.html">applications vignette</a></p>
+<p>These are discussed further in the <a href="https://richfitz.github.io/stevedore/articles/examples.html" class="external-link">applications vignette</a></p>
 </div>
-<div id="usage" class="section level2">
-<h2 class="hasAnchor">
-<a href="#usage" class="anchor"></a>Usage</h2>
+<div class="section level2">
+<h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
+</h2>
 <p>The main function in the package is <code>docker_client</code>; this will construct an object with which we can talk with the docker server.</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span>
-<span class="va">docker</span></code></pre></div>
-<pre><code>## &lt;docker_client&gt;
-##   config: Manage docker swarm configs
-##   container: Work with docker containers
-##   image: Work with docker images
-##   network: Work with docker networks
-##   node: Manage docker swarm nodes
-##   plugin: Work with docker plugins
-##   secret: Manage docker swarm secrets
-##   service: Work with docker services
-##   swarm: Manage the docker swarm
-##   task: Work with docker tasks
-##   volume: Work with docker volumes
-##   types: Methods for building complex docker types
-##   api_version()
-##   connection_info()
-##   cp(src, dest)
-##   df()
-##   events(since = NULL, until = NULL, filters = NULL)
-##   help(help_type = getOption("help_type"))
-##   info()
-##   login(username = NULL, password = NULL, email = NULL,
-##       serveraddress = NULL)
-##   ping()
-##   request(verb, path, query = NULL, body = NULL, headers = NULL,
-##       stream = NULL)
-##   version()</code></pre>
+<code class="sourceCode R"><span><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">docker</span></span></code></pre></div>
+<pre><code><span><span class="co">## &lt;docker_client&gt;</span></span>
+<span><span class="co">##   config: Manage docker swarm configs</span></span>
+<span><span class="co">##   container: Work with docker containers</span></span>
+<span><span class="co">##   image: Work with docker images</span></span>
+<span><span class="co">##   network: Work with docker networks</span></span>
+<span><span class="co">##   node: Manage docker swarm nodes</span></span>
+<span><span class="co">##   plugin: Work with docker plugins</span></span>
+<span><span class="co">##   secret: Manage docker swarm secrets</span></span>
+<span><span class="co">##   service: Work with docker services</span></span>
+<span><span class="co">##   swarm: Manage the docker swarm</span></span>
+<span><span class="co">##   task: Work with docker tasks</span></span>
+<span><span class="co">##   volume: Work with docker volumes</span></span>
+<span><span class="co">##   types: Methods for building complex docker types</span></span>
+<span><span class="co">##   api_version()</span></span>
+<span><span class="co">##   connection_info()</span></span>
+<span><span class="co">##   cp(src, dest)</span></span>
+<span><span class="co">##   df()</span></span>
+<span><span class="co">##   events(since = NULL, until = NULL, filters = NULL)</span></span>
+<span><span class="co">##   help(help_type = getOption("help_type"))</span></span>
+<span><span class="co">##   info()</span></span>
+<span><span class="co">##   login(username = NULL, password = NULL, email = NULL,</span></span>
+<span><span class="co">##       serveraddress = NULL)</span></span>
+<span><span class="co">##   ping()</span></span>
+<span><span class="co">##   request(verb, path, query = NULL, body = NULL, headers = NULL,</span></span>
+<span><span class="co">##       stream = NULL)</span></span>
+<span><span class="co">##   version()</span></span></code></pre>
 <p>With this you can run containers:</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"alpine:3.1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html">c</a></span><span class="op">(</span><span class="st">"echo"</span>, <span class="st">"hello world"</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## Unable to find image 'alpine:3.1' locally</code></pre>
-<pre><code>## Pulling from library/alpine 3.1
-## Pulling fs layer 745c22e975cc
-## 745c22e975cc: Downloading 23.94 kB/2.3 MB 1%
-## 745c22e975cc: Downloading 1.72 MB/2.3 MB 75%
-## 745c22e975cc: Downloading 2.3 MB/2.3 MB 100%
-## Verifying Checksum 745c22e975cc
-## Download complete 745c22e975cc
-## 745c22e975cc: Extracting 32.77 kB/2.3 MB 1%
-## 745c22e975cc: Extracting 327.68 kB/2.3 MB 14%
-## 745c22e975cc: Extracting 2.3 MB/2.3 MB 100%
-## Pull complete 745c22e975cc
-## Digest: sha256:46472d54728aa60eafffeb663348dd5f5de048d701d7190030c75098acd1123d
-## Status: Downloaded newer image for alpine:3.1
-## O&gt; hello world</code></pre>
-<pre><code>## &lt;docker_run_output&gt;
-##   $container:
-##     &lt;docker_container&gt;
-##       id: 818942f57514b0856a1c766af260a54ccb7b192223dab442496585b5f78d403c
-##       name: blissful_borg
-##
-##   $logs:
-##     O&gt; hello world</code></pre>
+<code class="sourceCode R"><span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"alpine:3.1"</span>, <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"echo"</span>, <span class="st">"hello world"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Unable to find image 'alpine:3.1' locally</span></span></code></pre>
+<pre><code><span><span class="co">## Pulling from library/alpine 3.1</span></span>
+<span><span class="co">## Pulling fs layer 745c22e975cc</span></span>
+<span><span class="co">## 745c22e975cc: Downloading 23.94 kB/2.3 MB 1%</span></span>
+<span><span class="co">## 745c22e975cc: Downloading 1.72 MB/2.3 MB 75%</span></span>
+<span><span class="co">## 745c22e975cc: Downloading 2.3 MB/2.3 MB 100%</span></span>
+<span><span class="co">## Verifying Checksum 745c22e975cc</span></span>
+<span><span class="co">## Download complete 745c22e975cc</span></span>
+<span><span class="co">## 745c22e975cc: Extracting 32.77 kB/2.3 MB 1%</span></span>
+<span><span class="co">## 745c22e975cc: Extracting 327.68 kB/2.3 MB 14%</span></span>
+<span><span class="co">## 745c22e975cc: Extracting 2.3 MB/2.3 MB 100%</span></span>
+<span><span class="co">## Pull complete 745c22e975cc</span></span>
+<span><span class="co">## Digest: sha256:46472d54728aa60eafffeb663348dd5f5de048d701d7190030c75098acd1123d</span></span>
+<span><span class="co">## Status: Downloaded newer image for alpine:3.1</span></span>
+<span><span class="co">## O&gt; hello world</span></span></code></pre>
+<pre><code><span><span class="co">## &lt;docker_run_output&gt;</span></span>
+<span><span class="co">##   $container:</span></span>
+<span><span class="co">##     &lt;docker_container&gt;</span></span>
+<span><span class="co">##       id: 818942f57514b0856a1c766af260a54ccb7b192223dab442496585b5f78d403c</span></span>
+<span><span class="co">##       name: blissful_borg</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##   $logs:</span></span>
+<span><span class="co">##     O&gt; hello world</span></span></code></pre>
 <p>Or run containers in the background</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"bfirsh/reticulate-splines"</span>, detach <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<pre><code>## Unable to find image 'bfirsh/reticulate-splines:latest' locally</code></pre>
-<pre><code>## Pulling from bfirsh/reticulate-splines latest
-## Pulling fs layer e110a4a17941
-## Pulling fs layer 9cb73a4f4dd9
-## Pulling fs layer 544bc6b7ec68
-## 544bc6b7ec68: Downloading 251 B/251 B 100%
-## Verifying Checksum 544bc6b7ec68
-## Download complete 544bc6b7ec68
-## 9cb73a4f4dd9: Downloading 252 B/252 B 100%
-## Verifying Checksum 9cb73a4f4dd9
-## Download complete 9cb73a4f4dd9
-## e110a4a17941: Downloading 23.77 kB/2.31 MB 1%
-## Verifying Checksum e110a4a17941
-## Download complete e110a4a17941
-## e110a4a17941: Extracting 32.77 kB/2.31 MB 1%
-## e110a4a17941: Extracting 786.43 kB/2.31 MB 34%
-## e110a4a17941: Extracting 2.31 MB/2.31 MB 100%
-## Pull complete e110a4a17941
-## 9cb73a4f4dd9: Extracting 252 B/252 B 100%
-## 9cb73a4f4dd9: Extracting 252 B/252 B 100%
-## Pull complete 9cb73a4f4dd9
-## 544bc6b7ec68: Extracting 251 B/251 B 100%
-## 544bc6b7ec68: Extracting 251 B/251 B 100%
-## Pull complete 544bc6b7ec68
-## Digest: sha256:67cfd7db171e3de3551c209cfa24c7ae3757d54806d6b8191994a917f3e92723
-## Status: Downloaded newer image for bfirsh/reticulate-splines:latest</code></pre>
-<pre><code>## &lt;docker_container&gt;
-##   commit(repo = NULL, tag = NULL, author = NULL, changes = NULL,
-##       comment = NULL, pause = NULL, hostname = NULL, domainname = NULL,
-##       user = NULL, attach_stdin = NULL, attach_stdout = NULL,
-##       attach_stderr = NULL, exposed_ports = NULL, tty = NULL,
-##       open_stdin = NULL, stdin_once = NULL, env = NULL, cmd = NULL,
-##       healthcheck = NULL, args_escaped = NULL, image = NULL,
-##       volumes = NULL, working_dir = NULL, entrypoint = NULL,
-##       network_disabled = NULL, mac_address = NULL, on_build = NULL,
-##       labels = NULL, stop_signal = NULL, stop_timeout = NULL,
-##       shell = NULL)
-##   cp_in(src, dest)
-##   cp_out(src, dest)
-##   diff()
-##   exec(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,
-##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,
-##       user = NULL, working_dir = NULL, detach = FALSE,
-##       stream = stdout())
-##   exec_create(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,
-##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,
-##       user = NULL, working_dir = NULL)
-##   export()
-##   get_archive(path, dest)
-##   help(help_type = getOption("help_type"))
-##   id()
-##   image()
-##   inspect(reload = TRUE)
-##   kill(signal = NULL)
-##   labels(reload = TRUE)
-##   logs(follow = NULL, stdout = TRUE, stderr = TRUE, since = NULL,
-##       until = NULL, timestamps = NULL, tail = NULL, stream = stdout())
-##   name()
-##   path_stat(path)
-##   pause()
-##   ports(reload = TRUE)
-##   put_archive(src, path, no_overwrite_dir_non_dir = NULL)
-##   reload()
-##   remove(delete_volumes = NULL, force = NULL, link = NULL)
-##   rename(name)
-##   resize(h = NULL, w = NULL)
-##   restart(t = NULL)
-##   start(detach_keys = NULL)
-##   stats()
-##   status(reload = TRUE)
-##   stop(t = NULL)
-##   top(ps_args = NULL)
-##   unpause()
-##   update(cpu_shares = NULL, memory = NULL, cgroup_parent = NULL,
-##       blkio_weight = NULL, blkio_weight_device = NULL,
-##       blkio_device_read_bps = NULL, blkio_device_write_bps = NULL,
-##       blkio_device_read_iops = NULL, blkio_device_write_iops = NULL,
-##       cpu_period = NULL, cpu_quota = NULL, cpu_realtime_period = NULL,
-##       cpu_realtime_runtime = NULL, cpuset_cpus = NULL,
-##       cpuset_mems = NULL, devices = NULL, device_cgroup_rules = NULL,
-##       disk_quota = NULL, kernel_memory = NULL,
-##       memory_reservation = NULL, memory_swap = NULL,
-##       memory_swappiness = NULL, nano_cpus = NULL,
-##       oom_kill_disable = NULL, init = NULL, pids_limit = NULL,
-##       ulimits = NULL, cpu_count = NULL, cpu_percent = NULL,
-##       io_maximum_iops = NULL, io_maximum_bandwidth = NULL,
-##       restart_policy = NULL)
-##   wait(condition = NULL)</code></pre>
+<code class="sourceCode R"><span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"bfirsh/reticulate-splines"</span>, detach <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## Unable to find image 'bfirsh/reticulate-splines:latest' locally</span></span></code></pre>
+<pre><code><span><span class="co">## Pulling from bfirsh/reticulate-splines latest</span></span>
+<span><span class="co">## Pulling fs layer e110a4a17941</span></span>
+<span><span class="co">## Pulling fs layer 9cb73a4f4dd9</span></span>
+<span><span class="co">## Pulling fs layer 544bc6b7ec68</span></span>
+<span><span class="co">## 544bc6b7ec68: Downloading 251 B/251 B 100%</span></span>
+<span><span class="co">## Verifying Checksum 544bc6b7ec68</span></span>
+<span><span class="co">## Download complete 544bc6b7ec68</span></span>
+<span><span class="co">## 9cb73a4f4dd9: Downloading 252 B/252 B 100%</span></span>
+<span><span class="co">## Verifying Checksum 9cb73a4f4dd9</span></span>
+<span><span class="co">## Download complete 9cb73a4f4dd9</span></span>
+<span><span class="co">## e110a4a17941: Downloading 23.77 kB/2.31 MB 1%</span></span>
+<span><span class="co">## Verifying Checksum e110a4a17941</span></span>
+<span><span class="co">## Download complete e110a4a17941</span></span>
+<span><span class="co">## e110a4a17941: Extracting 32.77 kB/2.31 MB 1%</span></span>
+<span><span class="co">## e110a4a17941: Extracting 786.43 kB/2.31 MB 34%</span></span>
+<span><span class="co">## e110a4a17941: Extracting 2.31 MB/2.31 MB 100%</span></span>
+<span><span class="co">## Pull complete e110a4a17941</span></span>
+<span><span class="co">## 9cb73a4f4dd9: Extracting 252 B/252 B 100%</span></span>
+<span><span class="co">## 9cb73a4f4dd9: Extracting 252 B/252 B 100%</span></span>
+<span><span class="co">## Pull complete 9cb73a4f4dd9</span></span>
+<span><span class="co">## 544bc6b7ec68: Extracting 251 B/251 B 100%</span></span>
+<span><span class="co">## 544bc6b7ec68: Extracting 251 B/251 B 100%</span></span>
+<span><span class="co">## Pull complete 544bc6b7ec68</span></span>
+<span><span class="co">## Digest: sha256:67cfd7db171e3de3551c209cfa24c7ae3757d54806d6b8191994a917f3e92723</span></span>
+<span><span class="co">## Status: Downloaded newer image for bfirsh/reticulate-splines:latest</span></span></code></pre>
+<pre><code><span><span class="co">## &lt;docker_container&gt;</span></span>
+<span><span class="co">##   commit(repo = NULL, tag = NULL, author = NULL, changes = NULL,</span></span>
+<span><span class="co">##       comment = NULL, pause = NULL, hostname = NULL, domainname = NULL,</span></span>
+<span><span class="co">##       user = NULL, attach_stdin = NULL, attach_stdout = NULL,</span></span>
+<span><span class="co">##       attach_stderr = NULL, exposed_ports = NULL, tty = NULL,</span></span>
+<span><span class="co">##       open_stdin = NULL, stdin_once = NULL, env = NULL, cmd = NULL,</span></span>
+<span><span class="co">##       healthcheck = NULL, args_escaped = NULL, image = NULL,</span></span>
+<span><span class="co">##       volumes = NULL, working_dir = NULL, entrypoint = NULL,</span></span>
+<span><span class="co">##       network_disabled = NULL, mac_address = NULL, on_build = NULL,</span></span>
+<span><span class="co">##       labels = NULL, stop_signal = NULL, stop_timeout = NULL,</span></span>
+<span><span class="co">##       shell = NULL)</span></span>
+<span><span class="co">##   cp_in(src, dest)</span></span>
+<span><span class="co">##   cp_out(src, dest)</span></span>
+<span><span class="co">##   diff()</span></span>
+<span><span class="co">##   exec(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,</span></span>
+<span><span class="co">##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,</span></span>
+<span><span class="co">##       user = NULL, working_dir = NULL, detach = FALSE,</span></span>
+<span><span class="co">##       stream = stdout())</span></span>
+<span><span class="co">##   exec_create(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,</span></span>
+<span><span class="co">##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,</span></span>
+<span><span class="co">##       user = NULL, working_dir = NULL)</span></span>
+<span><span class="co">##   export()</span></span>
+<span><span class="co">##   get_archive(path, dest)</span></span>
+<span><span class="co">##   help(help_type = getOption("help_type"))</span></span>
+<span><span class="co">##   id()</span></span>
+<span><span class="co">##   image()</span></span>
+<span><span class="co">##   inspect(reload = TRUE)</span></span>
+<span><span class="co">##   kill(signal = NULL)</span></span>
+<span><span class="co">##   labels(reload = TRUE)</span></span>
+<span><span class="co">##   logs(follow = NULL, stdout = TRUE, stderr = TRUE, since = NULL,</span></span>
+<span><span class="co">##       until = NULL, timestamps = NULL, tail = NULL, stream = stdout())</span></span>
+<span><span class="co">##   name()</span></span>
+<span><span class="co">##   path_stat(path)</span></span>
+<span><span class="co">##   pause()</span></span>
+<span><span class="co">##   ports(reload = TRUE)</span></span>
+<span><span class="co">##   put_archive(src, path, no_overwrite_dir_non_dir = NULL)</span></span>
+<span><span class="co">##   reload()</span></span>
+<span><span class="co">##   remove(delete_volumes = NULL, force = NULL, link = NULL)</span></span>
+<span><span class="co">##   rename(name)</span></span>
+<span><span class="co">##   resize(h = NULL, w = NULL)</span></span>
+<span><span class="co">##   restart(t = NULL)</span></span>
+<span><span class="co">##   start(detach_keys = NULL)</span></span>
+<span><span class="co">##   stats()</span></span>
+<span><span class="co">##   status(reload = TRUE)</span></span>
+<span><span class="co">##   stop(t = NULL)</span></span>
+<span><span class="co">##   top(ps_args = NULL)</span></span>
+<span><span class="co">##   unpause()</span></span>
+<span><span class="co">##   update(cpu_shares = NULL, memory = NULL, cgroup_parent = NULL,</span></span>
+<span><span class="co">##       blkio_weight = NULL, blkio_weight_device = NULL,</span></span>
+<span><span class="co">##       blkio_device_read_bps = NULL, blkio_device_write_bps = NULL,</span></span>
+<span><span class="co">##       blkio_device_read_iops = NULL, blkio_device_write_iops = NULL,</span></span>
+<span><span class="co">##       cpu_period = NULL, cpu_quota = NULL, cpu_realtime_period = NULL,</span></span>
+<span><span class="co">##       cpu_realtime_runtime = NULL, cpuset_cpus = NULL,</span></span>
+<span><span class="co">##       cpuset_mems = NULL, devices = NULL, device_cgroup_rules = NULL,</span></span>
+<span><span class="co">##       disk_quota = NULL, kernel_memory = NULL,</span></span>
+<span><span class="co">##       memory_reservation = NULL, memory_swap = NULL,</span></span>
+<span><span class="co">##       memory_swappiness = NULL, nano_cpus = NULL,</span></span>
+<span><span class="co">##       oom_kill_disable = NULL, init = NULL, pids_limit = NULL,</span></span>
+<span><span class="co">##       ulimits = NULL, cpu_count = NULL, cpu_percent = NULL,</span></span>
+<span><span class="co">##       io_maximum_iops = NULL, io_maximum_bandwidth = NULL,</span></span>
+<span><span class="co">##       restart_policy = NULL)</span></span>
+<span><span class="co">##   wait(condition = NULL)</span></span></code></pre>
 <p>You can manage containers</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##                                                                 id
-## 1 f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c
-##          names
-## 1 gallant_....
-##                                                                     image
-## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
-##                                                                  image_id
-## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
-##                 command    created        ports size_rw size_root_fs
-## 1 /usr/local/bin/run.sh 1541670175 characte....      NA           NA
-##   labels   state                status host_config network_settings
-## 1        running Up Less than a second     default     list(bri....
-##         mounts             name
-## 1 characte.... gallant_dubinsky</code></pre>
+<code class="sourceCode R"><span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##                                                                 id</span></span>
+<span><span class="co">## 1 f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c</span></span>
+<span><span class="co">##          names</span></span>
+<span><span class="co">## 1 gallant_....</span></span>
+<span><span class="co">##                                                                     image</span></span>
+<span><span class="co">## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9</span></span>
+<span><span class="co">##                                                                  image_id</span></span>
+<span><span class="co">## 1 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9</span></span>
+<span><span class="co">##                 command    created        ports size_rw size_root_fs</span></span>
+<span><span class="co">## 1 /usr/local/bin/run.sh 1541670175 characte....      NA           NA</span></span>
+<span><span class="co">##   labels   state                status host_config network_settings</span></span>
+<span><span class="co">## 1        running Up Less than a second     default     list(bri....</span></span>
+<span><span class="co">##         mounts             name</span></span>
+<span><span class="co">## 1 characte.... gallant_dubinsky</span></span></code></pre>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span>limit <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">$</span><span class="va">id</span>
-<span class="va">container</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">get</span><span class="op">(</span><span class="va">id</span><span class="op">)</span>
-<span class="va">container</span></code></pre></div>
-<pre><code>## &lt;docker_container&gt;
-##   commit(repo = NULL, tag = NULL, author = NULL, changes = NULL,
-##       comment = NULL, pause = NULL, hostname = NULL, domainname = NULL,
-##       user = NULL, attach_stdin = NULL, attach_stdout = NULL,
-##       attach_stderr = NULL, exposed_ports = NULL, tty = NULL,
-##       open_stdin = NULL, stdin_once = NULL, env = NULL, cmd = NULL,
-##       healthcheck = NULL, args_escaped = NULL, image = NULL,
-##       volumes = NULL, working_dir = NULL, entrypoint = NULL,
-##       network_disabled = NULL, mac_address = NULL, on_build = NULL,
-##       labels = NULL, stop_signal = NULL, stop_timeout = NULL,
-##       shell = NULL)
-##   cp_in(src, dest)
-##   cp_out(src, dest)
-##   diff()
-##   exec(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,
-##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,
-##       user = NULL, working_dir = NULL, detach = FALSE,
-##       stream = stdout())
-##   exec_create(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,
-##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,
-##       user = NULL, working_dir = NULL)
-##   export()
-##   get_archive(path, dest)
-##   help(help_type = getOption("help_type"))
-##   id()
-##   image()
-##   inspect(reload = TRUE)
-##   kill(signal = NULL)
-##   labels(reload = TRUE)
-##   logs(follow = NULL, stdout = TRUE, stderr = TRUE, since = NULL,
-##       until = NULL, timestamps = NULL, tail = NULL, stream = stdout())
-##   name()
-##   path_stat(path)
-##   pause()
-##   ports(reload = TRUE)
-##   put_archive(src, path, no_overwrite_dir_non_dir = NULL)
-##   reload()
-##   remove(delete_volumes = NULL, force = NULL, link = NULL)
-##   rename(name)
-##   resize(h = NULL, w = NULL)
-##   restart(t = NULL)
-##   start(detach_keys = NULL)
-##   stats()
-##   status(reload = TRUE)
-##   stop(t = NULL)
-##   top(ps_args = NULL)
-##   unpause()
-##   update(cpu_shares = NULL, memory = NULL, cgroup_parent = NULL,
-##       blkio_weight = NULL, blkio_weight_device = NULL,
-##       blkio_device_read_bps = NULL, blkio_device_write_bps = NULL,
-##       blkio_device_read_iops = NULL, blkio_device_write_iops = NULL,
-##       cpu_period = NULL, cpu_quota = NULL, cpu_realtime_period = NULL,
-##       cpu_realtime_runtime = NULL, cpuset_cpus = NULL,
-##       cpuset_mems = NULL, devices = NULL, device_cgroup_rules = NULL,
-##       disk_quota = NULL, kernel_memory = NULL,
-##       memory_reservation = NULL, memory_swap = NULL,
-##       memory_swappiness = NULL, nano_cpus = NULL,
-##       oom_kill_disable = NULL, init = NULL, pids_limit = NULL,
-##       ulimits = NULL, cpu_count = NULL, cpu_percent = NULL,
-##       io_maximum_iops = NULL, io_maximum_bandwidth = NULL,
-##       restart_policy = NULL)
-##   wait(condition = NULL)</code></pre>
+<code class="sourceCode R"><span><span class="va">id</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span>limit <span class="op">=</span> <span class="fl">1L</span><span class="op">)</span><span class="op">$</span><span class="va">id</span></span>
+<span><span class="va">container</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">get</span><span class="op">(</span><span class="va">id</span><span class="op">)</span></span>
+<span><span class="va">container</span></span></code></pre></div>
+<pre><code><span><span class="co">## &lt;docker_container&gt;</span></span>
+<span><span class="co">##   commit(repo = NULL, tag = NULL, author = NULL, changes = NULL,</span></span>
+<span><span class="co">##       comment = NULL, pause = NULL, hostname = NULL, domainname = NULL,</span></span>
+<span><span class="co">##       user = NULL, attach_stdin = NULL, attach_stdout = NULL,</span></span>
+<span><span class="co">##       attach_stderr = NULL, exposed_ports = NULL, tty = NULL,</span></span>
+<span><span class="co">##       open_stdin = NULL, stdin_once = NULL, env = NULL, cmd = NULL,</span></span>
+<span><span class="co">##       healthcheck = NULL, args_escaped = NULL, image = NULL,</span></span>
+<span><span class="co">##       volumes = NULL, working_dir = NULL, entrypoint = NULL,</span></span>
+<span><span class="co">##       network_disabled = NULL, mac_address = NULL, on_build = NULL,</span></span>
+<span><span class="co">##       labels = NULL, stop_signal = NULL, stop_timeout = NULL,</span></span>
+<span><span class="co">##       shell = NULL)</span></span>
+<span><span class="co">##   cp_in(src, dest)</span></span>
+<span><span class="co">##   cp_out(src, dest)</span></span>
+<span><span class="co">##   diff()</span></span>
+<span><span class="co">##   exec(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,</span></span>
+<span><span class="co">##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,</span></span>
+<span><span class="co">##       user = NULL, working_dir = NULL, detach = FALSE,</span></span>
+<span><span class="co">##       stream = stdout())</span></span>
+<span><span class="co">##   exec_create(cmd, stdin = NULL, stdout = TRUE, stderr = TRUE,</span></span>
+<span><span class="co">##       detach_keys = NULL, tty = NULL, env = NULL, privileged = NULL,</span></span>
+<span><span class="co">##       user = NULL, working_dir = NULL)</span></span>
+<span><span class="co">##   export()</span></span>
+<span><span class="co">##   get_archive(path, dest)</span></span>
+<span><span class="co">##   help(help_type = getOption("help_type"))</span></span>
+<span><span class="co">##   id()</span></span>
+<span><span class="co">##   image()</span></span>
+<span><span class="co">##   inspect(reload = TRUE)</span></span>
+<span><span class="co">##   kill(signal = NULL)</span></span>
+<span><span class="co">##   labels(reload = TRUE)</span></span>
+<span><span class="co">##   logs(follow = NULL, stdout = TRUE, stderr = TRUE, since = NULL,</span></span>
+<span><span class="co">##       until = NULL, timestamps = NULL, tail = NULL, stream = stdout())</span></span>
+<span><span class="co">##   name()</span></span>
+<span><span class="co">##   path_stat(path)</span></span>
+<span><span class="co">##   pause()</span></span>
+<span><span class="co">##   ports(reload = TRUE)</span></span>
+<span><span class="co">##   put_archive(src, path, no_overwrite_dir_non_dir = NULL)</span></span>
+<span><span class="co">##   reload()</span></span>
+<span><span class="co">##   remove(delete_volumes = NULL, force = NULL, link = NULL)</span></span>
+<span><span class="co">##   rename(name)</span></span>
+<span><span class="co">##   resize(h = NULL, w = NULL)</span></span>
+<span><span class="co">##   restart(t = NULL)</span></span>
+<span><span class="co">##   start(detach_keys = NULL)</span></span>
+<span><span class="co">##   stats()</span></span>
+<span><span class="co">##   status(reload = TRUE)</span></span>
+<span><span class="co">##   stop(t = NULL)</span></span>
+<span><span class="co">##   top(ps_args = NULL)</span></span>
+<span><span class="co">##   unpause()</span></span>
+<span><span class="co">##   update(cpu_shares = NULL, memory = NULL, cgroup_parent = NULL,</span></span>
+<span><span class="co">##       blkio_weight = NULL, blkio_weight_device = NULL,</span></span>
+<span><span class="co">##       blkio_device_read_bps = NULL, blkio_device_write_bps = NULL,</span></span>
+<span><span class="co">##       blkio_device_read_iops = NULL, blkio_device_write_iops = NULL,</span></span>
+<span><span class="co">##       cpu_period = NULL, cpu_quota = NULL, cpu_realtime_period = NULL,</span></span>
+<span><span class="co">##       cpu_realtime_runtime = NULL, cpuset_cpus = NULL,</span></span>
+<span><span class="co">##       cpuset_mems = NULL, devices = NULL, device_cgroup_rules = NULL,</span></span>
+<span><span class="co">##       disk_quota = NULL, kernel_memory = NULL,</span></span>
+<span><span class="co">##       memory_reservation = NULL, memory_swap = NULL,</span></span>
+<span><span class="co">##       memory_swappiness = NULL, nano_cpus = NULL,</span></span>
+<span><span class="co">##       oom_kill_disable = NULL, init = NULL, pids_limit = NULL,</span></span>
+<span><span class="co">##       ulimits = NULL, cpu_count = NULL, cpu_percent = NULL,</span></span>
+<span><span class="co">##       io_maximum_iops = NULL, io_maximum_bandwidth = NULL,</span></span>
+<span><span class="co">##       restart_policy = NULL)</span></span>
+<span><span class="co">##   wait(condition = NULL)</span></span></code></pre>
 <p>And control containers</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">container</span><span class="op">$</span><span class="fu">inspect</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">config</span><span class="op">$</span><span class="va">image</span></code></pre></div>
-<pre><code>## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"</code></pre>
+<code class="sourceCode R"><span><span class="va">container</span><span class="op">$</span><span class="fu">inspect</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">config</span><span class="op">$</span><span class="va">image</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"</span></span></code></pre>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">container</span><span class="op">$</span><span class="fu">logs</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## O&gt; Reticulating spline 1...</code></pre>
+<code class="sourceCode R"><span><span class="va">container</span><span class="op">$</span><span class="fu">logs</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## O&gt; Reticulating spline 1...</span></span></code></pre>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">container</span><span class="op">$</span><span class="kw">stop</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></code></pre></div>
-<pre><code>## NULL</code></pre>
+<code class="sourceCode R"><span><span class="va">container</span><span class="op">$</span><span class="kw">stop</span><span class="op">(</span>t <span class="op">=</span> <span class="fl">0</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">container</span><span class="op">$</span><span class="fu">remove</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## NULL</code></pre>
+<code class="sourceCode R"><span><span class="va">container</span><span class="op">$</span><span class="fu">remove</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
 <p>And manage images</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/head.html">head</a></span><span class="op">(</span><span class="va">docker</span><span class="op">$</span><span class="va">image</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>##                                                                        id
-## 1 sha256:f36c4228b2c6863208de3a13f2e467476d00ab492416c0aadcfc0e247db1ee03
-## 2 sha256:f2aae6ff5d896839bfb8609cb1510bcf36efcb6950683c3bcfb760668b0eefbe
-## 3 sha256:65250ab7e8aa2f0887e890436ef1fb99189037b134ba6204cf3d2a366cd237c1
-## 4 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9
-##   parent_id    repo_tags repo_digests    created      size shared_size
-## 1             alpine:3.1 alpine@s.... 1536704412   5046821          -1
-## 2           debian:l.... debian@s.... 1536096084 100576015          -1
-## 3           richfitz.... richfitz.... 1517994341   4148087          -1
-## 4           bfirsh/r.... bfirsh/r.... 1471273134   4799043          -1
-##   virtual_size labels containers
-## 1      5046821                -1
-## 2    100576015                -1
-## 3      4148087  0.0.1         -1
-## 4      4799043                -1</code></pre>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="va">docker</span><span class="op">$</span><span class="va">image</span><span class="op">$</span><span class="fu">list</span><span class="op">(</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##                                                                        id</span></span>
+<span><span class="co">## 1 sha256:f36c4228b2c6863208de3a13f2e467476d00ab492416c0aadcfc0e247db1ee03</span></span>
+<span><span class="co">## 2 sha256:f2aae6ff5d896839bfb8609cb1510bcf36efcb6950683c3bcfb760668b0eefbe</span></span>
+<span><span class="co">## 3 sha256:65250ab7e8aa2f0887e890436ef1fb99189037b134ba6204cf3d2a366cd237c1</span></span>
+<span><span class="co">## 4 sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9</span></span>
+<span><span class="co">##   parent_id    repo_tags repo_digests    created      size shared_size</span></span>
+<span><span class="co">## 1             alpine:3.1 alpine@s.... 1536704412   5046821          -1</span></span>
+<span><span class="co">## 2           debian:l.... debian@s.... 1536096084 100576015          -1</span></span>
+<span><span class="co">## 3           richfitz.... richfitz.... 1517994341   4148087          -1</span></span>
+<span><span class="co">## 4           bfirsh/r.... bfirsh/r.... 1471273134   4799043          -1</span></span>
+<span><span class="co">##   virtual_size labels containers</span></span>
+<span><span class="co">## 1      5046821                -1</span></span>
+<span><span class="co">## 2    100576015                -1</span></span>
+<span><span class="co">## 3      4148087  0.0.1         -1</span></span>
+<span><span class="co">## 4      4799043                -1</span></span></code></pre>
 <p>Some of these functions have many arguments, but <code>stevedore</code> includes help inline:</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="va">create</span></code></pre></div>
-<pre><code>## function(image, cmd = NULL, hostname = NULL, domainname = NULL,
-##     user = NULL, attach_stdin = NULL, attach_stdout = NULL,
-##     attach_stderr = NULL, ports = NULL, tty = NULL, open_stdin = NULL,
-##     stdin_once = NULL, env = NULL, health_check = NULL,
-##     args_escaped = NULL, volumes = NULL, working_dir = NULL,
-##     entrypoint = NULL, network_disabled = NULL, mac_address = NULL,
-##     on_build = NULL, labels = NULL, stop_signal = NULL,
-##     stop_timeout = NULL, shell = NULL, host_config = NULL,
-##     network = NULL, name = NULL)
-## ----------------------------------------------------------------------
-## Create a container. Similar to the cli command `docker create` or
-##   `docker container create`.
-## ----------------------------------------------------------------------
-##   image: The name of the image to use when creating the container
-##   cmd: Command to run specified as a string or an array of
-##         strings.
-##   hostname: The hostname to use for the container, as a valid RFC
-##         1123 hostname.
-##   domainname: The domain name to use for the container.
-##   user: The user that commands are run as inside the container.
-##   attach_stdin: Whether to attach to `stdin`.
-##   attach_stdout: Whether to attach to `stdout`.
-##   attach_stderr: Whether to attach to `stderr`.
-##   ports: An object mapping ports to an empty object in the form:
-##
-##         `{"&lt;port&gt;/&lt;tcp|udp|sctp&gt;": {}}`
-##   tty: Attach standard streams to a TTY, including `stdin` if it
-##         is not closed.
-##   open_stdin: Open `stdin`
-##   stdin_once: Close `stdin` after one attached client disconnects
-##   env: A list of environment variables to set inside the container
-##         in the form `["VAR=value", ...]`. A variable without `=`
-##         is removed from the environment, rather than to have an
-##         empty value.
-##   health_check: A test to perform to check that the container is
-##         healthy. Construct with `$types$health_config()`
-##   args_escaped: Command is already escaped (Windows only)
-##   volumes: An object mapping mount point paths inside the
-##         container to empty objects.
-##   working_dir: The working directory for commands to run in.
-##   entrypoint: The entry point for the container as a string or an
-##         array of strings.
-##
-##         If the array consists of exactly one empty string (`[""]`)
-##         then the entry point is reset to system default (i.e., the
-##         entry point used by docker when there is no `ENTRYPOINT`
-##         instruction in the `Dockerfile`).
-##   network_disabled: Disable networking for the container.
-##   mac_address: MAC address of the container.
-##   on_build: `ONBUILD` metadata that were defined in the image's
-##         `Dockerfile`.
-##   labels: User-defined key/value metadata.
-##   stop_signal: Signal to stop a container as a string or unsigned
-##         integer.
-##   stop_timeout: Timeout to stop a container in seconds.
-##   shell: Shell for when `RUN`, `CMD`, and `ENTRYPOINT` uses a
-##         shell.
-##   host_config: Container configuration that depends on the host we
-##         are running on
-##   network: This container's networking configuration.
-##   name: Assign the specified name to the container. Must match
-##         `/?[a-zA-Z0-9_-]+`.</code></pre>
-<p>as well as via an <code>help()</code> method on each object (e.g., <code>docker$help()</code>, <code>docker$container$help()</code>) which will display help for the API version that you are using.</p>
+<code class="sourceCode R"><span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="va">create</span></span></code></pre></div>
+<pre><code><span><span class="co">## function(image, cmd = NULL, hostname = NULL, domainname = NULL,</span></span>
+<span><span class="co">##     user = NULL, attach_stdin = NULL, attach_stdout = NULL,</span></span>
+<span><span class="co">##     attach_stderr = NULL, ports = NULL, tty = NULL, open_stdin = NULL,</span></span>
+<span><span class="co">##     stdin_once = NULL, env = NULL, health_check = NULL,</span></span>
+<span><span class="co">##     args_escaped = NULL, volumes = NULL, working_dir = NULL,</span></span>
+<span><span class="co">##     entrypoint = NULL, network_disabled = NULL, mac_address = NULL,</span></span>
+<span><span class="co">##     on_build = NULL, labels = NULL, stop_signal = NULL,</span></span>
+<span><span class="co">##     stop_timeout = NULL, shell = NULL, host_config = NULL,</span></span>
+<span><span class="co">##     network = NULL, name = NULL)</span></span>
+<span><span class="co">## ----------------------------------------------------------------------</span></span>
+<span><span class="co">## Create a container. Similar to the cli command `docker create` or</span></span>
+<span><span class="co">##   `docker container create`.</span></span>
+<span><span class="co">## ----------------------------------------------------------------------</span></span>
+<span><span class="co">##   image: The name of the image to use when creating the container</span></span>
+<span><span class="co">##   cmd: Command to run specified as a string or an array of</span></span>
+<span><span class="co">##         strings.</span></span>
+<span><span class="co">##   hostname: The hostname to use for the container, as a valid RFC</span></span>
+<span><span class="co">##         1123 hostname.</span></span>
+<span><span class="co">##   domainname: The domain name to use for the container.</span></span>
+<span><span class="co">##   user: The user that commands are run as inside the container.</span></span>
+<span><span class="co">##   attach_stdin: Whether to attach to `stdin`.</span></span>
+<span><span class="co">##   attach_stdout: Whether to attach to `stdout`.</span></span>
+<span><span class="co">##   attach_stderr: Whether to attach to `stderr`.</span></span>
+<span><span class="co">##   ports: An object mapping ports to an empty object in the form:</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##         `{"&lt;port&gt;/&lt;tcp|udp|sctp&gt;": {}}`</span></span>
+<span><span class="co">##   tty: Attach standard streams to a TTY, including `stdin` if it</span></span>
+<span><span class="co">##         is not closed.</span></span>
+<span><span class="co">##   open_stdin: Open `stdin`</span></span>
+<span><span class="co">##   stdin_once: Close `stdin` after one attached client disconnects</span></span>
+<span><span class="co">##   env: A list of environment variables to set inside the container</span></span>
+<span><span class="co">##         in the form `["VAR=value", ...]`. A variable without `=`</span></span>
+<span><span class="co">##         is removed from the environment, rather than to have an</span></span>
+<span><span class="co">##         empty value.</span></span>
+<span><span class="co">##   health_check: A test to perform to check that the container is</span></span>
+<span><span class="co">##         healthy. Construct with `$types$health_config()`</span></span>
+<span><span class="co">##   args_escaped: Command is already escaped (Windows only)</span></span>
+<span><span class="co">##   volumes: An object mapping mount point paths inside the</span></span>
+<span><span class="co">##         container to empty objects.</span></span>
+<span><span class="co">##   working_dir: The working directory for commands to run in.</span></span>
+<span><span class="co">##   entrypoint: The entry point for the container as a string or an</span></span>
+<span><span class="co">##         array of strings.</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##         If the array consists of exactly one empty string (`[""]`)</span></span>
+<span><span class="co">##         then the entry point is reset to system default (i.e., the</span></span>
+<span><span class="co">##         entry point used by docker when there is no `ENTRYPOINT`</span></span>
+<span><span class="co">##         instruction in the `Dockerfile`).</span></span>
+<span><span class="co">##   network_disabled: Disable networking for the container.</span></span>
+<span><span class="co">##   mac_address: MAC address of the container.</span></span>
+<span><span class="co">##   on_build: `ONBUILD` metadata that were defined in the image's</span></span>
+<span><span class="co">##         `Dockerfile`.</span></span>
+<span><span class="co">##   labels: User-defined key/value metadata.</span></span>
+<span><span class="co">##   stop_signal: Signal to stop a container as a string or unsigned</span></span>
+<span><span class="co">##         integer.</span></span>
+<span><span class="co">##   stop_timeout: Timeout to stop a container in seconds.</span></span>
+<span><span class="co">##   shell: Shell for when `RUN`, `CMD`, and `ENTRYPOINT` uses a</span></span>
+<span><span class="co">##         shell.</span></span>
+<span><span class="co">##   host_config: Container configuration that depends on the host we</span></span>
+<span><span class="co">##         are running on</span></span>
+<span><span class="co">##   network: This container's networking configuration.</span></span>
+<span><span class="co">##   name: Assign the specified name to the container. Must match</span></span>
+<span><span class="co">##         `/?[a-zA-Z0-9_-]+`.</span></span></code></pre>
+<p>as well as via an <code><a href="https://rdrr.io/r/utils/help.html" class="external-link">help()</a></code> method on each object (e.g., <code>docker$help()</code>, <code>docker$container$help()</code>) which will display help for the API version that you are using.</p>
 </div>
-<div id="approach" class="section level2">
-<h2 class="hasAnchor">
-<a href="#approach" class="anchor"></a>Approach</h2>
-<p>The Docker API is <a href="https://docs.docker.com/develop/sdk/#api-version-matrix">versioned</a> and each version includes a <a href="https://docs.docker.com/engine/api/v1.29">machine-readable API specification</a>. Rather than manually write wrappers that fit the output docker gives, <code>stevedore</code> <em>generates</em> an interface directly from the spefification. Currently <code>stevedore</code> supports docker API versions 1.25 to 1.39 (defaulting to 1.29).</p>
+<div class="section level2">
+<h2 id="approach">Approach<a class="anchor" aria-label="anchor" href="#approach"></a>
+</h2>
+<p>The Docker API is <a href="https://docs.docker.com/develop/sdk/#api-version-matrix" class="external-link">versioned</a> and each version includes a <a href="https://docs.docker.com/engine/api/v1.29" class="external-link">machine-readable API specification</a>. Rather than manually write wrappers that fit the output docker gives, <code>stevedore</code> <em>generates</em> an interface directly from the spefification. Currently <code>stevedore</code> supports docker API versions 1.25 to 1.39 (defaulting to 1.29).</p>
 <p>This approach means that the output will be type-stable - there is no inference on what to return based on what the server chooses to return. With a given API version, the same fields will always be returned. Some of this information is very rich, for example, for the backgrounded container above:</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">container</span><span class="op">$</span><span class="fu">inspect</span><span class="op">(</span>reload <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
-<pre><code>## $id
-## [1] "f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c"
-##
-## $created
-## [1] "2018-11-08T09:42:55.7684396Z"
-##
-## $path
-## [1] "/usr/local/bin/run.sh"
-##
-## $args
-## character(0)
-##
-## $state
-## $state$status
-## [1] "running"
-##
-## $state$running
-## [1] TRUE
-##
-## $state$paused
-## [1] FALSE
-##
-## $state$restarting
-## [1] FALSE
-##
-## $state$oom_killed
-## [1] FALSE
-##
-## $state$dead
-## [1] FALSE
-##
-## $state$pid
-## [1] 2100
-##
-## $state$exit_code
-## [1] 0
-##
-## $state$error
-## [1] ""
-##
-## $state$started_at
-## [1] "2018-11-08T09:42:56.1686632Z"
-##
-## $state$finished_at
-## [1] "0001-01-01T00:00:00Z"
-##
-##
-## $image
-## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"
-##
-## $resolv_conf_path
-## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/resolv.conf"
-##
-## $hostname_path
-## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/hostname"
-##
-## $hosts_path
-## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/hosts"
-##
-## $log_path
-## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c-json.log"
-##
-## $node
-## NULL
-##
-## $name
-## [1] "/gallant_dubinsky"
-##
-## $restart_count
-## [1] 0
-##
-## $driver
-## [1] "overlay2"
-##
-## $mount_label
-## [1] ""
-##
-## $process_label
-## [1] ""
-##
-## $app_armor_profile
-## [1] ""
-##
-## $exec_ids
-## [1] NA
-##
-## $host_config
-## $host_config$cpu_shares
-## [1] 0
-##
-## $host_config$memory
-## [1] 0
-##
-## $host_config$cgroup_parent
-## [1] ""
-##
-## $host_config$blkio_weight
-## [1] 0
-##
-## $host_config$blkio_weight_device
-## [1] path   weight
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$blkio_device_read_bps
-## [1] path rate
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$blkio_device_write_bps
-## [1] path rate
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$blkio_device_read_iops
-## [1] path rate
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$blkio_device_write_iops
-## [1] path rate
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$cpu_period
-## [1] 0
-##
-## $host_config$cpu_quota
-## [1] 0
-##
-## $host_config$cpu_realtime_period
-## [1] 0
-##
-## $host_config$cpu_realtime_runtime
-## [1] 0
-##
-## $host_config$cpuset_cpus
-## [1] ""
-##
-## $host_config$cpuset_mems
-## [1] ""
-##
-## $host_config$devices
-## [1] path_on_host       path_in_container  cgroup_permissions
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$device_cgroup_rules
-## character(0)
-##
-## $host_config$disk_quota
-## [1] 0
-##
-## $host_config$kernel_memory
-## [1] 0
-##
-## $host_config$memory_reservation
-## [1] 0
-##
-## $host_config$memory_swap
-## [1] 0
-##
-## $host_config$memory_swappiness
-## [1] NA
-##
-## $host_config$nano_cpus
-## [1] NA
-##
-## $host_config$oom_kill_disable
-## [1] FALSE
-##
-## $host_config$init
-## [1] NA
-##
-## $host_config$pids_limit
-## [1] 0
-##
-## $host_config$ulimits
-## [1] name soft hard
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$cpu_count
-## [1] 0
-##
-## $host_config$cpu_percent
-## [1] 0
-##
-## $host_config$io_maximum_iops
-## [1] 0
-##
-## $host_config$io_maximum_bandwidth
-## [1] 0
-##
-## $host_config$binds
-## character(0)
-##
-## $host_config$container_idfile
-## [1] ""
-##
-## $host_config$log_config
-## $host_config$log_config$type
-## [1] "json-file"
-##
-## $host_config$log_config$config
-## character(0)
-##
-##
-## $host_config$network_mode
-## [1] "default"
-##
-## $host_config$port_bindings
-## NULL
-##
-## $host_config$restart_policy
-## $host_config$restart_policy$name
-## [1] ""
-##
-## $host_config$restart_policy$maximum_retry_count
-## [1] 0
-##
-##
-## $host_config$auto_remove
-## [1] FALSE
-##
-## $host_config$volume_driver
-## [1] ""
-##
-## $host_config$volumes_from
-## character(0)
-##
-## $host_config$mounts
-## [1] target         source         type           read_only
-## [5] consistency    bind_options   volume_options tmpfs_options
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $host_config$cap_add
-## character(0)
-##
-## $host_config$cap_drop
-## character(0)
-##
-## $host_config$dns
-## character(0)
-##
-## $host_config$dns_options
-## character(0)
-##
-## $host_config$dns_search
-## character(0)
-##
-## $host_config$extra_hosts
-## character(0)
-##
-## $host_config$group_add
-## character(0)
-##
-## $host_config$ipc_mode
-## [1] "shareable"
-##
-## $host_config$cgroup
-## [1] ""
-##
-## $host_config$links
-## character(0)
-##
-## $host_config$oom_score_adj
-## [1] 0
-##
-## $host_config$pid_mode
-## [1] ""
-##
-## $host_config$privileged
-## [1] FALSE
-##
-## $host_config$publish_all_ports
-## [1] FALSE
-##
-## $host_config$readonly_rootfs
-## [1] FALSE
-##
-## $host_config$security_opt
-## character(0)
-##
-## $host_config$storage_opt
-## NULL
-##
-## $host_config$tmpfs
-## NULL
-##
-## $host_config$uts_mode
-## [1] ""
-##
-## $host_config$userns_mode
-## [1] ""
-##
-## $host_config$shm_size
-## [1] 67108864
-##
-## $host_config$sysctls
-## NULL
-##
-## $host_config$runtime
-## [1] "runc"
-##
-## $host_config$console_size
-## [1] 0 0
-##
-## $host_config$isolation
-## [1] ""
-##
-##
-## $graph_driver
-## $graph_driver$name
-## [1] "overlay2"
-##
-## $graph_driver$data
-##                                                                                                                                                                                                                                                                                                                                                                                          lower_dir
-## "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a-init/diff:/var/lib/docker/overlay2/c8d267ac9c2c791b61defb32ff381584c45699ba427405916713212557d89e1e/diff:/var/lib/docker/overlay2/52c07e23aeaf3bf61741b0e990d956453c8ae1ee7fa704b09f4d81209a7d4615/diff:/var/lib/docker/overlay2/1d11fb00255ff4b13d8bb5ec599d1f706e449001cd4fe4622457c62df0eac3aa/diff"
-##                                                                                                                                                                                                                                                                                                                                                                                         merged_dir
-##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/merged"
-##                                                                                                                                                                                                                                                                                                                                                                                          upper_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/diff"
-##                                                                                                                                                                                                                                                                                                                                                                                           work_dir
-##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/work"
-##
-##
-## $size_rw
-## [1] NA
-##
-## $size_root_fs
-## [1] NA
-##
-## $mounts
-## [1] type        name        source      destination driver      mode
-## [7] rw          propagation
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $config
-## $config$hostname
-## [1] "f19bcf663cc3"
-##
-## $config$domainname
-## [1] ""
-##
-## $config$user
-## [1] ""
-##
-## $config$attach_stdin
-## [1] FALSE
-##
-## $config$attach_stdout
-## [1] FALSE
-##
-## $config$attach_stderr
-## [1] FALSE
-##
-## $config$exposed_ports
-## NULL
-##
-## $config$tty
-## [1] FALSE
-##
-## $config$open_stdin
-## [1] FALSE
-##
-## $config$stdin_once
-## [1] FALSE
-##
-## $config$env
-## [1] "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"
-##
-## $config$cmd
-## [1] "/usr/local/bin/run.sh"
-##
-## $config$healthcheck
-## NULL
-##
-## $config$args_escaped
-## [1] TRUE
-##
-## $config$image
-## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"
-##
-## $config$volumes
-## NULL
-##
-## $config$working_dir
-## [1] ""
-##
-## $config$entrypoint
-## character(0)
-##
-## $config$network_disabled
-## [1] NA
-##
-## $config$mac_address
-## [1] NA
-##
-## $config$on_build
-## character(0)
-##
-## $config$labels
-## character(0)
-##
-## $config$stop_signal
-## [1] NA
-##
-## $config$stop_timeout
-## [1] NA
-##
-## $config$shell
-## character(0)
-##
-##
-## $network_settings
-## $network_settings$bridge
-## [1] ""
-##
-## $network_settings$sandbox_id
-## [1] "02dabb4fbb1379e9f8d2b60629e3c48df126a31c75d1b12ee788465227f3cebd"
-##
-## $network_settings$hairpin_mode
-## [1] FALSE
-##
-## $network_settings$link_local_ipv6_address
-## [1] ""
-##
-## $network_settings$link_local_ipv6_prefix_len
-## [1] 0
-##
-## $network_settings$ports
-## list()
-##
-## $network_settings$sandbox_key
-## [1] "/var/run/docker/netns/02dabb4fbb13"
-##
-## $network_settings$secondary_ipaddresses
-## [1] addr       prefix_len
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $network_settings$secondary_ipv6_addresses
-## [1] addr       prefix_len
-## &lt;0 rows&gt; (or 0-length row.names)
-##
-## $network_settings$endpoint_id
-## [1] "da5987bfa58745c873503e55926d58a29795e914dabbd129f1a927b383951d63"
-##
-## $network_settings$gateway
-## [1] "172.17.0.1"
-##
-## $network_settings$global_ipv6_address
-## [1] ""
-##
-## $network_settings$global_ipv6_prefix_len
-## [1] 0
-##
-## $network_settings$ip_address
-## [1] "172.17.0.2"
-##
-## $network_settings$ip_prefix_len
-## [1] 16
-##
-## $network_settings$ipv6_gateway
-## [1] ""
-##
-## $network_settings$mac_address
-## [1] "02:42:ac:11:00:02"
-##
-## $network_settings$networks
-## $network_settings$networks$bridge
-## $network_settings$networks$bridge$ipam_config
-## NULL
-##
-## $network_settings$networks$bridge$links
-## character(0)
-##
-## $network_settings$networks$bridge$aliases
-## character(0)
-##
-## $network_settings$networks$bridge$network_id
-## [1] "8bc1cc7ddc2eb36bcb0856854799a26b41549f16ab0ad9b643a632ba146a4b87"
-##
-## $network_settings$networks$bridge$endpoint_id
-## [1] "da5987bfa58745c873503e55926d58a29795e914dabbd129f1a927b383951d63"
-##
-## $network_settings$networks$bridge$gateway
-## [1] "172.17.0.1"
-##
-## $network_settings$networks$bridge$ip_address
-## [1] "172.17.0.2"
-##
-## $network_settings$networks$bridge$ip_prefix_len
-## [1] 16
-##
-## $network_settings$networks$bridge$ipv6_gateway
-## [1] ""
-##
-## $network_settings$networks$bridge$global_ipv6_address
-## [1] ""
-##
-## $network_settings$networks$bridge$global_ipv6_prefix_len
-## [1] 0
-##
-## $network_settings$networks$bridge$mac_address
-## [1] "02:42:ac:11:00:02"
-##
-## $network_settings$networks$bridge$driver_opts
-## NULL</code></pre>
+<code class="sourceCode R"><span><span class="va">container</span><span class="op">$</span><span class="fu">inspect</span><span class="op">(</span>reload <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## $id</span></span>
+<span><span class="co">## [1] "f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $created</span></span>
+<span><span class="co">## [1] "2018-11-08T09:42:55.7684396Z"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $path</span></span>
+<span><span class="co">## [1] "/usr/local/bin/run.sh"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $args</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state</span></span>
+<span><span class="co">## $state$status</span></span>
+<span><span class="co">## [1] "running"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$running</span></span>
+<span><span class="co">## [1] TRUE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$paused</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$restarting</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$oom_killed</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$dead</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$pid</span></span>
+<span><span class="co">## [1] 2100</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$exit_code</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$error</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$started_at</span></span>
+<span><span class="co">## [1] "2018-11-08T09:42:56.1686632Z"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $state$finished_at</span></span>
+<span><span class="co">## [1] "0001-01-01T00:00:00Z"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $image</span></span>
+<span><span class="co">## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $resolv_conf_path</span></span>
+<span><span class="co">## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/resolv.conf"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $hostname_path</span></span>
+<span><span class="co">## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/hostname"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $hosts_path</span></span>
+<span><span class="co">## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/hosts"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $log_path</span></span>
+<span><span class="co">## [1] "/var/lib/docker/containers/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c/f19bcf663cc3527acc41d2a5b86810be03a9c82ba7043255981e4611405d446c-json.log"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $node</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $name</span></span>
+<span><span class="co">## [1] "/gallant_dubinsky"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $restart_count</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $driver</span></span>
+<span><span class="co">## [1] "overlay2"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $mount_label</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $process_label</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $app_armor_profile</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $exec_ids</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config</span></span>
+<span><span class="co">## $host_config$cpu_shares</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$memory</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cgroup_parent</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_weight</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_weight_device</span></span>
+<span><span class="co">## [1] path   weight</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_device_read_bps</span></span>
+<span><span class="co">## [1] path rate</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_device_write_bps</span></span>
+<span><span class="co">## [1] path rate</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_device_read_iops</span></span>
+<span><span class="co">## [1] path rate</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$blkio_device_write_iops</span></span>
+<span><span class="co">## [1] path rate</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_period</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_quota</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_realtime_period</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_realtime_runtime</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpuset_cpus</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpuset_mems</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$devices</span></span>
+<span><span class="co">## [1] path_on_host       path_in_container  cgroup_permissions</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$device_cgroup_rules</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$disk_quota</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$kernel_memory</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$memory_reservation</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$memory_swap</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$memory_swappiness</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$nano_cpus</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$oom_kill_disable</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$init</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$pids_limit</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$ulimits</span></span>
+<span><span class="co">## [1] name soft hard</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_count</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cpu_percent</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$io_maximum_iops</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$io_maximum_bandwidth</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$binds</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$container_idfile</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$log_config</span></span>
+<span><span class="co">## $host_config$log_config$type</span></span>
+<span><span class="co">## [1] "json-file"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$log_config$config</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$network_mode</span></span>
+<span><span class="co">## [1] "default"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$port_bindings</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$restart_policy</span></span>
+<span><span class="co">## $host_config$restart_policy$name</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$restart_policy$maximum_retry_count</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$auto_remove</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$volume_driver</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$volumes_from</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$mounts</span></span>
+<span><span class="co">## [1] target         source         type           read_only</span></span>
+<span><span class="co">## [5] consistency    bind_options   volume_options tmpfs_options</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cap_add</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cap_drop</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$dns</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$dns_options</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$dns_search</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$extra_hosts</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$group_add</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$ipc_mode</span></span>
+<span><span class="co">## [1] "shareable"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$cgroup</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$links</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$oom_score_adj</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$pid_mode</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$privileged</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$publish_all_ports</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$readonly_rootfs</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$security_opt</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$storage_opt</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$tmpfs</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$uts_mode</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$userns_mode</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$shm_size</span></span>
+<span><span class="co">## [1] 67108864</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$sysctls</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$runtime</span></span>
+<span><span class="co">## [1] "runc"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$console_size</span></span>
+<span><span class="co">## [1] 0 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $host_config$isolation</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $graph_driver</span></span>
+<span><span class="co">## $graph_driver$name</span></span>
+<span><span class="co">## [1] "overlay2"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $graph_driver$data</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                                                                                                          lower_dir</span></span>
+<span><span class="co">## "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a-init/diff:/var/lib/docker/overlay2/c8d267ac9c2c791b61defb32ff381584c45699ba427405916713212557d89e1e/diff:/var/lib/docker/overlay2/52c07e23aeaf3bf61741b0e990d956453c8ae1ee7fa704b09f4d81209a7d4615/diff:/var/lib/docker/overlay2/1d11fb00255ff4b13d8bb5ec599d1f706e449001cd4fe4622457c62df0eac3aa/diff"</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                                                                                                         merged_dir</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                 "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/merged"</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                                                                                                          upper_dir</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/diff"</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                                                                                                           work_dir</span></span>
+<span><span class="co">##                                                                                                                                                                                                                                                                                                   "/var/lib/docker/overlay2/11f5db807974ea3d80bc91877f74f88aeb6e601e91f682b447c5d6b92021fb8a/work"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $size_rw</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $size_root_fs</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $mounts</span></span>
+<span><span class="co">## [1] type        name        source      destination driver      mode</span></span>
+<span><span class="co">## [7] rw          propagation</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config</span></span>
+<span><span class="co">## $config$hostname</span></span>
+<span><span class="co">## [1] "f19bcf663cc3"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$domainname</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$user</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$attach_stdin</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$attach_stdout</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$attach_stderr</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$exposed_ports</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$tty</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$open_stdin</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$stdin_once</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$env</span></span>
+<span><span class="co">## [1] "PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$cmd</span></span>
+<span><span class="co">## [1] "/usr/local/bin/run.sh"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$healthcheck</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$args_escaped</span></span>
+<span><span class="co">## [1] TRUE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$image</span></span>
+<span><span class="co">## [1] "sha256:b1666055931f332541bda7c425e624764de96c85177a61a0b49238a42b80b7f9"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$volumes</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$working_dir</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$entrypoint</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$network_disabled</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$mac_address</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$on_build</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$labels</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$stop_signal</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$stop_timeout</span></span>
+<span><span class="co">## [1] NA</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $config$shell</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings</span></span>
+<span><span class="co">## $network_settings$bridge</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$sandbox_id</span></span>
+<span><span class="co">## [1] "02dabb4fbb1379e9f8d2b60629e3c48df126a31c75d1b12ee788465227f3cebd"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$hairpin_mode</span></span>
+<span><span class="co">## [1] FALSE</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$link_local_ipv6_address</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$link_local_ipv6_prefix_len</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$ports</span></span>
+<span><span class="co">## list()</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$sandbox_key</span></span>
+<span><span class="co">## [1] "/var/run/docker/netns/02dabb4fbb13"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$secondary_ipaddresses</span></span>
+<span><span class="co">## [1] addr       prefix_len</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$secondary_ipv6_addresses</span></span>
+<span><span class="co">## [1] addr       prefix_len</span></span>
+<span><span class="co">## &lt;0 rows&gt; (or 0-length row.names)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$endpoint_id</span></span>
+<span><span class="co">## [1] "da5987bfa58745c873503e55926d58a29795e914dabbd129f1a927b383951d63"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$gateway</span></span>
+<span><span class="co">## [1] "172.17.0.1"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$global_ipv6_address</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$global_ipv6_prefix_len</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$ip_address</span></span>
+<span><span class="co">## [1] "172.17.0.2"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$ip_prefix_len</span></span>
+<span><span class="co">## [1] 16</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$ipv6_gateway</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$mac_address</span></span>
+<span><span class="co">## [1] "02:42:ac:11:00:02"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks</span></span>
+<span><span class="co">## $network_settings$networks$bridge</span></span>
+<span><span class="co">## $network_settings$networks$bridge$ipam_config</span></span>
+<span><span class="co">## NULL</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$links</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$aliases</span></span>
+<span><span class="co">## character(0)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$network_id</span></span>
+<span><span class="co">## [1] "8bc1cc7ddc2eb36bcb0856854799a26b41549f16ab0ad9b643a632ba146a4b87"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$endpoint_id</span></span>
+<span><span class="co">## [1] "da5987bfa58745c873503e55926d58a29795e914dabbd129f1a927b383951d63"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$gateway</span></span>
+<span><span class="co">## [1] "172.17.0.1"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$ip_address</span></span>
+<span><span class="co">## [1] "172.17.0.2"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$ip_prefix_len</span></span>
+<span><span class="co">## [1] 16</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$ipv6_gateway</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$global_ipv6_address</span></span>
+<span><span class="co">## [1] ""</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$global_ipv6_prefix_len</span></span>
+<span><span class="co">## [1] 0</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$mac_address</span></span>
+<span><span class="co">## [1] "02:42:ac:11:00:02"</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## $network_settings$networks$bridge$driver_opts</span></span>
+<span><span class="co">## NULL</span></span></code></pre>
 </div>
-<div id="windows-support" class="section level2">
-<h2 class="hasAnchor">
-<a href="#windows-support" class="anchor"></a>Windows support</h2>
-<p>Windows support for docker through this package is currently incomplete. The <a href="https://ci.appveyor.com/project/richfitz/stevedore">appveyor build</a> tests only the parts of the package that don’t actually call docker due to difficult-to-debug issues with container compatibility on that platform.</p>
-<div id="current-situation" class="section level3">
-<h3 class="hasAnchor">
-<a href="#current-situation" class="anchor"></a>Current situation</h3>
-<p>The support for windows is not as comprehensive as for other platforms (but I’m not sure how common using docker is on windows yet). The reason for this is that <a href="https://cran.r-project.org/package=curl"><code>curl</code></a> (and the underlying <code>libcurl</code> library) do not support communicating over “named pipes” which is how docker works on windows 10.</p>
+<div class="section level2">
+<h2 id="windows-support">Windows support<a class="anchor" aria-label="anchor" href="#windows-support"></a>
+</h2>
+<p>Windows support for docker through this package is currently incomplete. The <a href="https://ci.appveyor.com/project/richfitz/stevedore" class="external-link">appveyor build</a> tests only the parts of the package that don’t actually call docker due to difficult-to-debug issues with container compatibility on that platform.</p>
+<div class="section level3">
+<h3 id="current-situation">Current situation<a class="anchor" aria-label="anchor" href="#current-situation"></a>
+</h3>
+<p>The support for windows is not as comprehensive as for other platforms (but I’m not sure how common using docker is on windows yet). The reason for this is that <a href="https://cran.r-project.org/package=curl" class="external-link"><code>curl</code></a> (and the underlying <code>libcurl</code> library) do not support communicating over “named pipes” which is how docker works on windows 10.</p>
 <p>The package includes a small wrapper around the python sdk’s docker support. On the R side this requires the <code>reticulate</code> package. It also requires that you have a python installation that includes both the <code>docker</code> package and <code>pypiwin32</code> - once python is installed you can add these packages to python with</p>
 <pre><code>pip install docker pypiwin32</code></pre>
 <p>(or <code>pip3</code> instead of <code>pip</code> to use python3).</p>
 <p>You can check that everything is configured by running</p>
 <div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">stevedore</span><span class="fu">:::</span><span class="fu">httppipe_available</span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
-<p>which will return <code>TRUE</code> if everything is OK, and otherwise print some information about errors loading the package. In the case of error consult the reticulate documentation (<code><a href="https://cran.rstudio.com/web/packages/reticulate/vignettes/versions.html">vignette("versions", package = "reticulate")</a></code> will be especially useful). Improvements to installation documentation and process are welcome!</p>
+<code class="sourceCode R"><span><span class="fu">stevedore</span><span class="fu">:::</span><span class="fu">httppipe_available</span><span class="op">(</span>verbose <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p>which will return <code>TRUE</code> if everything is OK, and otherwise print some information about errors loading the package. In the case of error consult the reticulate documentation (<code><a href="https://rstudio.github.io/reticulate/articles/versions.html" class="external-link">vignette("versions", package = "reticulate")</a></code> will be especially useful). Improvements to installation documentation and process are welcome!</p>
 </div>
-<div id="limitations" class="section level3">
-<h3 class="hasAnchor">
-<a href="#limitations" class="anchor"></a>Limitations</h3>
+<div class="section level3">
+<h3 id="limitations">Limitations<a class="anchor" aria-label="anchor" href="#limitations"></a>
+</h3>
 <p>The primary limitation of the <code>httppipe</code> interface is that streaming connections are not supported. This affects the following methods</p>
 <ul>
 <li>container logs with <code>follow = TRUE</code>: completely unsupported</li>
@@ -982,96 +980,106 @@
 <li>exec start - works but information printed only at end of execution</li>
 </ul>
 </div>
-<div id="going-forward" class="section level3">
-<h3 class="hasAnchor">
-<a href="#going-forward" class="anchor"></a>Going forward</h3>
-<p>The support in this package is a duplicate of the micropackage <a href="https://github.com/richfitz/httppipe/"><code>httppipe</code></a>. This implements the minimum functionality with windows named pipes to support docker. I would <strong>love</strong> for someone to help port this to a python-free package. This probably requires a bit of C/C++ and knowledge of the win32 API.</p>
+<div class="section level3">
+<h3 id="going-forward">Going forward<a class="anchor" aria-label="anchor" href="#going-forward"></a>
+</h3>
+<p>The support in this package is a duplicate of the micropackage <a href="https://github.com/richfitz/httppipe/" class="external-link"><code>httppipe</code></a>. This implements the minimum functionality with windows named pipes to support docker. I would <strong>love</strong> for someone to help port this to a python-free package. This probably requires a bit of C/C++ and knowledge of the win32 API.</p>
 </div>
 </div>
-<div id="development-and-testing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#development-and-testing" class="anchor"></a>Development and testing</h2>
-<p>See the <a href="https://github.com/richfitz/stevedore/blob/master/development.md">development guide</a> if you want to get started developing <code>stevedore</code> - it provides pointers to the core objects.</p>
+<div class="section level2">
+<h2 id="development-and-testing">Development and testing<a class="anchor" aria-label="anchor" href="#development-and-testing"></a>
+</h2>
+<p>See the <a href="https://github.com/richfitz/stevedore/blob/master/development.md" class="external-link">development guide</a> if you want to get started developing <code>stevedore</code> - it provides pointers to the core objects.</p>
 </div>
-<div id="package-limitations" class="section level2">
-<h2 class="hasAnchor">
-<a href="#package-limitations" class="anchor"></a>Package limitations</h2>
+<div class="section level2">
+<h2 id="package-limitations">Package limitations<a class="anchor" aria-label="anchor" href="#package-limitations"></a>
+</h2>
 <p>Endpoints that require “http hijacking” are not fully supported (primarily <code>attach</code>) but the foundations are there to support this - stdin is likely to be a major hassle though and I’m not sure if it’s possible from within R’s REPL.</p>
 </div>
-<div id="installation" class="section level2">
-<h2 class="hasAnchor">
-<a href="#installation" class="anchor"></a>Installation</h2>
+<div class="section level2">
+<h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
+</h2>
 <p><code>stevedore</code> can be installed from CRAN using</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"stevedore"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"stevedore"</span><span class="op">)</span></span></code></pre></div>
 <p>On windows you will also need <code>reticulate</code></p>
 <div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"reticulate"</span><span class="op">)</span></span></code></pre></div>
 <p>You will also need a python installation and the <code>docker</code> and <code>pypiwin32</code> packages, which can be installed with pip (see <a href="#windows-support">above</a>).</p>
 <p>Once installed, find out if everything is set up to use docker by running</p>
 <div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="reference/docker_available.html">docker_available</a></span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] TRUE</code></pre>
+<code class="sourceCode R"><span><span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="reference/docker_available.html">docker_available</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] TRUE</span></span></code></pre>
 <p>To install the development version from GitHub, you can use <code>remotes</code>:</p>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">remotes</span><span class="fu">::</span><span class="fu"><a href="https://remotes.r-lib.org/reference/install_github.html">install_github</a></span><span class="op">(</span><span class="st">"richfitz/stevedore"</span>, upgrade <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu">remotes</span><span class="fu">::</span><span class="fu">install_github</span><span class="op">(</span><span class="st">"richfitz/stevedore"</span>, upgrade <span class="op">=</span> <span class="cn">FALSE</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="licence" class="section level2">
-<h2 class="hasAnchor">
-<a href="#licence" class="anchor"></a>Licence</h2>
-<p>MIT © <a href="https://github.com/richfitz">Rich FitzJohn</a>.</p>
-<p>Please note that this project is released with a <a href="https://github.com/richfitz/stevedore/blob/master/CONDUCT.md">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
+<div class="section level2">
+<h2 id="licence">Licence<a class="anchor" aria-label="anchor" href="#licence"></a>
+</h2>
+<p>MIT © <a href="https://github.com/richfitz" class="external-link">Rich FitzJohn</a>.</p>
+<p>Please note that this project is released with a <a href="https://github.com/richfitz/stevedore/blob/master/CONDUCT.md" class="external-link">Contributor Code of Conduct</a>. By participating in this project you agree to abide by its terms.</p>
 </div>
 </div>
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
     <div class="links">
-<h2>Links</h2>
+<h2 data-toc-skip>Links</h2>
 <ul class="list-unstyled">
-<li>Download from CRAN at <br><a href="https://cloud.r-project.org/package=stevedore">https://​cloud.r-project.org/​package=stevedore</a>
-</li>
-<li>Browse source code at <br><a href="https://github.com/richfitz/stevedore/">https://​github.com/​richfitz/​stevedore/​</a>
-</li>
-<li>Report a bug at <br><a href="https://github.com/richfitz/stevedore/issues">https://​github.com/​richfitz/​stevedore/​issues</a>
-</li>
+<li><a href="https://cloud.r-project.org/package=stevedore" class="external-link">View on CRAN</a></li>
+<li><a href="https://github.com/richfitz/stevedore/" class="external-link">Browse source code</a></li>
+<li><a href="https://github.com/richfitz/stevedore/issues" class="external-link">Report a bug</a></li>
 </ul>
 </div>
+
 <div class="license">
-<h2>License</h2>
+<h2 data-toc-skip>License</h2>
 <ul class="list-unstyled">
 <li>
-<a href="https://opensource.org/licenses/mit-license.php">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
+<a href="https://opensource.org/licenses/mit-license.php" class="external-link">MIT</a> + file <a href="LICENSE-text.html">LICENSE</a>
 </li>
 </ul>
 </div>
+
+
+<div class="citation">
+<h2 data-toc-skip>Citation</h2>
+<ul class="list-unstyled">
+<li><a href="authors.html#citation">Citing stevedore</a></li>
+</ul>
+</div>
+
 <div class="developers">
-<h2>Developers</h2>
+<h2 data-toc-skip>Developers</h2>
 <ul class="list-unstyled">
 <li>Rich FitzJohn <br><small class="roles"> Author, maintainer </small>  </li>
 </ul>
 </div>
 
-  <div class="dev-status">
-<h2>Dev status</h2>
+<div class="dev-status">
+<h2 data-toc-skip>Dev status</h2>
 <ul class="list-unstyled">
-<li><a href="https://www.repostatus.org/#active"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed."></a></li>
-<li><a href="https://travis-ci.org/richfitz/stevedore"><img src="https://travis-ci.org/richfitz/stevedore.svg?branch=master" alt="Travis-CI Build Status"></a></li>
-<li><a href="https://ci.appveyor.com/project/richfitz/stevedore"><img src="https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
-<li><a href="https://codecov.io/github/richfitz/stevedore?branch=master"><img src="https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master" alt="codecov.io"></a></li>
-<li><a href="https://cran.r-project.org/package=stevedore"><img src="https://www.r-pkg.org/badges/version/stevedore"></a></li>
+<li><a href="https://www.repostatus.org/#active" class="external-link"><img src="https://www.repostatus.org/badges/latest/active.svg" alt="Project Status: Active – The project has reached a stable, usable state and is being actively developed."></a></li>
+<li><a href="https://travis-ci.org/richfitz/stevedore" class="external-link"><img src="https://travis-ci.org/richfitz/stevedore.svg?branch=master" alt="Travis-CI Build Status"></a></li>
+<li><a href="https://ci.appveyor.com/project/richfitz/stevedore" class="external-link"><img src="https://ci.appveyor.com/api/projects/status/github/richfitz/stevedore?branch=master&amp;svg=true" alt="AppVeyor build status"></a></li>
+<li><a href="https://codecov.io/github/richfitz/stevedore?branch=master" class="external-link"><img src="https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master" alt="codecov.io"></a></li>
+<li><a href="https://cran.r-project.org/package=stevedore" class="external-link"><img src="https://www.r-pkg.org/badges/version/stevedore"></a></li>
 </ul>
 </div>
-</div>
+
+  </div>
 </div>
 
 
       <footer><div class="copyright">
-  <p>Developed by Rich FitzJohn.</p>
+  <p></p>
+<p>Developed by Rich FitzJohn.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -1079,6 +1087,8 @@
 
   
 
+
+  
 
   </body>
 </html>

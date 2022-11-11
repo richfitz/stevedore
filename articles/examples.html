@@ -19,6 +19,8 @@
 <![endif]-->
 </head>
 <body data-spy="scroll" data-target="#toc">
+    
+
     <div class="container template-article">
       <header><div class="navbar navbar-default navbar-fixed-top" role="navigation">
   <div class="container">
@@ -31,18 +33,12 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">stevedore</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="Released version">0.9.4</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.9.5</span>
       </span>
     </div>
 
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-<li>
-  <a href="../index.html">
-    <span class="fas fa-home fa-lg"></span>
-     
-  </a>
-</li>
 <li>
   <a href="../articles/stevedore.html">Get started</a>
 </li>
@@ -50,7 +46,7 @@
   <a href="../reference/index.html">Reference</a>
 </li>
 <li class="dropdown">
-  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
+  <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
     Articles
      
     <span class="caret"></span>
@@ -70,7 +66,7 @@
       </ul>
 <ul class="nav navbar-nav navbar-right">
 <li>
-  <a href="https://github.com/richfitz/stevedore/">
+  <a href="https://github.com/richfitz/stevedore/" class="external-link">
     <span class="fab fa-github fa-lg"></span>
      
   </a>
@@ -85,87 +81,99 @@
 
       
 
-      </header><script src="examples_files/accessible-code-block-0.0.1/empty-anchor.js"></script><div class="row">
+      </header><div class="row">
   <div class="col-md-9 contents">
     <div class="page-header toc-ignore">
       <h1 data-toc-skip>Examples and use-cases</h1>
-                        <h4 class="author">Rich FitzJohn</h4>
+                        <h4 data-toc-skip class="author">Rich
+FitzJohn</h4>
             
-            <h4 class="date">2020-01-12</h4>
+            <h4 data-toc-skip class="date">2020-01-12</h4>
       
-      <small class="dont-index">Source: <a href="https://github.com/richfitz/stevedore/blob/master/vignettes/examples.Rmd"><code>vignettes/examples.Rmd</code></a></small>
+      <small class="dont-index">Source: <a href="https://github.com/richfitz/stevedore/blob/HEAD/vignettes/examples.Rmd" class="external-link"><code>vignettes/examples.Rmd</code></a></small>
       <div class="hidden name"><code>examples.Rmd</code></div>
 
     </div>
 
     
     
-<div id="using-a-database-in-testing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#using-a-database-in-testing" class="anchor"></a>Using a database in testing</h2>
-<p>This example requires the <code>redux</code> package, which is available on CRAN and can be installed with</p>
+<div class="section level2">
+<h2 id="using-a-database-in-testing">Using a database in testing<a class="anchor" aria-label="anchor" href="#using-a-database-in-testing"></a>
+</h2>
+<p>This example requires the <code>redux</code> package, which is
+available on CRAN and can be installed with</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html">install.packages</a></span><span class="op">(</span><span class="st">"redux"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"redux"</span><span class="op">)</span></span></code></pre></div>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="../reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span>
-
-<span class="va">redis</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"redis"</span>, name <span class="op">=</span> <span class="st">"redis"</span>, ports <span class="op">=</span> <span class="st">"6379"</span>,
-                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">docker</span> <span class="op">&lt;-</span> <span class="fu">stevedore</span><span class="fu">::</span><span class="fu"><a href="../reference/docker_client.html">docker_client</a></span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">redis</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"redis"</span>, name <span class="op">=</span> <span class="st">"redis"</span>, ports <span class="op">=</span> <span class="st">"6379"</span>,</span>
+<span>                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>We now have a Redis server running on 32769</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>##   container_port protocol host_ip host_port
-## 1           6379      tcp 0.0.0.0     32769</code></pre>
+<code class="sourceCode R"><span><span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">##   container_port protocol host_ip host_port</span></span>
+<span><span class="co">## 1           6379      tcp 0.0.0.0     32769</span></span></code></pre>
 <p>Make a connection to the Redis server:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">redux</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/redux/man/hiredis.html">hiredis</a></span><span class="op">(</span>port <span class="op">=</span> <span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">redux</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/redux/man/hiredis.html" class="external-link">hiredis</a></span><span class="op">(</span>port <span class="op">=</span> <span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span></span></code></pre></div>
 <p>and we can communicate with the Redis server:</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">con</span><span class="op">$</span><span class="fu">PING</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## [Redis: PONG]</code></pre>
-<p>Because this is a brand new container we can write data without worrying about clobbering data that already exists:</p>
+<code class="sourceCode R"><span><span class="va">con</span><span class="op">$</span><span class="fu">PING</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [Redis: PONG]</span></span></code></pre>
+<p>Because this is a brand new container we can write data without
+worrying about clobbering data that already exists:</p>
 <div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">con</span><span class="op">$</span><span class="fu">SET</span><span class="op">(</span><span class="st">"key"</span>, <span class="st">"hello redis"</span><span class="op">)</span></code></pre></div>
-<pre><code>## [Redis: OK]</code></pre>
+<code class="sourceCode R"><span><span class="va">con</span><span class="op">$</span><span class="fu">SET</span><span class="op">(</span><span class="st">"key"</span>, <span class="st">"hello redis"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [Redis: OK]</span></span></code></pre>
 <div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">con</span><span class="op">$</span><span class="fu">GET</span><span class="op">(</span><span class="st">"key"</span><span class="op">)</span></code></pre></div>
-<pre><code>## [1] "hello redis"</code></pre>
-<p>And we can get a fresh copy of Redis by simply starting a new copy of redis</p>
+<code class="sourceCode R"><span><span class="va">con</span><span class="op">$</span><span class="fu">GET</span><span class="op">(</span><span class="st">"key"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## [1] "hello redis"</span></span></code></pre>
+<p>And we can get a fresh copy of Redis by simply starting a new copy of
+redis</p>
 <div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">redis</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## NULL</code></pre>
+<code class="sourceCode R"><span><span class="va">redis</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
 <div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">redis</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"redis"</span>, name <span class="op">=</span> <span class="st">"redis"</span>, ports <span class="op">=</span> <span class="st">"6379"</span>,
-                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span>
-<span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">redux</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/redux/man/hiredis.html">hiredis</a></span><span class="op">(</span>port <span class="op">=</span> <span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span>
-<span class="va">con</span><span class="op">$</span><span class="fu">KEYS</span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span></code></pre></div>
-<pre><code>## list()</code></pre>
+<code class="sourceCode R"><span><span class="va">redis</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"redis"</span>, name <span class="op">=</span> <span class="st">"redis"</span>, ports <span class="op">=</span> <span class="st">"6379"</span>,</span>
+<span>                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span>
+<span><span class="va">con</span> <span class="op">&lt;-</span> <span class="fu">redux</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/redux/man/hiredis.html" class="external-link">hiredis</a></span><span class="op">(</span>port <span class="op">=</span> <span class="va">redis</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span></span>
+<span><span class="va">con</span><span class="op">$</span><span class="fu">KEYS</span><span class="op">(</span><span class="st">"*"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## list()</span></span></code></pre>
 <div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">redis</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></code></pre></div>
-<pre><code>## NULL</code></pre>
-<p>The same approach works for other database that might be large or awkward to install, such as Postgres or MySQL.</p>
+<code class="sourceCode R"><span><span class="va">redis</span><span class="op">$</span><span class="fu">kill</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## NULL</span></span></code></pre>
+<p>The same approach works for other database that might be large or
+awkward to install, such as Postgres or MySQL.</p>
 </div>
-<div id="testing-shiny-apps" class="section level2">
-<h2 class="hasAnchor">
-<a href="#testing-shiny-apps" class="anchor"></a>Testing shiny apps</h2>
-<p>(this section is not actually run because doing anything with it requires looking in a web browser)</p>
-<p>The rocker project has a shiny container that provides an easy to use version of the shiny server. If we have a directory <code>app</code> that contains a shiny application we can map this with:</p>
+<div class="section level2">
+<h2 id="testing-shiny-apps">Testing shiny apps<a class="anchor" aria-label="anchor" href="#testing-shiny-apps"></a>
+</h2>
+<p>(this section is not actually run because doing anything with it
+requires looking in a web browser)</p>
+<p>The rocker project has a shiny container that provides an easy to use
+version of the shiny server. If we have a directory <code>app</code>
+that contains a shiny application we can map this with:</p>
 <div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">volumes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"%s:%s"</span>, <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html">normalizePath</a></span><span class="op">(</span><span class="st">"app"</span><span class="op">)</span>, <span class="st">"/srv/shiny-server/"</span><span class="op">)</span></code></pre></div>
-<p>(see the <a href="https://hub.docker.com/r/rocker/shiny">shiny docker image documentation</a> for the destination path.</p>
+<code class="sourceCode R"><span><span class="va">volumes</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"%s:%s"</span>, <span class="fu"><a href="https://rdrr.io/r/base/normalizePath.html" class="external-link">normalizePath</a></span><span class="op">(</span><span class="st">"app"</span><span class="op">)</span>, <span class="st">"/srv/shiny-server/"</span><span class="op">)</span></span></code></pre></div>
+<p>(see the <a href="https://hub.docker.com/r/rocker/shiny" class="external-link">shiny docker
+image documentation</a> for the destination path.</p>
 <p>We can start this with</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">shiny</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"rocker/shiny"</span>, name <span class="op">=</span> <span class="st">"shiny"</span>, ports <span class="op">=</span> <span class="st">"3838"</span>,
-                              volumes <span class="op">=</span> <span class="va">volumes</span>,
-                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">shiny</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="st">"rocker/shiny"</span>, name <span class="op">=</span> <span class="st">"shiny"</span>, ports <span class="op">=</span> <span class="st">"3838"</span>,</span>
+<span>                              volumes <span class="op">=</span> <span class="va">volumes</span>,</span>
+<span>                              detach <span class="op">=</span> <span class="cn">TRUE</span>, rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p>In an interactive session, you can visit the shiny server:</p>
 <div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html">browseURL</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html">sprintf</a></span><span class="op">(</span><span class="st">"http://localhost:%s"</span>, <span class="va">shiny</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/browseURL.html" class="external-link">browseURL</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/sprintf.html" class="external-link">sprintf</a></span><span class="op">(</span><span class="st">"http://localhost:%s"</span>, <span class="va">shiny</span><span class="op">$</span><span class="fu">ports</span><span class="op">(</span><span class="op">)</span><span class="op">$</span><span class="va">host_port</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 </div>
-<div id="package-testing" class="section level2">
-<h2 class="hasAnchor">
-<a href="#package-testing" class="anchor"></a>Package testing</h2>
-<p>You can build an image that contains all the bits required to test your package and then run tests using that image. This ensures that you’re running in a totally clean environment (and that you really know what all the dependencies of your package are)</p>
+<div class="section level2">
+<h2 id="package-testing">Package testing<a class="anchor" aria-label="anchor" href="#package-testing"></a>
+</h2>
+<p>You can build an image that contains all the bits required to test
+your package and then run tests using that image. This ensures that
+you’re running in a totally clean environment (and that you really know
+what all the dependencies of your package are)</p>
 <p>For this we have a Dockerfile, which contains</p>
 <pre class="plain"><code>FROM rocker/r-ver:latest
 
@@ -190,40 +198,41 @@ COPY tester.sh /usr/local/bin
 RUN chmod +x /usr/local/bin/tester.sh
 
 ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
-<p>And the script <code>tester.sh</code> (copied into the docker image above) which contains:</p>
+<p>And the script <code>tester.sh</code> (copied into the docker image
+above) which contains:</p>
 <div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu">lang_output</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html">readLines</a></span><span class="op">(</span><span class="st">"tester/tester.sh"</span><span class="op">)</span>, <span class="st">"shell"</span><span class="op">)</span></code></pre></div>
-<pre><code>## ```shell
-## #!/usr/bin/env bash
-## set -e
-##
-## if [[ "$#" -ne 1 ]]; then
-##     echo "Expected one argument"
-##     exit 1
-## fi
-## SRC=$1
-##
-## if echo $SRC | grep -q "^https://"; then
-##     DEST=$(mktemp -d)
-##     git clone $SRC $DEST
-##     SRC=$DEST
-## fi
-##
-## if [ ! -f "$SRC/DESCRIPTION" ]; then
-##     echo "Did not find a DESCRIPTION" file
-##     exit 1
-## fi
-##
-## PACKAGE=$(grep '^Package:' "$SRC/DESCRIPTION" | \
-##                  sed -E 's/^Package:[[:space:]]+//')
-## R CMD build $SRC
-## PACKAGE_TGZ=$(ls -1tr ${PACKAGE}*gz | tail -n1)
-##
-## export _R_CHECK_CRAN_INCOMING_=FALSE
-## Rscript -e "rcmdcheck::rcmdcheck('$PACKAGE_TGZ', args = c('--as-cran', '--no-manual'))"
-## ```</code></pre>
+<code class="sourceCode R"><span><span class="fu">lang_output</span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"tester/tester.sh"</span><span class="op">)</span>, <span class="st">"shell"</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## ```shell</span></span>
+<span><span class="co">## #!/usr/bin/env bash</span></span>
+<span><span class="co">## set -e</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## if [[ "$#" -ne 1 ]]; then</span></span>
+<span><span class="co">##     echo "Expected one argument"</span></span>
+<span><span class="co">##     exit 1</span></span>
+<span><span class="co">## fi</span></span>
+<span><span class="co">## SRC=$1</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## if echo $SRC | grep -q "^https://"; then</span></span>
+<span><span class="co">##     DEST=$(mktemp -d)</span></span>
+<span><span class="co">##     git clone $SRC $DEST</span></span>
+<span><span class="co">##     SRC=$DEST</span></span>
+<span><span class="co">## fi</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## if [ ! -f "$SRC/DESCRIPTION" ]; then</span></span>
+<span><span class="co">##     echo "Did not find a DESCRIPTION" file</span></span>
+<span><span class="co">##     exit 1</span></span>
+<span><span class="co">## fi</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## PACKAGE=$(grep '^Package:' "$SRC/DESCRIPTION" | \</span></span>
+<span><span class="co">##                  sed -E 's/^Package:[[:space:]]+//')</span></span>
+<span><span class="co">## R CMD build $SRC</span></span>
+<span><span class="co">## PACKAGE_TGZ=$(ls -1tr ${PACKAGE}*gz | tail -n1)</span></span>
+<span><span class="co">##</span></span>
+<span><span class="co">## export _R_CHECK_CRAN_INCOMING_=FALSE</span></span>
+<span><span class="co">## Rscript -e "rcmdcheck::rcmdcheck('$PACKAGE_TGZ', args = c('--as-cran', '--no-manual'))"</span></span>
+<span><span class="co">## ```</span></span></code></pre>
 <div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="va">img</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">image</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="st">"tester"</span>, tag <span class="op">=</span> <span class="st">"richfitz/tester"</span><span class="op">)</span></code></pre></div>
+<code class="sourceCode R"><span><span class="va">img</span> <span class="op">&lt;-</span> <span class="va">docker</span><span class="op">$</span><span class="va">image</span><span class="op">$</span><span class="fu">build</span><span class="op">(</span><span class="st">"tester"</span>, tag <span class="op">=</span> <span class="st">"richfitz/tester"</span><span class="op">)</span></span></code></pre></div>
 <pre><code>## Step 1/6 : FROM rocker/r-ver:latest
 ##  ---&gt; f3ed4b5c4d71
 ## Step 2/6 : RUN apt-get update &amp;&amp;         apt-get install -yy                 git                 libcurl4-openssl-dev                 libssl-dev                 qpdf
@@ -278,8 +287,8 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## Get:19 http://deb.debian.org/debian buster/main amd64 patch amd64 2.7.6-3+deb10u1 [126 kB]
 ## Get:20 http://deb.debian.org/debian buster/main amd64 qpdf amd64 8.4.0-2 [413 kB]
 ## Get:21 http://deb.debian.org/debian buster/main amd64 xauth amd64 1:1.0.10-1 [40.3 kB]
-## [91mdebconf: delaying package configuration, since apt-utils is not installed
-## [0mFetched 19.2 MB in 6s (3,115 kB/s)
+##  [91mdebconf: delaying package configuration, since apt-utils is not installed
+##  [0mFetched 19.2 MB in 6s (3,115 kB/s)
 ## Selecting previously unselected package perl-modules-5.28.
 ## (Reading database ... 
 (Reading database ... 5%
@@ -394,248 +403,248 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ##  ---&gt; 7cf3bd16a336
 ## Step 3/6 : RUN install2.r --error         curl         knitr         openssl         rcmdcheck         rmarkdown         rcorpora         testthat         uuid
 ##  ---&gt; Running in 4fedb68c3d63
-## [91malso installing the dependencies ‘ps’, ‘glue’, ‘stringi’, ‘sys’, ‘processx’, ‘assertthat’, ‘fansi’, ‘backports’, ‘Rcpp’, ‘rstudioapi’, ‘evaluate’, ‘highr’, ‘markdown’, ‘stringr’, ‘yaml’, ‘xfun’, ‘askpass’, ‘callr’, ‘cli’, ‘crayon’, ‘desc’, ‘digest’, ‘pkgbuild’, ‘prettyunits’, ‘R6’, ‘rprojroot’, ‘sessioninfo’, ‘withr’, ‘xopen’, ‘htmltools’, ‘base64enc’, ‘jsonlite’, ‘mime’, ‘tinytex’, ‘ellipsis’, ‘magrittr’, ‘pkgload’, ‘praise’, ‘rlang’
+##  [91malso installing the dependencies ‘ps’, ‘glue’, ‘stringi’, ‘sys’, ‘processx’, ‘assertthat’, ‘fansi’, ‘backports’, ‘Rcpp’, ‘rstudioapi’, ‘evaluate’, ‘highr’, ‘markdown’, ‘stringr’, ‘yaml’, ‘xfun’, ‘askpass’, ‘callr’, ‘cli’, ‘crayon’, ‘desc’, ‘digest’, ‘pkgbuild’, ‘prettyunits’, ‘R6’, ‘rprojroot’, ‘sessioninfo’, ‘withr’, ‘xopen’, ‘htmltools’, ‘base64enc’, ‘jsonlite’, ‘mime’, ‘tinytex’, ‘ellipsis’, ‘magrittr’, ‘pkgload’, ‘praise’, ‘rlang’
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/ps_1.3.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 261887 bytes (255 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m===[0m[91m=[0m[91m===[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/ps_1.3.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 261887 bytes (255 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=== [0m [91m= [0m [91m=== [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m==
 ## downloaded 255 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/glue_1.3.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 122950 bytes (120 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=======[0m[91m======[0m[91m=======[0m[91m=======[0m[91m====
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/glue_1.3.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 122950 bytes (120 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m======= [0m [91m====== [0m [91m======= [0m [91m======= [0m [91m====
 ## downloaded 120 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/stringi_1.4.5.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 7284255 bytes (6.9 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mContent type 'application/x-gzip' length 7284255 bytes (6.9 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 6.9 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/sys_3.3.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 20225 bytes (19 KB)
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/sys_3.3.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 20225 bytes (19 KB)
 ## ==================================================
 ## downloaded 19 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/processx_3.4.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 123430 bytes (120 KB)
-## =[0m[91m==[0m[91m=======[0m[91m=[0m[91m=[0m[91m====[0m[91m=======[0m[91m=======[0m[91m======[0m[91m=======[0m[91m=======
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/processx_3.4.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 123430 bytes (120 KB)
+## = [0m [91m== [0m [91m======= [0m [91m= [0m [91m= [0m [91m==== [0m [91m======= [0m [91m======= [0m [91m====== [0m [91m======= [0m [91m=======
 ## downloaded 120 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/assertthat_0.2.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 12742 bytes (12 KB)
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/assertthat_0.2.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 12742 bytes (12 KB)
 ## ==================================================
 ## downloaded 12 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/fansi_0.4.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 270906 bytes (264 KB)
-## ===[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m==[0m[91m===[0m[91m===[0m[91m==[0m[91m===[0m[91m=[0m[91m===[0m[91m==[0m[91m===[0m[91m===[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m===[0m[91m==[0m[91m
-## [0m[91mdownloaded 264 KB
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/fansi_0.4.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 270906 bytes (264 KB)
+## === [0m [91m=== [0m [91m=== [0m [91m== [0m [91m=== [0m [91m== [0m [91m=== [0m [91m=== [0m [91m== [0m [91m=== [0m [91m= [0m [91m=== [0m [91m== [0m [91m=== [0m [91m=== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m=== [0m [91m== [0m [91m
+##  [0m [91mdownloaded 264 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/backports_1.1.5.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 14798 bytes (14 KB)
-## =[0m[91m=[0m[91m=[0m[91m=[0m[91m==============================================
-## [0m[91mdownloaded 14 KB
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/backports_1.1.5.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 14798 bytes (14 KB)
+## = [0m [91m= [0m [91m= [0m [91m= [0m [91m==============================================
+##  [0m [91mdownloaded 14 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/Rcpp_1.0.3.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 2749025 bytes (2.6 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/Rcpp_1.0.3.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 2749025 bytes (2.6 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m
 ## downloaded 2.6 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rstudioapi_0.10.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 61888 bytes (60 KB)
-## ======[0m[91m======[0m[91m==============[0m[91m=============[0m[91m========[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/rstudioapi_0.10.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 61888 bytes (60 KB)
+## ====== [0m [91m====== [0m [91m============== [0m [91m============= [0m [91m======== [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 60 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/evaluate_0.14.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 24206 bytes (23 KB)
-## ==========[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================================
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/evaluate_0.14.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 24206 bytes (23 KB)
+## ========== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=================================
 ## downloaded 23 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/highr_0.8.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 17445 bytes (17 KB)
-## [0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m===[0m[91m==[0m[91m===[0m[91m==[0m[91m====[0m[91m===[0m[91m=======================[0m[91m==[0m[91m===
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/highr_0.8.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 17445 bytes (17 KB)
+##  [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m=== [0m [91m== [0m [91m=== [0m [91m== [0m [91m==== [0m [91m=== [0m [91m======================= [0m [91m== [0m [91m===
 ## downloaded 17 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/markdown_1.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 81050 bytes (79 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================[0m[91m==========
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/markdown_1.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 81050 bytes (79 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m================= [0m [91m==========
 ## downloaded 79 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/stringr_1.4.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 135777 bytes (132 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=====[0m[91m=[0m[91m=====[0m[91m======[0m[91m======[0m[91m==[0m[91m======[0m[91m======[0m[91m=======
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 135777 bytes (132 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m===== [0m [91m= [0m [91m===== [0m [91m====== [0m [91m====== [0m [91m== [0m [91m====== [0m [91m====== [0m [91m=======
 ## downloaded 132 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/yaml_2.2.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 89447 bytes (87 KB)
-## ===============================[0m[91m===================
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 89447 bytes (87 KB)
+## =============================== [0m [91m===================
 ## downloaded 87 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/xfun_0.11.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 57700 bytes (56 KB)
+##  [0m [91mContent type 'application/x-gzip' length 57700 bytes (56 KB)
 ## ==================================================
 ## downloaded 56 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/askpass_1.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 5730 bytes
-## [0m[91m====[0m[91m=[0m[91m=[0m[91m=[0m[91m=====[0m[91m=[0m[91m=====================================
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 5730 bytes
+##  [0m [91m==== [0m [91m= [0m [91m= [0m [91m= [0m [91m===== [0m [91m= [0m [91m=====================================
 ## downloaded 5730 bytes
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/callr_3.4.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 100129 bytes (97 KB)
-## =======[0m[91m===[0m[91m======[0m[91m======[0m[91m======[0m[91m========[0m[91m=========[0m[91m=====
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 100129 bytes (97 KB)
+## ======= [0m [91m=== [0m [91m====== [0m [91m====== [0m [91m====== [0m [91m======== [0m [91m========= [0m [91m=====
 ## downloaded 97 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/cli_2.0.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 111914 bytes (109 KB)
-## =======[0m[91m=======[0m[91m=======[0m[91m=======[0m[91m=======[0m[91m========[0m[91m=======
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/cli_2.0.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 111914 bytes (109 KB)
+## ======= [0m [91m======= [0m [91m======= [0m [91m======= [0m [91m======= [0m [91m======== [0m [91m=======
 ## downloaded 109 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/crayon_1.3.4.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 658694 bytes (643 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m==
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 658694 bytes (643 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m==
 ## downloaded 643 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/desc_1.2.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 65612 bytes (64 KB)
-## ===============[0m[91m============[0m[91m=============[0m[91m==========
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/desc_1.2.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 65612 bytes (64 KB)
+## =============== [0m [91m============ [0m [91m============= [0m [91m==========
 ## downloaded 64 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/digest_0.6.23.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 143316 bytes (139 KB)
-## =====[0m[91m=======[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=====[0m[91m=====
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/digest_0.6.23.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 143316 bytes (139 KB)
+## ===== [0m [91m======= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m===== [0m [91m=====
 ## downloaded 139 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/pkgbuild_1.0.6.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 29322 bytes (28 KB)
-## [0m[91m=[0m[91m=[0m[91m=========================[0m[91m=======================
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 29322 bytes (28 KB)
+##  [0m [91m= [0m [91m= [0m [91m========================= [0m [91m=======================
 ## downloaded 28 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/prettyunits_1.1.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 10179 bytes
-## ==================================================[0m[91m
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/prettyunits_1.1.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 10179 bytes
+## ================================================== [0m [91m
 ## downloaded 10179 bytes
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/R6_2.4.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 35536 bytes (34 KB)
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/R6_2.4.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 35536 bytes (34 KB)
 ## ==================================================
 ## downloaded 34 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/rprojroot_1.3-2.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 50414 bytes (49 KB)
-## ===============[0m[91m=================[0m[91m================[0m[91m==[0m[91m
+##  [0m [91mContent type 'application/x-gzip' length 50414 bytes (49 KB)
+## =============== [0m [91m================= [0m [91m================ [0m [91m== [0m [91m
 ## downloaded 49 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/sessioninfo_1.1.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 46027 bytes (44 KB)
-## =================[0m[91m============[0m[91m===[0m[91m=[0m[91m====[0m[91m=[0m[91m=====[0m[91m=[0m[91m=[0m[91m=[0m[91m====[0m[91m
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/sessioninfo_1.1.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 46027 bytes (44 KB)
+## ================= [0m [91m============ [0m [91m=== [0m [91m= [0m [91m==== [0m [91m= [0m [91m===== [0m [91m= [0m [91m= [0m [91m= [0m [91m==== [0m [91m
 ## downloaded 44 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/withr_2.1.2.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 53578 bytes (52 KB)
-## ===[0m[91m=[0m[91m==[0m[91m=[0m[91m===========================================
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/withr_2.1.2.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 53578 bytes (52 KB)
+## === [0m [91m= [0m [91m== [0m [91m= [0m [91m===========================================
 ## downloaded 52 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/xopen_1.0.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 11221 bytes (10 KB)
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/xopen_1.0.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 11221 bytes (10 KB)
 ## ==================================================
 ## downloaded 10 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/htmltools_0.4.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 52542 bytes (51 KB)
-## ===============[0m[91m===============[0m[91m====================
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/htmltools_0.4.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 52542 bytes (51 KB)
+## =============== [0m [91m=============== [0m [91m====================
 ## downloaded 51 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/base64enc_0.1-3.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 7833 bytes
-## [0m[91m=[0m[91m=[0m[91m================================================[0m[91m
+##  [0m [91mContent type 'application/x-gzip' length 7833 bytes
+##  [0m [91m= [0m [91m= [0m [91m================================================ [0m [91m
 ## downloaded 7833 bytes
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/jsonlite_1.6.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 1052728 bytes (1.0 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/jsonlite_1.6.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 1052728 bytes (1.0 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m
 ## downloaded 1.0 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/mime_0.8.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 12813 bytes (12 KB)
-## [0m[91m=[0m[91m=[0m[91m======[0m[91m=[0m[91m=[0m[91m========================================
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/mime_0.8.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 12813 bytes (12 KB)
+##  [0m [91m= [0m [91m= [0m [91m====== [0m [91m= [0m [91m= [0m [91m========================================
 ## downloaded 12 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/tinytex_0.18.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 24265 bytes (23 KB)
-## ==[0m[91m=[0m[91m=[0m[91m=[0m[91m===[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=================
+##  [0m [91mContent type 'application/x-gzip' length 24265 bytes (23 KB)
+## == [0m [91m= [0m [91m= [0m [91m= [0m [91m=== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=================
 ## downloaded 23 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/ellipsis_0.3.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 7371 bytes
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/ellipsis_0.3.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 7371 bytes
 ## ==================================================
 ## downloaded 7371 bytes
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/magrittr_1.5.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 200504 bytes (195 KB)
-## ===[0m[91m=====[0m[91m=[0m[91m====[0m[91m===[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m====[0m[91m==
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/magrittr_1.5.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 200504 bytes (195 KB)
+## === [0m [91m===== [0m [91m= [0m [91m==== [0m [91m=== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==== [0m [91m==
 ## downloaded 195 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/pkgload_1.0.2.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 55605 bytes (54 KB)
-## ====[0m[91m=[0m[91m=============================================
+##  [0m [91mContent type 'application/x-gzip' length 55605 bytes (54 KB)
+## ==== [0m [91m= [0m [91m=============================================
 ## downloaded 54 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/praise_1.0.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 6100 bytes
+##  [0m [91mContent type 'application/x-gzip' length 6100 bytes
 ## ==================================================
 ## downloaded 6100 bytes
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/rlang_0.4.2.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 807983 bytes (789 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mContent type 'application/x-gzip' length 807983 bytes (789 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 789 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/curl_4.3.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 673779 bytes (657 KB)
-## =[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m==
+##  [0m [91mContent type 'application/x-gzip' length 673779 bytes (657 KB)
+## = [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m==
 ## downloaded 657 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/knitr_1.26.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 883689 bytes (862 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 883689 bytes (862 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 862 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/openssl_1.4.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 1206885 bytes (1.2 MB)
-## ===[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/openssl_1.4.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 1206885 bytes (1.2 MB)
+## === [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 1.2 MB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/rcmdcheck_1.3.3.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 45380 bytes (44 KB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m===========================[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
-## [0m[91mdownloaded 44 KB
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 45380 bytes (44 KB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m=========================== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m
+##  [0m [91mdownloaded 44 KB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rmarkdown_2.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 3186667 bytes (3.0 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m==[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
-## [0m[91mdownloaded 3.0 MB
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/rmarkdown_2.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 3186667 bytes (3.0 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m== [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m
+##  [0m [91mdownloaded 3.0 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/rcorpora_2.0.0.tar.gz'
-## [0m[91mContent type 'application/x-gzip'[0m[91m length 1432100 bytes (1.4 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/rcorpora_2.0.0.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' [0m [91m length 1432100 bytes (1.4 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m=
 ## downloaded 1.4 MB
 ##
-## [0m[91mtrying URL 'https://cran.rstudio.com/src/contrib/testthat_2.3.1.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 247984 bytes (242 KB)
-## ===[0m[91m==[0m[91m====[0m[91m===[0m[91m=[0m[91m===[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m====[0m[91m===[0m[91m===[0m[91m====[0m[91m====
+##  [0m [91mtrying URL 'https://cran.rstudio.com/src/contrib/testthat_2.3.1.tar.gz'
+##  [0m [91mContent type 'application/x-gzip' length 247984 bytes (242 KB)
+## === [0m [91m== [0m [91m==== [0m [91m=== [0m [91m= [0m [91m=== [0m [91m=== [0m [91m=== [0m [91m==== [0m [91m=== [0m [91m=== [0m [91m==== [0m [91m=== [0m [91m=== [0m [91m==== [0m [91m====
 ## downloaded 242 KB
 ##
 ## trying URL 'https://cran.rstudio.com/src/contrib/uuid_0.1-2.tar.gz'
-## [0m[91mContent type 'application/x-gzip' length 46706 bytes (45 KB)
-## ==============[0m[91m==================[0m[91m==================
+##  [0m [91mContent type 'application/x-gzip' length 46706 bytes (45 KB)
+## ============== [0m [91m================== [0m [91m==================
 ## downloaded 45 KB
 ##
-## [0m[91m* installing *source* package ‘ps’ ...
-## [0m[91m** package ‘ps’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -Wall px.c -o px
+##  [0m [91m* installing *source* package ‘ps’ ...
+##  [0m [91m** package ‘ps’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -Wall px.c -o px
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api-common.c -o api-common.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c common.c -o common.o
@@ -646,44 +655,44 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c linux.c -o linux.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api-linux.c -o api-linux.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o ps.so init.o api-common.o common.o extra.o dummy.o posix.o api-posix.o linux.o api-linux.o -L/usr/local/lib/R/lib -lR
-## [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-ps/00new/ps
+##  [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-ps/00new/ps
 ## ** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
 ## * DONE (ps)
-## [0m[91m* installing *source* package ‘glue’ ...
-## [0m[91m** package ‘glue’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c glue.c -o glue.o
+##  [0m [91m* installing *source* package ‘glue’ ...
+##  [0m [91m** package ‘glue’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c glue.c -o glue.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c trim.c -o trim.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o glue.so glue.o init.o trim.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-glue/00new/glue/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m*** copying figures
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (glue)
-## [0m[91m* installing *source* package ‘stringi’ ...
-## [0m[91m** package ‘stringi’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0mchecking for R_HOME... /usr/local/lib/R
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-glue/00new/glue/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m*** copying figures
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (glue)
+##  [0m [91m* installing *source* package ‘stringi’ ...
+##  [0m [91m** package ‘stringi’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0mchecking for R_HOME... /usr/local/lib/R
 ## checking for R... /usr/local/lib/R/bin/R
 ## checking for endianness... little
 ## checking for R &gt;= 3.1.0 for C++11 use... yes
@@ -728,15 +737,15 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## *** The available ICU4C cannot be used
 ## checking whether we may compile src/icu61/common/putil.cpp... yes
 ## checking whether we may compile src/icu61/i18n/number_affixutils.cpp... yes
-## checking whether we can fetch icudt... [91mdownloading the ICU data library (icudt)
-## [0m[91moutput path: icu61/data/icudt61l.zip
-## [0m[91mtrying URL 'http://www.ibspan.waw.pl/~gagolews/stringi/icudt61l.zip'
-## [0m[91mContent type 'application/zip'[0m[91m length 10791080 bytes (10.3 MB)
-## [0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m=[0m[91m
-## [0m[91mdownloaded 10.3 MB
+## checking whether we can fetch icudt...  [91mdownloading the ICU data library (icudt)
+##  [0m [91moutput path: icu61/data/icudt61l.zip
+##  [0m [91mtrying URL 'http://www.ibspan.waw.pl/~gagolews/stringi/icudt61l.zip'
+##  [0m [91mContent type 'application/zip' [0m [91m length 10791080 bytes (10.3 MB)
+##  [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m= [0m [91m
+##  [0m [91mdownloaded 10.3 MB
 ##
-## [0m[91micudt fetch successful
-## [0mconfigure: creating ./config.status
+##  [0m [91micudt fetch successful
+##  [0mconfigure: creating ./config.status
 ## config.status: creating src/Makevars
 ## config.status: creating src/uconfig_local.h
 ## config.status: creating src/install.libs.R
@@ -763,8 +772,8 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ##     LDFLAGS=
 ##     LIBS=
 ##
-## [91m** libs
-## [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stri_brkiter.cpp -o stri_brkiter.o
+##  [91m** libs
+##  [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stri_brkiter.cpp -o stri_brkiter.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stri_collator.cpp -o stri_collator.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stri_common.cpp -o stri_common.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stri_compare.cpp -o stri_compare.o
@@ -1255,57 +1264,57 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c icu61/i18n/ztrans.cpp -o icu61/i18n/ztrans.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I. -Iicu61       -Iicu61/unicode -Iicu61/common       -Iicu61/i18n -DU_STATIC_IMPLEMENTATION       -DU_COMMON_IMPLEMENTATION -DU_I18N_IMPLEMENTATION -DUCONFIG_USE_LOCAL   -UDEBUG -DNDEBUG -DU_HAVE_ELF_H  -I/usr/local/include -fpic -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c icu61/stubdata/stubdata.cpp -o icu61/stubdata/stubdata.o
 ## g++ -std=gnu++11 -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o stringi.so stri_brkiter.o stri_collator.o stri_common.o stri_compare.o stri_container_base.o stri_container_bytesearch.o stri_container_listint.o stri_container_listraw.o stri_container_listutf8.o stri_container_regex.o stri_container_usearch.o stri_container_utf16.o stri_container_utf8.o stri_container_utf8_indexable.o stri_encoding_conversion.o stri_encoding_detection.o stri_encoding_management.o stri_escape.o stri_exception.o stri_ICU_settings.o stri_join.o stri_length.o stri_pad.o stri_prepare_arg.o stri_random.o stri_reverse.o stri_search_class_count.o stri_search_class_detect.o stri_search_class_extract.o stri_search_class_locate.o stri_search_class_replace.o stri_search_class_split.o stri_search_class_startsendswith.o stri_search_class_subset.o stri_search_class_trim.o stri_search_common.o stri_search_coll_count.o stri_search_coll_detect.o stri_search_coll_extract.o stri_search_coll_locate.o stri_search_coll_replace.o stri_search_coll_split.o stri_search_coll_startsendswith.o stri_search_coll_subset.o stri_search_boundaries_count.o stri_search_boundaries_extract.o stri_search_boundaries_locate.o stri_search_boundaries_split.o stri_search_fixed_count.o stri_search_fixed_detect.o stri_search_fixed_extract.o stri_search_fixed_locate.o stri_search_fixed_replace.o stri_search_fixed_split.o stri_search_fixed_subset.o stri_search_fixed_startsendswith.o stri_search_in.o stri_search_other_split.o stri_search_regex_count.o stri_search_regex_detect.o stri_search_regex_extract.o stri_search_regex_locate.o stri_search_regex_match.o stri_search_regex_replace.o stri_search_regex_split.o stri_search_regex_subset.o stri_sort.o stri_stats.o stri_stringi.o stri_sub.o stri_test.o stri_time_zone.o stri_time_calendar.o stri_time_symbols.o stri_time_format.o stri_trans_casemap.o stri_trans_other.o stri_trans_normalization.o stri_trans_transliterate.o stri_ucnv.o stri_uloc.o stri_utils.o stri_wrap.o icu61/common/appendable.o icu61/common/bmpset.o icu61/common/brkeng.o icu61/common/brkiter.o icu61/common/bytesinkutil.o icu61/common/bytestream.o icu61/common/bytestrie.o icu61/common/bytestriebuilder.o icu61/common/bytestrieiterator.o icu61/common/caniter.o icu61/common/chariter.o icu61/common/charstr.o icu61/common/cmemory.o icu61/common/cstr.o icu61/common/cstring.o icu61/common/cwchar.o icu61/common/dictbe.o icu61/common/dictionarydata.o icu61/common/dtintrv.o icu61/common/edits.o icu61/common/errorcode.o icu61/common/filteredbrk.o icu61/common/filterednormalizer2.o icu61/common/icudataver.o icu61/common/icuplug.o icu61/common/listformatter.o icu61/common/loadednormalizer2impl.o icu61/common/locavailable.o icu61/common/locbased.o icu61/common/locdispnames.o icu61/common/locdspnm.o icu61/common/locid.o icu61/common/loclikely.o icu61/common/locmap.o icu61/common/locresdata.o icu61/common/locutil.o icu61/common/messagepattern.o icu61/common/normalizer2.o icu61/common/normalizer2impl.o icu61/common/normlzr.o icu61/common/parsepos.o icu61/common/patternprops.o icu61/common/pluralmap.o icu61/common/propname.o icu61/common/propsvec.o icu61/common/punycode.o icu61/common/putil.o icu61/common/rbbi_cache.o icu61/common/rbbi.o icu61/common/rbbidata.o icu61/common/rbbinode.o icu61/common/rbbirb.o icu61/common/rbbiscan.o icu61/common/rbbisetb.o icu61/common/rbbistbl.o icu61/common/rbbitblb.o icu61/common/resbund_cnv.o icu61/common/resbund.o icu61/common/resource.o icu61/common/ruleiter.o icu61/common/schriter.o icu61/common/serv.o icu61/common/servlk.o icu61/common/servlkf.o icu61/common/servls.o icu61/common/servnotf.o icu61/common/servrbf.o icu61/common/servslkf.o icu61/common/sharedobject.o icu61/common/simpleformatter.o icu61/common/stringpiece.o icu61/common/stringtriebuilder.o icu61/common/uarrsort.o icu61/common/ubidi_props.o icu61/common/ubidi.o icu61/common/ubidiln.o icu61/common/ubiditransform.o icu61/common/ubidiwrt.o icu61/common/ubrk.o icu61/common/ucase.o icu61/common/ucasemap_titlecase_brkiter.o icu61/common/ucasemap.o icu61/common/ucat.o icu61/common/uchar.o icu61/common/ucharstrie.o icu61/common/ucharstriebuilder.o icu61/common/ucharstrieiterator.o icu61/common/uchriter.o icu61/common/ucln_cmn.o icu61/common/ucmndata.o icu61/common/ucnv_bld.o icu61/common/ucnv_cb.o icu61/common/ucnv_cnv.o icu61/common/ucnv_ct.o icu61/common/ucnv_err.o icu61/common/ucnv_ext.o icu61/common/ucnv_io.o icu61/common/ucnv_lmb.o icu61/common/ucnv_set.o icu61/common/ucnv_u16.o icu61/common/ucnv_u32.o icu61/common/ucnv_u7.o icu61/common/ucnv_u8.o icu61/common/ucnv.o icu61/common/ucnv2022.o icu61/common/ucnvbocu.o icu61/common/ucnvdisp.o icu61/common/ucnvhz.o icu61/common/ucnvisci.o icu61/common/ucnvlat1.o icu61/common/ucnvmbcs.o icu61/common/ucnvscsu.o icu61/common/ucnvsel.o icu61/common/ucol_swp.o icu61/common/ucurr.o icu61/common/udata.o icu61/common/udatamem.o icu61/common/udataswp.o icu61/common/uenum.o icu61/common/uhash_us.o icu61/common/uhash.o icu61/common/uidna.o icu61/common/uinit.o icu61/common/uinvchar.o icu61/common/uiter.o icu61/common/ulist.o icu61/common/ulistformatter.o icu61/common/uloc_keytype.o icu61/common/uloc_tag.o icu61/common/uloc.o icu61/common/umapfile.o icu61/common/umath.o icu61/common/umutex.o icu61/common/unames.o icu61/common/unifiedcache.o icu61/common/unifilt.o icu61/common/unifunct.o icu61/common/uniset_closure.o icu61/common/uniset_props.o icu61/common/uniset.o icu61/common/unisetspan.o icu61/common/unistr_case_locale.o icu61/common/unistr_case.o icu61/common/unistr_cnv.o icu61/common/unistr_props.o icu61/common/unistr_titlecase_brkiter.o icu61/common/unistr.o icu61/common/unorm.o icu61/common/unormcmp.o icu61/common/uobject.o icu61/common/uprops.o icu61/common/ures_cnv.o icu61/common/uresbund.o icu61/common/uresdata.o icu61/common/usc_impl.o icu61/common/uscript_props.o icu61/common/uscript.o icu61/common/uset_props.o icu61/common/uset.o icu61/common/usetiter.o icu61/common/ushape.o icu61/common/usprep.o icu61/common/ustack.o icu61/common/ustr_cnv.o icu61/common/ustr_titlecase_brkiter.o icu61/common/ustr_wcs.o icu61/common/ustrcase_locale.o icu61/common/ustrcase.o icu61/common/ustrenum.o icu61/common/ustrfmt.o icu61/common/ustring.o icu61/common/ustrtrns.o icu61/common/utext.o icu61/common/utf_impl.o icu61/common/util_props.o icu61/common/util.o icu61/common/utrace.o icu61/common/utrie.o icu61/common/utrie2_builder.o icu61/common/utrie2.o icu61/common/uts46.o icu61/common/utypes.o icu61/common/uvector.o icu61/common/uvectr32.o icu61/common/uvectr64.o icu61/common/wintz.o icu61/i18n/affixpatternparser.o icu61/i18n/alphaindex.o icu61/i18n/anytrans.o icu61/i18n/astro.o icu61/i18n/basictz.o icu61/i18n/bocsu.o icu61/i18n/brktrans.o icu61/i18n/buddhcal.o icu61/i18n/calendar.o icu61/i18n/casetrn.o icu61/i18n/cecal.o icu61/i18n/chnsecal.o icu61/i18n/choicfmt.o icu61/i18n/coleitr.o icu61/i18n/coll.o icu61/i18n/collation.o icu61/i18n/collationbuilder.o icu61/i18n/collationcompare.o icu61/i18n/collationdata.o icu61/i18n/collationdatabuilder.o icu61/i18n/collationdatareader.o icu61/i18n/collationdatawriter.o icu61/i18n/collationfastlatin.o icu61/i18n/collationfastlatinbuilder.o icu61/i18n/collationfcd.o icu61/i18n/collationiterator.o icu61/i18n/collationkeys.o icu61/i18n/collationroot.o icu61/i18n/collationrootelements.o icu61/i18n/collationruleparser.o icu61/i18n/collationsets.o icu61/i18n/collationsettings.o icu61/i18n/collationtailoring.o icu61/i18n/collationweights.o icu61/i18n/compactdecimalformat.o icu61/i18n/coptccal.o icu61/i18n/cpdtrans.o icu61/i18n/csdetect.o icu61/i18n/csmatch.o icu61/i18n/csr2022.o icu61/i18n/csrecog.o icu61/i18n/csrmbcs.o icu61/i18n/csrsbcs.o icu61/i18n/csrucode.o icu61/i18n/csrutf8.o icu61/i18n/curramt.o icu61/i18n/currfmt.o icu61/i18n/currpinf.o icu61/i18n/currunit.o icu61/i18n/dangical.o icu61/i18n/datefmt.o icu61/i18n/dayperiodrules.o icu61/i18n/dcfmtsym.o icu61/i18n/decContext.o icu61/i18n/decfmtst.o icu61/i18n/decimalformatpattern.o icu61/i18n/decimfmt.o icu61/i18n/decimfmtimpl.o icu61/i18n/decNumber.o icu61/i18n/digitaffix.o icu61/i18n/digitaffixesandpadding.o icu61/i18n/digitformatter.o icu61/i18n/digitgrouping.o icu61/i18n/digitinterval.o icu61/i18n/digitlst.o icu61/i18n/double-conversion-bignum-dtoa.o icu61/i18n/double-conversion-bignum.o icu61/i18n/double-conversion-cached-powers.o icu61/i18n/double-conversion-diy-fp.o icu61/i18n/double-conversion-fast-dtoa.o icu61/i18n/double-conversion.o icu61/i18n/dtfmtsym.o icu61/i18n/dtitvfmt.o icu61/i18n/dtitvinf.o icu61/i18n/dtptngen.o icu61/i18n/dtrule.o icu61/i18n/esctrn.o icu61/i18n/ethpccal.o icu61/i18n/fmtable_cnv.o icu61/i18n/fmtable.o icu61/i18n/format.o icu61/i18n/fphdlimp.o icu61/i18n/fpositer.o icu61/i18n/funcrepl.o icu61/i18n/gender.o icu61/i18n/gregocal.o icu61/i18n/gregoimp.o icu61/i18n/hebrwcal.o icu61/i18n/indiancal.o icu61/i18n/inputext.o icu61/i18n/islamcal.o icu61/i18n/japancal.o icu61/i18n/measfmt.o icu61/i18n/measunit.o icu61/i18n/measure.o icu61/i18n/msgfmt.o icu61/i18n/name2uni.o icu61/i18n/nfrs.o icu61/i18n/nfrule.o icu61/i18n/nfsubs.o icu61/i18n/nortrans.o icu61/i18n/nounit.o icu61/i18n/nultrans.o icu61/i18n/number_affixutils.o icu61/i18n/number_compact.o icu61/i18n/number_decimalquantity.o icu61/i18n/number_decimfmtprops.o icu61/i18n/number_fluent.o icu61/i18n/number_formatimpl.o icu61/i18n/number_grouping.o icu61/i18n/number_integerwidth.o icu61/i18n/number_longnames.o icu61/i18n/number_modifiers.o icu61/i18n/number_notation.o icu61/i18n/number_padding.o icu61/i18n/number_patternmodifier.o icu61/i18n/number_patternstring.o icu61/i18n/number_rounding.o icu61/i18n/number_scientific.o icu61/i18n/number_stringbuilder.o icu61/i18n/numfmt.o icu61/i18n/numsys.o icu61/i18n/olsontz.o icu61/i18n/persncal.o icu61/i18n/pluralaffix.o icu61/i18n/plurfmt.o icu61/i18n/plurrule.o icu61/i18n/precision.o icu61/i18n/quant.o icu61/i18n/quantityformatter.o icu61/i18n/rbnf.o icu61/i18n/rbt_data.o icu61/i18n/rbt_pars.o icu61/i18n/rbt_rule.o icu61/i18n/rbt_set.o icu61/i18n/rbt.o icu61/i18n/rbtz.o icu61/i18n/regexcmp.o icu61/i18n/regeximp.o icu61/i18n/regexst.o icu61/i18n/regextxt.o icu61/i18n/region.o icu61/i18n/reldatefmt.o icu61/i18n/reldtfmt.o icu61/i18n/rematch.o icu61/i18n/remtrans.o icu61/i18n/repattrn.o icu61/i18n/rulebasedcollator.o icu61/i18n/scientificnumberformatter.o icu61/i18n/scriptset.o icu61/i18n/search.o icu61/i18n/selfmt.o icu61/i18n/sharedbreakiterator.o icu61/i18n/simpletz.o icu61/i18n/smallintformatter.o icu61/i18n/smpdtfmt.o icu61/i18n/smpdtfst.o icu61/i18n/sortkey.o icu61/i18n/standardplural.o icu61/i18n/strmatch.o icu61/i18n/strrepl.o icu61/i18n/stsearch.o icu61/i18n/taiwncal.o icu61/i18n/timezone.o icu61/i18n/titletrn.o icu61/i18n/tmunit.o icu61/i18n/tmutamt.o icu61/i18n/tmutfmt.o icu61/i18n/tolowtrn.o icu61/i18n/toupptrn.o icu61/i18n/translit.o icu61/i18n/transreg.o icu61/i18n/tridpars.o icu61/i18n/tzfmt.o icu61/i18n/tzgnames.o icu61/i18n/tznames_impl.o icu61/i18n/tznames.o icu61/i18n/tzrule.o icu61/i18n/tztrans.o icu61/i18n/ucal.o icu61/i18n/ucln_in.o icu61/i18n/ucol_res.o icu61/i18n/ucol_sit.o icu61/i18n/ucol.o icu61/i18n/ucoleitr.o icu61/i18n/ucsdet.o icu61/i18n/udat.o icu61/i18n/udateintervalformat.o icu61/i18n/udatpg.o icu61/i18n/ufieldpositer.o icu61/i18n/uitercollationiterator.o icu61/i18n/ulocdata.o icu61/i18n/umsg.o icu61/i18n/unesctrn.o icu61/i18n/uni2name.o icu61/i18n/unum.o icu61/i18n/unumsys.o icu61/i18n/upluralrules.o icu61/i18n/uregex.o icu61/i18n/uregexc.o icu61/i18n/uregion.o icu61/i18n/usearch.o icu61/i18n/uspoof_build.o icu61/i18n/uspoof_conf.o icu61/i18n/uspoof_impl.o icu61/i18n/uspoof.o icu61/i18n/utf16collationiterator.o icu61/i18n/utf8collationiterator.o icu61/i18n/utmscale.o icu61/i18n/utrans.o icu61/i18n/valueformatter.o icu61/i18n/visibledigits.o icu61/i18n/vtzone.o icu61/i18n/vzone.o icu61/i18n/windtfmt.o icu61/i18n/winnmfmt.o icu61/i18n/wintzimpl.o icu61/i18n/zonemeta.o icu61/i18n/zrule.o icu61/i18n/ztrans.o icu61/stubdata/stubdata.o -L/usr/local/lib/R/lib -lR
-## [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-stringi/00new/stringi
-## [0m[91micudt already downloaded
-## [0m[91mdecompressing icudt archive icu61/data/icudt61l.zip to: /usr/local/lib/R/site-library/00LOCK-stringi/00new/stringi/libs
-## [0m[91micudt has been installed successfully
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (stringi)
-## [0m[91m* installing *source* package ‘sys’ ...
-## [0m[91m** package ‘sys’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c exec.c -o exec.o
+##  [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-stringi/00new/stringi
+##  [0m [91micudt already downloaded
+##  [0m [91mdecompressing icudt archive icu61/data/icudt61l.zip to: /usr/local/lib/R/site-library/00LOCK-stringi/00new/stringi/libs
+##  [0m [91micudt has been installed successfully
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (stringi)
+##  [0m [91m* installing *source* package ‘sys’ ...
+##  [0m [91m** package ‘sys’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c exec.c -o exec.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o sys.so exec.o init.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-sys/00new/sys/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (sys)
-## [0m[91m* installing *source* package ‘assertthat’ ...
-## [0m[91m** package ‘assertthat’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (assertthat)
-## [0m[91m* installing *source* package ‘fansi’ ...
-## [0m[91m** package ‘fansi’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c assumptions.c -o assumptions.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-sys/00new/sys/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (sys)
+##  [0m [91m* installing *source* package ‘assertthat’ ...
+##  [0m [91m** package ‘assertthat’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (assertthat)
+##  [0m [91m* installing *source* package ‘fansi’ ...
+##  [0m [91m** package ‘fansi’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c assumptions.c -o assumptions.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c has.c -o has.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c nchar.c -o nchar.o
@@ -1322,107 +1331,107 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c utils.c -o utils.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c wrap.c -o wrap.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o fansi.so assumptions.o has.o init.o nchar.o read.o rnchar.o state.o strip.o strsplit.o tabs.o tohtml.o unhandled.o unique.o utf8.o utils.o wrap.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-fansi/00new/fansi/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (fansi)
-## [0m[91m* installing *source* package ‘backports’ ...
-## [0m[91m** package ‘backports’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dotsElt.c -o dotsElt.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-fansi/00new/fansi/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (fansi)
+##  [0m [91m* installing *source* package ‘backports’ ...
+##  [0m [91m** package ‘backports’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dotsElt.c -o dotsElt.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dotsLength.c -o dotsLength.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o backports.so dotsElt.o dotsLength.o init.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-backports/00new/backports/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (backports)
-## [0m[91m* installing *source* package ‘Rcpp’ ...
-## [0m[91m** package ‘Rcpp’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api.cpp -o api.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-backports/00new/backports/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (backports)
+##  [0m [91m* installing *source* package ‘Rcpp’ ...
+##  [0m [91m** package ‘Rcpp’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api.cpp -o api.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c attributes.cpp -o attributes.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c barrier.cpp -o barrier.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c date.cpp -o date.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c module.cpp -o module.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c rcpp_init.cpp -o rcpp_init.o
 ## g++ -std=gnu++11 -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o Rcpp.so api.o attributes.o barrier.o date.o module.o rcpp_init.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-Rcpp/00new/Rcpp/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (Rcpp)
-## [0m[91m* installing *source* package ‘rstudioapi’ ...
-## [0m[91m** package ‘rstudioapi’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rstudioapi)
-## [0m[91m* installing *source* package ‘evaluate’ ...
-## [0m[91m** package ‘evaluate’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (evaluate)
-## [0m[91m* installing *source* package ‘highr’ ...
-## [0m[91m** package ‘highr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (highr)
-## [0m[91m* installing *source* package ‘yaml’ ...
-## [0m[91m** package ‘yaml’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api.c -o api.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-Rcpp/00new/Rcpp/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (Rcpp)
+##  [0m [91m* installing *source* package ‘rstudioapi’ ...
+##  [0m [91m** package ‘rstudioapi’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rstudioapi)
+##  [0m [91m* installing *source* package ‘evaluate’ ...
+##  [0m [91m** package ‘evaluate’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (evaluate)
+##  [0m [91m* installing *source* package ‘highr’ ...
+##  [0m [91m** package ‘highr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (highr)
+##  [0m [91m* installing *source* package ‘yaml’ ...
+##  [0m [91m** package ‘yaml’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c api.c -o api.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dumper.c -o dumper.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c emitter.c -o emitter.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c implicit.c -o implicit.o
@@ -1435,50 +1444,50 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c scanner.c -o scanner.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I. -DNDEBUG  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c writer.c -o writer.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o yaml.so api.o dumper.o emitter.o implicit.o loader.o parser.o r_emit.o r_ext.o r_parse.o reader.o scanner.o writer.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-yaml/00new/yaml/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (yaml)
-## [0m[91m* installing *source* package ‘xfun’ ...
-## [0m[91m** package ‘xfun’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (xfun)
-## [0m[91m* installing *source* package ‘crayon’ ...
-## [0m[91m** package ‘crayon’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (crayon)
-## [0m[91m* installing *source* package ‘digest’ ...
-## [0m[91m** package ‘digest’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c SpookyV2.cpp -o SpookyV2.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-yaml/00new/yaml/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (yaml)
+##  [0m [91m* installing *source* package ‘xfun’ ...
+##  [0m [91m** package ‘xfun’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (xfun)
+##  [0m [91m* installing *source* package ‘crayon’ ...
+##  [0m [91m** package ‘crayon’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (crayon)
+##  [0m [91m* installing *source* package ‘digest’ ...
+##  [0m [91m** package ‘digest’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c SpookyV2.cpp -o SpookyV2.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c aes.c -o aes.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c crc32.c -o crc32.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c digest.c -o digest.o
@@ -1493,82 +1502,82 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c spooky_serialize.cpp -o spooky_serialize.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c xxhash.c -o xxhash.o
 ## g++ -std=gnu++11 -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o digest.so SpookyV2.o aes.o crc32.o digest.o digest2int.o init.o md5.o pmurhash.o raes.o sha1.o sha2.o sha256.o spooky_serialize.o xxhash.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-digest/00new/digest/libs
-## [0m[91m** R
-## [0m[91m** demo
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (digest)
-## [0m[91m* installing *source* package ‘prettyunits’ ...
-## [0m[91m** package ‘prettyunits’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (prettyunits)
-## [0m[91m* installing *source* package ‘R6’ ...
-## [0m[91m** package ‘R6’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (R6)
-## [0m[91m* installing *source* package ‘withr’ ...
-## [0m[91m** package ‘withr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (withr)
-## [0m[91m* installing *source* package ‘base64enc’ ...
-## [0m[91m** package ‘base64enc’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-digest/00new/digest/libs
+##  [0m [91m** R
+##  [0m [91m** demo
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (digest)
+##  [0m [91m* installing *source* package ‘prettyunits’ ...
+##  [0m [91m** package ‘prettyunits’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (prettyunits)
+##  [0m [91m* installing *source* package ‘R6’ ...
+##  [0m [91m** package ‘R6’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (R6)
+##  [0m [91m* installing *source* package ‘withr’ ...
+##  [0m [91m** package ‘withr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (withr)
+##  [0m [91m* installing *source* package ‘base64enc’ ...
+##  [0m [91m** package ‘base64enc’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c uriencode.c -o uriencode.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c utf8.c -o utf8.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o base64enc.so base64.o uriencode.o utf8.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-base64enc/00new/base64enc/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (base64enc)
-## [0m[91m* installing *source* package ‘jsonlite’ ...
-## [0m[91m** package ‘jsonlite’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-base64enc/00new/base64enc/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (base64enc)
+##  [0m [91m* installing *source* package ‘jsonlite’ ...
+##  [0m [91m** package ‘jsonlite’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c collapse_array.c -o collapse_array.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c collapse_object.c -o collapse_object.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c collapse_pretty.c -o collapse_pretty.o
@@ -1598,92 +1607,92 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -Iyajl/api  -I/usr/local/include -fvisibility=hidden  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c yajl/yajl_tree.c -o yajl/yajl_tree.o
 ## ar rcs yajl/libstatyajl.a yajl/yajl.o yajl/yajl_alloc.o yajl/yajl_buf.o yajl/yajl_encode.o yajl/yajl_gen.o yajl/yajl_lex.o yajl/yajl_parser.o yajl/yajl_tree.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o jsonlite.so base64.o collapse_array.o collapse_object.o collapse_pretty.o escape_chars.o integer64_to_na.o is_datelist.o is_recordlist.o is_scalarlist.o modp_numtoa.o null_to_na.o num_to_char.o parse.o prettify.o push_parser.o r-base64.o register.o row_collapse.o transpose_list.o validate.o -Lyajl -lstatyajl -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-jsonlite/00new/jsonlite/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (jsonlite)
-## [0m[91m* installing *source* package ‘mime’ ...
-## [0m[91m** package ‘mime’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-jsonlite/00new/jsonlite/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (jsonlite)
+##  [0m [91m* installing *source* package ‘mime’ ...
+##  [0m [91m** package ‘mime’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c rawmatch.c -o rawmatch.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o mime.so init.o rawmatch.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-mime/00new/mime/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (mime)
-## [0m[91m* installing *source* package ‘magrittr’ ...
-## [0m[91m** package ‘magrittr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (magrittr)
-## [0m[91m* installing *source* package ‘praise’ ...
-## [0m[91m** package ‘praise’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (praise)
-## [0m[91m* installing *source* package ‘rlang’ ...
-## [0m[91m** package ‘rlang’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I./lib/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c capture.c -o capture.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-mime/00new/mime/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (mime)
+##  [0m [91m* installing *source* package ‘magrittr’ ...
+##  [0m [91m** package ‘magrittr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (magrittr)
+##  [0m [91m* installing *source* package ‘praise’ ...
+##  [0m [91m** package ‘praise’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (praise)
+##  [0m [91m* installing *source* package ‘rlang’ ...
+##  [0m [91m** package ‘rlang’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I./lib/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c capture.c -o capture.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I./lib/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c export.c -o export.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I./lib/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c internal.c -o internal.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I./lib/  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c lib.c -o lib.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o rlang.so capture.o export.o internal.o lib.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-rlang/00new/rlang/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m*** copying figures
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rlang)
-## [0m[91m* installing *source* package ‘curl’ ...
-## [0m[91m** package ‘curl’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0mUsing PKG_CFLAGS=
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-rlang/00new/rlang/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m*** copying figures
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rlang)
+##  [0m [91m* installing *source* package ‘curl’ ...
+##  [0m [91m** package ‘curl’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0mUsing PKG_CFLAGS=
 ## Using PKG_LIBS=-lcurl
-## [91m** libs
-## [0mrm -f curl.so callbacks.o curl.o download.o escape.o fetch.o form.o getdate.o handle.o ieproxy.o init.o interrupt.o multi.o nslookup.o reflist.o split.o ssl.o typechecking.o utils.o version.o winidn.o writer.o
+##  [91m** libs
+##  [0mrm -f curl.so callbacks.o curl.o download.o escape.o fetch.o form.o getdate.o handle.o ieproxy.o init.o interrupt.o multi.o nslookup.o reflist.o split.o ssl.o typechecking.o utils.o version.o winidn.o writer.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -DSTRICT_R_HEADERS  -I/usr/local/include -fvisibility=hidden -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c callbacks.c -o callbacks.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -DSTRICT_R_HEADERS  -I/usr/local/include -fvisibility=hidden -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c curl.c -o curl.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -DSTRICT_R_HEADERS  -I/usr/local/include -fvisibility=hidden -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c download.c -o download.o
@@ -1706,24 +1715,24 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -DSTRICT_R_HEADERS  -I/usr/local/include -fvisibility=hidden -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c winidn.c -o winidn.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -DSTRICT_R_HEADERS  -I/usr/local/include -fvisibility=hidden -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c writer.c -o writer.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o curl.so callbacks.o curl.o download.o escape.o fetch.o form.o getdate.o handle.o ieproxy.o init.o interrupt.o multi.o nslookup.o reflist.o split.o ssl.o typechecking.o utils.o version.o winidn.o writer.o -lcurl -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-curl/00new/curl/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (curl)
-## [0m[91m* installing *source* package ‘uuid’ ...
-## [0m[91m** package ‘uuid’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m'config' variable 'CPP' is deprecated
-## [0mchecking for gcc... gcc
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-curl/00new/curl/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (curl)
+##  [0m [91m* installing *source* package ‘uuid’ ...
+##  [0m [91m** package ‘uuid’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m'config' variable 'CPP' is deprecated
+##  [0mchecking for gcc... gcc
 ## checking whether the C compiler works... yes
 ## checking for C compiler default output file name... a.out
 ## checking for suffix of executables...
@@ -1779,8 +1788,8 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## configure: creating ./config.status
 ## config.status: creating src/Makevars
 ## config.status: creating src/config.h
-## [91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c R.c -o R.o
+##  [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c R.c -o R.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c clear.c -o clear.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c compare.c -o compare.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c copy.c -o copy.o
@@ -1791,23 +1800,23 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unpack.c -o unpack.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I/usr/local/include  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unparse.c -o unparse.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o uuid.so R.o clear.o compare.o copy.o gen_uuid.o isnull.o pack.o parse.o unpack.o unparse.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-uuid/00new/uuid/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (uuid)
-## [0m[91m* installing *source* package ‘processx’ ...
-## [0m[91m** package ‘processx’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -Wall tools/px.c -o tools/px
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-uuid/00new/uuid/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (uuid)
+##  [0m [91m* installing *source* package ‘processx’ ...
+##  [0m [91m** package ‘processx’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -Wall tools/px.c -o tools/px
 ## gcc -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  supervisor/supervisor.c supervisor/utils.c \
 ##       -o supervisor/supervisor
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
@@ -1826,23 +1835,23 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unix/utils.c -o unix/utils.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unix/named_pipe.c -o unix/named_pipe.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o processx.so init.o poll.o errors.o processx-connection.o processx-vector.o create-time.o base64.o unix/childlist.o unix/connection.o unix/processx.o unix/sigchld.o unix/utils.o unix/named_pipe.o -L/usr/local/lib/R/lib -lR
-## [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-processx/00new/processx
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (processx)
-## [0m[91m* installing *source* package ‘markdown’ ...
-## [0m[91m** package ‘markdown’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c Rbase64.c -o Rbase64.o
+##  [91minstalling via 'install.libs.R' to /usr/local/lib/R/site-library/00LOCK-processx/00new/processx
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (processx)
+##  [0m [91m* installing *source* package ‘markdown’ ...
+##  [0m [91m** package ‘markdown’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c Rbase64.c -o Rbase64.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c Rinit.c -o Rinit.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c Rmarkdown.c -o Rmarkdown.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c autolink.c -o autolink.o
@@ -1854,221 +1863,221 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c markdown.c -o markdown.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c stack.c -o stack.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o markdown.so Rbase64.o Rinit.o Rmarkdown.o autolink.o buffer.o houdini_href_e.o houdini_html_e.o html.o html_smartypants.o markdown.o stack.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-markdown/00new/markdown/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (markdown)
-## [0m[91m* installing *source* package ‘stringr’ ...
-## [0m[91m** package ‘stringr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** data
-## [0m[91m*** moving datasets to lazyload DB
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m*** copying figures
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (stringr)
-## [0m[91m* installing *source* package ‘askpass’ ...
-## [0m[91m** package ‘askpass’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c askpass.c -o askpass.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-markdown/00new/markdown/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (markdown)
+##  [0m [91m* installing *source* package ‘stringr’ ...
+##  [0m [91m** package ‘stringr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** data
+##  [0m [91m*** moving datasets to lazyload DB
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m*** copying figures
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (stringr)
+##  [0m [91m* installing *source* package ‘askpass’ ...
+##  [0m [91m** package ‘askpass’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c askpass.c -o askpass.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o askpass.so askpass.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-askpass/00new/askpass/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-askpass/00new/askpass/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
 ## * DONE (askpass)
-## [0m[91m* installing *source* package ‘cli’ ...
-## [0m[91m** package ‘cli’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m*** copying figures
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (cli)
-## [0m[91m* installing *source* package ‘rprojroot’ ...
-## [0m[91m** package ‘rprojroot’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rprojroot)
-## [0m[91m* installing *source* package ‘htmltools’ ...
-## [0m[91m** package ‘htmltools’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG  -I"/usr/local/lib/R/site-library/Rcpp/include" -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c RcppExports.cpp -o RcppExports.o
+##  [0m [91m* installing *source* package ‘cli’ ...
+##  [0m [91m** package ‘cli’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m*** copying figures
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (cli)
+##  [0m [91m* installing *source* package ‘rprojroot’ ...
+##  [0m [91m** package ‘rprojroot’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rprojroot)
+##  [0m [91m* installing *source* package ‘htmltools’ ...
+##  [0m [91m** package ‘htmltools’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mg++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG  -I"/usr/local/lib/R/site-library/Rcpp/include" -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c RcppExports.cpp -o RcppExports.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG  -I"/usr/local/lib/R/site-library/Rcpp/include" -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG  -I"/usr/local/lib/R/site-library/Rcpp/include" -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c template.cpp -o template.o
 ## g++ -std=gnu++11 -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o htmltools.so RcppExports.o init.o template.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-htmltools/00new/htmltools/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (htmltools)
-## [0m[91m* installing *source* package ‘tinytex’ ...
-## [0m[91m** package ‘tinytex’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (tinytex)
-## [0m[91m* installing *source* package ‘ellipsis’ ...
-## [0m[91m** package ‘ellipsis’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dots.c -o dots.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-htmltools/00new/htmltools/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (htmltools)
+##  [0m [91m* installing *source* package ‘tinytex’ ...
+##  [0m [91m** package ‘tinytex’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (tinytex)
+##  [0m [91m* installing *source* package ‘ellipsis’ ...
+##  [0m [91m** package ‘ellipsis’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c dots.c -o dots.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o ellipsis.so dots.o init.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-ellipsis/00new/ellipsis/libs
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (ellipsis)
-## [0m[91m* installing *source* package ‘rcorpora’ ...
-## [0m[91m** package ‘rcorpora’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rcorpora)
-## [0m[91m* installing *source* package ‘callr’ ...
-## [0m[91m** package ‘callr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (callr)
-## [0m[91m* installing *source* package ‘desc’ ...
-## [0m[91m** package ‘desc’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (desc)
-## [0m[91m* installing *source* package ‘sessioninfo’ ...
-## [0m[91m** package ‘sessioninfo’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (sessioninfo)
-## [0m[91m* installing *source* package ‘xopen’ ...
-## [0m[91m** package ‘xopen’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (xopen)
-## [0m[91m* installing *source* package ‘knitr’ ...
-## [0m[91m** package ‘knitr’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** demo
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (knitr)
-## [0m[91m* installing *source* package ‘openssl’ ...
-## [0m[91m** package ‘openssl’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0mUsing PKG_CFLAGS=
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-ellipsis/00new/ellipsis/libs
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (ellipsis)
+##  [0m [91m* installing *source* package ‘rcorpora’ ...
+##  [0m [91m** package ‘rcorpora’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rcorpora)
+##  [0m [91m* installing *source* package ‘callr’ ...
+##  [0m [91m** package ‘callr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (callr)
+##  [0m [91m* installing *source* package ‘desc’ ...
+##  [0m [91m** package ‘desc’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (desc)
+##  [0m [91m* installing *source* package ‘sessioninfo’ ...
+##  [0m [91m** package ‘sessioninfo’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (sessioninfo)
+##  [0m [91m* installing *source* package ‘xopen’ ...
+##  [0m [91m** package ‘xopen’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (xopen)
+##  [0m [91m* installing *source* package ‘knitr’ ...
+##  [0m [91m** package ‘knitr’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** demo
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (knitr)
+##  [0m [91m* installing *source* package ‘openssl’ ...
+##  [0m [91m** package ‘openssl’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0mUsing PKG_CFLAGS=
 ## Using PKG_LIBS=-l:libssl.so.1.1 -l:libcrypto.so.1.1
-## [91m** libs
-## [0mrm -f aes.o base64.o bignum.o cert.o compatibility.o diffie.o envelope.o error.o hash.o info.o keygen.o keys.o onload.o openssh.o password.o pbkdf.o pem.o pkcs12.o pkcs7.o rand.o rsa.o signing.o ssl.o stream.o write.o x25519.o openssl.so bcrypt/libstatbcrypt.a bcrypt/bcrypt_pbkdf.o bcrypt/blowfish.o
+##  [91m** libs
+##  [0mrm -f aes.o base64.o bignum.o cert.o compatibility.o diffie.o envelope.o error.o hash.o info.o keygen.o keys.o onload.o openssh.o password.o pbkdf.o pem.o pkcs12.o pkcs7.o rand.o rsa.o signing.o ssl.o stream.o write.o x25519.o openssl.so bcrypt/libstatbcrypt.a bcrypt/bcrypt_pbkdf.o bcrypt/blowfish.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c aes.c -o aes.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c base64.c -o base64.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c bignum.c -o bignum.o
@@ -2099,103 +2108,103 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c bcrypt/blowfish.c -o bcrypt/blowfish.o
 ## ar rcs bcrypt/libstatbcrypt.a bcrypt/bcrypt_pbkdf.o bcrypt/blowfish.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o openssl.so aes.o base64.o bignum.o cert.o compatibility.o diffie.o envelope.o error.o hash.o info.o keygen.o keys.o onload.o openssh.o password.o pbkdf.o pem.o pkcs12.o pkcs7.o rand.o rsa.o signing.o ssl.o stream.o write.o x25519.o -Lbcrypt -lstatbcrypt -l:libssl.so.1.1 -l:libcrypto.so.1.1 -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-openssl/00new/openssl/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (openssl)
-## [0m[91m* installing *source* package ‘pkgbuild’ ...
-## [0m[91m** package ‘pkgbuild’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (pkgbuild)
-## [0m[91m* installing *source* package ‘rmarkdown’ ...
-## [0m[91m** package ‘rmarkdown’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rmarkdown)
-## [0m[91m* installing *source* package ‘pkgload’ ...
-## [0m[91m** package ‘pkgload’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unlock.c -o unlock.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-openssl/00new/openssl/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (openssl)
+##  [0m [91m* installing *source* package ‘pkgbuild’ ...
+##  [0m [91m** package ‘pkgbuild’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (pkgbuild)
+##  [0m [91m* installing *source* package ‘rmarkdown’ ...
+##  [0m [91m** package ‘rmarkdown’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rmarkdown)
+##  [0m [91m* installing *source* package ‘pkgload’ ...
+##  [0m [91m** package ‘pkgload’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG   -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c unlock.c -o unlock.o
 ## gcc -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o pkgload.so unlock.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-pkgload/00new/pkgload/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (pkgload)
-## [0m[91m* installing *source* package ‘rcmdcheck’ ...
-## [0m[91m** package ‘rcmdcheck’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** R
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m** building package indices
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (rcmdcheck)
-## [0m[91m* installing *source* package ‘testthat’ ...
-## [0m[91m** package ‘testthat’ successfully unpacked and MD5 sums checked
-## [0m[91m** using staged installation
-## [0m[91m** libs
-## [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-pkgload/00new/pkgload/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (pkgload)
+##  [0m [91m* installing *source* package ‘rcmdcheck’ ...
+##  [0m [91m** package ‘rcmdcheck’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** R
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m** building package indices
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (rcmdcheck)
+##  [0m [91m* installing *source* package ‘testthat’ ...
+##  [0m [91m** package ‘testthat’ successfully unpacked and MD5 sums checked
+##  [0m [91m** using staged installation
+##  [0m [91m** libs
+##  [0mgcc -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c init.c -o init.o
 ## gcc -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c reassign.c -o reassign.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-catch.cpp -o test-catch.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-example.cpp -o test-example.o
 ## g++ -std=gnu++11 -I"/usr/local/lib/R/include" -DNDEBUG -I../inst/include -DCOMPILING_TESTTHAT  -I/usr/local/include  -fpic  -g -O2 -fstack-protector-strong -Wformat -Werror=format-security -Wdate-time -D_FORTIFY_SOURCE=2 -g  -c test-runner.cpp -o test-runner.o
 ## g++ -std=gnu++11 -shared -L/usr/local/lib/R/lib -L/usr/local/lib -o testthat.so init.o reassign.o test-catch.o test-example.o test-runner.o -L/usr/local/lib/R/lib -lR
-## [91minstalling to /usr/local/lib/R/site-library/00LOCK-testthat/00new/testthat/libs
-## [0m[91m** R
-## [0m[91m** inst
-## [0m[91m** byte-compile and prepare package for lazy loading
-## [0m[91m** help
-## [0m[91m*** installing help indices
-## [0m[91m*** copying figures
-## [0m[91m** building package indices
-## [0m[91m** installing vignettes
-## [0m[91m** testing if installed package can be loaded from temporary location
-## [0m[91m** checking absolute paths in shared objects and dynamic libraries
-## [0m[91m** testing if installed package can be loaded from final location
-## [0m[91m** testing if installed package keeps a record of temporary installation path
-## [0m[91m* DONE (testthat)
-## [0m[91m
-## [0m[91mThe downloaded source packages are in
+##  [91minstalling to /usr/local/lib/R/site-library/00LOCK-testthat/00new/testthat/libs
+##  [0m [91m** R
+##  [0m [91m** inst
+##  [0m [91m** byte-compile and prepare package for lazy loading
+##  [0m [91m** help
+##  [0m [91m*** installing help indices
+##  [0m [91m*** copying figures
+##  [0m [91m** building package indices
+##  [0m [91m** installing vignettes
+##  [0m [91m** testing if installed package can be loaded from temporary location
+##  [0m [91m** checking absolute paths in shared objects and dynamic libraries
+##  [0m [91m** testing if installed package can be loaded from final location
+##  [0m [91m** testing if installed package keeps a record of temporary installation path
+##  [0m [91m* DONE (testthat)
+##  [0m [91m
+##  [0m [91mThe downloaded source packages are in
 ##  ‘/tmp/downloaded_packages’
-## [0mRemoving intermediate container 4fedb68c3d63
+##  [0mRemoving intermediate container 4fedb68c3d63
 ##  ---&gt; 4793cd0a9742
 ## Step 4/6 : COPY tester.sh /usr/local/bin
 ##  ---&gt; bd6cf5371b42
@@ -2211,91 +2220,94 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 ## Successfully tagged richfitz/tester:latest</code></pre>
 <p>With this image we can then test packages off github:</p>
 <div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span class="fu"><a href="https://rdrr.io/r/base/invisible.html">invisible</a></span><span class="op">(</span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">img</span>, <span class="st">"https://github.com/richfitz/ids"</span>,
-                               rm <span class="op">=</span> <span class="cn">TRUE</span>, stream <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/showConnections.html">stdout</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></code></pre></div>
-<pre><code>## E&gt; Cloning into '/tmp/tmp.7eoWpFjoX1'...
-## O&gt; * checking for file ‘/tmp/tmp.7eoWpFjoX1/DESCRIPTION’ ... OK
-## O&gt; * preparing ‘ids’:
-## O&gt; * checking DESCRIPTION meta-information ... OK
-## O&gt; * installing the package to build vignettes
-## O&gt; * creating vignettes ... OK
-## O&gt; * checking for LF line-endings in source and make files and shell scripts
-## O&gt; * checking for empty or unneeded directories
-## O&gt; * looking to see if a ‘data/datalist’ file should be added
-## O&gt; * building ‘ids_1.1.0.tar.gz’
-## E&gt;
-## O&gt; ── R CMD check ─────────────────────────────────────────────────────────────────
-## O&gt; * using log directory ‘/tmp/Rtmph66C1d/file6a36150827/ids.Rcheck’
-## O&gt; * using R version 3.6.2 (2019-12-12)
-## O&gt; * using platform: x86_64-pc-linux-gnu (64-bit)
-## O&gt; * using session charset: UTF-8
-## O&gt; * using options ‘--no-manual --as-cran’
-## O&gt; * checking for file ‘ids/DESCRIPTION’ ... OK
-## O&gt; * this is package ‘ids’ version ‘1.1.0’
-## O&gt; * package encoding: UTF-8
-## O&gt; * checking package namespace information ... OK
-## O&gt; * checking package dependencies ... OK
-## O&gt; * checking if this is a source package ... OK
-## O&gt; * checking if there is a namespace ... OK
-## O&gt; * checking for executable files ... OK
-## O&gt; * checking for hidden files and directories ... OK
-## O&gt; * checking for portable file names ... OK
-## O&gt; * checking for sufficient/correct file permissions ... OK
-## O&gt; * checking serialization versions ... OK
-## O&gt; * checking whether package ‘ids’ can be installed ... OK
-## O&gt; * checking installed package size ... OK
-## O&gt; * checking package directory ... OK
-## O&gt; * checking for future file timestamps ... OK
-## O&gt; * checking ‘build’ directory ... OK
-## O&gt; * checking DESCRIPTION meta-information ... OK
-## O&gt; * checking top-level files ... OK
-## O&gt; * checking for left-over files ... OK
-## O&gt; * checking index information ... OK
-## O&gt; * checking package subdirectories ... OK
-## O&gt; * checking R files for non-ASCII characters ... OK
-## O&gt; * checking R files for syntax errors ... OK
-## O&gt; * checking whether the package can be loaded ... OK
-## O&gt; * checking whether the package can be loaded with stated dependencies ... OK
-## O&gt; * checking whether the package can be unloaded cleanly ... OK
-## O&gt; * checking whether the namespace can be loaded with stated dependencies ... OK
-## O&gt; * checking whether the namespace can be unloaded cleanly ... OK
-## O&gt; * checking loading without being on the library search path ... OK
-## O&gt; * checking dependencies in R code ... OK
-## O&gt; * checking S3 generic/method consistency ... OK
-## O&gt; * checking replacement functions ... OK
-## O&gt; * checking foreign function calls ... OK
-## O&gt; * checking R code for possible problems ... OK
-## O&gt; * checking Rd files ... OK
-## O&gt; * checking Rd metadata ... OK
-## O&gt; * checking Rd line widths ... OK
-## O&gt; * checking Rd cross-references ... OK
-## O&gt; * checking for missing documentation entries ... OK
-## O&gt; * checking for code/documentation mismatches ... OK
-## O&gt; * checking Rd \usage sections ... OK
-## O&gt; * checking Rd contents ... OK
-## O&gt; * checking for unstated dependencies in examples ... OK
-## O&gt; * checking R/sysdata.rda ... OK
-## O&gt; * checking installed files from ‘inst/doc’ ... OK
-## O&gt; * checking files in ‘vignettes’ ... OK
-## O&gt; * checking examples ... OK
-## O&gt; * checking for unstated dependencies in ‘tests’ ... OK
-## O&gt; * checking tests ...
-## O&gt;   Running ‘testthat.R’
-## O&gt;  OK
-## O&gt; * checking for unstated dependencies in vignettes ... OK
-## O&gt; * checking package vignettes in ‘inst/doc’ ... OK
-## O&gt; * checking re-building of vignette outputs ... OK
-## O&gt; * checking for detritus in the temp directory ... OK
-## O&gt; * DONE
-## O&gt;
-## O&gt; Status: OK
-## O&gt;
-## O&gt; ── R CMD check results ────────────────────────────────────────── ids 1.1.0 ────
-## O&gt; Duration: 15.7s
-## O&gt;
-## O&gt; 0 errors ✔ | 0 warnings ✔ | 0 notes ✔</code></pre>
-<p>(I have cheated here and put all of the dependencies of <code>ids</code> into the docker image via the Dockerfile).</p>
-<p>The same approach would work by mounting the package source directory into the container and passing the path (within the container) to <code>$run()</code>.</p>
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/invisible.html" class="external-link">invisible</a></span><span class="op">(</span><span class="va">docker</span><span class="op">$</span><span class="va">container</span><span class="op">$</span><span class="fu">run</span><span class="op">(</span><span class="va">img</span>, <span class="st">"https://github.com/richfitz/ids"</span>,</span>
+<span>                               rm <span class="op">=</span> <span class="cn">TRUE</span>, stream <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/showConnections.html" class="external-link">stdout</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<pre><code><span><span class="co">## E&gt; Cloning into '/tmp/tmp.7eoWpFjoX1'...</span></span>
+<span><span class="co">## O&gt; * checking for file ‘/tmp/tmp.7eoWpFjoX1/DESCRIPTION’ ... OK</span></span>
+<span><span class="co">## O&gt; * preparing ‘ids’:</span></span>
+<span><span class="co">## O&gt; * checking DESCRIPTION meta-information ... OK</span></span>
+<span><span class="co">## O&gt; * installing the package to build vignettes</span></span>
+<span><span class="co">## O&gt; * creating vignettes ... OK</span></span>
+<span><span class="co">## O&gt; * checking for LF line-endings in source and make files and shell scripts</span></span>
+<span><span class="co">## O&gt; * checking for empty or unneeded directories</span></span>
+<span><span class="co">## O&gt; * looking to see if a ‘data/datalist’ file should be added</span></span>
+<span><span class="co">## O&gt; * building ‘ids_1.1.0.tar.gz’</span></span>
+<span><span class="co">## E&gt;</span></span>
+<span><span class="co">## O&gt; ── R CMD check ─────────────────────────────────────────────────────────────────</span></span>
+<span><span class="co">## O&gt; * using log directory ‘/tmp/Rtmph66C1d/file6a36150827/ids.Rcheck’</span></span>
+<span><span class="co">## O&gt; * using R version 3.6.2 (2019-12-12)</span></span>
+<span><span class="co">## O&gt; * using platform: x86_64-pc-linux-gnu (64-bit)</span></span>
+<span><span class="co">## O&gt; * using session charset: UTF-8</span></span>
+<span><span class="co">## O&gt; * using options ‘--no-manual --as-cran’</span></span>
+<span><span class="co">## O&gt; * checking for file ‘ids/DESCRIPTION’ ... OK</span></span>
+<span><span class="co">## O&gt; * this is package ‘ids’ version ‘1.1.0’</span></span>
+<span><span class="co">## O&gt; * package encoding: UTF-8</span></span>
+<span><span class="co">## O&gt; * checking package namespace information ... OK</span></span>
+<span><span class="co">## O&gt; * checking package dependencies ... OK</span></span>
+<span><span class="co">## O&gt; * checking if this is a source package ... OK</span></span>
+<span><span class="co">## O&gt; * checking if there is a namespace ... OK</span></span>
+<span><span class="co">## O&gt; * checking for executable files ... OK</span></span>
+<span><span class="co">## O&gt; * checking for hidden files and directories ... OK</span></span>
+<span><span class="co">## O&gt; * checking for portable file names ... OK</span></span>
+<span><span class="co">## O&gt; * checking for sufficient/correct file permissions ... OK</span></span>
+<span><span class="co">## O&gt; * checking serialization versions ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether package ‘ids’ can be installed ... OK</span></span>
+<span><span class="co">## O&gt; * checking installed package size ... OK</span></span>
+<span><span class="co">## O&gt; * checking package directory ... OK</span></span>
+<span><span class="co">## O&gt; * checking for future file timestamps ... OK</span></span>
+<span><span class="co">## O&gt; * checking ‘build’ directory ... OK</span></span>
+<span><span class="co">## O&gt; * checking DESCRIPTION meta-information ... OK</span></span>
+<span><span class="co">## O&gt; * checking top-level files ... OK</span></span>
+<span><span class="co">## O&gt; * checking for left-over files ... OK</span></span>
+<span><span class="co">## O&gt; * checking index information ... OK</span></span>
+<span><span class="co">## O&gt; * checking package subdirectories ... OK</span></span>
+<span><span class="co">## O&gt; * checking R files for non-ASCII characters ... OK</span></span>
+<span><span class="co">## O&gt; * checking R files for syntax errors ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether the package can be loaded ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether the package can be loaded with stated dependencies ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether the package can be unloaded cleanly ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether the namespace can be loaded with stated dependencies ... OK</span></span>
+<span><span class="co">## O&gt; * checking whether the namespace can be unloaded cleanly ... OK</span></span>
+<span><span class="co">## O&gt; * checking loading without being on the library search path ... OK</span></span>
+<span><span class="co">## O&gt; * checking dependencies in R code ... OK</span></span>
+<span><span class="co">## O&gt; * checking S3 generic/method consistency ... OK</span></span>
+<span><span class="co">## O&gt; * checking replacement functions ... OK</span></span>
+<span><span class="co">## O&gt; * checking foreign function calls ... OK</span></span>
+<span><span class="co">## O&gt; * checking R code for possible problems ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd files ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd metadata ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd line widths ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd cross-references ... OK</span></span>
+<span><span class="co">## O&gt; * checking for missing documentation entries ... OK</span></span>
+<span><span class="co">## O&gt; * checking for code/documentation mismatches ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd \usage sections ... OK</span></span>
+<span><span class="co">## O&gt; * checking Rd contents ... OK</span></span>
+<span><span class="co">## O&gt; * checking for unstated dependencies in examples ... OK</span></span>
+<span><span class="co">## O&gt; * checking R/sysdata.rda ... OK</span></span>
+<span><span class="co">## O&gt; * checking installed files from ‘inst/doc’ ... OK</span></span>
+<span><span class="co">## O&gt; * checking files in ‘vignettes’ ... OK</span></span>
+<span><span class="co">## O&gt; * checking examples ... OK</span></span>
+<span><span class="co">## O&gt; * checking for unstated dependencies in ‘tests’ ... OK</span></span>
+<span><span class="co">## O&gt; * checking tests ...</span></span>
+<span><span class="co">## O&gt;   Running ‘testthat.R’</span></span>
+<span><span class="co">## O&gt;  OK</span></span>
+<span><span class="co">## O&gt; * checking for unstated dependencies in vignettes ... OK</span></span>
+<span><span class="co">## O&gt; * checking package vignettes in ‘inst/doc’ ... OK</span></span>
+<span><span class="co">## O&gt; * checking re-building of vignette outputs ... OK</span></span>
+<span><span class="co">## O&gt; * checking for detritus in the temp directory ... OK</span></span>
+<span><span class="co">## O&gt; * DONE</span></span>
+<span><span class="co">## O&gt;</span></span>
+<span><span class="co">## O&gt; Status: OK</span></span>
+<span><span class="co">## O&gt;</span></span>
+<span><span class="co">## O&gt; ── R CMD check results ────────────────────────────────────────── ids 1.1.0 ────</span></span>
+<span><span class="co">## O&gt; Duration: 15.7s</span></span>
+<span><span class="co">## O&gt;</span></span>
+<span><span class="co">## O&gt; 0 errors ✔ | 0 warnings ✔ | 0 notes ✔</span></span></code></pre>
+<p>(I have cheated here and put all of the dependencies of
+<code>ids</code> into the docker image via the Dockerfile).</p>
+<p>The same approach would work by mounting the package source directory
+into the container and passing the path (within the container) to
+<code>$run()</code>.</p>
 </div>
   </div>
 
@@ -2310,11 +2322,13 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 
 
       <footer><div class="copyright">
-  <p>Developed by Rich FitzJohn.</p>
+  <p></p>
+<p>Developed by Rich FitzJohn.</p>
 </div>
 
 <div class="pkgdown">
-  <p>Site built with <a href="https://pkgdown.r-lib.org/">pkgdown</a> 1.6.1.</p>
+  <p></p>
+<p>Site built with <a href="https://pkgdown.r-lib.org/" class="external-link">pkgdown</a> 2.0.6.</p>
 </div>
 
       </footer>
@@ -2322,6 +2336,8 @@ ENTRYPOINT ["/usr/local/bin/tester.sh"]</code></pre>
 
   
 
+
+  
 
   </body>
 </html>
