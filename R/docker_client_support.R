@@ -833,7 +833,7 @@ mcr_prepare_push <- function(name, tag, registry_auth) {
     name <- parse_image_name(name)
     tag <- name$tag %||% "latest"
     registry_auth <- api_client$auth$get(name$registry) %||% base64encode("{}")
-    name <- sprintf("%s/%s", name$registry, name$image)
+    name <- sprintf("%s/%s", name$registry, name$name)
   }, list(name = name, tag = tag, registry_auth = registry_auth))
 }
 
