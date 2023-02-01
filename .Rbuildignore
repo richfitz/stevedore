@@ -17,3 +17,5 @@ vignettes_src
 ^scripts$
 ^appveyor\.yml$
 ^\.github$
+^.*\.Rproj$
+^\.Rproj\.user$
