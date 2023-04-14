@@ -118,7 +118,8 @@ pull_status_printer <- function(stream = stdout()) {
       cur <- x$progressDetail[["current"]]
       tot <- x$progressDetail[["total"]]
       str <- sprintf("%s: %s %s/%s %d%%%s", x[["id"]], x[["status"]],
-                     pretty_bytes(cur), pretty_bytes(tot),
+                     # pretty_bytes(cur), pretty_bytes(tot),
+                     cur, tot,
                      round(cur / tot * 100),
                      endl)
     } else {
