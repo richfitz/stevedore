@@ -118,7 +118,8 @@ pull_status_printer <- function(stream = stdout()) {
       cur <- x$progressDetail[["current"]]
       tot <- x$progressDetail[["total"]]
       str <- sprintf("%s: %s %s/%s %d%%%s", x[["id"]], x[["status"]],
-                     pretty_bytes(cur), pretty_bytes(tot),
+                     # pretty_bytes(cur), pretty_bytes(tot),
+                     cur, tot,
                      round(cur / tot * 100),
                      endl)
     } else {
@@ -833,7 +834,7 @@ mcr_prepare_push <- function(name, tag, registry_auth) {
     name <- parse_image_name(name)
     tag <- name$tag %||% "latest"
     registry_auth <- api_client$auth$get(name$registry) %||% base64encode("{}")
-    name <- sprintf("%s/%s", name$registry, name$image)
+    name <- sprintf("%s/%s", name$registry, name$name)
   }, list(name = name, tag = tag, registry_auth = registry_auth))
 }
 
