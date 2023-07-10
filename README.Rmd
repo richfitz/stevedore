@@ -4,7 +4,7 @@
 <!-- badges: start -->
 [![Project Status: Active – The project has reached a stable, usable state and is being actively developed.](https://www.repostatus.org/badges/latest/active.svg)](https://www.repostatus.org/#active)
 [![R build status](https://github.com/richfitz/stevedore/workflows/R-CMD-check/badge.svg)](https://github.com/richfitz/stevedore/actions)
-[![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://codecov.io/github/richfitz/stevedore?branch=master)
+[![codecov.io](https://codecov.io/github/richfitz/stevedore/coverage.svg?branch=master)](https://app.codecov.io/github/richfitz/stevedore?branch=master)
 [![](https://www.r-pkg.org/badges/version/stevedore)](https://cran.r-project.org/package=stevedore)
 <!-- badges: end -->
 
