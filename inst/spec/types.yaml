@@ -5,7 +5,7 @@
 ## used by container create)
 health_config:
   path: ["definitions", "HealthConfig"]
-  from: 1.26
+  from: "1.26"
 
 dns_config:
   path: ["definitions", "TaskSpec", "properties", "ContainerSpec", "properties", "DNSConfig"]
