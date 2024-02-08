@@ -10,7 +10,7 @@ Description: Work with containers over the Docker API.  Rather than
 License: MIT + file LICENSE
 Authors@R: c(person("Rich", "FitzJohn", role = c("aut", "cre"),
     email = "rich.fitzjohn@gmail.com"))
-URL: https://github.com/richfitz/stevedore
+URL: https://github.com/richfitz/stevedore, https://richfitz.github.io/stevedore/
 BugReports: https://github.com/richfitz/stevedore/issues
 Imports:
     crayon,
